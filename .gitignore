@@ -1,0 +1,22 @@
+# Secrets — never commit signing material or API keys
+*.p8
+*.p12
+*.cer
+*.mobileprovision
+*.provisionprofile
+AuthKey_*
+private_keys/
+.env
+.env.*
+
+# Build output
+build/
+DerivedData/
+.build/
+*.xcarchive
+*.ipa
+*.dSYM.zip
+xcuserdata/
+.swiftpm/
+*.xcodeproj/
+.DS_Store

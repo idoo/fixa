@@ -1,0 +1,52 @@
+# Fixa
+
+Fixa is an independent, open-source iPhone app for reporting everyday faults in your municipality: a street light that is out, a pothole, graffiti, a broken playground, a water leak. You pick what's wrong, take a photo, drop a pin, and Fixa sends the report straight to the municipality's own e-service.
+
+**Fixa is not made by, endorsed by, or affiliated with any municipality.** It is a citizen-built tool that fills in the municipality's public web form for you, in a form that works better on a phone. Reports end up in the same queue as reports sent through the website.
+
+The first supported municipality is Värmdö (Stockholm County). Adding another is a matter of writing one JSON file; see [docs/ADAPTERS.md](docs/ADAPTERS.md).
+
+## Why
+
+Värmdö's fault-report form is Swedish only, spans five web pages, accepts one attachment, and its map is blank: the tile server rejects requests because the site sends no `Referer`. Fixa keeps the same destination but adds:
+
+- eight large tiles for the common cases, mapped to the form's categories;
+- GPS, a real map and address search; coordinates go into both the place text and the form's map field;
+- up to three photos, merged into the single attachment the form accepts, with metadata stripped;
+- a one-tap emergency call that picks the right number for the time of day (service centre or the after-hours water/sewer duty line);
+- the interface in Swedish, English, Finnish, Arabic, Ukrainian and Polish;
+- a local history of what you sent;
+- e-mail as a fallback when the e-service is down.
+
+## How it works
+
+There is no Fixa server. The app talks directly to the municipality's e-service ([Abou](https://www.abou.se/) e-tjänsteplattform): it opens a fresh anonymous session, uploads the photo, posts each page with the same fields a browser would send, presses *Slutför*, and reads the confirmation page. Everything about a municipality is described in an adapter file (`adapters/*.json`), validated by `schema/adapter.schema.json`: URLs, page IDs, field keys, categories, tiles, emergency numbers and opening hours. No code change is needed.
+
+```
+FixaKit/          Swift package: adapter spec, Abou client and parser, validation, tests, fixa-cli
+Fixa/             SwiftUI app
+adapters/         one JSON file per municipality e-service
+schema/           JSON Schema for adapters
+docs/ADAPTERS.md  how to add a municipality
+```
+
+## Build
+
+Requirements: Xcode 26 or later and [XcodeGen](https://github.com/yonaskolb/XcodeGen).
+
+```sh
+xcodegen generate
+xcodebuild test -scheme Fixa -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
+cd FixaKit && swift test                         # package tests on macOS
+swift run --package-path FixaKit fixa-cli dry-run # walks the live form up to the summary page, sends nothing
+```
+
+Signing settings in `project.yml` are the maintainer's; change `DEVELOPMENT_TEAM` and the bundle ID to build your own copy.
+
+## Privacy
+
+Fixa sends your report only to the municipality's e-service. Your e-mail, name and phone, if you want a reply, are stored only on your phone. There is no analytics and no tracking.
+
+## License
+
+[EUPL-1.2](LICENSE). Municipalities are welcome to take this code, rebrand it and run it as their own.
