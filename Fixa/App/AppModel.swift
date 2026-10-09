@@ -168,7 +168,7 @@ final class AppModel {
             photos = [image]
         }
         recomposePhoto()
-        history.replaceAll(DemoData.historyItems())
+        history.replaceAll(options.emptyHistory ? [] : DemoData.historyItems())
         sent = DemoData.receipt
     }
 

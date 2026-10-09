@@ -8,56 +8,38 @@ struct AboutScreen: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: Fx.Space.xl) {
-                FxSectionHeader(
-                    String(localized: "About Fixa"),
-                    subtitle: String(localized: "A small app for reporting things that need fixing.")
+            VStack(alignment: .leading, spacing: Fx.Space.l) {
+                FxCard {
+                    FxIconRow(
+                        systemImage: "chevron.left.forwardslash.chevron.right",
+                        text: String(localized: "Open source (EUPL-1.2) on GitHub"),
+                        link: Self.repoURL
+                    )
+                    FxIconRow(
+                        systemImage: "iphone",
+                        text: String(localized: "No account, no server. Your data stays on this phone, and photos lose their location.")
+                    )
+                    FxIconRow(
+                        systemImage: "building.columns",
+                        text: String(localized: "Independent app, not part of \(spec.municipality.name).")
+                    )
+                }
+
+                FxIconRow(
+                    systemImage: "phone",
+                    text: String(localized: "Call 112 if life or property is in danger.")
                 )
-
-                FxCard {
-                    Text("Open source")
-                        .font(Fx.Font.headline)
-                        .foregroundStyle(Fx.Color.ink)
-                    Text("Fixa's code is open source under the EUPL-1.2 licence.")
-                        .font(Fx.Font.body)
-                        .foregroundStyle(Fx.Color.inkSoft)
-                        .fixedSize(horizontal: false, vertical: true)
-                    Link(destination: Self.repoURL) {
-                        Label("Source code on GitHub", systemImage: "arrow.up.forward.square")
-                            .font(Fx.Font.callout.weight(.semibold))
-                            .frame(minHeight: Fx.minTarget)
-                    }
-                    .foregroundStyle(Fx.Color.sea)
-                }
-
-                FxCard {
-                    Text("Your data")
-                        .font(Fx.Font.headline)
-                        .foregroundStyle(Fx.Color.ink)
-                    Text("Fixa has no server and no account. Your report goes straight from this phone to \(spec.municipality.name)'s e-service. Photos are re-saved without location data. Sent reports and your contact details are kept only on this phone.")
-                        .font(Fx.Font.body)
-                        .foregroundStyle(Fx.Color.inkSoft)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                FxCard {
-                    Text("Good to know")
-                        .font(Fx.Font.headline)
-                        .foregroundStyle(Fx.Color.ink)
-                    Text(spec.disclaimer.resolve())
-                        .font(Fx.Font.body)
-                        .foregroundStyle(Fx.Color.inkSoft)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
 
                 Text("Version \(Self.version)")
                     .font(Fx.Font.footnote)
                     .foregroundStyle(Fx.Color.inkSoft)
             }
-            .padding(Fx.Space.l)
+            .padding(.horizontal, Fx.Space.l)
+            .padding(.top, Fx.Space.s)
+            .padding(.bottom, Fx.Space.l)
         }
         .fxScreenBackground()
-        .navigationTitle(Text("About"))
+        .navigationTitle(Text("About Fixa"))
         .navigationBarTitleDisplayMode(.inline)
     }
 
