@@ -289,11 +289,11 @@ struct ReportScreen: View {
                     .frame(minHeight: Fx.minTarget)
                     .background(Fx.Color.card, in: Capsule())
                     .overlay {
-                        Capsule().strokeBorder(added ? Fx.Color.sea : Fx.Color.line, lineWidth: 1.5)
+                        Capsule().strokeBorder(added ? Fx.Color.sea : Fx.Color.line, lineWidth: added ? Fx.Border.emphasis : Fx.Border.hairline)
                     }
                     .contentShape(Capsule())
                 }
-                .buttonStyle(FxPressStyle(dims: true))
+                .buttonStyle(FxPressStyle())
                 .accessibilityLabel(Text(phrase))
                 .accessibilityHint(added ? Text("") : Text("Adds this to the description"))
                 .accessibilityAddTraits(added ? .isSelected : [])
