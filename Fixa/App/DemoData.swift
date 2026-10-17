@@ -11,6 +11,9 @@ enum DemoData {
         return UIImage(data: data)
     }
 
+    /// A filled-in profile, so Profile and the Report's reply row render with content.
+    static let profile = Contact(firstName: "Anna", lastName: "Lind", phone: "070-123 45 67", email: "anna@example.se")
+
     static func draft(adapterID: String) -> ReportDraft {
         ReportDraft(
             adapterID: adapterID,
@@ -21,7 +24,7 @@ enum DemoData {
             locationText: "Gustavsbergs centrum, Odelbergs väg",
             photoJPEG: nil,
             wantsFeedback: true,
-            contact: Contact(firstName: "Alex", lastName: "Berg", phone: "", email: "alex@example.com")
+            contact: profile
         )
     }
 

@@ -40,13 +40,8 @@ struct HistoryScreen: View {
 
     private var emptyState: some View {
         VStack(spacing: Fx.Space.l) {
-            Image(systemName: "tray")
-                .font(.system(.title, weight: .regular))
-                .foregroundStyle(Fx.Color.sea)
-                .frame(width: 72, height: 72)
-                .background(Fx.Color.sea.opacity(0.10), in: .circle)
-                .accessibilityHidden(true)
-            Text("No reports yet")
+            FxBadge(systemImage: "tray", fill: Fx.Color.Pastel.sky, side: 72)
+            Text("Nothing reported yet. Everything's fine?")
                 .font(Fx.Font.title)
                 .foregroundStyle(Fx.Color.ink)
                 .multilineTextAlignment(.center)
@@ -74,11 +69,11 @@ private struct HistoryRow: View {
                     .foregroundStyle(Fx.Color.ink)
                 Text(item.locationText.isEmpty ? item.description : item.locationText)
                     .font(Fx.Font.callout)
-                    .foregroundStyle(Fx.Color.inkSoft)
+                    .foregroundStyle(Fx.Color.ink2)
                     .lineLimit(1)
                 Text(item.date, format: .dateTime.day().month().year())
                     .font(Fx.Font.footnote)
-                    .foregroundStyle(Fx.Color.inkSoft)
+                    .foregroundStyle(Fx.Color.ink2)
             }
         }
         .padding(.vertical, Fx.Space.xs)
@@ -100,13 +95,14 @@ private struct HistoryThumbnail: View {
             } else {
                 Image(systemName: spec.tile(id: item.tileID)?.symbol ?? "doc.text")
                     .font(Fx.Font.title)
-                    .foregroundStyle(Fx.Color.sea)
+                    .foregroundStyle(Fx.Color.onPastel)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Fx.Color.paper)
+                    .background(Fx.Color.Pastel.sky)
             }
         }
         .frame(width: side, height: side)
-        .clipShape(RoundedRectangle(cornerRadius: Fx.Radius.s))
+        .clipShape(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous))
+        .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous), fill: .clear)
         .accessibilityHidden(true)
     }
 }
@@ -143,10 +139,11 @@ struct HistoryDetailScreen: View {
                                     longitudinalMeters: 400
                                 )), interactionModes: []) {
                                     Marker(placeText(for: item), coordinate: center)
-                                        .tint(Fx.Color.accent)
+                                        .tint(Fx.Color.sea)
                                 }
                                 .frame(height: 140)
                                 .clipShape(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous))
+                                .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous), fill: .clear)
                                 .allowsHitTesting(false)
                                 .accessibilityHidden(true)
                             }
@@ -178,8 +175,8 @@ struct HistoryDetailScreen: View {
     private func field(_ title: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: Fx.Space.xs) {
             Text(title)
-                .font(Fx.Font.footnote.weight(.semibold))
-                .foregroundStyle(Fx.Color.inkSoft)
+                .font(Fx.Font.subheadline)
+                .foregroundStyle(Fx.Color.ink2)
             Text(value)
                 .font(Fx.Font.body)
                 .foregroundStyle(Fx.Color.ink)

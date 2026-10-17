@@ -32,7 +32,7 @@ struct AboutScreen: View {
 
                 Text("Version \(Self.version)")
                     .font(Fx.Font.footnote)
-                    .foregroundStyle(Fx.Color.inkSoft)
+                    .foregroundStyle(Fx.Color.ink2)
             }
             .padding(.horizontal, Fx.Space.l)
             .padding(.top, Fx.Space.s)

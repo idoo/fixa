@@ -1,10 +1,9 @@
 import SwiftUI
 
-/// Bar pinned to the bottom edge, in the thumb zone: paper background, top hairline.
+/// Bar pinned to the bottom edge, in the thumb zone: paper background, 2 pt ink rule on top.
 /// Holds the screen's primary action. Use through `.fxBottomBar { … }`.
 struct FxBottomBar<Content: View>: View {
     private let content: Content
-    @Environment(\.displayScale) private var displayScale
 
     init(@ViewBuilder content: () -> Content) {
         self.content = content()
@@ -16,7 +15,7 @@ struct FxBottomBar<Content: View>: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, Fx.Space.l)
-        .padding(.top, Fx.Space.s)
+        .padding(.top, Fx.Space.m)
         .padding(.bottom, Fx.Space.s)
         .background {
             Fx.Color.paper.ignoresSafeArea(edges: .bottom)
@@ -24,7 +23,7 @@ struct FxBottomBar<Content: View>: View {
         .overlay(alignment: .top) {
             Rectangle()
                 .fill(Fx.Color.line)
-                .frame(height: 1 / displayScale)
+                .frame(height: Fx.Sticker.line)
                 .accessibilityHidden(true)
         }
     }

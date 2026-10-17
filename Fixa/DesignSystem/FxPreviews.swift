@@ -17,7 +17,7 @@ private struct FxCatalog: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Fx.Space.xl) {
-                FxSectionHeader("Fixa", subtitle: "Report a problem in Värmdö")
+                FxSectionHeader("Fixa", subtitle: "Report a problem in Värmdö without the e-service maze.")
                 FxProgressSteps(current: 2, total: 3)
                 FxCallRow(title: "No water or a blocked sewer?",
                           detail: "VA-jouren via SOS Alarm · 08-454 25 71", action: {})
@@ -26,8 +26,8 @@ private struct FxCatalog: View {
                 LazyVGrid(columns: [GridItem(.flexible(), spacing: Fx.Space.m),
                                     GridItem(.flexible(), spacing: Fx.Space.m)],
                           spacing: Fx.Space.m) {
-                    ForEach(tiles, id: \.id) { tile in
-                        FxTile(title: tile.title, systemImage: tile.symbol,
+                    ForEach(Array(tiles.enumerated()), id: \.element.id) { index, tile in
+                        FxTile(title: tile.title, systemImage: tile.symbol, index: index,
                                isSelected: tile.id == selected) { selected = tile.id }
                     }
                 }

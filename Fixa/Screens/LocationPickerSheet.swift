@@ -52,7 +52,7 @@ struct LocationPickerSheet: View {
     private var searchField: some View {
         HStack(spacing: Fx.Space.s) {
             Image(systemName: "magnifyingglass")
-                .foregroundStyle(Fx.Color.inkSoft)
+                .foregroundStyle(Fx.Color.ink2)
                 .accessibilityHidden(true)
             TextField(
                 String(localized: "Search for an address or place"),
@@ -67,7 +67,7 @@ struct LocationPickerSheet: View {
                     search.query = ""
                 } label: {
                     Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(Fx.Color.inkSoft)
+                        .foregroundStyle(Fx.Color.ink2)
                         .frame(width: Fx.minTarget, height: Fx.minTarget)
                 }
                 .accessibilityLabel(Text("Clear search"))
@@ -76,8 +76,7 @@ struct LocationPickerSheet: View {
         .font(Fx.Font.body)
         .padding(.horizontal, Fx.Space.m)
         .frame(minHeight: Fx.minTarget)
-        .background(Fx.Color.card, in: RoundedRectangle(cornerRadius: Fx.Radius.s))
-        .overlay(RoundedRectangle(cornerRadius: Fx.Radius.s).stroke(Fx.Color.line))
+        .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.s), fill: Fx.Color.card)
         .padding(Fx.Space.l)
     }
 
@@ -93,7 +92,7 @@ struct LocationPickerSheet: View {
                     if !suggestion.subtitle.isEmpty {
                         Text(suggestion.subtitle)
                             .font(Fx.Font.footnote)
-                            .foregroundStyle(Fx.Color.inkSoft)
+                            .foregroundStyle(Fx.Color.ink2)
                     }
                 }
                 .frame(maxWidth: .infinity, minHeight: Fx.minTarget, alignment: .leading)
@@ -109,7 +108,7 @@ struct LocationPickerSheet: View {
             Map(position: $position) {
                 if let pin {
                     Marker(address, coordinate: pin)
-                        .tint(Fx.Color.accent)
+                        .tint(Fx.Color.sea)
                 }
                 UserAnnotation()
             }
@@ -152,11 +151,11 @@ struct LocationPickerSheet: View {
             }
             HStack(spacing: Fx.Space.s) {
                 Image(systemName: pin == nil ? "hand.tap" : "mappin.and.ellipse")
-                    .foregroundStyle(Fx.Color.accent)
+                    .foregroundStyle(Fx.Color.sea)
                     .accessibilityHidden(true)
                 Text(pinSummary)
                     .font(Fx.Font.callout)
-                    .foregroundStyle(pin == nil ? Fx.Color.inkSoft : Fx.Color.ink)
+                    .foregroundStyle(pin == nil ? Fx.Color.ink2 : Fx.Color.ink)
                 Spacer(minLength: 0)
             }
             FxPrimaryButton(title: String(localized: "Use this place"), systemImage: "checkmark") {

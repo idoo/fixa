@@ -15,6 +15,7 @@ struct FixaApp: App {
 
 struct RootView: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         @Bindable var model = model
@@ -25,9 +26,14 @@ struct RootView: View {
                         destination(route, spec: spec)
                     }
             }
-            .tint(Fx.Color.accent)
+            .tint(Fx.Color.sea)
             .sheet(isPresented: $model.isLocationPickerPresented) {
                 LocationPickerSheet(spec: spec)
+            }
+            .onChange(of: scenePhase) { _, phase in
+                if phase != .active {
+                    model.persistNow()
+                }
             }
         } else {
             ContentUnavailableView(
@@ -48,6 +54,7 @@ struct RootView: View {
         case .history: HistoryScreen(spec: spec)
         case .historyDetail(let id): HistoryDetailScreen(spec: spec, itemID: id)
         case .about: AboutScreen(spec: spec)
+        case .profile: ProfileScreen()
         }
     }
 }

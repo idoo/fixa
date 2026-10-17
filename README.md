@@ -1,4 +1,8 @@
+<img src="Fixa/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon.png" width="96" alt="Fixa icon: two traffic cones on a wooden jetty">
+
 # Fixa
+
+**Report a problem in your municipality without the e-service maze.** On the App Store as *Fixa: felanmälan till kommunen* (English: *Fixa: Report Local Problems*).
 
 Fixa is an independent, open-source iPhone app for reporting everyday faults in your municipality: a street light that is out, a pothole, graffiti, a broken playground, a water leak. You pick what's wrong, take a photo, drop a pin, and Fixa sends the report straight to the municipality's own e-service.
 
@@ -45,8 +49,12 @@ Signing settings in `project.yml` are the maintainer's; change `DEVELOPMENT_TEAM
 
 ## Privacy
 
-Fixa sends your report only to the municipality's e-service. Your e-mail, name and phone, if you want a reply, are stored only on your phone. There is no analytics and no tracking.
+Fixa sends your report only to the municipality's e-service. Your e-mail, name and phone, if you want a reply, are stored only on your phone. There is no analytics and no tracking. Details: [PRIVACY.md](PRIVACY.md).
+
+## For municipalities
+
+You are free to take Fixa for your own municipality under the EUPL-1.2: point it at your e-service with one adapter file, put your own name, colours and icon on it, and publish it. If you'd like help adapting it, open an issue on [GitHub](https://github.com/idoo/fixa/issues).
 
 ## License
 
-[EUPL-1.2](LICENSE). Municipalities are welcome to take this code, rebrand it and run it as their own.
+[EUPL-1.2](LICENSE).
