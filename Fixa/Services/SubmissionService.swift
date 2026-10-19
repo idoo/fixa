@@ -83,12 +83,12 @@ extension SubmissionStage {
 
     var label: String {
         switch self {
-        case .starting: String(localized: "Opening the e-service…")
-        case .uploadingPhoto: String(localized: "Uploading the photo…")
-        case .sendingReport: String(localized: "Sending the report…")
-        case .sendingContact: String(localized: "Adding your contact details…")
-        case .confirming: String(localized: "Confirming…")
-        case .done: String(localized: "Sent")
+        case .starting: String(localized: "Opening the e-service…", bundle: L10n.bundle, locale: L10n.locale)
+        case .uploadingPhoto: String(localized: "Uploading the photo…", bundle: L10n.bundle, locale: L10n.locale)
+        case .sendingReport: String(localized: "Sending the report…", bundle: L10n.bundle, locale: L10n.locale)
+        case .sendingContact: String(localized: "Adding your contact details…", bundle: L10n.bundle, locale: L10n.locale)
+        case .confirming: String(localized: "Confirming…", bundle: L10n.bundle, locale: L10n.locale)
+        case .done: String(localized: "Sent", bundle: L10n.bundle, locale: L10n.locale)
         }
     }
 }
@@ -97,21 +97,21 @@ extension SubmissionError {
     var userMessage: String {
         switch self {
         case .sessionLocked:
-            String(localized: "The e-service is busy with another report from this phone. Wait a minute and try again.")
+            String(localized: "The e-service is busy with another report from this phone. Wait a minute and try again.", bundle: L10n.bundle, locale: L10n.locale)
         case .serverValidation(let messages):
             messages.isEmpty
-                ? String(localized: "The e-service didn't accept the report.")
-                : String(localized: "The e-service says: \(messages.joined(separator: " "))")
+                ? String(localized: "The e-service didn't accept the report.", bundle: L10n.bundle, locale: L10n.locale)
+                : String(localized: "The e-service says: \(messages.joined(separator: " "))", bundle: L10n.bundle, locale: L10n.locale)
         case .formChanged:
-            String(localized: "The municipality seems to have changed its form")
+            String(localized: "The municipality seems to have changed its form", bundle: L10n.bundle, locale: L10n.locale)
         case .uploadFailed:
-            String(localized: "The photo couldn't be uploaded.")
+            String(localized: "The photo couldn't be uploaded.", bundle: L10n.bundle, locale: L10n.locale)
         case .http(let code):
-            String(localized: "The e-service returned an error (\(code)).")
+            String(localized: "The e-service returned an error (\(code)).", bundle: L10n.bundle, locale: L10n.locale)
         case .transport:
-            String(localized: "Couldn't reach the e-service. Check your connection.")
+            String(localized: "Couldn't reach the e-service. Check your connection.", bundle: L10n.bundle, locale: L10n.locale)
         case .invalidSpec:
-            String(localized: "Fixa's settings for this municipality are broken. Please update the app.")
+            String(localized: "Fixa's settings for this municipality are broken. Please update the app.", bundle: L10n.bundle, locale: L10n.locale)
         }
     }
 }

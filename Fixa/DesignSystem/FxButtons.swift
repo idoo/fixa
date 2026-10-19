@@ -51,7 +51,7 @@ struct FxPrimaryButton: View {
         .disabled(isLoading)
         .sensoryFeedback(.impact(weight: .medium), trigger: taps) { _, _ in haptics }
         .accessibilityLabel(Text(title))
-        .accessibilityValue(isLoading ? Text(String(localized: "Loading…", comment: "Accessibility value on a busy button")) : Text(""))
+        .accessibilityValue(isLoading ? Text(String(localized: "Loading…", bundle: L10n.bundle, locale: L10n.locale, comment: "Accessibility value on a busy button")) : Text(""))
     }
 }
 

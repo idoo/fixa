@@ -236,8 +236,8 @@ struct FxCallRow: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(title))
         .accessibilityValue(Text(accessibilityValue ?? detail))
-        .accessibilityInputLabels(([String(localized: "Call", comment: "Voice Control name of a call row"), title] + inputLabels).map { Text($0) })
-        .accessibilityHint(Text(String(localized: "Starts a phone call", comment: "Accessibility hint for a call row")))
+        .accessibilityInputLabels(([String(localized: "Call", bundle: L10n.bundle, locale: L10n.locale, comment: "Voice Control name of a call row"), title] + inputLabels).map { Text($0) })
+        .accessibilityHint(Text(String(localized: "Starts a phone call", bundle: L10n.bundle, locale: L10n.locale, comment: "Accessibility hint for a call row")))
         .accessibilityAddTraits(.isButton)
     }
 }
@@ -318,8 +318,8 @@ struct FxProgressSteps: View {
         }
         .animation(reduceMotion ? nil : Fx.Motion.select, value: safeCurrent)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(String(localized: "Progress", comment: "Accessibility label for the step indicator")))
-        .accessibilityValue(Text(String(localized: "Step \(safeCurrent) of \(safeTotal)", comment: "Accessibility value for the step indicator")))
+        .accessibilityLabel(Text(String(localized: "Progress", bundle: L10n.bundle, locale: L10n.locale, comment: "Accessibility label for the step indicator")))
+        .accessibilityValue(Text(String(localized: "Step \(safeCurrent) of \(safeTotal)", bundle: L10n.bundle, locale: L10n.locale, comment: "Accessibility value for the step indicator")))
     }
 }
 

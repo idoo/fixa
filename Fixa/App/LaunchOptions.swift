@@ -7,6 +7,8 @@ import Foundation
 ///   -FixaStatus degraded|down  forces the municipality e-service status Home shows (status banner)
 ///   -FixaTextSize medium|large|xLarge|xxLarge|xxxLarge|accessibility1|accessibility2|accessibility3
 ///                   overrides the saved text size for this launch (saved only by a real change in Settings)
+///   -FixaLanguage en|sv|fi|ar|uk|pl|system  switches the UI language in-app right after launch,
+///                   through the same path as the Language page (saved only outside -FixaDemo)
 ///   -FixaDemo 1     seeds a demo draft, profile, history and receipt; no network, nothing saved
 ///   -FixaEmptyHistory 1  with -FixaDemo: leaves the demo history empty (History empty state)
 ///   -FixaDryRun 1   Review's Send stops at the Summary page (nothing is submitted)
@@ -20,6 +22,8 @@ struct LaunchOptions: Sendable {
 
     var screen: Screen?
     var textSize: TextSizeStep?
+    /// `-FixaLanguage`: `.some(nil)` is "Same as iPhone"; nil leaves the saved choice.
+    var language: AppLanguage??
     /// `-FixaStatus`: a forced e-service status, or nil to use the real one.
     var status: AdapterStatus?
     var demo: Bool
@@ -41,6 +45,11 @@ struct LaunchOptions: Sendable {
         screen = value("-FixaScreen").flatMap { Screen(rawValue: $0.lowercased()) }
         textSize = value("-FixaTextSize").flatMap { raw in
             TextSizeStep.allCases.first { $0.rawValue.lowercased() == raw.lowercased() }
+        }
+        language = value("-FixaLanguage").flatMap { raw -> AppLanguage?? in
+            let code = raw.lowercased()
+            if code == "system" { return .some(nil) }
+            return AppLanguage(rawValue: code).map { .some($0) }
         }
         status = value("-FixaStatus")
             .flatMap { AdapterStatus.State(rawValue: $0.lowercased()) }

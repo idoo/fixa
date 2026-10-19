@@ -69,9 +69,9 @@ struct FxStatusStamp: View {
 
     private var accessibilityText: String {
         if let caseNumber {
-            String(localized: "Received. Case number \(caseNumber)", comment: "Accessibility label of the receipt stamp")
+            String(localized: "Received. Case number \(caseNumber)", bundle: L10n.bundle, locale: L10n.locale, comment: "Accessibility label of the receipt stamp")
         } else {
-            String(localized: "Received", comment: "Accessibility label of the receipt stamp without case number")
+            String(localized: "Received", bundle: L10n.bundle, locale: L10n.locale, comment: "Accessibility label of the receipt stamp without case number")
         }
     }
 }
@@ -88,7 +88,7 @@ struct FxCopyButton: View {
     @Environment(\.fxHaptics) private var haptics
     @Environment(\.fxReduceMotion) private var reduceMotion
 
-    init(title: String, copiedTitle: String = String(localized: "Copied"), value: String) {
+    init(title: String, copiedTitle: String = String(localized: "Copied", bundle: L10n.bundle, locale: L10n.locale), value: String) {
         self.title = title
         self.copiedTitle = copiedTitle
         self.value = value

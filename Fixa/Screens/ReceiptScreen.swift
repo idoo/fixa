@@ -5,6 +5,7 @@ struct ReceiptScreen: View {
     let spec: AdapterSpec
     @Environment(AppModel.self) private var model
     @Environment(\.locale) private var locale
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         let sent = model.sent ?? SentReport(caseNumber: nil, date: .now, isDryRun: false)
@@ -19,7 +20,7 @@ struct ReceiptScreen: View {
         }
         .fxScreenBackground()
         .fxBottomBar {
-            FxPrimaryButton(title: String(localized: "Done"), systemImage: "checkmark") {
+            FxPrimaryButton(title: String(localized: "Done", bundle: L10n.bundle, locale: L10n.locale), systemImage: "checkmark") {
                 model.finish()
             }
         }
@@ -32,14 +33,15 @@ struct ReceiptScreen: View {
             if sent.isDryRun {
                 FxBanner(
                     kind: .info,
-                    title: String(localized: "Test run finished"),
-                    message: String(localized: "Fixa reached the last step and stopped. Nothing was submitted.")
+                    title: String(localized: "Test run finished", bundle: L10n.bundle, locale: L10n.locale),
+                    message: String(localized: "Fixa reached the last step and stopped. Nothing was submitted.", bundle: L10n.bundle, locale: L10n.locale)
                 )
             } else {
                 VStack(spacing: Fx.Space.s) {
                     FxStatusStamp(caseNumber: sent.caseNumber)
-                    // The stamp caps its text size; this plain line scales all the way and can be selected.
-                    if let caseNumber = sent.caseNumber {
+                    // The stamp caps its text size; at accessibility sizes this plain line repeats the
+                    // number so it scales all the way. Otherwise the stamp alone shows it (no duplicate).
+                    if let caseNumber = sent.caseNumber, dynamicTypeSize.isAccessibilitySize {
                         Text("Case number \(caseNumber.ltrIsolated)")
                             .font(Fx.Font.headline)
                             .foregroundStyle(Fx.Color.ink)
@@ -51,7 +53,7 @@ struct ReceiptScreen: View {
             }
 
             VStack(spacing: Fx.Space.s) {
-                Text(sent.isDryRun ? String(localized: "Not sent") : String(localized: "Sent to \(spec.municipality.name)"))
+                Text(sent.isDryRun ? String(localized: "Not sent", bundle: L10n.bundle, locale: L10n.locale) : String(localized: "Sent to \(spec.municipality.name)", bundle: L10n.bundle, locale: L10n.locale))
                     .font(Fx.Font.title)
                     .foregroundStyle(Fx.Color.ink)
                     .multilineTextAlignment(.center)
@@ -61,7 +63,7 @@ struct ReceiptScreen: View {
                     .foregroundStyle(Fx.Color.ink2)
                     .multilineTextAlignment(.center)
                 if !sent.isDryRun, let caseNumber = sent.caseNumber {
-                    FxCopyButton(title: String(localized: "Copy case number"), value: caseNumber)
+                    FxCopyButton(title: String(localized: "Copy case number", bundle: L10n.bundle, locale: L10n.locale), value: caseNumber)
                         .padding(.top, Fx.Space.s)
                 }
             }
@@ -80,7 +82,7 @@ struct ReceiptScreen: View {
                             .multilineTextAlignment(.center)
                             .fixedSize(horizontal: false, vertical: true)
                     }
-                    FxSecondaryButton(title: String(localized: "Sent reports"), systemImage: "clock.arrow.circlepath") {
+                    FxSecondaryButton(title: String(localized: "Sent reports", bundle: L10n.bundle, locale: L10n.locale), systemImage: "clock.arrow.circlepath") {
                         model.finish()
                         model.path = [.history]
                     }
@@ -91,7 +93,7 @@ struct ReceiptScreen: View {
 
     private var nextStep: String {
         model.draft.wantsFeedback
-            ? String(localized: "They pass it to the right team and reply by e-mail.")
-            : String(localized: "They pass it to the right team.")
+            ? String(localized: "They pass it to the right team and reply by e-mail.", bundle: L10n.bundle, locale: L10n.locale)
+            : String(localized: "They pass it to the right team.", bundle: L10n.bundle, locale: L10n.locale)
     }
 }

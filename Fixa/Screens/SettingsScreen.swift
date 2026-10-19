@@ -15,38 +15,38 @@ struct SettingsScreen: View {
         @Bindable var model = model
         ScrollView {
             VStack(alignment: .leading, spacing: Fx.Space.xl) {
-                section(String(localized: "Your details")) {
+                section(String(localized: "Your details", bundle: L10n.bundle, locale: L10n.locale)) {
                     SettingsNavRow(
                         systemImage: "envelope",
-                        title: String(localized: "Contact details"),
+                        title: String(localized: "Contact details", bundle: L10n.bundle, locale: L10n.locale),
                         value: contactSummary
                     ) {
                         model.path.append(.contactDetails)
                     }
                     FxDivider()
                     FxToggleRow(
-                        title: String(localized: "Remember my details"),
+                        title: String(localized: "Remember my details", bundle: L10n.bundle, locale: L10n.locale),
                         subtitle: model.rememberDetails
-                            ? String(localized: "Saved on this phone for your next report.")
-                            : String(localized: "Used only for the report you're writing, then forgotten."),
+                            ? String(localized: "Saved on this phone for your next report.", bundle: L10n.bundle, locale: L10n.locale)
+                            : String(localized: "Used only for the report you're writing, then forgotten.", bundle: L10n.bundle, locale: L10n.locale),
                         isOn: $model.rememberDetails
                     )
                 }
 
-                section(String(localized: "Language")) {
+                section(String(localized: "Language", bundle: L10n.bundle, locale: L10n.locale)) {
                     SettingsNavRow(
                         systemImage: "globe",
-                        title: String(localized: "Language"),
+                        title: String(localized: "Language", bundle: L10n.bundle, locale: L10n.locale),
                         value: model.effectiveLanguage.nativeName
                     ) {
                         model.path.append(.language)
                     }
                 }
 
-                section(String(localized: "Display")) {
+                section(String(localized: "Display", bundle: L10n.bundle, locale: L10n.locale)) {
                     SettingsNavRow(
                         systemImage: "textformat.size",
-                        title: String(localized: "Text size"),
+                        title: String(localized: "Text size", bundle: L10n.bundle, locale: L10n.locale),
                         value: textSizeSummary
                     ) {
                         model.path.append(.textSize)
@@ -54,33 +54,33 @@ struct SettingsScreen: View {
                     FxDivider()
                     AppearancePicker(appearance: $model.display.appearance)
                     FxDivider()
-                    FxToggleRow(title: String(localized: "Bold text"), isOn: $model.display.boldText)
+                    FxToggleRow(title: String(localized: "Bold text", bundle: L10n.bundle, locale: L10n.locale), isOn: $model.display.boldText)
                     FxDivider()
                     FxToggleRow(
-                        title: String(localized: "Higher contrast"),
-                        subtitle: String(localized: "Darker borders and text"),
+                        title: String(localized: "Higher contrast", bundle: L10n.bundle, locale: L10n.locale),
+                        subtitle: String(localized: "Darker borders and text", bundle: L10n.bundle, locale: L10n.locale),
                         isOn: $model.display.higherContrast
                     )
                     FxDivider()
                     FxToggleRow(
-                        title: String(localized: "Reduce motion"),
-                        subtitle: String(localized: "Fewer moving effects"),
+                        title: String(localized: "Reduce motion", bundle: L10n.bundle, locale: L10n.locale),
+                        subtitle: String(localized: "Fewer moving effects", bundle: L10n.bundle, locale: L10n.locale),
                         isOn: $model.display.reduceMotion
                     )
                     FxDivider()
                     FxToggleRow(
-                        title: String(localized: "Vibration"),
-                        subtitle: String(localized: "Small taps when you press buttons"),
+                        title: String(localized: "Vibration", bundle: L10n.bundle, locale: L10n.locale),
+                        subtitle: String(localized: "Small taps when you press buttons", bundle: L10n.bundle, locale: L10n.locale),
                         isOn: $model.display.vibration
                     )
                 }
 
                 privacySection
 
-                section(String(localized: "About")) {
+                section(String(localized: "About", bundle: L10n.bundle, locale: L10n.locale)) {
                     SettingsNavRow(
                         systemImage: "info.circle",
-                        title: String(localized: "About Fixa"),
+                        title: String(localized: "About Fixa", bundle: L10n.bundle, locale: L10n.locale),
                         value: nil
                     ) {
                         model.path.append(.about)
@@ -88,7 +88,7 @@ struct SettingsScreen: View {
                     FxDivider()
                     FxIconRow(
                         systemImage: "hand.raised",
-                        text: String(localized: "Privacy policy"),
+                        text: String(localized: "Privacy policy", bundle: L10n.bundle, locale: L10n.locale),
                         link: Self.privacyPolicyURL
                     )
                     FxDivider()
@@ -105,10 +105,10 @@ struct SettingsScreen: View {
 
     private var privacySection: some View {
         let sentCount = model.history.items.count
-        return section(String(localized: "Privacy")) {
+        return section(String(localized: "Privacy", bundle: L10n.bundle, locale: L10n.locale)) {
             SettingsNavRow(
                 systemImage: "lock",
-                title: String(localized: "What Fixa stores"),
+                title: String(localized: "What Fixa stores", bundle: L10n.bundle, locale: L10n.locale),
                 value: nil
             ) {
                 model.path.append(.privacy)
@@ -116,8 +116,8 @@ struct SettingsScreen: View {
             FxDivider()
             SettingsActionRow(
                 systemImage: "clock.arrow.circlepath",
-                title: String(localized: "Clear sent reports"),
-                value: sentCount.formatted(),
+                title: String(localized: "Clear sent reports", bundle: L10n.bundle, locale: L10n.locale),
+                value: sentCount.formatted(.number.locale(L10n.locale)),
                 tint: Fx.Color.sea
             ) {
                 isClearHistoryPresented = true
@@ -142,7 +142,7 @@ struct SettingsScreen: View {
             FxDivider()
             SettingsActionRow(
                 systemImage: "trash",
-                title: String(localized: "Delete all my data"),
+                title: String(localized: "Delete all my data", bundle: L10n.bundle, locale: L10n.locale),
                 value: nil,
                 tint: Fx.Color.error
             ) {
@@ -169,7 +169,7 @@ struct SettingsScreen: View {
             }
             if deletions > 0 {
                 FxDivider()
-                FxBanner(kind: .success, title: String(localized: "Your data is deleted from this phone."))
+                FxBanner(kind: .success, title: String(localized: "Your data is deleted from this phone.", bundle: L10n.bundle, locale: L10n.locale))
                     .padding(.vertical, Fx.Space.s)
             }
         }
@@ -180,9 +180,9 @@ struct SettingsScreen: View {
     private func clearHistoryMessage(count: Int) -> String {
         let municipality = model.spec?.municipality.name ?? ""
         if count == 1 {
-            return String(localized: "1 report is removed from this phone, with its case number. \(municipality) still has it.")
+            return String(localized: "1 report is removed from this phone, with its case number. \(municipality) still has it.", bundle: L10n.bundle, locale: L10n.locale)
         }
-        return String(localized: "\(count) reports are removed from this phone, with their case numbers. \(municipality) still has them.")
+        return String(localized: "\(count) reports are removed from this phone, with their case numbers. \(municipality) still has them.", bundle: L10n.bundle, locale: L10n.locale)
     }
 
     static let privacyPolicyURL = URL(string: "https://github.com/idoo/fixa/blob/main/PRIVACY.md")!
@@ -201,19 +201,19 @@ struct SettingsScreen: View {
 
     private var contactSummary: String {
         let email = model.profile.email.trimmingCharacters(in: .whitespacesAndNewlines)
-        return email.isEmpty ? String(localized: "Not added") : email
+        return email.isEmpty ? String(localized: "Not added", bundle: L10n.bundle, locale: L10n.locale) : email
     }
 
     private var textSizeSummary: String {
-        guard let step = model.display.textSize else { return String(localized: "iPhone setting") }
-        return String(localized: "Size \(step.number) of \(TextSizeStep.allCases.count)")
+        guard let step = model.display.textSize else { return String(localized: "iPhone setting", bundle: L10n.bundle, locale: L10n.locale) }
+        return String(localized: "Size \(step.number) of \(TextSizeStep.allCases.count)", bundle: L10n.bundle, locale: L10n.locale)
     }
 
     private var versionText: String {
         let info = Bundle.main.infoDictionary
         let version = info?["CFBundleShortVersionString"] as? String ?? "1.0"
         let build = info?["CFBundleVersion"] as? String ?? "1"
-        return String(localized: "Version \(version) (\(build))")
+        return String(localized: "Version \(version) (\(build))", bundle: L10n.bundle, locale: L10n.locale)
     }
 }
 
@@ -235,23 +235,19 @@ struct SettingsNavRow: View {
                     .foregroundStyle(Fx.Color.sea)
                     .frame(width: iconColumn)
                     .accessibilityHidden(true)
-                let layout = dynamicTypeSize.isAccessibilitySize
-                    ? AnyLayout(VStackLayout(alignment: .leading, spacing: Fx.Space.xs))
-                    : AnyLayout(HStackLayout(spacing: Fx.Space.s))
-                layout {
+                // Title on top, current value underneath: long values (an e-mail address) never
+                // break the title or wrap mid-word beside it.
+                VStack(alignment: .leading, spacing: 2) {
                     Text(title)
                         .font(Fx.Font.body)
                         .foregroundStyle(Fx.Color.ink)
                         .fixedSize(horizontal: false, vertical: true)
-                    if !dynamicTypeSize.isAccessibilitySize {
-                        Spacer(minLength: Fx.Space.s)
-                    }
                     if let value {
                         Text(value)
-                            .font(Fx.Font.body)
+                            .font(Fx.Font.callout)
                             .foregroundStyle(Fx.Color.ink2)
-                            .multilineTextAlignment(.trailing)
-                            .fixedSize(horizontal: false, vertical: true)
+                            .lineLimit(dynamicTypeSize.isAccessibilitySize ? 3 : 1)
+                            .truncationMode(.middle)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -353,9 +349,9 @@ private struct AppearancePicker: View {
 
     static func title(_ appearance: DisplaySettings.Appearance) -> String {
         switch appearance {
-        case .automatic: String(localized: "Automatic")
-        case .light: String(localized: "Light")
-        case .dark: String(localized: "Dark")
+        case .automatic: String(localized: "Automatic", bundle: L10n.bundle, locale: L10n.locale)
+        case .light: String(localized: "Light", bundle: L10n.bundle, locale: L10n.locale)
+        case .dark: String(localized: "Dark", bundle: L10n.bundle, locale: L10n.locale)
         }
     }
 }

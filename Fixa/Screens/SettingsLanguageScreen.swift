@@ -13,7 +13,7 @@ struct SettingsLanguageScreen: View {
             VStack(alignment: .leading, spacing: Fx.Space.l) {
                 FxCard {
                     row(
-                        title: String(localized: "Same as iPhone (\(AppLanguage.system.nativeName))"),
+                        title: String(localized: "Same as iPhone (\(AppLanguage.system.nativeName))", bundle: L10n.bundle, locale: L10n.locale),
                         subtitle: nil,
                         language: nil
                     )

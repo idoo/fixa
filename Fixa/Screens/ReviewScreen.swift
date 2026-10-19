@@ -33,11 +33,11 @@ struct ReviewScreen: View {
                     if model.options.dryRun {
                         FxBanner(
                             kind: .info,
-                            title: String(localized: "Test mode"),
-                            message: String(localized: "Fixa stops before the last step. Nothing is submitted.")
+                            title: String(localized: "Test mode", bundle: L10n.bundle, locale: L10n.locale),
+                            message: String(localized: "Fixa stops before the last step. Nothing is submitted.", bundle: L10n.bundle, locale: L10n.locale)
                         )
                     }
-                    FxBanner(kind: .info, title: String(localized: "Good to know"), message: spec.disclaimer.resolve())
+                    FxBanner(kind: .info, title: String(localized: "Good to know", bundle: L10n.bundle, locale: L10n.locale), message: spec.disclaimer.resolve(L10n.locale))
                     if model.submission.error != nil, formDrift == nil, !MailComposer.canSendMail {
                         mailUnavailableFallback
                     }
@@ -77,7 +77,7 @@ struct ReviewScreen: View {
 
     private var summaryCard: some View {
         FxCard {
-            editableRow(String(localized: "Category")) {
+            editableRow(String(localized: "Category", bundle: L10n.bundle, locale: L10n.locale)) {
                 value(problemTitle)
                 if let category = municipalityCategory {
                     Text(category)
@@ -87,7 +87,7 @@ struct ReviewScreen: View {
                 }
             }
             divider
-            editableRow(String(localized: "Place")) {
+            editableRow(String(localized: "Place", bundle: L10n.bundle, locale: L10n.locale)) {
                 value(placeText)
                 if let coordinate = model.draft.coordinate {
                     Map(initialPosition: .region(MKCoordinateRegion(
@@ -107,7 +107,7 @@ struct ReviewScreen: View {
                 }
             }
             divider
-            editableRow(String(localized: "Description, as sent")) {
+            editableRow(String(localized: "Description, as sent", bundle: L10n.bundle, locale: L10n.locale)) {
                 value(ReportComposer.description(for: model.draft, spec: spec))
                 Text("Fixa adds this Swedish summary so the municipality understands.")
                     .font(Fx.Font.footnote)
@@ -115,7 +115,7 @@ struct ReviewScreen: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             divider
-            editableRow(String(localized: "Photo")) {
+            editableRow(String(localized: "Photo", bundle: L10n.bundle, locale: L10n.locale)) {
                 if let data = model.draft.photoJPEG, let image = UIImage(data: data) {
                     photo(image)
                 } else {
@@ -125,7 +125,7 @@ struct ReviewScreen: View {
                 }
             }
             divider
-            editableRow(String(localized: "Reply"), extraInputLabel: String(localized: "Change reply details")) {
+            editableRow(String(localized: "Reply", bundle: L10n.bundle, locale: L10n.locale), extraInputLabel: String(localized: "Change reply details", bundle: L10n.bundle, locale: L10n.locale)) {
                 value(replySummary)
             }
         }
@@ -133,15 +133,15 @@ struct ReviewScreen: View {
 
     /// The tile people chose ("Streetlight out"); the category when there is no tile.
     private var problemTitle: String {
-        spec.tile(id: model.draft.tileID)?.title.resolve()
-            ?? spec.category(for: model.draft)?.title.resolve()
+        spec.tile(id: model.draft.tileID)?.title.resolve(L10n.locale)
+            ?? spec.category(for: model.draft)?.title.resolve(L10n.locale)
             ?? "–"
     }
 
     /// The municipality's own category, shown under the tile title when it says something different.
     private var municipalityCategory: String? {
         guard spec.tile(id: model.draft.tileID) != nil,
-              let category = spec.category(for: model.draft)?.title.resolve(),
+              let category = spec.category(for: model.draft)?.title.resolve(L10n.locale),
               category != problemTitle else { return nil }
         return category
     }
@@ -149,12 +149,12 @@ struct ReviewScreen: View {
     /// Address or place text only; never coordinates.
     private var placeText: String {
         let text = model.draft.locationText.trimmingCharacters(in: .whitespacesAndNewlines)
-        return text.isEmpty ? String(localized: "Pin on the map") : text
+        return text.isEmpty ? String(localized: "Pin on the map", bundle: L10n.bundle, locale: L10n.locale) : text
     }
 
     /// E-mail and phone are isolated left-to-right so "+46…" and "@" keep their order in Arabic.
     private var replySummary: String {
-        guard model.draft.wantsFeedback else { return String(localized: "No reply requested") }
+        guard model.draft.wantsFeedback else { return String(localized: "No reply requested", bundle: L10n.bundle, locale: L10n.locale) }
         let c = model.draft.contact
         let name = [c.firstName, c.lastName].filter { !$0.isEmpty }.joined(separator: " ")
         let email = c.email.isEmpty ? "" : c.email.ltrIsolated
@@ -262,11 +262,11 @@ struct ReviewScreen: View {
                 .accessibilityElement(children: .combine)
                 .accessibilityFocused($failureFocused)
                 if let url = spec.eServiceURL {
-                    FxSecondaryButton(title: String(localized: "Open the municipality's form"), systemImage: "safari") {
+                    FxSecondaryButton(title: String(localized: "Open the municipality's form", bundle: L10n.bundle, locale: L10n.locale), systemImage: "safari") {
                         UIApplication.shared.open(url)
                     }
                 }
-                FxCopyButton(title: String(localized: "Copy report text"), value: mailText)
+                FxCopyButton(title: String(localized: "Copy report text", bundle: L10n.bundle, locale: L10n.locale), value: mailText)
                 if let url = drift.issueURL(spec: spec) {
                     Link(destination: url) {
                         Text("Tell Fixa about it")
@@ -291,19 +291,19 @@ struct ReviewScreen: View {
         let submission = model.submission
         if formDrift != nil {
             // Trying again won't help until the adapter is updated: e-mail is the way through.
-            FxPrimaryButton(title: String(localized: "Send by e-mail instead"), systemImage: "envelope", action: sendByMail)
+            FxPrimaryButton(title: String(localized: "Send by e-mail instead", bundle: L10n.bundle, locale: L10n.locale), systemImage: "envelope", action: sendByMail)
         } else if submission.error != nil {
             statusSlot
                 .transition(.opacity)
-            FxPrimaryButton(title: String(localized: "Try again"), systemImage: "arrow.clockwise", action: send)
-            FxSecondaryButton(title: String(localized: "Send by e-mail instead"), systemImage: "envelope", action: sendByMail)
+            FxPrimaryButton(title: String(localized: "Try again", bundle: L10n.bundle, locale: L10n.locale), systemImage: "arrow.clockwise", action: send)
+            FxSecondaryButton(title: String(localized: "Send by e-mail instead", bundle: L10n.bundle, locale: L10n.locale), systemImage: "envelope", action: sendByMail)
         } else {
             if submission.isSending {
                 statusSlot
                     .transition(.opacity)
             }
             FxPrimaryButton(
-                title: String(localized: "Send to \(spec.municipality.name)"),
+                title: String(localized: "Send to \(spec.municipality.name)", bundle: L10n.bundle, locale: L10n.locale),
                 systemImage: "paperplane",
                 isLoading: submission.isSending,
                 action: send
@@ -363,7 +363,7 @@ struct ReviewScreen: View {
                     proxy.scrollTo(Self.driftCardID, anchor: .top)
                 }
             }
-            AccessibilityNotification.Announcement(String(localized: "Not sent. \(error.userMessage)")).post()
+            AccessibilityNotification.Announcement(String(localized: "Not sent. \(error.userMessage)", bundle: L10n.bundle, locale: L10n.locale)).post()
             failureFocused = true
         }
     }
@@ -377,7 +377,7 @@ struct ReviewScreen: View {
                     .foregroundStyle(Fx.Color.ink2)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            FxCopyButton(title: String(localized: "Copy report text"), value: mailText)
+            FxCopyButton(title: String(localized: "Copy report text", bundle: L10n.bundle, locale: L10n.locale), value: mailText)
         }
     }
 
@@ -396,7 +396,7 @@ struct ReviewScreen: View {
     private var mailText: String {
         var text = MailFallback.body(model.draft, spec: spec)
         if let email = spec.fallbackEmail {
-            text = String(localized: "To: \(email)") + "\n" + String(localized: "Subject: \(MailFallback.subject(model.draft, spec: spec))") + "\n\n" + text
+            text = String(localized: "To: \(email)", bundle: L10n.bundle, locale: L10n.locale) + "\n" + String(localized: "Subject: \(MailFallback.subject(model.draft, spec: spec))", bundle: L10n.bundle, locale: L10n.locale) + "\n\n" + text
         }
         return text
     }

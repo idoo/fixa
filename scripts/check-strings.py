@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Fail if any catalog key lacks a translated value or has mismatched format specifiers.
+"""Fail if any catalog key lacks a translated value or has mismatched format specifiers, or if
+a Swift `String(localized:` call lacks `bundle:` (it would ignore the in-app language).
 
 Usage: python3 scripts/check-strings.py
 """
@@ -46,8 +47,23 @@ def values(entry, language):
     return units
 
 
+def missing_bundle():
+    """`String(localized:` calls without `bundle:`; they resolve the iPhone's language, not Fixa's."""
+    found = []
+    for path in sorted((ROOT / "Fixa").rglob("*.swift")):
+        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if line.lstrip().startswith("//"):
+                continue
+            calls = line.split("String(localized:")[1:]
+            for call in calls:
+                if "bundle:" not in call:
+                    found.append(f"{path.relative_to(ROOT)}:{number}: String(localized:) without bundle: L10n.bundle")
+    return found
+
+
 def main():
     errors = []
+    errors.extend(missing_bundle())
     counts = {}
     for path in CATALOGS:
         catalog = json.loads(path.read_text(encoding="utf-8"))

@@ -52,11 +52,11 @@ struct ReportScreen: View {
                     locationSection
                         .id(Section.place)
                     VStack(alignment: .leading, spacing: Fx.Space.s) {
-                        FxSectionHeader(String(localized: "What's wrong?"))
+                        FxSectionHeader(String(localized: "What's wrong?", bundle: L10n.bundle, locale: L10n.locale))
                         FxTextEditor(
-                            title: String(localized: "What's wrong?"),
+                            title: String(localized: "What's wrong?", bundle: L10n.bundle, locale: L10n.locale),
                             text: $model.draft.description,
-                            prompt: String(localized: "For example: the light by the bus stop has been out since Monday. Write in any language."),
+                            prompt: String(localized: "For example: the light by the bus stop has been out since Monday. Write in any language.", bundle: L10n.bundle, locale: L10n.locale),
                             issue: model.issue(for: .description)?.message,
                             minHeight: 140,
                             showsTitle: false
@@ -74,7 +74,7 @@ struct ReportScreen: View {
                 .padding(Fx.Space.l)
             }
             .fxBottomBar {
-                FxPrimaryButton(title: String(localized: "Review"), systemImage: "arrow.forward") {
+                FxPrimaryButton(title: String(localized: "Review", bundle: L10n.bundle, locale: L10n.locale), systemImage: "arrow.forward") {
                     review(scrollingWith: proxy)
                 }
             }
@@ -115,7 +115,7 @@ struct ReportScreen: View {
             keyboardFocus = first
         }
         AccessibilityNotification.Announcement(
-            String(localized: "Fix \(issues.count) things before review. \(firstIssue.message)")
+            String(localized: "Fix \(issues.count) things before review. \(firstIssue.message)", bundle: L10n.bundle, locale: L10n.locale)
         ).post()
     }
 
@@ -130,16 +130,16 @@ struct ReportScreen: View {
 
     private var categorySection: some View {
         let tile = spec.tile(id: model.draft.tileID)
-        let title = tile?.title.resolve() ?? String(localized: "Choose a problem")
+        let title = tile?.title.resolve(L10n.locale) ?? String(localized: "Choose a problem", bundle: L10n.bundle, locale: L10n.locale)
         let issue = model.issue(for: .category)?.message
         return VStack(alignment: .leading, spacing: Fx.Space.s) {
-            FxSectionHeader(String(localized: "Problem"))
+            FxSectionHeader(String(localized: "Problem", bundle: L10n.bundle, locale: L10n.locale))
             Menu {
                 ForEach(spec.tiles, id: \.id) { tile in
                     Button {
                         model.select(tile: tile)
                     } label: {
-                        Label(tile.title.resolve(), systemImage: tile.symbol)
+                        Label(tile.title.resolve(L10n.locale), systemImage: tile.symbol)
                     }
                 }
             } label: {
@@ -180,16 +180,16 @@ struct ReportScreen: View {
         let room = AppModel.maxPhotos - model.photos.count - pendingPhotos
         return VStack(alignment: .leading, spacing: Fx.Space.s) {
             FxSectionHeader(
-                String(localized: "Photos"),
-                subtitle: String(localized: "Optional, up to 3")
+                String(localized: "Photos", bundle: L10n.bundle, locale: L10n.locale),
+                subtitle: String(localized: "Optional, up to 3", bundle: L10n.bundle, locale: L10n.locale)
             )
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: Fx.Space.s) {
                     ForEach(Array(model.photos.enumerated()), id: \.offset) { index, image in
                         FxPhotoSlot(
                             image: image,
-                            label: String(localized: "Photo \(index + 1)"),
-                            removeLabel: String(localized: "Remove photo \(index + 1)")
+                            label: String(localized: "Photo \(index + 1)", bundle: L10n.bundle, locale: L10n.locale),
+                            removeLabel: String(localized: "Remove photo \(index + 1)", bundle: L10n.bundle, locale: L10n.locale)
                         ) {
                             model.removePhoto(at: index)
                         }
@@ -203,7 +203,7 @@ struct ReportScreen: View {
                             maxSelectionCount: AppModel.maxPhotos - model.photos.count,
                             matching: .images
                         ) {
-                            FxPhotoSlot(addTitle: String(localized: "Choose photos"), systemImage: "photo.on.rectangle")
+                            FxPhotoSlot(addTitle: String(localized: "Choose photos", bundle: L10n.bundle, locale: L10n.locale), systemImage: "photo.on.rectangle")
                         }
                         .buttonStyle(FxPressStyle())
                         .accessibilityLabel(Text("Choose photos"))
@@ -212,7 +212,7 @@ struct ReportScreen: View {
                                 cameraTaps += 1
                                 isCameraPresented = true
                             } label: {
-                                FxPhotoSlot(addTitle: String(localized: "Take photo"), systemImage: "camera")
+                                FxPhotoSlot(addTitle: String(localized: "Take photo", bundle: L10n.bundle, locale: L10n.locale), systemImage: "camera")
                             }
                             .buttonStyle(FxPressStyle())
                             .accessibilityLabel(Text("Take photo"))
@@ -245,7 +245,7 @@ struct ReportScreen: View {
     private var locationSection: some View {
         let issue = model.issue(for: .location)?.message
         return VStack(alignment: .leading, spacing: Fx.Space.s) {
-            FxSectionHeader(String(localized: "Where?"))
+            FxSectionHeader(String(localized: "Where?", bundle: L10n.bundle, locale: L10n.locale))
             Button {
                 model.isLocationPickerPresented = true
             } label: {
@@ -297,11 +297,11 @@ struct ReportScreen: View {
     private var locationSummary: String {
         if model.draft.coordinate == nil {
             return model.isFindingLocation
-                ? String(localized: "Finding you…")
-                : String(localized: "Choose the place on a map")
+                ? String(localized: "Finding you…", bundle: L10n.bundle, locale: L10n.locale)
+                : String(localized: "Choose the place on a map", bundle: L10n.bundle, locale: L10n.locale)
         }
         let text = model.draft.locationText.trimmingCharacters(in: .whitespaces)
-        return text.isEmpty ? String(localized: "Pin placed on the map") : text
+        return text.isEmpty ? String(localized: "Pin placed on the map", bundle: L10n.bundle, locale: L10n.locale) : text
     }
 
     // MARK: Quick phrases
@@ -357,9 +357,9 @@ struct ReportScreen: View {
             }
         )
         return VStack(alignment: .leading, spacing: Fx.Space.m) {
-            FxSectionHeader(String(localized: "Reply"), subtitle: String(localized: "Optional"))
+            FxSectionHeader(String(localized: "Reply", bundle: L10n.bundle, locale: L10n.locale), subtitle: String(localized: "Optional", bundle: L10n.bundle, locale: L10n.locale))
             FxToggleRow(
-                title: String(localized: "Reply to me by e-mail"),
+                title: String(localized: "Reply to me by e-mail", bundle: L10n.bundle, locale: L10n.locale),
                 isOn: wantsReply
             )
             if model.draft.wantsFeedback, !replyInline {
@@ -367,9 +367,9 @@ struct ReportScreen: View {
             } else if model.draft.wantsFeedback {
                 // Typed straight into the profile, so it is there next time.
                 FxTextField(
-                    title: String(localized: "E-mail"),
+                    title: String(localized: "E-mail", bundle: L10n.bundle, locale: L10n.locale),
                     text: $model.profile.email,
-                    prompt: String(localized: "name@example.com"),
+                    prompt: String(localized: "name@example.com", bundle: L10n.bundle, locale: L10n.locale),
                     kind: .email,
                     issue: model.issue(for: .email)?.message
                 )
@@ -377,16 +377,16 @@ struct ReportScreen: View {
                 .accessibilityFocused($a11yFocus, equals: .reply)
                 nameLayout {
                     FxTextField(
-                        title: String(localized: "First name (optional)"),
+                        title: String(localized: "First name (optional)", bundle: L10n.bundle, locale: L10n.locale),
                         text: $model.profile.firstName
                     )
                     FxTextField(
-                        title: String(localized: "Last name (optional)"),
+                        title: String(localized: "Last name (optional)", bundle: L10n.bundle, locale: L10n.locale),
                         text: $model.profile.lastName
                     )
                 }
                 FxTextField(
-                    title: String(localized: "Phone (optional)"),
+                    title: String(localized: "Phone (optional)", bundle: L10n.bundle, locale: L10n.locale),
                     text: $model.profile.phone,
                     kind: .phone,
                     issue: model.issue(for: .phone)?.message
@@ -478,7 +478,7 @@ enum QuickPhrases {
         .flatMap(Bundle.init(path:))
 
     private static func phrase(_ resource: LocalizedStringResource) -> Phrase {
-        let label = String(localized: resource)
+        let label = L10n.bundle.localizedString(forKey: resource.key, value: resource.key, table: nil)
         let swedish = swedishBundle?.localizedString(forKey: resource.key, value: label, table: nil) ?? label
         return Phrase(label: label, swedish: swedish)
     }

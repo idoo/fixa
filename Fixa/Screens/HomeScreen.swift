@@ -20,9 +20,9 @@ struct HomeScreen: View {
                 if status.state != .ok {
                     FxBanner(
                         kind: .warning,
-                        title: String(localized: "The municipality's e-service has changed"),
-                        message: status.message?.resolve()
-                            ?? String(localized: "Fixa is an independent app. We are updating it. Your report is saved, and you can still send it by email.")
+                        title: String(localized: "The municipality's e-service has changed", bundle: L10n.bundle, locale: L10n.locale),
+                        message: status.message?.resolve(L10n.locale)
+                            ?? String(localized: "Fixa is an independent app. We are updating it. Your report is saved, and you can still send it by email.", bundle: L10n.bundle, locale: L10n.locale)
                     )
                 }
                 VStack(alignment: .leading, spacing: Fx.Space.xs) {
@@ -40,7 +40,7 @@ struct HomeScreen: View {
                 LazyVGrid(columns: columns, spacing: Fx.Space.m) {
                     ForEach(Array(spec.tiles.enumerated()), id: \.element.id) { index, tile in
                         FxTile(
-                            title: tile.title.resolve(),
+                            title: tile.title.resolve(L10n.locale),
                             systemImage: tile.symbol,
                             index: index,
                             isSelected: model.draft.tileID == tile.id && !model.path.isEmpty
@@ -126,9 +126,9 @@ struct HomeScreen: View {
         // Number first and unbreakable (NBSP, non-breaking hyphen): if the line wraps, only the name moves.
         let number = contact.phone.replacingOccurrences(of: " ", with: "\u{00A0}").replacingOccurrences(of: "-", with: "\u{2011}")
         return FxCallRow(
-            title: String(localized: "No water or a blocked sewer?"),
-            detail: "\(number.ltrIsolated) · \(contact.title.resolve())",
-            accessibilityValue: "\(contact.phone), \(contact.title.resolve())"
+            title: String(localized: "No water or a blocked sewer?", bundle: L10n.bundle, locale: L10n.locale),
+            detail: "\(number.ltrIsolated) · \(contact.title.resolve(L10n.locale))",
+            accessibilityValue: "\(contact.phone), \(contact.title.resolve(L10n.locale))"
         ) {
             if let url = URL(string: "tel:\(digits)") {
                 openURL(url)
