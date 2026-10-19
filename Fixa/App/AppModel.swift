@@ -11,13 +11,21 @@ enum Route: Hashable {
     case history
     case historyDetail(UUID)
     case about
-    case profile
+    case settings
+    case contactDetails
+    case language
+    case textSize
+    case privacy
 }
 
 @Observable
 @MainActor
 final class AppModel {
-    let spec: AdapterSpec?
+    /// The municipality adapter: bundled, or a newer accepted copy from GitHub (`AdapterStore`).
+    let adapters = AdapterStore(adapterID: AppModel.adapterID)
+    var spec: AdapterSpec? { adapters.spec }
+    /// What Home shows about the municipality's e-service; `-FixaStatus` forces one for screenshots.
+    var adapterStatus: AdapterStatus { options.status ?? adapters.status }
     let options: LaunchOptions
     let history: HistoryStore
     let submission = SubmissionService()
@@ -57,6 +65,40 @@ final class AppModel {
     /// Set once the user has tried to continue; inline issues show from then on.
     var showIssues = false
     private(set) var sent: SentReport?
+    /// Text size, appearance, contrast, bold, motion and vibration (UserDefaults `fixa.display`).
+    var display: DisplaySettings {
+        didSet {
+            guard persists, display != oldValue else { return }
+            display.save()
+        }
+    }
+    /// Off: contact details serve only the report being written, are never saved and are
+    /// forgotten when it is finished (UserDefaults `fixa.rememberDetails`, default on).
+    var rememberDetails: Bool {
+        didSet {
+            guard rememberDetails != oldValue else { return }
+            if persists {
+                UserDefaults.standard.set(rememberDetails, forKey: Self.rememberKey)
+            }
+            saveProfileNow()
+        }
+    }
+    /// The chosen UI language; `nil` is "Same as iPhone" (UserDefaults `fixa.language`).
+    /// Slice Language makes the UI follow it.
+    var language: AppLanguage? {
+        didSet {
+            guard persists, language != oldValue else { return }
+            if let language {
+                UserDefaults.standard.set(language.rawValue, forKey: AppLanguage.storageKey)
+            } else {
+                UserDefaults.standard.removeObject(forKey: AppLanguage.storageKey)
+            }
+        }
+    }
+    /// The language the app shows now.
+    var effectiveLanguage: AppLanguage { language ?? .system }
+    /// The first-launch disclaimer; shown once (UserDefaults `fixa.onboarded`), again from About.
+    var isOnboardingPresented: Bool
 
     @ObservationIgnored private var profileSaveTask: Task<Void, Never>?
     @ObservationIgnored private var draftSaveTask: Task<Void, Never>?
@@ -64,14 +106,29 @@ final class AppModel {
     static let maxPhotos = 3
     private static let adapterID = "se.varmdo.ksb"
     private static let contactKey = "fixa.contact"
+    private static let rememberKey = "fixa.rememberDetails"
+    private static let onboardedKey = "fixa.onboarded"
 
     init(options: LaunchOptions = .current) {
         self.options = options
-        let bundled = AdapterCatalog.bundled()
-        spec = bundled.first { $0.id == Self.adapterID } ?? bundled.first
         history = HistoryStore(inMemory: options.demo)
         profileStorage = Self.loadContact()
-        draftStorage = ReportDraft(adapterID: spec?.id ?? Self.adapterID)
+        var savedDisplay = DisplaySettings.load()
+        if let size = options.textSize {
+            savedDisplay.textSize = size
+        }
+        display = savedDisplay
+        rememberDetails = UserDefaults.standard.object(forKey: Self.rememberKey) as? Bool ?? true
+        language = UserDefaults.standard.string(forKey: AppLanguage.storageKey).flatMap(AppLanguage.init(rawValue:))
+        // Demo, test and screenshot launches skip it unless they ask for `-FixaScreen onboarding`.
+        if options.screen == .onboarding {
+            isOnboardingPresented = true
+        } else if options.demo || options.liveTest || options.screen != nil {
+            isOnboardingPresented = false
+        } else {
+            isOnboardingPresented = !UserDefaults.standard.bool(forKey: Self.onboardedKey)
+        }
+        draftStorage = ReportDraft(adapterID: adapters.spec?.id ?? Self.adapterID)
         draftStorage = freshDraft()
         if options.demo {
             seedDemo()
@@ -137,11 +194,14 @@ final class AppModel {
         path.append(.receipt)
     }
 
-    /// Back to Home with a fresh draft; the profile stays.
+    /// Back to Home with a fresh draft; the profile stays unless "Remember my details" is off.
     func finish() {
         sent = nil
         photos = []
         clearSavedDraft()
+        if !rememberDetails {
+            profileStorage = Contact()
+        }
         draft = freshDraft()
         showIssues = false
         submission.reset()
@@ -154,6 +214,47 @@ final class AppModel {
         fresh.wantsFeedback = profileHasEmail
         fresh.contact = fresh.wantsFeedback ? profileStorage : Contact()
         return fresh
+    }
+
+    // MARK: Onboarding
+
+    func finishOnboarding() {
+        isOnboardingPresented = false
+        if persists {
+            UserDefaults.standard.set(true, forKey: Self.onboardedKey)
+        }
+    }
+
+    /// "How Fixa works" in About.
+    func showOnboarding() {
+        isOnboardingPresented = true
+    }
+
+    // MARK: Deleting data
+
+    /// Removes the sent-reports list from this phone (the file itself, not an empty list).
+    func clearHistory() {
+        history.deleteAll()
+    }
+
+    /// Contact details, the unsent report with its photos and the sent-reports list leave this
+    /// phone. Language and display settings stay. Not while a report is being sent.
+    func deleteAllData() {
+        guard !submission.isSending else { return }
+        profileSaveTask?.cancel()
+        draftSaveTask?.cancel()
+        profileStorage = Contact()
+        photos = []
+        photoFiles = []
+        if persists {
+            UserDefaults.standard.removeObject(forKey: Self.contactKey)
+            DraftStore.clear()
+        }
+        draftStorage = freshDraft()
+        showIssues = false
+        history.deleteAll()
+        sent = nil
+        submission.reset()
     }
 
     // MARK: Location
@@ -298,7 +399,7 @@ final class AppModel {
     func saveProfileNow() {
         guard persists else { return }
         profileSaveTask?.cancel()
-        if profileIsEmpty {
+        if profileIsEmpty || !rememberDetails {
             UserDefaults.standard.removeObject(forKey: Self.contactKey)
         } else if let data = try? JSONEncoder().encode(profileStorage) {
             UserDefaults.standard.set(data, forKey: Self.contactKey)
@@ -385,8 +486,18 @@ final class AppModel {
             path = [.history]
         case .about:
             path = [.about]
-        case .profile:
-            path = [.profile]
+        case .settings:
+            path = [.settings]
+        case .contact:
+            path = [.settings, .contactDetails]
+        case .textsize:
+            path = [.settings, .textSize]
+        case .language:
+            path = [.settings, .language]
+        case .privacy:
+            path = [.settings, .privacy]
+        case .onboarding:
+            path = []
         }
     }
 }

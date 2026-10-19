@@ -41,6 +41,13 @@ final class HistoryStore {
         save()
     }
 
+    /// Empties the list and removes the file itself rather than writing an empty one.
+    func deleteAll() {
+        items = []
+        guard let fileURL else { return }
+        try? FileManager.default.removeItem(at: fileURL)
+    }
+
     func item(id: UUID) -> HistoryItem? {
         items.first { $0.id == id }
     }

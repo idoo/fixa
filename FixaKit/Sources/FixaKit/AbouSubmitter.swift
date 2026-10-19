@@ -52,7 +52,11 @@ public struct AbouSubmitter: Sendable {
                 let errors = AbouPageParser.validationErrors(page.html)
                 if !errors.isEmpty { throw SubmissionError.serverValidation(errors) }
                 guard let receipt = AbouPageParser.parseReceipt(html: page.html, url: page.url, now: Date()) else {
-                    throw SubmissionError.unexpectedPage(currentPageID(page) ?? page.url.absoluteString)
+                    throw SubmissionError.formChanged(FormDrift(
+                        pageID: currentPageID(page),
+                        missing: [],
+                        detail: "After the final confirmation the e-service showed a page without a receipt (\(page.url.absoluteString))."
+                    ))
                 }
                 progress(.done)
                 return receipt
@@ -90,7 +94,8 @@ public struct AbouSubmitter: Sendable {
         return AbouPageParser.pageID(from: page.url)
     }
 
-    /// Index of the page we are on, searching `pages[from...]`; otherwise the most specific error.
+    /// Index of the page we are on, searching `pages[from...]` by page id, then by finding the page's fields;
+    /// otherwise the most specific error.
     private func position(of page: Page, from start: Int) throws -> Int {
         let pages = spec.channel.pages
         let current = currentPageID(page)
@@ -98,7 +103,34 @@ public struct AbouSubmitter: Sendable {
         if isLocked(page.html) { throw SubmissionError.sessionLocked }
         let errors = AbouPageParser.validationErrors(page.html)
         if !errors.isEmpty { throw SubmissionError.serverValidation(errors) }
-        throw SubmissionError.unexpectedPage(current ?? page.url.absoluteString)
+
+        // The page id may have been renamed: accept a page whose adapter fields are all on it.
+        let form = FormStructure(html: page.html)
+        if let index = pages[start...].firstIndex(where: { candidate in
+            !candidate.fields.isEmpty && resolve(candidate.fields, in: form) != nil
+        }) {
+            return index
+        }
+        let required = form.unfilledRequired(filled: [])
+        let expected = pages[start...].map(\.id).joined(separator: " or ")
+        throw SubmissionError.formChanged(FormDrift(
+            pageID: current,
+            missing: required,
+            detail: "Fixa expected the page \(expected) but got \(current ?? page.url.absoluteString)"
+                + (required.isEmpty ? "." : ", which asks for required fields Fixa doesn't fill.")
+        ))
+    }
+
+    /// Controls for every field, each control used once; nil if any field is not on the page.
+    private func resolve(_ fields: [AdapterSpec.FieldSpec], in form: FormStructure) -> [FormControl]? {
+        var taken: Set<String> = []
+        var result: [FormControl] = []
+        for field in fields {
+            guard let control = form.control(for: field, excluding: taken) else { return nil }
+            taken.insert(control.name)
+            result.append(control)
+        }
+        return result
     }
 
     private func stage(_ name: String) -> SubmissionStage {
@@ -109,13 +141,44 @@ public struct AbouSubmitter: Sendable {
         }
     }
 
+    /// Name/value pairs for the page; `.formChanged` listing every field, option or new required
+    /// question that doesn't match the adapter.
     private func values(for page: AdapterSpec.PageSpec, draft: ReportDraft, html: String) throws -> [(String, String)] {
-        try page.fields.map { field in
-            guard let name = AbouPageParser.fieldName(html, key: field.key, control: field.control) else {
-                throw SubmissionError.invalidSpec("Field \(field.key)_field$\(field.control) not found on \(page.id)")
+        let form = FormStructure(html: html)
+        var taken: Set<String> = []
+        var pairs: [(String, String)] = []
+        var missing: [String] = []
+        for field in page.fields {
+            let label = field.allLabels.first ?? "\(field.role.rawValue) (\(field.key))"
+            guard let control = form.control(for: field, excluding: taken) else {
+                missing.append(label)
+                continue
             }
-            return (name, value(for: field, draft: draft))
+            taken.insert(control.name)
+            var value = value(for: field, draft: draft)
+            if !value.isEmpty, !control.options.isEmpty {
+                let synonyms = field.role == .category
+                    ? spec.category(for: draft)?.synonyms ?? []
+                    : field.optionSynonyms?[value] ?? []
+                guard let resolved = FormStructure.option(for: value, synonyms: synonyms, in: control.options) else {
+                    missing.append("\(label): \(value)")
+                    continue
+                }
+                value = resolved
+            }
+            pairs.append((control.name, value))
         }
+        for question in form.unfilledRequired(filled: taken) where !missing.contains(question) {
+            missing.append(question)
+        }
+        guard missing.isEmpty else {
+            throw SubmissionError.formChanged(FormDrift(
+                pageID: page.id,
+                missing: missing,
+                detail: "Some fields on this page are missing, renamed beyond recognition, or new and required."
+            ))
+        }
+        return pairs
     }
 
     private func value(for field: AdapterSpec.FieldSpec, draft: ReportDraft) -> String {
@@ -216,7 +279,11 @@ public struct AbouSubmitter: Sendable {
     private func post(_ page: Page, values: [(String, String)], eventTarget: String? = nil) async throws -> Page {
         guard let action = AbouPageParser.formAction(page.html),
               let target = URL(string: action, relativeTo: page.url)?.absoluteURL else {
-            throw SubmissionError.unexpectedPage(page.url.absoluteString)
+            throw SubmissionError.formChanged(FormDrift(
+                pageID: currentPageID(page),
+                missing: [],
+                detail: "The page has no form to send (\(page.url.absoluteString))."
+            ))
         }
         var fields = AbouPageParser.hiddenFields(page.html)
         fields["__EVENTTARGET"] = eventTarget ?? spec.channel.nextEventTarget

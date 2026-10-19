@@ -3,11 +3,14 @@ import UIKit
 
 /// The one brand accent: a cone-orange receipt stamp. Ink type on cone (5.54:1), simple double border,
 /// "MOTTAGET" + monospaced case number, rotated −6°, and a one-shot "stamp" landing (spring + success haptic).
-/// Reduce Motion: appears in place without the landing.
+/// Reduce Motion: appears in place without the landing. Accessibility text sizes: capped at AX1, upright,
+/// and allowed to shrink to the width (the case number also appears as plain text on the receipt).
 struct FxStatusStamp: View {
     let caseNumber: String?
 
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.fxReduceMotion) private var reduceMotion
+    @Environment(\.fxHaptics) private var haptics
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var stamped = false
 
     init(caseNumber: String?) {
@@ -16,11 +19,11 @@ struct FxStatusStamp: View {
 
     var body: some View {
         stamp
-            .rotationEffect(.degrees(-6))
+            .rotationEffect(.degrees(dynamicTypeSize.isAccessibilitySize ? 0 : -6))
             .scaleEffect(stamped || reduceMotion ? 1 : 1.4)
             .opacity(stamped || reduceMotion ? 1 : 0)
             .padding(Fx.Space.l)
-            .sensoryFeedback(.success, trigger: stamped)
+            .sensoryFeedback(.success, trigger: stamped) { _, _ in haptics }
             .onAppear {
                 guard !stamped else { return }
                 if reduceMotion {
@@ -60,7 +63,8 @@ struct FxStatusStamp: View {
                 .padding(Fx.Space.xs + 2)
         }
         .overlay(shape.strokeBorder(Fx.Color.onCone, lineWidth: Fx.Border.emphasis))
-        .fixedSize()
+        .fixedSize(horizontal: false, vertical: true)
+        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
     }
 
     private var accessibilityText: String {
@@ -73,7 +77,7 @@ struct FxStatusStamp: View {
 }
 
 /// Compact bordered copy control that sits under the stamp (case number) or a fallback text.
-/// Copies `value` to the pasteboard, plays a success haptic, and shows `copiedTitle` for 1.5 s.
+/// Copies `value` to the pasteboard, plays a success haptic, shows `copiedTitle` for 1.5 s and announces it.
 struct FxCopyButton: View {
     let title: String
     let copiedTitle: String
@@ -81,6 +85,8 @@ struct FxCopyButton: View {
 
     @State private var copies = 0
     @State private var copied = false
+    @Environment(\.fxHaptics) private var haptics
+    @Environment(\.fxReduceMotion) private var reduceMotion
 
     init(title: String, copiedTitle: String = String(localized: "Copied"), value: String) {
         self.title = title
@@ -93,6 +99,7 @@ struct FxCopyButton: View {
             UIPasteboard.general.string = value
             copies += 1
             copied = true
+            AccessibilityNotification.Announcement(copiedTitle).post()
         } label: {
             HStack(spacing: Fx.Space.s) {
                 Image(systemName: copied ? "checkmark" : "doc.on.doc")
@@ -109,10 +116,10 @@ struct FxCopyButton: View {
             .frame(minHeight: Fx.minTarget)
             .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.m, style: .continuous))
             .contentShape(.rect(cornerRadius: Fx.Radius.m, style: .continuous))
-            .animation(Fx.Motion.select, value: copied)
+            .animation(reduceMotion ? nil : Fx.Motion.select, value: copied)
         }
         .buttonStyle(FxPressStyle())
-        .sensoryFeedback(.success, trigger: copies)
+        .sensoryFeedback(.success, trigger: copies) { _, _ in haptics }
         .task(id: copies) {
             guard copied else { return }
             try? await Task.sleep(for: .seconds(1.5))

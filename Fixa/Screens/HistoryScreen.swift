@@ -36,6 +36,14 @@ struct HistoryScreen: View {
         .fxScreenBackground()
         .navigationTitle(Text("Sent reports"))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            // Deleting without a swipe, for Voice Control and Switch Control.
+            if !model.history.items.isEmpty {
+                ToolbarItem(placement: .topBarTrailing) {
+                    EditButton()
+                }
+            }
+        }
     }
 
     private var emptyState: some View {
@@ -59,10 +67,17 @@ struct HistoryScreen: View {
 private struct HistoryRow: View {
     let item: HistoryItem
     let spec: AdapterSpec
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.locale) private var locale
+    @ScaledMetric(relativeTo: .headline) private var thumbnailSide: CGFloat = 56
 
     var body: some View {
-        HStack(spacing: Fx.Space.m) {
-            HistoryThumbnail(item: item, spec: spec, side: 56)
+        // Thumbnail above the text at accessibility sizes, so the text keeps the full width.
+        let layout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: Fx.Space.s))
+            : AnyLayout(HStackLayout(spacing: Fx.Space.m))
+        layout {
+            HistoryThumbnail(item: item, spec: spec, side: min(thumbnailSide, 80))
             VStack(alignment: .leading, spacing: Fx.Space.xs) {
                 Text(spec.tile(id: item.tileID)?.title.resolve() ?? String(localized: "Report"))
                     .font(Fx.Font.headline)
@@ -70,8 +85,8 @@ private struct HistoryRow: View {
                 Text(item.locationText.isEmpty ? item.description : item.locationText)
                     .font(Fx.Font.callout)
                     .foregroundStyle(Fx.Color.ink2)
-                    .lineLimit(1)
-                Text(item.date, format: .dateTime.day().month().year())
+                    .lineLimit(3)
+                Text(item.date.formatted(.dateTime.day().month().year().locale(locale)))
                     .font(Fx.Font.footnote)
                     .foregroundStyle(Fx.Color.ink2)
             }
@@ -81,10 +96,12 @@ private struct HistoryRow: View {
     }
 }
 
+/// Decorative in list rows; pass `accessibilityLabel` where the photo is content (the detail screen).
 private struct HistoryThumbnail: View {
     let item: HistoryItem
     let spec: AdapterSpec
     let side: CGFloat
+    var accessibilityLabel: String? = nil
 
     var body: some View {
         Group {
@@ -103,7 +120,10 @@ private struct HistoryThumbnail: View {
         .frame(width: side, height: side)
         .clipShape(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous).strokeBorder(Fx.Color.line, lineWidth: Fx.Border.hairline))
-        .accessibilityHidden(true)
+        .accessibilityElement()
+        .accessibilityLabel(Text(accessibilityLabel ?? ""))
+        .accessibilityAddTraits(.isImage)
+        .accessibilityHidden(accessibilityLabel == nil)
     }
 }
 
@@ -111,15 +131,18 @@ struct HistoryDetailScreen: View {
     let spec: AdapterSpec
     let itemID: UUID
     @Environment(AppModel.self) private var model
+    @Environment(\.locale) private var locale
+    @State private var isRemoveConfirmPresented = false
 
     var body: some View {
+        let item = model.history.item(id: itemID)
         Group {
-            if let item = model.history.item(id: itemID) {
+            if let item {
                 ScrollView {
                     VStack(alignment: .leading, spacing: Fx.Space.xl) {
                         FxSectionHeader(
-                            spec.tile(id: item.tileID)?.title.resolve() ?? String(localized: "Report"),
-                            subtitle: item.date.formatted(.dateTime.day().month(.wide).year().hour().minute())
+                            title(for: item),
+                            subtitle: item.date.formatted(.dateTime.day().month(.wide).year().hour().minute().locale(locale))
                         )
                         FxCard {
                             if let caseNumber = item.caseNumber {
@@ -149,8 +172,16 @@ struct HistoryDetailScreen: View {
                             }
                             field(String(localized: "Description"), value: item.description)
                             if item.thumbnail != nil {
-                                HistoryThumbnail(item: item, spec: spec, side: 120)
+                                HistoryThumbnail(
+                                    item: item,
+                                    spec: spec,
+                                    side: 120,
+                                    accessibilityLabel: String(localized: "Attached photo")
+                                )
                             }
+                        }
+                        FxSecondaryButton(title: String(localized: "Remove from this phone"), systemImage: "trash") {
+                            isRemoveConfirmPresented = true
                         }
                     }
                     .padding(.horizontal, Fx.Space.l)
@@ -162,7 +193,30 @@ struct HistoryDetailScreen: View {
             }
         }
         .fxScreenBackground()
+        .navigationTitle(Text(item.map(title(for:)) ?? String(localized: "Report")))
         .navigationBarTitleDisplayMode(.inline)
+        .confirmationDialog(
+            Text("Remove this report from this phone?"),
+            isPresented: $isRemoveConfirmPresented,
+            titleVisibility: .visible
+        ) {
+            Button(role: .destructive, action: remove) {
+                Text("Remove from this phone")
+            }
+        } message: {
+            Text("It disappears from Sent reports in Fixa. The report itself stays with \(spec.municipality.name).")
+        }
+    }
+
+    private func title(for item: HistoryItem) -> String {
+        spec.tile(id: item.tileID)?.title.resolve() ?? String(localized: "Report")
+    }
+
+    private func remove() {
+        model.history.delete([itemID])
+        if model.path.last == .historyDetail(itemID) {
+            model.path.removeLast()
+        }
     }
 
     /// Address or place text only; never coordinates.

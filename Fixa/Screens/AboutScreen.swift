@@ -3,6 +3,7 @@ import SwiftUI
 
 struct AboutScreen: View {
     let spec: AdapterSpec
+    @Environment(AppModel.self) private var model
 
     private static let repoURL = URL(string: "https://github.com/idoo/fixa")!
 
@@ -23,6 +24,16 @@ struct AboutScreen: View {
                         systemImage: "building.columns",
                         text: String(localized: "Independent app, not part of \(spec.municipality.name).")
                     )
+                }
+
+                FxCard {
+                    SettingsNavRow(
+                        systemImage: "questionmark.circle",
+                        title: String(localized: "How Fixa works"),
+                        value: nil
+                    ) {
+                        model.showOnboarding()
+                    }
                 }
 
                 FxIconRow(

@@ -9,6 +9,7 @@ struct FxPrimaryButton: View {
     let action: () -> Void
 
     @State private var taps = 0
+    @Environment(\.fxHaptics) private var haptics
     @Environment(\.isEnabled) private var isEnabled
 
     init(title: String, systemImage: String? = nil, isLoading: Bool = false, action: @escaping () -> Void) {
@@ -48,7 +49,7 @@ struct FxPrimaryButton: View {
         }
         .buttonStyle(FxPressStyle())
         .disabled(isLoading)
-        .sensoryFeedback(.impact(weight: .medium), trigger: taps)
+        .sensoryFeedback(.impact(weight: .medium), trigger: taps) { _, _ in haptics }
         .accessibilityLabel(Text(title))
         .accessibilityValue(isLoading ? Text(String(localized: "Loading…", comment: "Accessibility value on a busy button")) : Text(""))
     }
@@ -61,6 +62,7 @@ struct FxSecondaryButton: View {
     let action: () -> Void
 
     @State private var taps = 0
+    @Environment(\.fxHaptics) private var haptics
 
     init(title: String, systemImage: String? = nil, action: @escaping () -> Void) {
         self.title = title
@@ -76,7 +78,7 @@ struct FxSecondaryButton: View {
             FxSecondaryLabel(title: title, systemImage: systemImage)
         }
         .buttonStyle(FxPressStyle())
-        .sensoryFeedback(.impact(weight: .light), trigger: taps)
+        .sensoryFeedback(.impact(weight: .light), trigger: taps) { _, _ in haptics }
         .accessibilityLabel(Text(title))
     }
 }
@@ -115,6 +117,10 @@ struct FxIconButton: View {
     let action: () -> Void
 
     @State private var taps = 0
+    @Environment(\.fxHaptics) private var haptics
+    @ScaledMetric(relativeTo: .headline) private var scaledSide: CGFloat = 48
+    /// Grows with Dynamic Type, capped so it never covers the content it floats over.
+    private var side: CGFloat { min(scaledSide, 88) }
 
     init(systemImage: String, label: String, isLoading: Bool = false, action: @escaping () -> Void) {
         self.systemImage = systemImage
@@ -139,13 +145,14 @@ struct FxIconButton: View {
                         .foregroundStyle(Fx.Color.sea)
                 }
             }
-            .frame(width: 48, height: 48)
+            .frame(width: side, height: side)
             .fxCardSurface(Circle())
             .contentShape(Circle())
         }
         .buttonStyle(FxPressStyle())
-        .sensoryFeedback(.impact(weight: .light), trigger: taps)
+        .sensoryFeedback(.impact(weight: .light), trigger: taps) { _, _ in haptics }
         .accessibilityLabel(Text(label))
+        .accessibilityShowsLargeContentViewer()
     }
 }
 
@@ -191,9 +198,8 @@ struct FxBadge: View {
 }
 
 /// Compact category tile for a 2-column grid: white card, muted pastel glyph circle above a semibold
-/// title of up to two lines, both on one leading edge. `index` picks the pastel so the grid is varied
-/// but stable. The title reserves two lines so sibling tiles share one height; at accessibility sizes it
-/// grows instead of truncating. Selected: 2 pt sea border. Selection haptic.
+/// title, both on one leading edge. `index` picks the pastel so the grid is varied but stable. The title
+/// never truncates; LazyVGrid gives each row its tallest tile's height. Selected: 2 pt sea border. Selection haptic.
 struct FxTile: View {
     let title: String
     let systemImage: String
@@ -202,7 +208,8 @@ struct FxTile: View {
     let action: () -> Void
 
     @State private var taps = 0
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.fxHaptics) private var haptics
+    @Environment(\.fxReduceMotion) private var reduceMotion
     @ScaledMetric(relativeTo: .body) private var iconSide: CGFloat = 36
 
     init(title: String, systemImage: String, index: Int = 0, isSelected: Bool = false, action: @escaping () -> Void) {
@@ -230,24 +237,20 @@ struct FxTile: View {
                 borderWidth: isSelected ? Fx.Border.emphasis : Fx.Border.hairline
             )
             .contentShape(.rect(cornerRadius: Fx.Radius.m, style: .continuous))
-            .animation(Fx.Motion.select, value: isSelected)
+            .animation(reduceMotion ? nil : Fx.Motion.select, value: isSelected)
         }
         .buttonStyle(FxPressStyle())
-        .sensoryFeedback(.selection, trigger: taps)
+        .sensoryFeedback(.selection, trigger: taps) { _, _ in haptics }
         .accessibilityLabel(Text(title))
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
-    @ViewBuilder private var titleText: some View {
-        let text = Text(title)
+    private var titleText: some View {
+        Text(title)
             .font(Fx.Font.headline)
             .foregroundStyle(Fx.Color.ink)
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, alignment: .leading)
-        if dynamicTypeSize.isAccessibilitySize {
-            text.fixedSize(horizontal: false, vertical: true)
-        } else {
-            text.lineLimit(2, reservesSpace: true)
-        }
+            .fixedSize(horizontal: false, vertical: true)
     }
 }

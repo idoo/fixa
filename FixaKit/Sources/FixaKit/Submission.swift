@@ -16,13 +16,41 @@ public struct SubmissionReceipt: Codable, Sendable, Equatable {
     }
 }
 
+/// The live e-service no longer looks like the adapter describes: a page, field or option moved,
+/// was renamed beyond what the adapter's fallbacks recognise, or a new required field appeared.
+public struct FormDrift: Error, Sendable, Equatable {
+    /// `PageId` of the page where the mismatch was found, if the page had one.
+    public var pageID: String?
+    /// Human-readable labels (or keys) of fields and options Fixa could not fill.
+    public var missing: [String]
+    /// One sentence for logs and the drift canary.
+    public var detail: String
+
+    public init(pageID: String?, missing: [String], detail: String) {
+        self.pageID = pageID
+        self.missing = missing
+        self.detail = detail
+    }
+
+    /// One paragraph for logs and the CI canary.
+    public var report: String {
+        var text = "The e-service form no longer matches the adapter"
+        text += pageID.map { " on page \($0)" } ?? ""
+        text += ". \(detail)"
+        if !missing.isEmpty { text += " Missing: \(missing.joined(separator: "; "))." }
+        return text
+    }
+}
+
 public enum SubmissionError: Error, Sendable, Equatable {
     case sessionLocked
     case serverValidation([String])
-    case unexpectedPage(String)
+    /// The page doesn't look like the adapter says (unknown page, missing field or option, new required field).
+    case formChanged(FormDrift)
     case uploadFailed(String)
     case http(Int)
     case transport(String)
+    /// The adapter itself is unusable (bad channel kind, URL or page list), independent of the live page.
     case invalidSpec(String)
 }
 

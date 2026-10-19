@@ -91,5 +91,9 @@ do {
     if let path = value(after: "--save-html", in: args), let body = transport.lastBody {
         try? body.write(to: URL(fileURLWithPath: path))
     }
+    if case SubmissionError.formChanged(let drift) = error {
+        FileHandle.standardError.write(Data("FORM CHANGED: \(drift.report) Update adapter \(spec.id) (key, labels or synonyms), then add a fixture test.\n".utf8))
+        exit(2)
+    }
     fail("Failed: \(error)")
 }

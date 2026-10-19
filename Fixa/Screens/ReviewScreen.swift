@@ -7,33 +7,48 @@ import UIKit
 struct ReviewScreen: View {
     let spec: AdapterSpec
     @Environment(AppModel.self) private var model
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.fxReduceMotion) private var reduceMotion
     @State private var isMailPresented = false
     @State private var isSharePresented = false
+    /// VoiceOver focus moves here when sending fails: the status slot, or the form-changed card.
+    @AccessibilityFocusState private var failureFocused: Bool
+
+    private static let driftCardID = "formChanged"
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: Fx.Space.l) {
-                Text("This is what \(spec.municipality.name) receives")
-                    .font(Fx.Font.callout)
-                    .foregroundStyle(Fx.Color.ink2)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .fixedSize(horizontal: false, vertical: true)
-                summaryCard
-                if model.options.dryRun {
-                    FxBanner(
-                        kind: .info,
-                        title: String(localized: "Test mode"),
-                        message: String(localized: "Fixa stops before the last step. Nothing is submitted.")
-                    )
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: Fx.Space.l) {
+                    if let drift = formDrift {
+                        formChangedCard(drift)
+                            .id(Self.driftCardID)
+                    }
+                    Text("This is what \(spec.municipality.name) receives")
+                        .font(Fx.Font.callout)
+                        .foregroundStyle(Fx.Color.ink2)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                    summaryCard
+                    if model.options.dryRun {
+                        FxBanner(
+                            kind: .info,
+                            title: String(localized: "Test mode"),
+                            message: String(localized: "Fixa stops before the last step. Nothing is submitted.")
+                        )
+                    }
+                    FxBanner(kind: .info, title: String(localized: "Good to know"), message: spec.disclaimer.resolve())
+                    if model.submission.error != nil, formDrift == nil, !MailComposer.canSendMail {
+                        mailUnavailableFallback
+                    }
                 }
-                FxBanner(kind: .info, title: String(localized: "Good to know"), message: spec.disclaimer.resolve())
-                if model.submission.error != nil, !MailComposer.canSendMail {
-                    mailUnavailableFallback
-                }
+                .padding(.horizontal, Fx.Space.l)
+                .padding(.top, Fx.Space.s)
+                .padding(.bottom, Fx.Space.l)
             }
-            .padding(.horizontal, Fx.Space.l)
-            .padding(.top, Fx.Space.s)
-            .padding(.bottom, Fx.Space.l)
+            .onChange(of: model.submission.phase) { _, phase in
+                announce(phase, scrollingWith: proxy)
+            }
         }
         .fxScreenBackground()
         .fxBottomBar { sendBar }
@@ -94,6 +109,10 @@ struct ReviewScreen: View {
             divider
             editableRow(String(localized: "Description, as sent")) {
                 value(ReportComposer.description(for: model.draft, spec: spec))
+                Text("Fixa adds this Swedish summary so the municipality understands.")
+                    .font(Fx.Font.footnote)
+                    .foregroundStyle(Fx.Color.ink2)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             divider
             editableRow(String(localized: "Photo")) {
@@ -106,7 +125,7 @@ struct ReviewScreen: View {
                 }
             }
             divider
-            editableRow(String(localized: "Reply")) {
+            editableRow(String(localized: "Reply"), extraInputLabel: String(localized: "Change reply details")) {
                 value(replySummary)
             }
         }
@@ -133,11 +152,14 @@ struct ReviewScreen: View {
         return text.isEmpty ? String(localized: "Pin on the map") : text
     }
 
+    /// E-mail and phone are isolated left-to-right so "+46…" and "@" keep their order in Arabic.
     private var replySummary: String {
         guard model.draft.wantsFeedback else { return String(localized: "No reply requested") }
         let c = model.draft.contact
         let name = [c.firstName, c.lastName].filter { !$0.isEmpty }.joined(separator: " ")
-        return [name, c.email, c.phone].filter { !$0.isEmpty }.joined(separator: "\n")
+        let email = c.email.isEmpty ? "" : c.email.ltrIsolated
+        let phone = c.phone.isEmpty ? "" : c.phone.ltrIsolated
+        return [name, email, phone].filter { !$0.isEmpty }.joined(separator: "\n")
     }
 
     /// Fills the card width at the photo's own aspect, capped at square so tall shots don't take over.
@@ -171,14 +193,26 @@ struct ReviewScreen: View {
     }
 
     /// A summary section; the whole row goes back to the report to change it.
-    private func editableRow<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
-        Button(action: editReport) {
+    /// "Edit" is hidden from VoiceOver but stays a Voice Control name ("Tap Edit Place").
+    private func editableRow<Content: View>(
+        _ title: String,
+        extraInputLabel: String? = nil,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        let header = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: Fx.Space.xs))
+            : AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: Fx.Space.s))
+        var inputLabels = [Text("Edit \(title)"), Text(title)]
+        if let extraInputLabel { inputLabels.append(Text(extraInputLabel)) }
+        return Button(action: editReport) {
             VStack(alignment: .leading, spacing: Fx.Space.xs) {
-                HStack(alignment: .firstTextBaseline, spacing: Fx.Space.s) {
+                header {
                     Text(title)
                         .font(Fx.Font.subheadline)
                         .foregroundStyle(Fx.Color.ink2)
-                    Spacer(minLength: Fx.Space.s)
+                    if !dynamicTypeSize.isAccessibilitySize {
+                        Spacer(minLength: Fx.Space.s)
+                    }
                     Text("Edit")
                         .font(Fx.Font.footnote.weight(.bold))
                         .foregroundStyle(Fx.Color.sea)
@@ -193,11 +227,59 @@ struct ReviewScreen: View {
         .disabled(model.submission.isSending)
         .accessibilityElement(children: .combine)
         .accessibilityHint(Text("Opens the report to change it"))
+        .accessibilityInputLabels(inputLabels)
     }
 
     private func editReport() {
         guard model.path.last == .review else { return }
         model.path.removeLast()
+    }
+
+    // MARK: Form changed
+
+    private var formDrift: FormDrift? {
+        if case .formChanged(let drift) = model.submission.error { return drift }
+        return nil
+    }
+
+    /// Kind, blame-free: the municipality updated its e-service and Fixa hasn't caught up yet.
+    /// The draft is kept; the bottom bar offers e-mail, the card the other ways to send it.
+    private func formChangedCard(_ drift: FormDrift) -> some View {
+        FxCard {
+            VStack(alignment: .leading, spacing: Fx.Space.m) {
+                VStack(alignment: .leading, spacing: Fx.Space.s) {
+                    FxBadge(systemImage: "wrench.and.screwdriver", fill: Fx.Color.Pastel.sun, side: 44)
+                    Text("The municipality seems to have changed its form")
+                        .font(Fx.Font.headline)
+                        .foregroundStyle(Fx.Color.ink)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityAddTraits(.isHeader)
+                    Text("Fixa is an independent app, so sometimes we notice a little later. Your report is saved on this phone. We'll fix Fixa as soon as we can.")
+                        .font(Fx.Font.body)
+                        .foregroundStyle(Fx.Color.ink2)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityFocused($failureFocused)
+                if let url = spec.eServiceURL {
+                    FxSecondaryButton(title: String(localized: "Open the municipality's form"), systemImage: "safari") {
+                        UIApplication.shared.open(url)
+                    }
+                }
+                FxCopyButton(title: String(localized: "Copy report text"), value: mailText)
+                if let url = drift.issueURL(spec: spec) {
+                    Link(destination: url) {
+                        Text("Tell Fixa about it")
+                            .font(Fx.Font.callout)
+                            .foregroundStyle(Fx.Color.sea)
+                            .underline()
+                            .frame(maxWidth: .infinity, minHeight: Fx.minTarget, alignment: .leading)
+                            .contentShape(.rect)
+                    }
+                    .accessibilityHint(Text("Opens a GitHub page. Only the app version and the form's page are filled in."))
+                }
+            }
+        }
     }
 
     // MARK: Send
@@ -207,20 +289,19 @@ struct ReviewScreen: View {
     @ViewBuilder
     private var sendBar: some View {
         let submission = model.submission
-        if submission.isSending || submission.error != nil {
+        if formDrift != nil {
+            // Trying again won't help until the adapter is updated: e-mail is the way through.
+            FxPrimaryButton(title: String(localized: "Send by e-mail instead"), systemImage: "envelope", action: sendByMail)
+        } else if submission.error != nil {
             statusSlot
                 .transition(.opacity)
-        }
-        if submission.error != nil {
             FxPrimaryButton(title: String(localized: "Try again"), systemImage: "arrow.clockwise", action: send)
-            FxSecondaryButton(title: String(localized: "Send by e-mail instead"), systemImage: "envelope") {
-                if MailComposer.canSendMail {
-                    isMailPresented = true
-                } else {
-                    isSharePresented = true
-                }
-            }
+            FxSecondaryButton(title: String(localized: "Send by e-mail instead"), systemImage: "envelope", action: sendByMail)
         } else {
+            if submission.isSending {
+                statusSlot
+                    .transition(.opacity)
+            }
             FxPrimaryButton(
                 title: String(localized: "Send to \(spec.municipality.name)"),
                 systemImage: "paperplane",
@@ -244,8 +325,8 @@ struct ReviewScreen: View {
                 .accessibilityElement(children: .combine)
             } else if let error = submission.error {
                 HStack(alignment: .firstTextBaseline, spacing: Fx.Space.s) {
-                    Image(systemName: "xmark.octagon.fill")
-                        .foregroundStyle(Fx.Color.error)
+                    Image(systemName: "wifi.exclamationmark")
+                        .foregroundStyle(Fx.Color.ink2)
                         .accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: Fx.Space.xs) {
                         Text("Not sent")
@@ -255,13 +336,36 @@ struct ReviewScreen: View {
                             .font(Fx.Font.callout)
                             .foregroundStyle(Fx.Color.ink2)
                             .fixedSize(horizontal: false, vertical: true)
+                        Text("Your report is saved on this phone.")
+                            .font(Fx.Font.footnote)
+                            .foregroundStyle(Fx.Color.ink2)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 }
                 .accessibilityElement(children: .combine)
+                .accessibilityFocused($failureFocused)
             }
         }
         .frame(maxWidth: .infinity, minHeight: Fx.minTarget, alignment: .topLeading)
-        .animation(Fx.Motion.select, value: submission.phase)
+        .animation(reduceMotion ? nil : Fx.Motion.select, value: submission.phase)
+    }
+
+    /// Reads each step aloud while sending; on failure moves VoiceOver to what went wrong.
+    private func announce(_ phase: SubmissionService.Phase, scrollingWith proxy: ScrollViewProxy) {
+        switch phase {
+        case .idle:
+            break
+        case .sending(let stage):
+            AccessibilityNotification.Announcement(stage.label).post()
+        case .failed(let error):
+            if case .formChanged = error {
+                withAnimation(reduceMotion ? nil : Fx.Motion.select) {
+                    proxy.scrollTo(Self.driftCardID, anchor: .top)
+                }
+            }
+            AccessibilityNotification.Announcement(String(localized: "Not sent. \(error.userMessage)")).post()
+            failureFocused = true
+        }
     }
 
     /// Mail isn't set up: the share sheet is the e-mail path, plus copy-and-send by hand.
@@ -279,6 +383,14 @@ struct ReviewScreen: View {
 
     private func send() {
         Task { await model.send() }
+    }
+
+    private func sendByMail() {
+        if MailComposer.canSendMail {
+            isMailPresented = true
+        } else {
+            isSharePresented = true
+        }
     }
 
     private var mailText: String {

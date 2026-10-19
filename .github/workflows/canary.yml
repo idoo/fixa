@@ -1,0 +1,84 @@
+# Daily check that the municipality's e-service still matches the adapter.
+# Dry run stops at the summary page; no case is created.
+# Exit 2 (form changed): status.json -> degraded + canary issue. Other failure: issue only.
+# Success after degraded: status.json -> ok + close the issue.
+name: Canary
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["adapters/**", "FixaKit/**"]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: canary
+
+jobs:
+  dry-run:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      ADAPTER: se.varmdo.ksb
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Dry run against the live form
+        id: run
+        run: |
+          set +e
+          (cd FixaKit && swift run fixa-cli dry-run) > canary.log 2>&1
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+          cat canary.log
+
+      - name: Update status and issue
+        env:
+          CODE: ${{ steps.run.outputs.code }}
+        run: |
+          state=$(jq -r --arg id "$ADAPTER" '.[$id].state // "ok"' adapters/status.json)
+          issue=$(gh issue list --label canary --state open --json number --jq '.[0].number // empty')
+
+          set_status() {
+            jq --arg id "$ADAPTER" --argjson s "$1" '.[$id] = $s' adapters/status.json > status.tmp
+            mv status.tmp adapters/status.json
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add adapters/status.json
+            git commit -m "$2"
+            git pull --rebase && git push
+          }
+
+          if [ "$CODE" = 0 ]; then
+            if [ "$state" != ok ]; then set_status '{"state": "ok"}' "Canary: $ADAPTER works again"; fi
+            if [ -n "$issue" ]; then gh issue close "$issue" --comment "Dry run passes again ($GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID). Status set back to ok."; fi
+            exit 0
+          fi
+
+          if [ "$CODE" = 2 ] && [ "$state" != degraded ]; then
+            set_status "$(jq -n --arg d "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '{
+              state: "degraded", updated: $d,
+              message: {
+                en: "The municipality has changed its e-service. We are working on updating Fixa. You can still send your report by email.",
+                sv: "Kommunens e-tjänst har ändrats. Vi jobbar på att uppdatera Fixa. Du kan fortfarande skicka med e-post."
+              }}')" "Canary: $ADAPTER form changed, status degraded"
+          fi
+
+          title="Canary: $ADAPTER dry run failed (exit $CODE)"
+          [ "$CODE" = 2 ] && title="Canary: $ADAPTER form changed"
+          body=$(printf '%s\n\nRun: %s\n\n```\n%s\n```\n' \
+            "$(grep -m1 'FORM CHANGED' canary.log || echo "Dry run exited with $CODE.")" \
+            "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            "$(tail -n 40 canary.log)")
+          gh label create canary --color D93F0B --description "Daily e-service check" 2>/dev/null || true
+          if [ -n "$issue" ]; then
+            gh issue comment "$issue" --body "$body"
+          else
+            gh issue create --label canary --title "$title" --body "$body"
+          fi
+          exit "$CODE"

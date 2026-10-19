@@ -20,7 +20,8 @@ private struct FxCatalog: View {
                 FxSectionHeader("Fixa", subtitle: "Report a problem in Värmdö in a minute.")
                 FxProgressSteps(current: 2, total: 3)
                 FxCallRow(title: "No water or a blocked sewer?",
-                          detail: "VA-jouren via SOS Alarm · 08-454 25 71", action: {})
+                          detail: "\("08-454 25 71".ltrIsolated) · VA-jouren via SOS Alarm",
+                          accessibilityValue: "08-454 25 71, VA-jouren via SOS Alarm", action: {})
                 FxBanner(kind: .warning, title: "Outside Värmdö kommun",
                          message: "Move the pin if that's wrong.")
                 LazyVGrid(columns: [GridItem(.flexible(), spacing: Fx.Space.m),

@@ -41,15 +41,14 @@ struct FxTextField: View {
             .padding(.horizontal, Fx.Space.m)
             .frame(minHeight: Fx.minTarget + 4)
             .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous), outline: borderColor, width: borderWidth)
-            .accessibilityLabel(Text(title))
-            .accessibilityHint(issue.map { Text($0) } ?? Text(""))
+            .accessibilityLabel(Text(fxFieldAccessibilityLabel(title: title, issue: issue)))
             FxIssueText(issue: issue)
         }
     }
 
     private var borderColor: Color {
         if issue != nil { return Fx.Color.error }
-        return focused ? Fx.Color.sea : Fx.Color.line
+        return focused ? Fx.Color.sea : Fx.Color.fieldBorder
     }
 
     private var borderWidth: CGFloat {
@@ -130,15 +129,15 @@ struct FxTextEditor: View {
                     }
                 }
                 .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous), outline: borderColor, width: borderWidth)
-                .accessibilityLabel(Text(title))
-                .accessibilityHint(issue.map { Text($0) } ?? Text(prompt))
+                .accessibilityLabel(Text(fxFieldAccessibilityLabel(title: title, issue: issue)))
+                .accessibilityHint(Text(prompt))
             FxIssueText(issue: issue)
         }
     }
 
     private var borderColor: Color {
         if issue != nil { return Fx.Color.error }
-        return focused ? Fx.Color.sea : Fx.Color.line
+        return focused ? Fx.Color.sea : Fx.Color.fieldBorder
     }
 
     private var borderWidth: CGFloat {
@@ -146,7 +145,13 @@ struct FxTextEditor: View {
     }
 }
 
-/// Inline validation message under a field.
+/// VoiceOver name of a field: the title, then the issue when there is one (never only a hint).
+private func fxFieldAccessibilityLabel(title: String, issue: String?) -> String {
+    guard let issue else { return title }
+    return "\(title). \(issue)"
+}
+
+/// Inline validation message under a field. Hidden from VoiceOver: the field's label already reads it.
 private struct FxIssueText: View {
     let issue: String?
 
@@ -161,6 +166,7 @@ private struct FxIssueText: View {
             .foregroundStyle(Fx.Color.error)
             .fixedSize(horizontal: false, vertical: true)
             .transition(.opacity)
+            .accessibilityHidden(true)
         }
     }
 }
@@ -176,7 +182,9 @@ struct FxPhotoSlot: View {
     }
 
     private let kind: Kind
-    @ScaledMetric(relativeTo: .footnote) private var side: CGFloat = 80
+    @ScaledMetric(relativeTo: .footnote) private var scaledSide: CGFloat = 80
+    /// Capped so three slots still fit a row at the largest text sizes.
+    private var side: CGFloat { min(scaledSide, 140) }
 
     /// A picked photo; the corner control removes it.
     init(image: UIImage, label: String, removeLabel: String, onRemove: @escaping () -> Void) {
@@ -235,7 +243,7 @@ struct FxPhotoSlot: View {
             }
             .padding(Fx.Space.xs)
             .frame(width: side, height: side)
-            .fxOutline(shape)
+            .fxOutline(shape, outline: Fx.Color.fieldBorder)
             .contentShape(shape)
         case .loading:
             ProgressView()

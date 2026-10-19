@@ -4,6 +4,7 @@ import SwiftUI
 struct ReceiptScreen: View {
     let spec: AdapterSpec
     @Environment(AppModel.self) private var model
+    @Environment(\.locale) private var locale
 
     var body: some View {
         let sent = model.sent ?? SentReport(caseNumber: nil, date: .now, isDryRun: false)
@@ -35,7 +36,18 @@ struct ReceiptScreen: View {
                     message: String(localized: "Fixa reached the last step and stopped. Nothing was submitted.")
                 )
             } else {
-                FxStatusStamp(caseNumber: sent.caseNumber)
+                VStack(spacing: Fx.Space.s) {
+                    FxStatusStamp(caseNumber: sent.caseNumber)
+                    // The stamp caps its text size; this plain line scales all the way and can be selected.
+                    if let caseNumber = sent.caseNumber {
+                        Text("Case number \(caseNumber.ltrIsolated)")
+                            .font(Fx.Font.headline)
+                            .foregroundStyle(Fx.Color.ink)
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .textSelection(.enabled)
+                    }
+                }
             }
 
             VStack(spacing: Fx.Space.s) {
@@ -61,6 +73,13 @@ struct ReceiptScreen: View {
                         .foregroundStyle(Fx.Color.ink2)
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
+                    if model.draft.wantsFeedback, locale.language.languageCode != .swedish {
+                        Text("The reply will be in Swedish. You can open it in Translate.")
+                            .font(Fx.Font.callout)
+                            .foregroundStyle(Fx.Color.ink2)
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                     FxSecondaryButton(title: String(localized: "Sent reports"), systemImage: "clock.arrow.circlepath") {
                         model.finish()
                         model.path = [.history]

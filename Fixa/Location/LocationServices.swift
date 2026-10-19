@@ -24,45 +24,90 @@ extension AdapterSpec.Region {
     }
 }
 
-/// One-shot "Use my location". Authorization is requested only when the user taps the button.
+/// One-shot current location. Every lookup is bounded by a timeout, so nothing can spin forever.
+/// Authorization is requested only by an explicit lookup when it hasn't been decided yet.
 @MainActor
 enum LocationProvider {
-    enum Failure: Error {
+    enum Failure: Error, Sendable {
         case denied
+        case restricted
+        case servicesOff
         case unavailable
+        case timedOut
     }
 
-    static func currentCoordinate() async throws -> CLLocationCoordinate2D {
+    /// What Fixa may do with location right now, read without prompting.
+    enum Access: Equatable, Sendable {
+        case notDetermined
+        case allowed(precise: Bool)
+        case denied
+        case restricted
+        case servicesOff
+    }
+
+    /// A found position; `isApproximate` when the user shares only an approximate location.
+    struct Fix: Sendable {
+        let coordinate: Coordinate
+        let isApproximate: Bool
+    }
+
+    private static let manager = CLLocationManager()
+
+    /// Current authorization. `locationServicesEnabled()` blocks, so it runs off the main actor.
+    static func access() async -> Access {
+        let servicesOn = await Task.detached { CLLocationManager.locationServicesEnabled() }.value
+        guard servicesOn else { return .servicesOff }
+        switch manager.authorizationStatus {
+        case .notDetermined: return .notDetermined
+        case .restricted: return .restricted
+        case .denied: return .denied
+        default: return .allowed(precise: manager.accuracyAuthorization == .fullAccuracy)
+        }
+    }
+
+    /// Quiet lookup: nil on any failure or after `timeout`.
+    static func currentCoordinate(timeout: Duration) async -> Coordinate? {
+        try? await currentFix(timeout: timeout).coordinate
+    }
+
+    /// Lookup that says why it failed. The clock starts once the permission prompt (if any) is answered,
+    /// then gives up with `Failure.timedOut` after `timeout`.
+    static func currentFix(timeout: Duration) async throws -> Fix {
+        try await withThrowingTaskGroup(of: Fix.self) { group in
+            group.addTask { try await liveFix() }
+            group.addTask {
+                while await isAskingPermission() {
+                    try await Task.sleep(for: .milliseconds(500))
+                }
+                try await Task.sleep(for: timeout)
+                throw Failure.timedOut
+            }
+            defer { group.cancelAll() }
+            guard let first = try await group.next() else { throw Failure.unavailable }
+            return first
+        }
+    }
+
+    private static func isAskingPermission() -> Bool {
+        manager.authorizationStatus == .notDetermined
+    }
+
+    private static func liveFix() async throws -> Fix {
         let session = CLServiceSession(authorization: .whenInUse)
         defer { session.invalidate() }
         for try await update in CLLocationUpdate.liveUpdates() {
-            if update.authorizationDenied || update.authorizationDeniedGlobally || update.authorizationRestricted {
-                throw Failure.denied
+            if update.authorizationDeniedGlobally { throw Failure.servicesOff }
+            if update.authorizationRestricted { throw Failure.restricted }
+            if update.authorizationDenied { throw Failure.denied }
+            guard let location = update.location, location.horizontalAccuracy >= 0 else { continue }
+            if update.accuracyLimited || manager.accuracyAuthorization == .reducedAccuracy {
+                return Fix(coordinate: Coordinate(location.coordinate), isApproximate: true)
             }
-            if let location = update.location, location.horizontalAccuracy >= 0, location.horizontalAccuracy < 200 {
-                return location.coordinate
+            if location.horizontalAccuracy < 200 {
+                return Fix(coordinate: Coordinate(location.coordinate), isApproximate: false)
             }
         }
         throw Failure.unavailable
-    }
-
-    /// Like `currentCoordinate()` but gives up quietly after `timeout`; nil on any failure.
-    /// Requests nothing on its own when authorization is already decided.
-    static func currentCoordinate(timeout: Duration) async -> Coordinate? {
-        let lookup = Task { @MainActor () -> Coordinate? in
-            guard let found = try? await currentCoordinate() else { return nil }
-            return Coordinate(found)
-        }
-        let timer = Task { @MainActor in
-            try? await Task.sleep(for: timeout)
-            lookup.cancel()
-        }
-        defer { timer.cancel() }
-        return await withTaskCancellationHandler {
-            await lookup.value
-        } onCancel: {
-            lookup.cancel()
-        }
     }
 }
 

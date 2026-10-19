@@ -1,0 +1,215 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Fixa App Store frames</title>
+<!--
+  Template only. Copy, crops and colours: frames.data.js. Type and furniture: :root tokens below.
+  render.mjs loads ?locale=<sv|en-US>&frame=<01..05> (or &contact=1) and screenshots .frame.
+  Type is the system font (SF Pro), the same as the app UI.
+-->
+<style>
+:root {
+  --canvas-w: 1320px;
+  --canvas-h: 2868px;
+  --paper: #F7F5F0;
+  --ink: #1E2136;
+  --ink-2: #4A4E63;
+  --blue: #1F5A8A;
+  --hairline: rgba(30, 33, 54, 0.16);
+
+  --copy-x: 110px;
+  --copy-w: 1100px;
+  --headline-top: 150px;
+  --headline-size: 124px;
+  --headline-line: 1.06;
+  --headline-weight: 700;
+  --headline-tracking: -0.022em;
+  --subline-top: 446px;
+  --subline-size: 50px;
+  --subline-line: 1.24;
+  --subline-weight: 500;
+
+  --device-shadow: 0 34px 90px rgba(30, 33, 54, 0.14), 0 6px 18px rgba(30, 33, 54, 0.08);
+  --pop-shadow: 0 40px 90px rgba(30, 33, 54, 0.22), 0 8px 22px rgba(30, 33, 54, 0.12);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+*, *::before, *::after { animation: none !important; transition: none !important; caret-color: transparent; }
+::selection { background: transparent; }
+html, body { width: var(--canvas-w); height: var(--canvas-h); overflow: hidden; background: var(--paper); }
+body { font-family: -apple-system, "SF Pro Display", system-ui, sans-serif; -webkit-font-smoothing: antialiased; color: var(--ink); }
+
+.frame { position: relative; width: var(--canvas-w); height: var(--canvas-h); overflow: hidden; background: var(--paper); }
+.frame > * { position: absolute; }
+.bg { inset: 0; z-index: 0; }
+
+.headline {
+  left: var(--copy-x); top: var(--headline-top); width: var(--copy-w);
+  font-size: var(--headline-size); line-height: var(--headline-line);
+  font-weight: var(--headline-weight); letter-spacing: var(--headline-tracking);
+  color: var(--ink); text-wrap: balance; hyphens: manual; z-index: 3;
+}
+.subline {
+  left: var(--copy-x); top: var(--subline-top); width: var(--copy-w);
+  font-size: var(--subline-size); line-height: var(--subline-line); font-weight: var(--subline-weight);
+  color: var(--ink-2); text-wrap: balance; z-index: 3;
+}
+.device, .pop {
+  overflow: hidden; background: var(--paper);
+  outline: 2px solid var(--hairline); outline-offset: -1px;
+}
+.device { box-shadow: var(--device-shadow); z-index: 2; }
+.pop { box-shadow: var(--pop-shadow); z-index: 4; }
+.device img, .pop img { position: absolute; display: block; }
+.icon { z-index: 4; border-radius: 22.4%; box-shadow: var(--pop-shadow); outline: 2px solid var(--hairline); outline-offset: -1px; }
+
+.contact { position: relative; background: #E9E5DC; }
+.contact img { position: absolute; display: block; }
+</style>
+<script src="frames.data.js"></script>
+</head>
+<body>
+<script>
+const params = new URLSearchParams(location.search);
+window.__GALLERY__ = GALLERY;
+window.__FRAMES__ = FRAMES.map(f => ({ id: f.id, screen: f.screen, headline: f.headline, subline: f.subline }));
+window.__CHECKS__ = [];
+
+const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const capture = (locale, screen) => `captures/${locale}/${screen}.png`;
+
+function luminance(hex) {
+  const v = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255)
+    .map(c => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
+}
+const contrast = (a, b) => { const [x, y] = [luminance(a), luminance(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+
+async function settle(imgs) {
+  await document.fonts.ready;
+  await Promise.all(imgs.map(i => i.decode()));
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+}
+
+function background(b) {
+  const W = GALLERY.canvas.width, H = GALLERY.canvas.height;
+  return `<svg class="bg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="${b.from}"/><stop offset="0.28" stop-color="${b.from}"/><stop offset="1" stop-color="${b.to}"/>
+      </linearGradient>
+      <radialGradient id="r" cx="0.5" cy="0.62" r="0.5">
+        <stop offset="0" stop-color="${b.glow}" stop-opacity="0.55"/><stop offset="1" stop-color="${b.glow}" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="${W}" height="${H}" fill="url(#g)"/>
+    <rect width="${W}" height="${H}" fill="url(#r)"/>
+  </svg>`;
+}
+
+async function renderFrame(locale, id) {
+  const fail = msg => window.__CHECKS__.push(msg);
+  const f = FRAMES.find(x => x.id === id);
+  if (!f) throw new Error(`unknown frame ${id}`);
+  if (!GALLERY.locales.includes(locale)) throw new Error(`unknown locale ${locale}`);
+  for (const k of ["purpose", "desire", "objection", "proof", "evidence", "headline", "background"]) if (!f[k]) fail(`missing ${k}`);
+  const head = f.headline[locale], sub = f.subline ? f.subline[locale] : "";
+  if (!head) fail("missing headline");
+  if (f.subline && !sub) fail("missing subline");
+  const words = (head || "").trim().split(/\s+/).length;
+  if (words < 2 || words > 6) fail(`headline has ${words} words`);
+  if (/[\u2013\u2014]/.test(head + sub)) fail("em/en dash in copy");
+  if (/seamless|effortless|powerful|unlock|elevate|reimagine|!/i.test(head + sub)) fail("slogan word or exclamation");
+
+  const cap = GALLERY.captureSize, D = DEVICE;
+  const s = D.w / cap.width, dh = Math.round(cap.height * s);
+  const pops = (f.pops || []).map(p => {
+    const c = p.crop[locale];
+    if (!c) { fail(`pop ${p.src} has no crop for ${locale}`); return ""; }
+    const w = Math.round(c.w * p.scale), h = Math.round(c.h * p.scale);
+    const left = Math.round(p.center.x - w / 2), top = Math.round(p.center.y - h / 2);
+    return `<div class="pop" data-role="artwork" style="left:${left}px;top:${top}px;width:${w}px;height:${h}px;border-radius:${p.radius}px;transform:rotate(${p.rotate}deg)">
+      <img alt="" src="${capture(locale, p.src)}" style="left:${-c.x * p.scale}px;top:${-c.y * p.scale}px;width:${cap.width * p.scale}px;height:${cap.height * p.scale}px"></div>`;
+  }).join("");
+  const icon = f.icon ? `<img class="icon" data-role="artwork" alt="" src="${f.icon.src}" style="left:${f.icon.center.x - f.icon.size / 2}px;top:${f.icon.center.y - f.icon.size / 2}px;width:${f.icon.size}px;height:${f.icon.size}px">` : "";
+
+  document.documentElement.lang = locale;
+  const frame = document.createElement("div");
+  frame.className = "frame";
+  frame.innerHTML = `${background(f.background)}
+    <h1 class="headline" data-role="headline">${esc(head || "")}</h1>
+    ${sub ? `<p class="subline" data-role="bullet">${esc(sub)}</p>` : ""}
+    <div class="device" data-role="app-capture" style="left:${D.x}px;top:${D.y}px;width:${D.w}px;height:${dh}px;border-radius:${D.radius}px">
+      <img alt="" src="${capture(locale, f.screen)}" style="left:0;top:0;width:${D.w}px;height:${dh}px"></div>
+    ${pops}${icon}`;
+  document.body.appendChild(frame);
+  await settle([...frame.querySelectorAll("img")]);
+
+  // ---- DOM gates ----
+  const W = GALLERY.canvas.width, H = GALLERY.canvas.height, sa = GALLERY.safeArea;
+  for (const img of frame.querySelectorAll(".device img, .pop img")) {
+    if (img.naturalWidth !== cap.width || img.naturalHeight !== cap.height) fail(`capture ${img.getAttribute("src")} is ${img.naturalWidth}x${img.naturalHeight}`);
+  }
+  const h1 = frame.querySelector(".headline"), cs = getComputedStyle(h1);
+  if (parseFloat(cs.fontSize) < GALLERY.headline.minPx) fail(`headline ${cs.fontSize} below floor`);
+  const lines = Math.round(h1.getBoundingClientRect().height / parseFloat(cs.lineHeight));
+  if (lines > GALLERY.headline.maxLines) fail(`headline ${lines} lines`);
+  const inSafe = (el, label) => {
+    const range = document.createRange(); range.selectNodeContents(el);
+    for (const r of range.getClientRects()) {
+      if (r.left < sa.left || r.right > W - sa.right || r.top < sa.top) fail(`${label} outside safe area (${Math.round(r.left)},${Math.round(r.top)},${Math.round(r.right)})`);
+    }
+    return el.getBoundingClientRect();
+  };
+  const hb = inSafe(h1, "headline");
+  const sub$ = frame.querySelector(".subline");
+  const db = frame.querySelector(".device").getBoundingClientRect();
+  let copyBottom = hb.bottom;
+  if (sub$) {
+    const sb = inSafe(sub$, "subline");
+    if (sb.top < hb.bottom + 8) fail(`subline (${Math.round(sb.top)}) collides with headline (${Math.round(hb.bottom)})`);
+    const sl = Math.round(sb.height / parseFloat(getComputedStyle(sub$).lineHeight));
+    if (sl > 2) fail(`subline ${sl} lines`);
+    copyBottom = sb.bottom;
+  }
+  if (copyBottom > db.top - 24) fail(`copy (${Math.round(copyBottom)}) collides with device (${Math.round(db.top)})`);
+  if (db.left < sa.left || db.right > W - sa.right || db.bottom > H - sa.bottom) fail("device outside safe area");
+  for (const p of frame.querySelectorAll(".pop, .icon")) {
+    const b = p.getBoundingClientRect();
+    if (b.left < sa.left || b.right > W - sa.right || b.bottom > H - sa.bottom) fail(`pop outside safe area (${Math.round(b.left)},${Math.round(b.right)},${Math.round(b.bottom)})`);
+    if (b.top < copyBottom + 24) fail("pop collides with copy");
+  }
+  const bgTop = f.background.from;
+  const c1 = contrast(css("--ink"), bgTop), c2 = contrast(css("--ink-2"), bgTop);
+  if (c1 < 4.5) fail(`headline contrast ${c1.toFixed(2)}`);
+  if (c2 < 4.5) fail(`subline contrast ${c2.toFixed(2)}`);
+}
+
+async function renderContact(locale) {
+  const thumbW = 330, thumbH = Math.round(thumbW * GALLERY.canvas.height / GALLERY.canvas.width), gap = 40, cols = FRAMES.length;
+  const W = cols * thumbW + (cols + 1) * gap, H = thumbH + 2 * gap;
+  document.documentElement.style.cssText += `;--canvas-w:${W}px;--canvas-h:${H}px`;
+  const sheet = document.createElement("div");
+  sheet.className = "frame contact";
+  sheet.style.cssText = `width:${W}px;height:${H}px`;
+  sheet.innerHTML = FRAMES.map((f, i) =>
+    `<img alt="" src="out/${locale}/${f.id}.png" style="left:${gap + i * (thumbW + gap)}px;top:${gap}px;width:${thumbW}px;height:${thumbH}px">`).join("");
+  document.body.appendChild(sheet);
+  await settle([...sheet.querySelectorAll("img")]);
+  window.__CONTACT_SIZE__ = { width: W, height: H };
+}
+
+(async () => {
+  try {
+    const locale = params.get("locale");
+    if (params.get("contact")) await renderContact(locale);
+    else await renderFrame(locale, params.get("frame") || FRAMES[0].id);
+  } catch (e) {
+    window.__CHECKS__.push(String(e && e.stack || e));
+  }
+  window.__SCREENSHOT_READY__ = true;
+})();
+</script>
+</body>
+</html>

@@ -1,33 +1,65 @@
 import FixaKit
 import MapKit
 import SwiftUI
+import UIKit
 
-/// Tap the map to place the pin, search an address, or use the current location.
+/// Centre-pin location picker: the pin stays in the middle and the map moves under it.
+/// Place it by moving the map, tapping a spot (re-centres there), searching an address,
+/// or the full-width "Use my current location" row under the search field.
 struct LocationPickerSheet: View {
     let spec: AdapterSpec
     @Environment(AppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.openURL) private var openURL
+    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.fxHaptics) private var haptics
+    @Environment(\.fxReduceMotion) private var reduceMotion
 
+    /// The placed spot; nil until the user places it (or a saved draft brings one).
     @State private var pin: CLLocationCoordinate2D?
     @State private var address = ""
     @State private var position: MapCameraPosition
+    /// The camera centre after the last move, i.e. where the drawn pin points.
+    @State private var centre: CLLocationCoordinate2D
+    @State private var cameraDistance: Double
+    /// Where a programmatic camera move is heading; its camera-change end must not count as the user's move.
+    @State private var pendingCentre: CLLocationCoordinate2D?
     @State private var search: AddressSearch
-    @State private var isLocating = false
-    @State private var locationProblem: String?
+    @State private var locate: LocateState = .idle
+    @State private var locateTask: Task<Void, Never>?
     @State private var geocodeTask: Task<Void, Never>?
+    @State private var didAutoLocate = false
+    @State private var foundCount = 0
     @FocusState private var searchFocused: Bool
+
+    /// Opening view when nothing is known yet: Gustavsberg centrum at about 3 km.
+    private static let gustavsberg = CLLocationCoordinate2D(latitude: 59.3262, longitude: 18.3856)
+    private static let overviewMeters: Double = 3000
+    private static let closeMeters: Double = 400
+    private static let nudgeMeters: Double = 20
+    private static let locateTimeout: Duration = .seconds(15)
 
     init(spec: AdapterSpec) {
         self.spec = spec
-        let region = spec.municipality.region.mapRegion
-        _position = State(initialValue: .region(region))
-        _search = State(initialValue: AddressSearch(region: region))
+        let region = spec.municipality.region
+        let start = region.contains(Coordinate(Self.gustavsberg)) ? Self.gustavsberg : region.center.clLocation
+        _position = State(initialValue: .region(MKCoordinateRegion(
+            center: start, latitudinalMeters: Self.overviewMeters, longitudinalMeters: Self.overviewMeters
+        )))
+        _centre = State(initialValue: start)
+        _cameraDistance = State(initialValue: Self.overviewMeters * 2)
+        _pendingCentre = State(initialValue: start)
+        _search = State(initialValue: AddressSearch(region: region.mapRegion))
     }
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                searchField
+                VStack(spacing: Fx.Space.s) {
+                    searchField
+                    locateRow
+                }
+                .padding(Fx.Space.l)
                 if !search.suggestions.isEmpty, searchFocused {
                     suggestionList
                 } else {
@@ -44,7 +76,17 @@ struct LocationPickerSheet: View {
                 }
             }
         }
+        .sensoryFeedback(.success, trigger: foundCount) { _, _ in haptics }
         .onAppear(perform: loadFromDraft)
+        .task { await refreshAccess(autoLocate: true) }
+        .onChange(of: scenePhase) { _, phase in
+            guard phase == .active else { return }
+            Task { await refreshAccess(autoLocate: false) }
+        }
+        .onDisappear {
+            locateTask?.cancel()
+            geocodeTask?.cancel()
+        }
     }
 
     // MARK: Parts
@@ -55,13 +97,18 @@ struct LocationPickerSheet: View {
                 .foregroundStyle(Fx.Color.ink2)
                 .accessibilityHidden(true)
             TextField(
-                String(localized: "Search for an address or place"),
-                text: Binding(get: { search.query }, set: { search.query = $0 })
-            )
+                text: Binding(get: { search.query }, set: { search.query = $0 }),
+                prompt: Text("Search for an address or place").foregroundStyle(Fx.Color.ink2)
+            ) {
+                Text("Search for an address or place")
+            }
             .focused($searchFocused)
             .textInputAutocapitalization(.words)
             .autocorrectionDisabled()
             .submitLabel(.search)
+            .onSubmit {
+                if let first = search.suggestions.first { choose(first) }
+            }
             if !search.query.isEmpty {
                 Button {
                     search.query = ""
@@ -74,10 +121,89 @@ struct LocationPickerSheet: View {
             }
         }
         .font(Fx.Font.body)
+        .foregroundStyle(Fx.Color.ink)
         .padding(.horizontal, Fx.Space.m)
         .frame(minHeight: Fx.minTarget)
-        .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.s), fill: Fx.Color.card)
-        .padding(Fx.Space.l)
+        .fxOutline(
+            RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous),
+            fill: Fx.Color.card,
+            outline: searchFocused ? Fx.Color.sea : Fx.Color.fieldBorder,
+            width: searchFocused ? Fx.Border.emphasis : Fx.Border.hairline
+        )
+    }
+
+    /// Full-width "Use my current location" row with its state; extra control under it when needed.
+    private var locateRow: some View {
+        let shape = RoundedRectangle(cornerRadius: Fx.Radius.m, style: .continuous)
+        return VStack(alignment: .leading, spacing: 0) {
+            Button(action: useMyLocation) {
+                HStack(alignment: .center, spacing: Fx.Space.m) {
+                    locateIcon
+                        .frame(minWidth: 28)
+                        .accessibilityHidden(true)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(locate.title)
+                            .font(Fx.Font.headline)
+                            .foregroundStyle(locate.isWarning ? Fx.Color.ink : Fx.Color.sea)
+                        if let subtitle = locate.subtitle(address: address) {
+                            Text(subtitle)
+                                .font(Fx.Font.footnote)
+                                .foregroundStyle(Fx.Color.ink2)
+                        }
+                    }
+                    .multilineTextAlignment(.leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.horizontal, Fx.Space.m)
+                .padding(.vertical, Fx.Space.s)
+                .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
+                .contentShape(.rect)
+            }
+            .buttonStyle(FxPressStyle())
+            .disabled(locate == .finding)
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityInputLabels([Text("Use my current location"), Text("My location")])
+
+            if let extra = locate.extraAction {
+                Button {
+                    switch extra {
+                    case .openSettings: openSettings()
+                    case .tryAgain: useMyLocation()
+                    }
+                } label: {
+                    Text(extra.title)
+                        .font(Fx.Font.callout.weight(.semibold))
+                        .underline()
+                        .foregroundStyle(Fx.Color.sea)
+                        .frame(maxWidth: .infinity, minHeight: Fx.minTarget, alignment: .leading)
+                        .padding(.horizontal, Fx.Space.m)
+                        .contentShape(.rect)
+                }
+                .buttonStyle(FxPressStyle())
+            }
+        }
+        .fxOutline(shape, fill: Fx.Color.card, outline: locate.isWarning ? Fx.Color.fieldBorder : Fx.Color.sea, width: Fx.Border.emphasis)
+    }
+
+    @ViewBuilder private var locateIcon: some View {
+        switch locate {
+        case .finding:
+            ProgressView().tint(Fx.Color.sea)
+        case .found:
+            Image(systemName: "checkmark.circle.fill")
+                .font(Fx.Font.headline)
+                .foregroundStyle(Fx.Color.success)
+        case .idle:
+            Image(systemName: "location.fill")
+                .font(Fx.Font.headline)
+                .foregroundStyle(Fx.Color.sea)
+        default:
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(Fx.Font.headline)
+                .foregroundStyle(Fx.Color.ink)
+        }
     }
 
     private var suggestionList: some View {
@@ -106,87 +232,182 @@ struct LocationPickerSheet: View {
     private var map: some View {
         MapReader { proxy in
             Map(position: $position) {
-                if let pin {
-                    Marker(address, coordinate: pin)
-                        .tint(Fx.Color.sea)
-                }
                 UserAnnotation()
             }
             .mapControls {
                 MapCompass()
                 MapScaleView()
             }
+            .onMapCameraChange(frequency: .onEnd) { context in
+                cameraMoved(to: context.camera.centerCoordinate, distance: context.camera.distance)
+            }
             .onTapGesture { point in
-                if let coordinate = proxy.convert(point, from: .local) {
-                    setPin(coordinate, address: nil)
-                }
+                guard let coordinate = proxy.convert(point, from: .local) else { return }
+                place(coordinate, address: nil, moveCamera: true)
             }
-            .accessibilityLabel(Text("Map. Tap to place the pin where the problem is."))
-            .overlay(alignment: .bottomTrailing) {
-                FxIconButton(
-                    systemImage: "location",
-                    label: isLocating ? String(localized: "Finding you…") : String(localized: "Use my location"),
-                    isLoading: isLocating
-                ) {
-                    useMyLocation()
-                }
-                // Sit above the Maps logo / legal row so they never collide (narrow screens, RTL).
-                .padding(.horizontal, Fx.Space.l)
-                .padding(.bottom, Fx.Space.xxl)
+            .overlay { centrePin }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text("Map. Move the map so the problem is under the centre mark."))
+            .accessibilityValue(Text(pinSummary))
+            .accessibilityAction(named: Text("Put the pin at the centre")) {
+                place(centre, address: nil, moveCamera: false)
             }
+            .accessibilityAction(named: Text("Move pin north 20 m")) { nudge(north: Self.nudgeMeters, east: 0) }
+            .accessibilityAction(named: Text("Move pin south 20 m")) { nudge(north: -Self.nudgeMeters, east: 0) }
+            .accessibilityAction(named: Text("Move pin east 20 m")) { nudge(north: 0, east: Self.nudgeMeters) }
+            .accessibilityAction(named: Text("Move pin west 20 m")) { nudge(north: 0, east: -Self.nudgeMeters) }
         }
+    }
+
+    /// The fixed pin: its tip sits on the map centre. Faded until a place is chosen.
+    private var centrePin: some View {
+        Image(systemName: "mappin")
+            .font(.system(size: 40, weight: .semibold))
+            .foregroundStyle(Fx.Color.sea)
+            .shadow(color: .black.opacity(0.25), radius: 2, y: 1)
+            .opacity(pin == nil ? 0.6 : 1)
+            .alignmentGuide(VerticalAlignment.center) { $0[.bottom] }
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
     }
 
     private var footer: some View {
         VStack(alignment: .leading, spacing: Fx.Space.m) {
-            if let pin, !spec.municipality.region.contains(Coordinate(pin)) {
+            if isOutside {
                 FxBanner(
                     kind: .warning,
-                    title: String(localized: "Outside \(spec.municipality.name)"),
-                    message: String(localized: "This spot looks outside the municipality. Move the pin if that's wrong.")
+                    title: String(localized: "The pin is outside \(spec.municipality.name)"),
+                    message: String(localized: "Fixa only sends reports to \(spec.municipality.name). Search for the address of the problem, or move the map.")
                 )
             }
-            if let locationProblem {
-                FxBanner(kind: .info, title: locationProblem)
-            }
-            HStack(spacing: Fx.Space.s) {
-                Image(systemName: pin == nil ? "hand.tap" : "mappin.and.ellipse")
+            Text("Move the map so the pin is on the problem.")
+                .font(Fx.Font.footnote)
+                .foregroundStyle(Fx.Color.ink2)
+                .fixedSize(horizontal: false, vertical: true)
+            HStack(alignment: .firstTextBaseline, spacing: Fx.Space.s) {
+                Image(systemName: "mappin.and.ellipse")
                     .foregroundStyle(Fx.Color.sea)
                     .accessibilityHidden(true)
                 Text(pinSummary)
                     .font(Fx.Font.callout)
                     .foregroundStyle(pin == nil ? Fx.Color.ink2 : Fx.Color.ink)
+                    .fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 0)
             }
-            FxPrimaryButton(title: String(localized: "Use this place"), systemImage: "checkmark") {
+            FxPrimaryButton(title: confirmTitle, systemImage: isOutside ? nil : "checkmark") {
                 confirm()
             }
-            .disabled(pin == nil)
-            .opacity(pin == nil ? 0.5 : 1)
+            .disabled(pin == nil || isOutside)
+            .accessibilityHint(Text(confirmHint))
         }
         .padding(Fx.Space.l)
         .background(Fx.Color.paper)
     }
 
+    private var isOutside: Bool {
+        guard let pin else { return false }
+        return !spec.municipality.region.contains(Coordinate(pin))
+    }
+
+    private var confirmTitle: String {
+        isOutside
+            ? String(localized: "Place is outside \(spec.municipality.name)")
+            : String(localized: "Use this place")
+    }
+
+    private var confirmHint: String {
+        pin == nil ? String(localized: "Put the pin on the map first") : ""
+    }
+
     private var pinSummary: String {
-        guard pin != nil else { return String(localized: "Tap the map where the problem is.") }
+        guard pin != nil else { return String(localized: "No place chosen yet.") }
         return address.isEmpty ? String(localized: "Finding the address…") : address
     }
 
     // MARK: Actions
 
     private func loadFromDraft() {
-        guard let coordinate = model.draft.coordinate else { return }
+        guard pin == nil, let coordinate = model.draft.coordinate else { return }
         pin = coordinate.clLocation
         address = model.draft.locationText
-        position = .region(MKCoordinateRegion(center: coordinate.clLocation, latitudinalMeters: 600, longitudinalMeters: 600))
+        moveCamera(to: coordinate.clLocation, meters: 600)
     }
 
-    private func setPin(_ coordinate: CLLocationCoordinate2D, address knownAddress: String?) {
+    /// Reads authorization without prompting; on open, locates automatically when already allowed.
+    private func refreshAccess(autoLocate: Bool) async {
+        let access = await LocationProvider.access()
+        switch access {
+        case .allowed(let precise):
+            if !precise, locate != .finding { locate = .approximate }
+            if precise, locate.isPermissionState { locate = .idle }
+            if autoLocate, !didAutoLocate, pin == nil, model.draft.coordinate == nil {
+                didAutoLocate = true
+                useMyLocation()
+            }
+        case .notDetermined:
+            if locate.isPermissionState { locate = .idle }
+        case .denied:
+            locate = .notAllowed(canOpenSettings: true)
+        case .restricted:
+            locate = .notAllowed(canOpenSettings: false)
+        case .servicesOff:
+            locate = .servicesOff
+        }
+    }
+
+    private func useMyLocation() {
+        guard locate != .finding else { return }
+        searchFocused = false
+        locate = .finding
+        locateTask?.cancel()
+        locateTask = Task {
+            do {
+                let fix = try await LocationProvider.currentFix(timeout: Self.locateTimeout)
+                guard !Task.isCancelled else { return }
+                if fix.isApproximate {
+                    locate = .approximate
+                    moveCamera(to: fix.coordinate.clLocation, meters: Self.overviewMeters)
+                } else {
+                    locate = .found
+                    foundCount += 1
+                    place(fix.coordinate.clLocation, address: nil, moveCamera: false)
+                    moveCamera(to: fix.coordinate.clLocation, meters: Self.closeMeters)
+                }
+            } catch LocationProvider.Failure.denied {
+                locate = .notAllowed(canOpenSettings: true)
+            } catch LocationProvider.Failure.restricted {
+                locate = .notAllowed(canOpenSettings: false)
+            } catch LocationProvider.Failure.servicesOff {
+                locate = .servicesOff
+            } catch {
+                guard !Task.isCancelled else { return }
+                locate = .failed
+            }
+        }
+    }
+
+    /// End of any camera move. A user's move places the pin at the new centre.
+    private func cameraMoved(to coordinate: CLLocationCoordinate2D, distance: Double) {
+        centre = coordinate
+        cameraDistance = distance
+        if let pending = pendingCentre {
+            pendingCentre = nil
+            if Self.meters(from: pending, to: coordinate) < 15 { return }
+        }
+        place(coordinate, address: nil, moveCamera: false)
+    }
+
+    /// Sets the pin, geocodes it when the address isn't known, announces the result to VoiceOver.
+    private func place(_ coordinate: CLLocationCoordinate2D, address knownAddress: String?, moveCamera move: Bool) {
+        if locate == .found, let current = pin, Self.meters(from: current, to: coordinate) > 1 {
+            locate = .idle
+        }
         pin = coordinate
+        if move { moveCamera(to: coordinate, distance: cameraDistance) }
         geocodeTask?.cancel()
         if let knownAddress {
             address = knownAddress
+            announcePlacement()
             return
         }
         address = ""
@@ -194,41 +415,130 @@ struct LocationPickerSheet: View {
             let text = await ReverseGeocoder.address(for: coordinate)
             guard !Task.isCancelled else { return }
             address = text ?? String(format: "%.5f, %.5f", coordinate.latitude, coordinate.longitude)
+            announcePlacement()
         }
+    }
+
+    private func announcePlacement() {
+        var text = String(localized: "Pin placed: \(address)")
+        if isOutside {
+            text += " " + String(localized: "The pin is outside \(spec.municipality.name)")
+        }
+        AccessibilityNotification.Announcement(text).post()
+    }
+
+    private func nudge(north: Double, east: Double) {
+        let from = pin ?? centre
+        let latitude = from.latitude + north / 111_320
+        let longitude = from.longitude + east / (111_320 * cos(from.latitude * .pi / 180))
+        place(CLLocationCoordinate2D(latitude: latitude, longitude: longitude), address: nil, moveCamera: true)
     }
 
     private func choose(_ suggestion: AddressSearch.Suggestion) {
         searchFocused = false
         Task {
             guard let (coordinate, text) = await search.resolve(suggestion) else { return }
-            setPin(coordinate, address: text)
-            position = .region(MKCoordinateRegion(center: coordinate, latitudinalMeters: 600, longitudinalMeters: 600))
+            place(coordinate, address: text, moveCamera: false)
+            moveCamera(to: coordinate, meters: 600)
             search.query = ""
         }
     }
 
-    private func useMyLocation() {
-        guard !isLocating else { return }
-        isLocating = true
-        locationProblem = nil
-        Task {
-            defer { isLocating = false }
-            do {
-                let coordinate = try await LocationProvider.currentCoordinate()
-                setPin(coordinate, address: nil)
-                position = .region(MKCoordinateRegion(center: coordinate, latitudinalMeters: 400, longitudinalMeters: 400))
-            } catch LocationProvider.Failure.denied {
-                locationProblem = String(localized: "Location is off for Fixa. You can turn it on in Settings, or tap the map instead.")
-            } catch {
-                locationProblem = String(localized: "Couldn't find your location. Tap the map instead.")
+    private func moveCamera(to coordinate: CLLocationCoordinate2D, meters: Double) {
+        moveCamera(to: coordinate, distance: meters * 2)
+    }
+
+    private func moveCamera(to coordinate: CLLocationCoordinate2D, distance: Double) {
+        pendingCentre = coordinate
+        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.35)) {
+            position = .camera(MapCamera(centerCoordinate: coordinate, distance: distance))
+        }
+    }
+
+    private func openSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        openURL(url)
+    }
+
+    private func confirm() {
+        guard let pin, !isOutside else { return }
+        model.draft.coordinate = Coordinate(pin)
+        model.draft.locationText = address
+        dismiss()
+    }
+
+    private static func meters(from a: CLLocationCoordinate2D, to b: CLLocationCoordinate2D) -> Double {
+        CLLocation(latitude: a.latitude, longitude: a.longitude)
+            .distance(from: CLLocation(latitude: b.latitude, longitude: b.longitude))
+    }
+}
+
+/// State of the "Use my current location" row.
+private enum LocateState: Equatable {
+    case idle
+    case finding
+    case found
+    case notAllowed(canOpenSettings: Bool)
+    case approximate
+    case servicesOff
+    case failed
+
+    enum Extra {
+        case openSettings, tryAgain
+
+        var title: String {
+            switch self {
+            case .openSettings: String(localized: "Open Settings")
+            case .tryAgain: String(localized: "Try again")
             }
         }
     }
 
-    private func confirm() {
-        guard let pin else { return }
-        model.draft.coordinate = Coordinate(pin)
-        model.draft.locationText = address
-        dismiss()
+    var title: String {
+        switch self {
+        case .idle: String(localized: "Use my current location")
+        case .finding: String(localized: "Finding where you are…")
+        case .found: String(localized: "Pin placed where you are")
+        case .notAllowed: String(localized: "Fixa isn't allowed to use your location")
+        case .approximate: String(localized: "Your iPhone shares only an approximate location")
+        case .servicesOff: String(localized: "Location Services are off on this iPhone")
+        case .failed: String(localized: "Couldn't find where you are")
+        }
+    }
+
+    func subtitle(address: String) -> String? {
+        switch self {
+        case .idle: String(localized: "Puts the pin where you are standing")
+        case .finding: String(localized: "This can take a few seconds outdoors")
+        case .found: address.isEmpty ? String(localized: "Finding the address…") : address
+        case .notAllowed: String(localized: "Search for the address above, or allow it in Settings.")
+        case .approximate: String(localized: "Turn on Precise Location in Settings, or move the map yourself.")
+        case .servicesOff: String(localized: "Settings › Privacy & Security › Location Services")
+        case .failed: String(localized: "Search for the address above, or move the map.")
+        }
+    }
+
+    var extraAction: Extra? {
+        switch self {
+        case .notAllowed(let canOpenSettings): canOpenSettings ? .openSettings : nil
+        case .approximate: .openSettings
+        case .failed: .tryAgain
+        default: nil
+        }
+    }
+
+    var isWarning: Bool {
+        switch self {
+        case .idle, .finding, .found: false
+        default: true
+        }
+    }
+
+    /// States that only reflect permission/settings and should follow a fresh authorization read.
+    var isPermissionState: Bool {
+        switch self {
+        case .notAllowed, .approximate, .servicesOff: true
+        default: false
+        }
     }
 }

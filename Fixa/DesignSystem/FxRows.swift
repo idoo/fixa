@@ -42,6 +42,7 @@ struct FxToggleRow: View {
     let title: String
     var subtitle: String? = nil
     @Binding var isOn: Bool
+    @Environment(\.fxHaptics) private var haptics
 
     init(title: String, subtitle: String? = nil, isOn: Binding<Bool>) {
         self.title = title
@@ -64,7 +65,7 @@ struct FxToggleRow: View {
         }
         .tint(Fx.Color.sea)
         .frame(minHeight: Fx.minTarget)
-        .sensoryFeedback(.selection, trigger: isOn)
+        .sensoryFeedback(.selection, trigger: isOn) { _, _ in haptics }
     }
 }
 
@@ -171,18 +172,31 @@ extension View {
 
 /// Compact single-row phone shortcut (e.g. an emergency line): white card with a warning-sun leading
 /// bar, short title, one secondary line (number and name) and a trailing sea call circle. The whole row
-/// is the tap target; light impact haptic on tap. Put the number in `detail` only, so it shows once.
+/// is the tap target; light impact haptic on tap. Put the number in `detail` only, so it shows once, and
+/// wrap it in `ltrIsolated` so it keeps its order in Arabic. `accessibilityValue` (default `detail`) is what
+/// VoiceOver reads after the title: pass the raw number and name. `inputLabels` are Voice Control names.
 struct FxCallRow: View {
     let title: String
     let detail: String
+    let accessibilityValue: String?
+    let inputLabels: [String]
     let action: () -> Void
 
     @State private var taps = 0
+    @Environment(\.fxHaptics) private var haptics
     @ScaledMetric(relativeTo: .subheadline) private var callSide: CGFloat = 36
 
-    init(title: String, detail: String, action: @escaping () -> Void) {
+    init(
+        title: String,
+        detail: String,
+        accessibilityValue: String? = nil,
+        inputLabels: [String] = [],
+        action: @escaping () -> Void
+    ) {
         self.title = title
         self.detail = detail
+        self.accessibilityValue = accessibilityValue
+        self.inputLabels = inputLabels
         self.action = action
     }
 
@@ -218,10 +232,11 @@ struct FxCallRow: View {
             .contentShape(.rect(cornerRadius: Fx.Radius.m, style: .continuous))
         }
         .buttonStyle(FxPressStyle())
-        .sensoryFeedback(.impact(weight: .light), trigger: taps)
+        .sensoryFeedback(.impact(weight: .light), trigger: taps) { _, _ in haptics }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(title))
-        .accessibilityValue(Text(detail))
+        .accessibilityValue(Text(accessibilityValue ?? detail))
+        .accessibilityInputLabels(([String(localized: "Call", comment: "Voice Control name of a call row"), title] + inputLabels).map { Text($0) })
         .accessibilityHint(Text(String(localized: "Starts a phone call", comment: "Accessibility hint for a call row")))
         .accessibilityAddTraits(.isButton)
     }
@@ -283,6 +298,7 @@ struct FxIconRow: View {
 struct FxProgressSteps: View {
     let current: Int
     let total: Int
+    @Environment(\.fxReduceMotion) private var reduceMotion
 
     init(current: Int, total: Int) {
         self.current = current
@@ -296,13 +312,19 @@ struct FxProgressSteps: View {
         HStack(spacing: Fx.Space.xs) {
             ForEach(1...safeTotal, id: \.self) { step in
                 Capsule()
-                    .fill(step <= safeCurrent ? Fx.Color.sea : Fx.Color.line)
+                    .fill(step <= safeCurrent ? Fx.Color.sea : Fx.Color.fieldBorder)
                     .frame(height: 4)
             }
         }
-        .animation(Fx.Motion.select, value: safeCurrent)
+        .animation(reduceMotion ? nil : Fx.Motion.select, value: safeCurrent)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(String(localized: "Progress", comment: "Accessibility label for the step indicator")))
         .accessibilityValue(Text(String(localized: "Step \(safeCurrent) of \(safeTotal)", comment: "Accessibility value for the step indicator")))
     }
+}
+
+extension String {
+    /// Wrapped in Unicode left-to-right isolates (U+2066 … U+2069) so phone numbers and codes keep their
+    /// order inside right-to-left text (Arabic). Neutral characters like "+" and "‑" otherwise flip.
+    var ltrIsolated: String { "\u{2066}\(self)\u{2069}" }
 }
