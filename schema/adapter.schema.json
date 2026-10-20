@@ -39,16 +39,17 @@
       "required": ["kind", "baseURL", "service", "introPath", "startPath", "nextEventTarget", "sessionLockedMarker", "pages"],
       "properties": {
         "kind": { "type": "string", "enum": ["abou"] },
-        "baseURL": { "type": "string" },
+        "baseURL": { "type": "string", "pattern": "^https://[a-z0-9.-]+/?$", "description": "Plain https origin: no user, port, path or query. A downloaded adapter must keep the bundled adapter's host, kind and service." },
         "service": { "type": "string" },
-        "introPath": { "type": "string" },
-        "startPath": { "type": "string" },
+        "introPath": { "$ref": "#/$defs/path" },
+        "startPath": { "$ref": "#/$defs/path" },
         "nextEventTarget": { "type": "string", "description": "__EVENTTARGET of the Next/Slutför button" },
         "sessionLockedMarker": { "type": "string" },
         "completionPostBackMarker": { "type": "string", "description": "Text on the page shown after Slutför that means the browser would now auto-post the form (e.g. Abou's ThankYou page runs __doPostBack('', '') on load to finish processing). While present, Fixa re-posts the form with an empty __EVENTTARGET." },
-        "maxCompletionPostBacks": { "type": "integer", "description": "Upper bound for those re-posts (default 3)." },
+        "maxCompletionPostBacks": { "type": "integer", "minimum": 0, "maximum": 5, "description": "Upper bound for those re-posts (default 3)." },
         "pages": {
           "type": "array",
+          "maxItems": 20,
           "description": "Pages in order; the last one is the summary page whose Next submits the case.",
           "items": {
             "type": "object",
@@ -58,6 +59,7 @@
               "stage": { "type": "string", "enum": ["sendingReport", "sendingContact", "confirming"] },
               "fields": {
                 "type": "array",
+                "maxItems": 50,
                 "items": {
                   "type": "object",
                   "required": ["role", "key", "control"],
@@ -93,16 +95,17 @@
           "properties": {
             "pageID": { "type": "string" },
             "fieldID": { "type": "string" },
-            "path": { "type": "string" },
-            "filePartName": { "type": "string" },
-            "fileName": { "type": "string" },
-            "actionPath": { "type": "string" }
+            "path": { "$ref": "#/$defs/path" },
+            "filePartName": { "type": "string", "pattern": "^[^\"\\\\/;\\u0000-\\u001f]+$" },
+            "fileName": { "type": "string", "pattern": "^[^\"\\\\/;\\u0000-\\u001f]+$" },
+            "actionPath": { "$ref": "#/$defs/path" }
           }
         }
       }
     },
     "categories": {
       "type": "array",
+      "maxItems": 100,
       "items": {
         "type": "object",
         "required": ["id", "value", "title"],
@@ -116,6 +119,7 @@
     },
     "tiles": {
       "type": "array",
+      "maxItems": 100,
       "items": {
         "type": "object",
         "required": ["id", "symbol", "categoryID", "title", "swedishSummary"],
@@ -175,6 +179,12 @@
     "disclaimer": { "$ref": "#/$defs/localizedText" }
   },
   "$defs": {
+    "path": {
+      "type": "string",
+      "pattern": "^/(?!/)[!#-9;-\\[\\]-~]*$",
+      "not": { "pattern": "//" },
+      "description": "Path on baseURL's host: starts with one '/', no scheme, '//', ':', backslash or whitespace."
+    },
     "coordinate": {
       "type": "object",
       "required": ["latitude", "longitude"],

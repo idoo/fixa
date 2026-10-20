@@ -63,6 +63,7 @@ struct ReportScreen: View {
                         )
                         .focused($keyboardFocus, equals: .details)
                         .accessibilityFocused($a11yFocus, equals: .details)
+                        .accessibilityIdentifier("report.description")
                         quickPhrases
                     }
                     .id(Section.details)
@@ -77,6 +78,7 @@ struct ReportScreen: View {
                 FxPrimaryButton(title: String(localized: "Review", bundle: L10n.bundle, locale: L10n.locale), systemImage: "arrow.forward") {
                     review(scrollingWith: proxy)
                 }
+                .accessibilityIdentifier("report.review")
             }
         }
         .scrollDismissesKeyboard(.interactively)
@@ -273,7 +275,9 @@ struct ReportScreen: View {
                             .font(Fx.Font.body)
                             .foregroundStyle(model.draft.coordinate == nil ? Fx.Color.ink2 : Fx.Color.ink)
                             .multilineTextAlignment(.leading)
-                            .lineLimit(3)
+                            // At accessibility sizes the address wraps word by word; never clip it.
+                            .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 3)
+                            .fixedSize(horizontal: false, vertical: dynamicTypeSize.isAccessibilitySize)
                         Spacer(minLength: Fx.Space.s)
                         Image(systemName: "chevron.forward")
                             .foregroundStyle(Fx.Color.ink2)
@@ -288,6 +292,7 @@ struct ReportScreen: View {
             .accessibilityHint(Text("Opens the map"))
             .accessibilityInputLabels([Text("Place"), Text("Map")])
             .accessibilityFocused($a11yFocus, equals: .place)
+            .accessibilityIdentifier("report.place")
             if let issue {
                 issueText(issue)
             }

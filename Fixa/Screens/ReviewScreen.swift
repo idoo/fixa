@@ -295,7 +295,9 @@ struct ReviewScreen: View {
         } else if submission.error != nil {
             statusSlot
                 .transition(.opacity)
-            FxPrimaryButton(title: String(localized: "Try again", bundle: L10n.bundle, locale: L10n.locale), systemImage: "arrow.clockwise", action: send)
+            if !(submission.error?.isUncertain ?? false) {
+                FxPrimaryButton(title: String(localized: "Try again", bundle: L10n.bundle, locale: L10n.locale), systemImage: "arrow.clockwise", action: send)
+            }
             FxSecondaryButton(title: String(localized: "Send by e-mail instead", bundle: L10n.bundle, locale: L10n.locale), systemImage: "envelope", action: sendByMail)
         } else {
             if submission.isSending {
@@ -308,6 +310,7 @@ struct ReviewScreen: View {
                 isLoading: submission.isSending,
                 action: send
             )
+            .accessibilityIdentifier("review.send")
         }
     }
 

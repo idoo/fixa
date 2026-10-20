@@ -89,9 +89,11 @@ enum TextSizeStep: String, Codable, CaseIterable, Sendable {
     }
 }
 
-/// The app's UI languages. `nil` in `AppModel.language` means "Same as iPhone".
+/// The app's UI languages, in picker order: English and Swedish first, then by native name
+/// (Latin, Greek, Cyrillic, Arabic script). `nil` in `AppModel.language` means "Same as iPhone".
+/// `pt` ships European Portuguese text.
 enum AppLanguage: String, CaseIterable, Identifiable, Sendable {
-    case en, sv, fi, ar, uk, pl
+    case en, sv, cs, da, de, et, es, fr, it, lv, lt, hu, nl, nb, pl, pt, ro, fi, el, ru, uk, ar
 
     var id: String { rawValue }
 

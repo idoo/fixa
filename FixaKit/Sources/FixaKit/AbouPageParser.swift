@@ -44,7 +44,8 @@ public enum AbouPageParser {
             .value
     }
 
-    /// Tolerant receipt reading: nil for form pages, error pages and session locks.
+    /// Tolerant receipt reading: nil for form pages, error pages, session locks and any page that neither
+    /// shows a case number nor says the report was received (a proxy error, an empty page).
     public static func parseReceipt(html: String, url: URL, now: Date) -> SubmissionReceipt? {
         if isSessionLocked(html) || !validationErrors(html).isEmpty { return nil }
         if html.contains("_field$") || decodeEntities(html).contains("Ärendet har inte skickats in") { return nil }
@@ -54,13 +55,20 @@ public enum AbouPageParser {
         let title = matches(#"<title[^>]*>(.*?)</title>"#, in: html, options: [.caseInsensitive, .dotMatchesLineSeparators])
             .first.map { visibleText($0[1]) } ?? ""
         let message = String(mainText(html).prefix(2000))
+        let number = caseNumber(in: message) ?? caseNumber(in: title)
+        guard number != nil || saysReceived(title + " " + message) else { return nil }
         return SubmissionReceipt(
-            caseNumber: caseNumber(in: message) ?? caseNumber(in: title),
+            caseNumber: number,
             finalURL: url,
             title: title,
             message: message,
             submittedAt: now
         )
+    }
+
+    /// Swedish wording of a confirmation page ("Tack…", "vi har tagit emot ditt ärende", "kvittens").
+    static func saysReceived(_ text: String) -> Bool {
+        !matches(#"(?i)\b(tack|tagit emot|mottagits?|mottagen|registrerats?|inskickad|kvittens)\b"#, in: text).isEmpty
     }
 
     // MARK: - Internals

@@ -25,6 +25,16 @@ struct HomeScreen: View {
                             ?? String(localized: "Fixa is an independent app. We are updating it. Your report is saved, and you can still send it by email.", bundle: L10n.bundle, locale: L10n.locale)
                     )
                 }
+                if let notice = model.outboxNotice {
+                    Button {
+                        model.path = [.history]
+                    } label: {
+                        FxBanner(kind: .info, title: notice.title, message: notice.message)
+                    }
+                    .buttonStyle(FxPressStyle())
+                    .accessibilityHint(Text("Opens Sent reports"))
+                    .accessibilityIdentifier("home.outboxBanner")
+                }
                 VStack(alignment: .leading, spacing: Fx.Space.xs) {
                     Text(verbatim: "Fixa")
                         .font(Fx.Font.largeTitle)
@@ -47,6 +57,7 @@ struct HomeScreen: View {
                         ) {
                             model.startReport(tile: tile)
                         }
+                        .accessibilityIdentifier("home.tile.\(tile.id)")
                     }
                 }
 
@@ -73,6 +84,7 @@ struct HomeScreen: View {
                     Label("Settings", systemImage: "gearshape")
                         .labelStyle(.titleAndIcon)
                 }
+                .accessibilityIdentifier("home.settings")
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
@@ -81,6 +93,7 @@ struct HomeScreen: View {
                     Label("Sent reports", systemImage: "clock.arrow.circlepath")
                         .labelStyle(.titleAndIcon)
                 }
+                .accessibilityIdentifier("home.history")
             }
         }
     }

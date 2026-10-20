@@ -1,12 +1,25 @@
 import Foundation
 import FixaKit
 import Observation
+import UIKit
 
 /// What the receipt screen shows. Dry runs never reach the municipality.
 struct SentReport: Equatable, Sendable {
+    enum Outcome: Equatable, Sendable {
+        /// The e-service confirmed it.
+        case sent
+        /// Saved on this phone; Fixa sends it on its own when the e-service can be reached.
+        case waiting
+        /// The final step went out but no confirmation came back. Never sent again on its own.
+        case maybeSent
+    }
+
     var caseNumber: String?
     var date: Date
     var isDryRun: Bool
+    var outcome: Outcome = .sent
+    /// The Sent reports entry for this report, when there is one.
+    var historyID: UUID? = nil
 }
 
 /// Wraps `AbouSubmitter` and publishes progress for the Review screen.
@@ -36,12 +49,19 @@ final class SubmissionService {
     }
 
     /// Returns nil when sending failed; `phase` then holds the error.
+    /// Each call gets its own ephemeral URLSession: Abou's cookies live in that session's private
+    /// jar only (never `HTTPCookieStorage.shared`) and go away with it. A background task keeps the
+    /// send running when the user leaves the app mid-way.
     func submit(_ draft: ReportDraft, spec: AdapterSpec, dryRun: Bool, recordResponses: Bool = false) async -> SentReport? {
         guard !isSending else { return nil }
         phase = .sending(.starting)
+        let background = BackgroundSend()
+        defer { background.end() }
+        let session = URLSessionTransport.ephemeral()
+        defer { session.session.finishTasksAndInvalidate() }
         let submitter = recordResponses
             ? AbouSubmitter(spec: spec, transport: RecordingTransport())
-            : AbouSubmitter(spec: spec)
+            : AbouSubmitter(spec: spec, transport: session)
         do {
             let receipt = try await submitter.submit(draft, dryRun: dryRun) { stage in
                 Task { @MainActor [weak self] in
@@ -63,6 +83,26 @@ final class SubmissionService {
             phase = .failed(.transport(error.localizedDescription))
         }
         return nil
+    }
+}
+
+/// Asks iOS for time to finish a send after the app leaves the screen. When that time runs out
+/// the task is simply ended: the request is never cancelled from here, so a half-finished final
+/// step surfaces as `.uncertain` rather than being retried.
+@MainActor
+private final class BackgroundSend {
+    private var id: UIBackgroundTaskIdentifier = .invalid
+
+    init() {
+        id = UIApplication.shared.beginBackgroundTask(withName: "Fixa send report") { @Sendable [weak self] in
+            MainActor.assumeIsolated { self?.end() }
+        }
+    }
+
+    func end() {
+        guard id != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(id)
+        id = .invalid
     }
 }
 
@@ -94,6 +134,12 @@ extension SubmissionStage {
 }
 
 extension SubmissionError {
+    /// The final step went out but no confirmation came back. Never retry this on its own.
+    var isUncertain: Bool {
+        if case .uncertain = self { return true }
+        return false
+    }
+
     var userMessage: String {
         switch self {
         case .sessionLocked:
@@ -112,6 +158,8 @@ extension SubmissionError {
             String(localized: "Couldn't reach the e-service. Check your connection.", bundle: L10n.bundle, locale: L10n.locale)
         case .invalidSpec:
             String(localized: "Fixa's settings for this municipality are broken. Please update the app.", bundle: L10n.bundle, locale: L10n.locale)
+        case .uncertain:
+            String(localized: "The connection dropped just as the report went out, so Fixa didn't see a confirmation.", bundle: L10n.bundle, locale: L10n.locale)
         }
     }
 }

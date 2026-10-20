@@ -106,6 +106,7 @@ struct LocationPickerSheet: View {
             .textInputAutocapitalization(.words)
             .autocorrectionDisabled()
             .submitLabel(.search)
+            .accessibilityIdentifier("location.search")
             .onSubmit {
                 if let first = search.suggestions.first { choose(first) }
             }
@@ -299,6 +300,7 @@ struct LocationPickerSheet: View {
             }
             .disabled(pin == nil || isOutside)
             .accessibilityHint(Text(confirmHint))
+            .accessibilityIdentifier("location.confirm")
         }
         .padding(Fx.Space.l)
         .background(Fx.Color.paper)

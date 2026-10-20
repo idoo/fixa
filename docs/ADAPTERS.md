@@ -24,7 +24,7 @@ Today the only channel kind is `abou`, the Abou e-service platform (ASP.NET WebF
 | `fallbackEmail` | Optional. Where the "send by e-mail instead" fallback goes. |
 | `disclaimer` | Localized. Shown before sending. |
 
-Localized texts are plain objects keyed by language: `{"sv": "…", "en": "…", "fi": "…", "ar": "…", "uk": "…", "pl": "…"}`. `sv` and `en` are required; the app falls back to English, then Swedish.
+Localized texts are plain objects keyed by language code: `{"sv": "…", "en": "…", "ru": "…", …}`, one key per app language (`en sv cs da de et es fr it lv lt hu nl nb pl pt ro fi el ru uk ar`). `sv` and `en` are required; a missing language falls back to English, then Swedish.
 
 ### `channel` (kind `abou`)
 
@@ -51,6 +51,9 @@ Municipalities edit their e-services. The submitter tolerates small changes and 
 - **Options** (dropdowns, radios): exact value, then the visible text or value after the same normalisation, then `categories[].synonyms` or the field's `optionSynonyms` (`{"Ja": ["Ja tack"]}`, keyed by `yesValue`/`noValue`).
 - **Pages**: by `PageId`, or, if the id was renamed, by finding all of a page's fields on it. Pages without fields (the summary) are matched by id only.
 - **Drift**: anything else throws `SubmissionError.formChanged(FormDrift)` with `pageID`, `missing` (labels of fields or options Fixa can't fill, and of new required questions, the ones with a visible `*`) and a one-sentence `detail`. Network and server answers stay `transport`, `http`, `sessionLocked` and `serverValidation`.
+- **Session lost**: before the final send, a page with `sessionLockedMarker`, the platform's `GenericError` page, or a bounce back to `introPath` (the session expired) makes the submitter start over once from `introPath` with fresh cookies. A second loss surfaces as `sessionLocked` (lock) or `transport` (expiry).
+- **Final send**: posting the summary page is the one request that creates the case. If it, or the ThankYou re-posts after it, time out, fail, or end on a page that shows neither a case number nor received-wording ("Tack", "tagit emot", "kvittens"), the submitter throws `SubmissionError.uncertain`. Nothing after that point is retried or restarted. `SubmissionError.isRetrySafe` is true only for `transport` and `http`, which can only happen before the final send; the app must never resend an `uncertain` report automatically.
+- **Timeouts**: `SubmissionTimeouts.page` (30 s) for every page request, `SubmissionTimeouts.upload` (120 s) for the photo upload.
 
 `fixa-cli dry-run` exits 2 on drift (1 on any other failure), so a scheduled CI job can tell "the form changed" from "the site was down". When it fires, capture the new page, add the new texts to `labels`/`synonyms` or update `key`, and add a fixture test.
 
@@ -58,7 +61,7 @@ Municipalities edit their e-services. The submitter tolerates small changes and 
 
 The app downloads `adapters/<id>.json` and `adapters/status.json` from `main` on GitHub (raw.githubusercontent.com) at launch and when it becomes active, at most every 6 hours. A downloaded adapter replaces the bundled one only if it decodes, passes the same consistency checks as the bundled copy (`AdapterSpec.problems`), has the same `id`, a `specVersion` the app supports, and a `minAppBuild` no higher than the installed build. Otherwise the app keeps what it has. A fix that only needs JSON therefore needs no App Store release.
 
-1. **Canary.** `.github/workflows/canary.yml` runs `fixa-cli dry-run` every day at 06:17 UTC, on every push touching `adapters/**` or `FixaKit/**`, and on demand. Exit 2 (form changed) sets the adapter's state in `adapters/status.json` to `degraded` with a kind message in English and Swedish, and opens (or comments on) an issue labelled `canary` with the drift report. Exit 1 (site down, build broken) only opens or updates the issue.
+1. **Canary.** `.github/workflows/canary.yml` runs `fixa-cli dry-run` every day at 06:17 UTC, on every push touching `adapters/**` or `FixaKit/**`, and on demand. It runs once per category (`--all-categories --no-point --feedback no`, which also covers the server skipping the contact page), then once with a photo (`Fixtures/canary-photo.jpg`), a map point and a reply wanted (the contact page). Runs are sequential, 5 s apart, and all stop at the summary page. Exit 2 (form changed) sets the adapter's state in `adapters/status.json` to `degraded` with a kind message in English and Swedish, and opens (or comments on) an issue labelled `canary` with the drift report. Exit 1 (site down, build broken) only opens or updates the issue.
 2. **Users.** Apps pick up the `degraded` status within 6 hours and show the message on Home. Reports stay saved and can still go by e-mail.
 3. **Fix.** Read the drift report in the issue, run `swift run fixa-cli dry-run --save-html page.html` locally, then update `key`, `labels` or `synonyms` in `adapters/<id>.json`, copy it into `FixaKit/Sources/FixaKit/Resources/adapters/`, and add a fixture test.
 4. **Push** to `main`. The canary runs on the push; when the dry run passes it sets the status back to `ok` and closes the issue. Apps pick up the new adapter and status within 6 hours.
@@ -90,7 +93,10 @@ swift test
 
 ```sh
 cd FixaKit
-swift run fixa-cli dry-run
+swift run fixa-cli dry-run                                   # street-light tile, point, reply wanted
+swift run fixa-cli dry-run --category lighting --category roads --no-point --feedback no
+swift run fixa-cli dry-run --all-categories --delay 5        # every category, one after another
+swift run fixa-cli dry-run --photo foto.jpg                  # also uploads the photo (to the unsent case)
 ```
 
 `fixa-cli submit --live --i-understand-this-creates-a-real-case [--photo foto.jpg] [--save-html receipt.html]` creates a **real** case. Only use it when you have agreed with the municipality to send a test case, then capture the receipt page as a new fixture.

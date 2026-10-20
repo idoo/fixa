@@ -73,5 +73,6 @@ struct SettingsLanguageScreen: View {
         .buttonStyle(FxPressStyle())
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+        .accessibilityIdentifier("language.\(language?.rawValue ?? "system")")
     }
 }

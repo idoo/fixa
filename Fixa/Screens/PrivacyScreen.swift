@@ -33,7 +33,7 @@ struct PrivacyScreen: View {
                 FxCard {
                     item(String(localized: "Fixa has no account, server or statistics. Photos lose their location before they are sent.", bundle: L10n.bundle, locale: L10n.locale), storage: nil)
                     FxDivider()
-                    item(String(localized: "These are included in your iPhone backup.", bundle: L10n.bundle, locale: L10n.locale), storage: nil)
+                    item(String(localized: "Your details, settings and sent reports are included in your iPhone backup. Unsent photos are not.", bundle: L10n.bundle, locale: L10n.locale), storage: nil)
                     FxDivider()
                     item(
                         String(localized: "Once in a while Fixa downloads an updated description of the municipality's form from GitHub. Nothing about you is sent.", bundle: L10n.bundle, locale: L10n.locale),
