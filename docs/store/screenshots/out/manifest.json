@@ -1,0 +1,99 @@
+{
+  "tools": {
+    "node": "v24.18.0",
+    "puppeteer": "24.43.1",
+    "browser": "HeadlessChrome/148.0.7778.97"
+  },
+  "canvas": {
+    "width": 1320,
+    "height": 2868
+  },
+  "frameOrder": [
+    "01",
+    "02",
+    "03",
+    "04",
+    "05"
+  ],
+  "inputs": {
+    "captures/sv/home.png": "fde9e1cb9ec1d2c30fd2b5a3316ff6eaafee2fbdb81b2aa2d8779b7258adc133",
+    "captures/sv/language.png": "0fc4493c8c5f6e850c358604058205052a2627bf94447447cac435af4132b41c",
+    "captures/sv/location.png": "47d2c5531fc5889809a2724ae50c3f4c0b12b6e18c6cb7a95d40c0f073549c4f",
+    "captures/sv/privacy.png": "b8094ecbab4a016c57e7f4a3b6df5c0e3421a6319f92bc17b0d3026cda662b88",
+    "captures/sv/receipt.png": "460f52d65d64e05927b89df6e6a83880a5a68a551a35c67a2adcb94d862d8b9e",
+    "captures/sv/settings.png": "9d99eb13ccbca91dea721faaffe2a09e6e67fc4385a1f2527463eae289b32ec0",
+    "captures/en-US/home.png": "62a9445484cc03453c8d32ba108975fa76520f386c63412fa2ad59d33ebaa830",
+    "captures/en-US/language.png": "045fa8d4978925aeb166c30527c9649e576af5c2aa215e38fb697b1f8b02e746",
+    "captures/en-US/location.png": "ac8c96f1b258db22542c79965609faa515328d553885d5adb4cec72e687fdc15",
+    "captures/en-US/privacy.png": "1d229ce8577e37b6b712c49c1a2421945e0e5e0a72bf3b3cd29900308d94746d",
+    "captures/en-US/receipt.png": "0be52513788c58f09ba7e8a6c1b035867a5d6a0bb80a1db894ecaca866f9654a",
+    "captures/en-US/settings.png": "b2b258979ae2d75eddef52d43e8ca5a6a3fb10e29b62d97b793aa40ec063afa4"
+  },
+  "outputs": {
+    "out/sv/01.png": {
+      "sha256": "d08c7b65aa1eef18ae50b627fd335f9807e7da2234a06c6dc3bb249ce63627ee",
+      "screen": "home",
+      "headline": "Anmäl ett fel på en minut",
+      "subline": "Gatlampa släckt? Tryck, fota, skicka."
+    },
+    "out/sv/02.png": {
+      "sha256": "db42b4b390dbb6fcaf762e3744dbeb5d13feb0c9ae4e5eb6b0c2affaa8fcf10a",
+      "screen": "location",
+      "headline": "Sätt nålen på kartan",
+      "subline": "Eller tryck på Använd min nuvarande plats."
+    },
+    "out/sv/03.png": {
+      "sha256": "f6a5f7b1fa860926041e0426bfc178a98a6e5306961525110f81aa8df2436bb2",
+      "screen": "receipt",
+      "headline": "Ärendenummer direkt",
+      "subline": "Det sparas i appen, så du kan följa upp."
+    },
+    "out/sv/04.png": {
+      "sha256": "7cc4cd8cb8fe1fdfd37f7da146ce05ed70d5a407810e14b070fddf2cead1a79f",
+      "screen": "privacy",
+      "headline": "Inget konto behövs",
+      "subline": "Dina uppgifter stannar i telefonen. Radera dem när du vill."
+    },
+    "out/sv/05.png": {
+      "sha256": "0db9fab2815e6ea8cb7a9a825207c94287c0ca70ed426301478833861c45e9d3",
+      "screen": "language",
+      "headline": "Fixa på sex språk",
+      "subline": "Byt språk direkt i appen."
+    },
+    "out/en-US/01.png": {
+      "sha256": "f0d73d6ccb7a71d81648cf69332bc18f57b8390737e6ab24c87b28488f865ebf",
+      "screen": "home",
+      "headline": "Report a problem in a minute",
+      "subline": "Street light out? Tap, snap, send."
+    },
+    "out/en-US/02.png": {
+      "sha256": "c1ec2ce5dae84cba0589480dfa96ea9e6342c41ee8bf20a88dba79347abdff9a",
+      "screen": "location",
+      "headline": "Drop a pin on the map",
+      "subline": "Or just tap Use my current location."
+    },
+    "out/en-US/03.png": {
+      "sha256": "eaf786122f1dd5d1e5626688f6b65bb92099facb7cb182b6dfc0897ea875a89f",
+      "screen": "receipt",
+      "headline": "Your case number, right away",
+      "subline": "It stays in the app so you can follow up."
+    },
+    "out/en-US/04.png": {
+      "sha256": "5ba73ca44ddfcbc48a15edfeeb282f26839db247369395932aea4a07568524eb",
+      "screen": "privacy",
+      "headline": "No account needed",
+      "subline": "Your details stay on your phone. Delete them anytime."
+    },
+    "out/en-US/05.png": {
+      "sha256": "738a0fb84d517ec40cb237f90c534512ac4cfdc04850732790faa8be3ccf508d",
+      "screen": "language",
+      "headline": "Fixa in six languages",
+      "subline": "Switch language right in the app."
+    }
+  },
+  "contactSheets": {
+    "out/contact-sv.png": "8bd40cdf19c1743c50f01062c6ccd7d1414eef2fb88a71ef8b38cd712e62ea98",
+    "out/contact-en-US.png": "ef656d3249e46400c572538d457f94c7272a7387c1b7cfe3471d9ae73ee384db"
+  },
+  "renderFailures": []
+}

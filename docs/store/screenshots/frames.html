@@ -25,7 +25,7 @@
   --headline-line: 1.06;
   --headline-weight: 700;
   --headline-tracking: -0.022em;
-  --subline-top: 446px;
+  --subline-gap: 30px;
   --subline-size: 50px;
   --subline-line: 1.24;
   --subline-weight: 500;
@@ -43,16 +43,18 @@ body { font-family: -apple-system, "SF Pro Display", system-ui, sans-serif; -web
 .frame > * { position: absolute; }
 .bg { inset: 0; z-index: 0; }
 
+.copy {
+  left: var(--copy-x); top: var(--headline-top); width: var(--copy-w); z-index: 3;
+  display: flex; flex-direction: column; gap: var(--subline-gap);
+}
 .headline {
-  left: var(--copy-x); top: var(--headline-top); width: var(--copy-w);
   font-size: var(--headline-size); line-height: var(--headline-line);
   font-weight: var(--headline-weight); letter-spacing: var(--headline-tracking);
-  color: var(--ink); text-wrap: balance; hyphens: manual; z-index: 3;
+  color: var(--ink); text-wrap: balance; hyphens: manual;
 }
 .subline {
-  left: var(--copy-x); top: var(--subline-top); width: var(--copy-w);
   font-size: var(--subline-size); line-height: var(--subline-line); font-weight: var(--subline-weight);
-  color: var(--ink-2); text-wrap: balance; z-index: 3;
+  color: var(--ink-2); text-wrap: balance;
 }
 .device, .pop {
   overflow: hidden; background: var(--paper);
@@ -61,7 +63,6 @@ body { font-family: -apple-system, "SF Pro Display", system-ui, sans-serif; -web
 .device { box-shadow: var(--device-shadow); z-index: 2; }
 .pop { box-shadow: var(--pop-shadow); z-index: 4; }
 .device img, .pop img { position: absolute; display: block; }
-.icon { z-index: 4; border-radius: 22.4%; box-shadow: var(--pop-shadow); outline: 2px solid var(--hairline); outline-offset: -1px; }
 
 .contact { position: relative; background: #E9E5DC; }
 .contact img { position: absolute; display: block; }
@@ -128,21 +129,22 @@ async function renderFrame(locale, id) {
     const c = p.crop[locale];
     if (!c) { fail(`pop ${p.src} has no crop for ${locale}`); return ""; }
     const w = Math.round(c.w * p.scale), h = Math.round(c.h * p.scale);
-    const left = Math.round(p.center.x - w / 2), top = Math.round(p.center.y - h / 2);
+    // Default: magnified in place, centred over the element's own spot on the device.
+    const at = p.center || { x: D.x + (c.x + c.w / 2) * s, y: D.y + (c.y + c.h / 2) * s };
+    const left = Math.round(at.x - w / 2), top = Math.round(at.y - h / 2);
     return `<div class="pop" data-role="artwork" style="left:${left}px;top:${top}px;width:${w}px;height:${h}px;border-radius:${p.radius}px;transform:rotate(${p.rotate}deg)">
       <img alt="" src="${capture(locale, p.src)}" style="left:${-c.x * p.scale}px;top:${-c.y * p.scale}px;width:${cap.width * p.scale}px;height:${cap.height * p.scale}px"></div>`;
   }).join("");
-  const icon = f.icon ? `<img class="icon" data-role="artwork" alt="" src="${f.icon.src}" style="left:${f.icon.center.x - f.icon.size / 2}px;top:${f.icon.center.y - f.icon.size / 2}px;width:${f.icon.size}px;height:${f.icon.size}px">` : "";
 
   document.documentElement.lang = locale;
   const frame = document.createElement("div");
   frame.className = "frame";
   frame.innerHTML = `${background(f.background)}
-    <h1 class="headline" data-role="headline">${esc(head || "")}</h1>
-    ${sub ? `<p class="subline" data-role="bullet">${esc(sub)}</p>` : ""}
+    <div class="copy"><h1 class="headline" data-role="headline">${esc(head || "")}</h1>
+    ${sub ? `<p class="subline" data-role="bullet">${esc(sub)}</p>` : ""}</div>
     <div class="device" data-role="app-capture" style="left:${D.x}px;top:${D.y}px;width:${D.w}px;height:${dh}px;border-radius:${D.radius}px">
       <img alt="" src="${capture(locale, f.screen)}" style="left:0;top:0;width:${D.w}px;height:${dh}px"></div>
-    ${pops}${icon}`;
+    ${pops}`;
   document.body.appendChild(frame);
   await settle([...frame.querySelectorAll("img")]);
 
@@ -175,7 +177,7 @@ async function renderFrame(locale, id) {
   }
   if (copyBottom > db.top - 24) fail(`copy (${Math.round(copyBottom)}) collides with device (${Math.round(db.top)})`);
   if (db.left < sa.left || db.right > W - sa.right || db.bottom > H - sa.bottom) fail("device outside safe area");
-  for (const p of frame.querySelectorAll(".pop, .icon")) {
+  for (const p of frame.querySelectorAll(".pop")) {
     const b = p.getBoundingClientRect();
     if (b.left < sa.left || b.right > W - sa.right || b.bottom > H - sa.bottom) fail(`pop outside safe area (${Math.round(b.left)},${Math.round(b.right)},${Math.round(b.bottom)})`);
     if (b.top < copyBottom + 24) fail("pop collides with copy");
