@@ -23,7 +23,7 @@ public struct FormDrift: Error, Sendable, Equatable {
     public var pageID: String?
     /// Human-readable labels (or keys) of fields and options Fixa could not fill.
     public var missing: [String]
-    /// One sentence for logs and the drift canary.
+    /// One sentence for logs and `fixa-cli dry-run`.
     public var detail: String
 
     public init(pageID: String?, missing: [String], detail: String) {
@@ -32,7 +32,7 @@ public struct FormDrift: Error, Sendable, Equatable {
         self.detail = detail
     }
 
-    /// One paragraph for logs and the CI canary.
+    /// One paragraph for logs and `fixa-cli dry-run`.
     public var report: String {
         var text = "The e-service form no longer matches the adapter"
         text += pageID.map { " on page \($0)" } ?? ""

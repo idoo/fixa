@@ -60,7 +60,7 @@ Fixa sends your report only to the municipality's e-service. Your e-mail, name a
 
 ### If the municipality changes its form
 
-- A daily canary (`.github/workflows/canary.yml`) dry-runs the e-service and opens an issue and marks the adapter `degraded` in `adapters/status.json` when the form no longer matches.
+- Nothing tests the live e-service automatically: Fixa sends the municipality no test traffic. If a send hits a changed form, it stops before the final step and offers e-mail; `adapters/status.json` is then set to `degraded` by hand.
 - The app reads `status.json` and the adapter from GitHub at most every six hours and shows a calm banner on Home: the report is saved and can still go by e-mail.
 - A fixed `adapters/*.json` reaches every phone without an App Store release, as long as this build accepts it.
 
