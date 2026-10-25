@@ -192,8 +192,9 @@ final class FixaFlowTests: XCTestCase {
     }
 
     /// Build 5 crashed (NSInternalInconsistencyException in `_UITraitOverrides`) the moment
-    /// Higher contrast was on, and then at every launch. Turn it on and back off, then check
-    /// the app is still alive and other screens still open.
+    /// Higher contrast was on, and then at every launch. Flip it twice from whatever state is
+    /// saved (display settings persist across runs), so both on and off are exercised, and
+    /// check the app stays alive and other screens still open.
     @MainActor
     func testF_HigherContrastDoesNotCrash() {
         let app = launch(["-FixaLanguage", "en"])
@@ -201,21 +202,23 @@ final class FixaFlowTests: XCTestCase {
         let toggle = app.switches.matching(NSPredicate(format: "label BEGINSWITH %@", "Higher contrast")).firstMatch
         XCTAssertTrue(toggle.waitForExistence(timeout: 10), "No Higher contrast switch")
         reveal(app, toggle)
+        let initial = toggle.value as? String
+        let flipped = initial == "1" ? "0" : "1"
         toggle.switches.firstMatch.exists ? toggle.switches.firstMatch.tap() : toggle.tap()
         RunLoop.current.run(until: Date().addingTimeInterval(1.5))
-        XCTAssertEqual(app.state, .runningForeground, "App died after turning Higher contrast on")
-        XCTAssertEqual(toggle.value as? String, "1", "Higher contrast did not turn on")
-        shot("f-contrast-on")
+        XCTAssertEqual(app.state, .runningForeground, "App died after switching Higher contrast")
+        XCTAssertEqual(toggle.value as? String, flipped, "Higher contrast did not switch")
+        shot("f-contrast-\(flipped)")
         app.navigationBars.buttons.element(boundBy: 0).tap()
         element(app, "home.history").tap()
-        XCTAssertEqual(app.state, .runningForeground, "App died navigating with Higher contrast on")
+        XCTAssertEqual(app.state, .runningForeground, "App died navigating after switching Higher contrast")
         app.navigationBars.buttons.element(boundBy: 0).tap()
         element(app, "home.settings").tap()
         reveal(app, toggle)
         toggle.switches.firstMatch.exists ? toggle.switches.firstMatch.tap() : toggle.tap()
         RunLoop.current.run(until: Date().addingTimeInterval(1.5))
-        XCTAssertEqual(app.state, .runningForeground, "App died after turning Higher contrast off")
-        XCTAssertEqual(toggle.value as? String, "0", "Higher contrast did not turn off")
+        XCTAssertEqual(app.state, .runningForeground, "App died after switching Higher contrast back")
+        XCTAssertEqual(toggle.value as? String, initial, "Higher contrast did not switch back")
     }
 }
 
