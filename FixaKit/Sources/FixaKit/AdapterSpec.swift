@@ -1,0 +1,203 @@
+import Foundation
+
+/// A municipality adapter, decoded from `adapters/*.json`.
+public struct AdapterSpec: Codable, Sendable, Identifiable {
+    public let specVersion: Int
+    public let id: String
+    public let municipality: Municipality
+    public let channel: Channel
+    public let categories: [Category]
+    public let tiles: [Tile]
+    public let validation: ValidationRules
+    public let emergency: Emergency?
+    public let fallbackEmail: String?
+    public let disclaimer: LocalizedText
+
+    public struct Municipality: Codable, Sendable {
+        public let name: String
+        public let countryCode: String
+        public let region: Region
+    }
+
+    public struct Region: Codable, Sendable {
+        public let center: Coordinate
+        public let bbox: BoundingBox
+
+        public var latitudeSpan: Double { bbox.maxLatitude - bbox.minLatitude }
+        public var longitudeSpan: Double { bbox.maxLongitude - bbox.minLongitude }
+
+        public func contains(_ c: Coordinate) -> Bool {
+            (bbox.minLatitude...bbox.maxLatitude).contains(c.latitude)
+                && (bbox.minLongitude...bbox.maxLongitude).contains(c.longitude)
+        }
+    }
+
+    public struct BoundingBox: Codable, Sendable {
+        public let minLatitude: Double
+        public let maxLatitude: Double
+        public let minLongitude: Double
+        public let maxLongitude: Double
+    }
+
+    /// How reports reach the municipality. Only `kind == "abou"` exists today.
+    public struct Channel: Codable, Sendable {
+        public let kind: String
+        public let baseURL: String
+        public let service: String
+        /// Intro page that hands out the session cookie, e.g. `/KSB`.
+        public let introPath: String
+        /// Path that starts a fresh case, e.g. `/Setup.aspx?Service=KSB&skipintro=true`.
+        public let startPath: String
+        /// `__EVENTTARGET` of the Next/Slutför button.
+        public let nextEventTarget: String
+        /// Text the platform shows when the session already has an open case.
+        public let sessionLockedMarker: String
+        /// Text on the page after Slutför meaning the browser would auto-post the form to finish
+        /// processing (Abou's ThankYou page calls `__doPostBack('', '')` on load). Optional.
+        public let completionPostBackMarker: String?
+        /// Upper bound for those re-posts; defaults to 3.
+        public let maxCompletionPostBacks: Int?
+        /// Pages in the order the platform shows them. The last page is the summary page whose Next submits the case.
+        public let pages: [PageSpec]
+        public let upload: UploadSpec?
+    }
+
+    public struct PageSpec: Codable, Sendable {
+        /// The `PageId` query value of the page.
+        public let id: String
+        /// Progress stage reported while this page is posted: `sendingReport`, `sendingContact` or `confirming`.
+        public let stage: String
+        public let fields: [FieldSpec]
+    }
+
+    public struct FieldSpec: Codable, Sendable {
+        public enum Role: String, Codable, Sendable {
+            case category, place, mapChoice, mapAnswer, description, feedback
+            case firstName, lastName, phone, email
+        }
+        public let role: Role
+        /// Field key, e.g. `KSB_14`; the input name ends in `$<key>_field$<control>`.
+        public let key: String
+        public let control: String
+        /// Radio value meaning yes (mapChoice, feedback).
+        public let yesValue: String?
+        /// Radio value meaning no (mapChoice, feedback).
+        public let noValue: String?
+    }
+
+    public struct UploadSpec: Codable, Sendable {
+        /// Page whose POST the upload must precede.
+        public let pageID: String
+        public let fieldID: String
+        public let path: String
+        public let filePartName: String
+        public let fileName: String
+        public let actionPath: String
+    }
+
+    public struct Category: Codable, Sendable, Identifiable, Hashable {
+        public let id: String
+        /// Exact value the form expects.
+        public let value: String
+        public let title: LocalizedText
+    }
+
+    public struct Tile: Codable, Sendable, Identifiable, Hashable {
+        public let id: String
+        public let symbol: String
+        public let categoryID: String
+        public let title: LocalizedText
+        /// First line of the description sent to the municipality.
+        public let swedishSummary: String
+    }
+
+    public struct ValidationRules: Codable, Sendable {
+        public let descriptionMin: Int
+        public let descriptionMax: Int
+        public let emailRequiredWhenFeedback: Bool
+        public let requireLocation: Bool
+    }
+
+    public struct Emergency: Codable, Sendable {
+        public let contacts: [EmergencyContact]
+        public let rules: [HoursRule]
+        public let defaultContactID: String
+        public let timeZone: String
+        public let note: LocalizedText
+    }
+
+    public struct EmergencyContact: Codable, Sendable, Identifiable, Hashable {
+        public let id: String
+        public let title: LocalizedText
+        public let phone: String
+    }
+
+    /// Applies on the listed ISO weekdays (1 = Monday … 7 = Sunday) before `until` ("HH:mm", local time).
+    public struct HoursRule: Codable, Sendable, Hashable {
+        public let isoWeekdays: [Int]
+        public let until: String
+        public let contactID: String
+    }
+
+    public func tile(id: String?) -> Tile? {
+        guard let id else { return nil }
+        return tiles.first { $0.id == id }
+    }
+
+    public func category(id: String?) -> Category? {
+        guard let id else { return nil }
+        return categories.first { $0.id == id }
+    }
+
+    /// The draft's explicit category, else its tile's category.
+    public func category(for draft: ReportDraft) -> Category? {
+        category(id: draft.categoryID) ?? category(id: tile(id: draft.tileID)?.categoryID)
+    }
+}
+
+/// Text in several languages. Encodes as a plain JSON object `{"sv": …, "en": …}`.
+public struct LocalizedText: Codable, Sendable, Hashable {
+    public let values: [String: String]
+
+    public init(_ values: [String: String]) {
+        self.values = values
+    }
+
+    public init(from decoder: Decoder) throws {
+        values = try decoder.singleValueContainer().decode([String: String].self)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(values)
+    }
+
+    /// The locale's language, else English, else Swedish.
+    public func resolve(_ locale: Locale = .current) -> String {
+        if let code = locale.language.languageCode?.identifier, let text = values[code] {
+            return text
+        }
+        return values["en"] ?? values["sv"] ?? values.values.sorted().first ?? ""
+    }
+}
+
+public enum AdapterCatalog {
+    public static func load(from url: URL) throws -> AdapterSpec {
+        try JSONDecoder().decode(AdapterSpec.self, from: Data(contentsOf: url))
+    }
+
+    /// Adapters shipped inside FixaKit, sorted by id.
+    public static func bundled() -> [AdapterSpec] {
+        var seen = Set<String>()
+        return bundledURLs()
+            .compactMap { try? load(from: $0) }
+            .filter { seen.insert($0.id).inserted }
+            .sorted { $0.id < $1.id }
+    }
+
+    static func bundledURLs() -> [URL] {
+        let nested = Bundle.module.urls(forResourcesWithExtension: "json", subdirectory: "adapters") ?? []
+        let flat = Bundle.module.urls(forResourcesWithExtension: "json", subdirectory: nil) ?? []
+        return nested + flat
+    }
+}

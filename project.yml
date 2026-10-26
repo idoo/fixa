@@ -1,0 +1,104 @@
+name: Fixa
+options:
+  bundleIdPrefix: se.jvcr
+  deploymentTarget:
+    iOS: "26.0"
+  developmentLanguage: en
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    DEVELOPMENT_TEAM: "6NE65QKPJ6"
+    CODE_SIGN_STYLE: Automatic
+
+packages:
+  FixaKit:
+    path: FixaKit
+
+targets:
+  Fixa:
+    type: application
+    platform: iOS
+    sources:
+      - path: Fixa
+        excludes:
+          - Resources/Info.plist
+    dependencies:
+      - package: FixaKit
+        product: FixaKit
+    info:
+      path: Fixa/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: Fixa
+        CFBundleDevelopmentRegion: en
+        CFBundleLocalizations: [en, sv, fi, ar, uk, pl]
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSLocationWhenInUseUsageDescription: Fixa uses your location to place the pin where the problem is. It is only used when you tap Use my location.
+        NSCameraUsageDescription: Fixa uses the camera so you can take a photo of the problem.
+        NSPhotoLibraryUsageDescription: Fixa lets you pick photos of the problem to attach to your report.
+        LSApplicationQueriesSchemes: [mailto]
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: se.jvcr.fixa
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        TARGETED_DEVICE_FAMILY: "1"
+        SUPPORTS_MACCATALYST: NO
+        SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+        SWIFT_APPROACHABLE_CONCURRENCY: YES
+        SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY: YES
+        SWIFT_EMIT_LOC_STRINGS: YES
+        LOCALIZATION_PREFERS_STRING_CATALOGS: YES
+        ENABLE_PREVIEWS: YES
+      # Release archives sign manually with the App Store profile. Target-scoped so the
+      # FixaKit resource bundle is not handed a provisioning profile it cannot use.
+      configs:
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: Apple Distribution
+          PROVISIONING_PROFILE_SPECIFIER: Fixa iOS App Store
+
+  FixaUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: FixaUITests
+    dependencies:
+      - target: Fixa
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: se.jvcr.fixa.uitests
+        TARGETED_DEVICE_FAMILY: "1"
+        TEST_TARGET_NAME: Fixa
+        GENERATE_INFOPLIST_FILE: YES
+
+schemes:
+  Fixa:
+    build:
+      targets:
+        Fixa: all
+        FixaUITests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - package: FixaKit/FixaKitTests
+        # UI tests live in the FixaUI scheme so a plain `xcodebuild test -scheme Fixa` stays fast.
+    archive:
+      config: Release
+  FixaUI:
+    build:
+      targets:
+        Fixa: all
+        FixaUITests: [test]
+    test:
+      config: Debug
+      targets:
+        - name: FixaUITests

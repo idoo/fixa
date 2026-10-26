@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/idoo/fixa/schema/adapter.schema.json",
+  "title": "Fixa municipality adapter",
+  "type": "object",
+  "required": ["specVersion", "id", "municipality", "channel", "categories", "tiles", "validation", "disclaimer"],
+  "additionalProperties": false,
+  "properties": {
+    "specVersion": { "type": "integer", "enum": [1] },
+    "id": { "type": "string", "description": "Reverse-DNS id, e.g. se.varmdo.ksb" },
+    "municipality": {
+      "type": "object",
+      "required": ["name", "countryCode", "region"],
+      "properties": {
+        "name": { "type": "string" },
+        "countryCode": { "type": "string", "description": "ISO 3166-1 alpha-2" },
+        "region": {
+          "type": "object",
+          "required": ["center", "bbox"],
+          "properties": {
+            "center": { "$ref": "#/$defs/coordinate" },
+            "bbox": {
+              "type": "object",
+              "required": ["minLatitude", "maxLatitude", "minLongitude", "maxLongitude"],
+              "properties": {
+                "minLatitude": { "type": "number" },
+                "maxLatitude": { "type": "number" },
+                "minLongitude": { "type": "number" },
+                "maxLongitude": { "type": "number" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "channel": {
+      "type": "object",
+      "required": ["kind", "baseURL", "service", "introPath", "startPath", "nextEventTarget", "sessionLockedMarker", "pages"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["abou"] },
+        "baseURL": { "type": "string" },
+        "service": { "type": "string" },
+        "introPath": { "type": "string" },
+        "startPath": { "type": "string" },
+        "nextEventTarget": { "type": "string", "description": "__EVENTTARGET of the Next/Slutför button" },
+        "sessionLockedMarker": { "type": "string" },
+        "completionPostBackMarker": { "type": "string", "description": "Text on the page shown after Slutför that means the browser would now auto-post the form (e.g. Abou's ThankYou page runs __doPostBack('', '') on load to finish processing). While present, Fixa re-posts the form with an empty __EVENTTARGET." },
+        "maxCompletionPostBacks": { "type": "integer", "description": "Upper bound for those re-posts (default 3)." },
+        "pages": {
+          "type": "array",
+          "description": "Pages in order; the last one is the summary page whose Next submits the case.",
+          "items": {
+            "type": "object",
+            "required": ["id", "stage", "fields"],
+            "properties": {
+              "id": { "type": "string", "description": "PageId query value" },
+              "stage": { "type": "string", "enum": ["sendingReport", "sendingContact", "confirming"] },
+              "fields": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["role", "key", "control"],
+                  "properties": {
+                    "role": {
+                      "type": "string",
+                      "enum": ["category", "place", "mapChoice", "mapAnswer", "description", "feedback", "firstName", "lastName", "phone", "email"]
+                    },
+                    "key": { "type": "string", "description": "Input name ends in $<key>_field$<control>" },
+                    "control": { "type": "string" },
+                    "yesValue": { "type": "string" },
+                    "noValue": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "upload": {
+          "type": "object",
+          "required": ["pageID", "fieldID", "path", "filePartName", "fileName", "actionPath"],
+          "properties": {
+            "pageID": { "type": "string" },
+            "fieldID": { "type": "string" },
+            "path": { "type": "string" },
+            "filePartName": { "type": "string" },
+            "fileName": { "type": "string" },
+            "actionPath": { "type": "string" }
+          }
+        }
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "value", "title"],
+        "properties": {
+          "id": { "type": "string" },
+          "value": { "type": "string", "description": "Exact form value" },
+          "title": { "$ref": "#/$defs/localizedText" }
+        }
+      }
+    },
+    "tiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "symbol", "categoryID", "title", "swedishSummary"],
+        "properties": {
+          "id": { "type": "string" },
+          "symbol": { "type": "string", "description": "SF Symbol name" },
+          "categoryID": { "type": "string" },
+          "title": { "$ref": "#/$defs/localizedText" },
+          "swedishSummary": { "type": "string" }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "required": ["descriptionMin", "descriptionMax", "emailRequiredWhenFeedback", "requireLocation"],
+      "properties": {
+        "descriptionMin": { "type": "integer" },
+        "descriptionMax": { "type": "integer" },
+        "emailRequiredWhenFeedback": { "type": "boolean" },
+        "requireLocation": { "type": "boolean" }
+      }
+    },
+    "emergency": {
+      "type": "object",
+      "required": ["contacts", "rules", "defaultContactID", "timeZone", "note"],
+      "properties": {
+        "contacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "title", "phone"],
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "$ref": "#/$defs/localizedText" },
+              "phone": { "type": "string" }
+            }
+          }
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["isoWeekdays", "until", "contactID"],
+            "properties": {
+              "isoWeekdays": { "type": "array", "items": { "type": "integer", "enum": [1, 2, 3, 4, 5, 6, 7] } },
+              "until": { "type": "string", "pattern": "^[0-2][0-9]:[0-5][0-9]$" },
+              "contactID": { "type": "string" }
+            }
+          }
+        },
+        "defaultContactID": { "type": "string" },
+        "timeZone": { "type": "string" },
+        "note": { "$ref": "#/$defs/localizedText" }
+      }
+    },
+    "fallbackEmail": { "type": "string" },
+    "disclaimer": { "$ref": "#/$defs/localizedText" }
+  },
+  "$defs": {
+    "coordinate": {
+      "type": "object",
+      "required": ["latitude", "longitude"],
+      "properties": {
+        "latitude": { "type": "number" },
+        "longitude": { "type": "number" }
+      }
+    },
+    "localizedText": {
+      "type": "object",
+      "description": "Language code to text; resolves to the user's language, then en, then sv.",
+      "required": ["sv", "en"],
+      "additionalProperties": { "type": "string" }
+    }
+  }
+}

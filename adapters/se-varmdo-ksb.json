@@ -1,0 +1,113 @@
+{
+  "specVersion": 1,
+  "id": "se.varmdo.ksb",
+  "municipality": {
+    "name": "Värmdö kommun",
+    "countryCode": "SE",
+    "region": {
+      "center": { "latitude": 59.31, "longitude": 18.55 },
+      "bbox": { "minLatitude": 59.15, "maxLatitude": 59.45, "minLongitude": 18.25, "maxLongitude": 19.05 }
+    }
+  },
+  "channel": {
+    "kind": "abou",
+    "baseURL": "https://service.varmdo.se",
+    "service": "KSB",
+    "introPath": "/KSB",
+    "startPath": "/Setup.aspx?Service=KSB&skipintro=true",
+    "nextEventTarget": "ctl00$ctl00$LeftAndMainSection$MainSection$ServiceSection$ServicePageNavigationSection$NextAndBackButtons$NextButton",
+    "sessionLockedMarker": "Du har ett ärende igång redan",
+    "completionPostBackMarker": "var doPostBack = 'True'",
+    "maxCompletionPostBacks": 3,
+    "pages": [
+      {
+        "id": "FaultReport",
+        "stage": "sendingReport",
+        "fields": [
+          { "role": "category", "key": "KSB_14", "control": "dropDownListFieldControl" },
+          { "role": "place", "key": "KSB_18", "control": "textFieldControl" },
+          { "role": "mapChoice", "key": "KSB_20", "control": "radioButtonListFieldControl", "yesValue": "Ja, visa karta och ange position", "noValue": "Nej" },
+          { "role": "mapAnswer", "key": "KSB_19", "control": "MapAnswer" },
+          { "role": "description", "key": "U_29_1_1", "control": "textFieldControl" },
+          { "role": "feedback", "key": "KSB_54", "control": "radioButtonListFieldControl", "yesValue": "Ja", "noValue": "Nej" }
+        ]
+      },
+      {
+        "id": "PersonalEmailInformation",
+        "stage": "sendingContact",
+        "fields": [
+          { "role": "firstName", "key": "U_29_3_2", "control": "textFieldControl" },
+          { "role": "lastName", "key": "U_29_3_3", "control": "textFieldControl" },
+          { "role": "phone", "key": "KSB_17", "control": "textFieldControl" },
+          { "role": "email", "key": "U_29_3_1", "control": "AnswerTextBoxControl" }
+        ]
+      },
+      {
+        "id": "SummaryPage",
+        "stage": "confirming",
+        "fields": []
+      }
+    ],
+    "upload": {
+      "pageID": "FaultReport",
+      "fieldID": "U.29.1.2",
+      "path": "/Citizen/Field/UploadFile/U.29.1.2",
+      "filePartName": "files[]",
+      "fileName": "foto.jpg",
+      "actionPath": "/Citizen/Field/Action"
+    }
+  },
+  "categories": [
+    { "id": "lighting", "value": "Belysning", "title": { "sv": "Belysning", "en": "Street lighting", "fi": "Katuvalaistus", "ar": "الإنارة", "uk": "Освітлення", "pl": "Oświetlenie" } },
+    { "id": "roads", "value": "Gator och cykelvägar", "title": { "sv": "Gator och cykelvägar", "en": "Streets and cycle paths", "fi": "Kadut ja pyörätiet", "ar": "الشوارع ومسارات الدراجات", "uk": "Вулиці та велодоріжки", "pl": "Ulice i drogi rowerowe" } },
+    { "id": "graffiti", "value": "Klotter och skadegörelse", "title": { "sv": "Klotter och skadegörelse", "en": "Graffiti and vandalism", "fi": "Töhryt ja ilkivalta", "ar": "الكتابة على الجدران والتخريب", "uk": "Графіті та вандалізм", "pl": "Graffiti i wandalizm" } },
+    { "id": "parks", "value": "Parker och grönytor", "title": { "sv": "Parker och grönytor", "en": "Parks and green spaces", "fi": "Puistot ja viheralueet", "ar": "الحدائق والمساحات الخضراء", "uk": "Парки та зелені зони", "pl": "Parki i tereny zielone" } },
+    { "id": "water", "value": "Vatten och avlopp", "title": { "sv": "Vatten och avlopp", "en": "Water and sewer", "fi": "Vesi ja viemäri", "ar": "المياه والصرف الصحي", "uk": "Водопостачання та каналізація", "pl": "Woda i kanalizacja" } },
+    { "id": "other", "value": "Övrigt", "title": { "sv": "Övrigt", "en": "Other", "fi": "Muu", "ar": "أخرى", "uk": "Інше", "pl": "Inne" } }
+  ],
+  "tiles": [
+    { "id": "streetlight", "symbol": "lightbulb.slash", "categoryID": "lighting", "swedishSummary": "Gatubelysning ur funktion", "title": { "sv": "Gatlampa släckt", "en": "Street light out", "fi": "Katuvalo ei pala", "ar": "إنارة الشارع معطلة", "uk": "Не світить ліхтар", "pl": "Nie świeci latarnia" } },
+    { "id": "pothole", "symbol": "road.lanes", "categoryID": "roads", "swedishSummary": "Hål eller skada i vägen", "title": { "sv": "Hål eller skada i vägen", "en": "Pothole or damaged road", "fi": "Kuoppa tai vaurio tiessä", "ar": "حفرة أو ضرر في الطريق", "uk": "Вибоїна або пошкоджена дорога", "pl": "Dziura lub uszkodzona droga" } },
+    { "id": "winter", "symbol": "snowflake", "categoryID": "roads", "swedishSummary": "Snö eller halka", "title": { "sv": "Snö eller halka", "en": "Snow or ice", "fi": "Lumi tai liukkaus", "ar": "ثلج أو جليد", "uk": "Сніг або ожеледиця", "pl": "Śnieg lub gołoledź" } },
+    { "id": "sign", "symbol": "exclamationmark.triangle", "categoryID": "roads", "swedishSummary": "Skadad skylt eller räcke", "title": { "sv": "Skadad skylt eller räcke", "en": "Damaged sign or barrier", "fi": "Vaurioitunut kyltti tai kaide", "ar": "لافتة أو حاجز متضرر", "uk": "Пошкоджений знак або огорожа", "pl": "Uszkodzony znak lub barierka" } },
+    { "id": "graffiti", "symbol": "paintbrush.pointed", "categoryID": "graffiti", "swedishSummary": "Klotter eller skadegörelse", "title": { "sv": "Klotter eller skadegörelse", "en": "Graffiti or vandalism", "fi": "Töhryjä tai ilkivaltaa", "ar": "كتابة على الجدران أو تخريب", "uk": "Графіті або вандалізм", "pl": "Graffiti lub wandalizm" } },
+    { "id": "park", "symbol": "tree", "categoryID": "parks", "swedishSummary": "Park, lekplats eller träd", "title": { "sv": "Park, lekplats eller träd", "en": "Park, playground or tree", "fi": "Puisto, leikkipaikka tai puu", "ar": "حديقة أو ملعب أطفال أو شجرة", "uk": "Парк, дитячий майданчик або дерево", "pl": "Park, plac zabaw lub drzewo" } },
+    { "id": "water", "symbol": "drop", "categoryID": "water", "swedishSummary": "Vatten eller avlopp", "title": { "sv": "Vatten eller avlopp", "en": "Water or sewer", "fi": "Vesi tai viemäri", "ar": "المياه أو الصرف الصحي", "uk": "Вода або каналізація", "pl": "Woda lub kanalizacja" } },
+    { "id": "other", "symbol": "ellipsis.circle", "categoryID": "other", "swedishSummary": "Övrigt", "title": { "sv": "Något annat", "en": "Something else", "fi": "Jotain muuta", "ar": "شيء آخر", "uk": "Щось інше", "pl": "Coś innego" } }
+  ],
+  "validation": {
+    "descriptionMin": 10,
+    "descriptionMax": 4000,
+    "emailRequiredWhenFeedback": true,
+    "requireLocation": true
+  },
+  "emergency": {
+    "contacts": [
+      { "id": "servicecenter", "phone": "08-570 470 00", "title": { "sv": "Värmdö kommuns servicecenter", "en": "Värmdö kommun service centre", "fi": "Värmdön kunnan palvelukeskus", "ar": "مركز خدمة بلدية فارمدو", "uk": "Сервісний центр комуни Вермдьо", "pl": "Centrum obsługi gminy Värmdö" } },
+      { "id": "sos", "phone": "08-454 25 71", "title": { "sv": "VA-jouren via SOS Alarm", "en": "Water and sewer on-call via SOS Alarm", "fi": "Vesi- ja viemäripäivystys SOS Alarmin kautta", "ar": "طوارئ المياه والصرف عبر SOS Alarm", "uk": "Чергова служба водоканалу через SOS Alarm", "pl": "Dyżur wodno-kanalizacyjny przez SOS Alarm" } }
+    ],
+    "rules": [
+      { "isoWeekdays": [1, 2, 3, 4], "until": "17:00", "contactID": "servicecenter" },
+      { "isoWeekdays": [5], "until": "13:00", "contactID": "servicecenter" }
+    ],
+    "defaultContactID": "sos",
+    "timeZone": "Europe/Stockholm",
+    "note": {
+      "sv": "Ring bara vid akuta fel på vatten och avlopp, till exempel om vattnet är borta, avloppet är stopp eller det översvämmar. Servicecenter svarar måndag–torsdag före 17.00 och fredag före 13.00. Övrig tid svarar VA-jouren via SOS Alarm.",
+      "en": "Call only for urgent water or sewer problems, such as no water, a blocked sewer or flooding. The service centre answers Monday–Thursday before 17:00 and Friday before 13:00. At other times the on-call service answers via SOS Alarm.",
+      "fi": "Soita vain kiireellisissä vesi- ja viemärivioissa, esimerkiksi jos vettä ei tule, viemäri on tukossa tai jokin tulvii. Palvelukeskus vastaa maanantaista torstaihin ennen klo 17 ja perjantaina ennen klo 13. Muina aikoina vastaa päivystys SOS Alarmin kautta.",
+      "ar": "اتصل فقط عند الأعطال العاجلة في المياه أو الصرف الصحي، مثل انقطاع المياه أو انسداد الصرف أو حدوث فيضان. يرد مركز الخدمة من الاثنين إلى الخميس قبل الساعة 17:00 ويوم الجمعة قبل الساعة 13:00. في الأوقات الأخرى ترد خدمة الطوارئ عبر SOS Alarm.",
+      "uk": "Телефонуйте лише в разі термінових проблем з водою чи каналізацією: немає води, засмітилася каналізація або підтоплення. Сервісний центр відповідає з понеділка по четвер до 17:00 і в п'ятницю до 13:00. В інший час відповідає чергова служба через SOS Alarm.",
+      "pl": "Dzwoń tylko w pilnych sprawach dotyczących wody lub kanalizacji, np. gdy nie ma wody, kanalizacja jest zatkana albo coś zalewa. Centrum obsługi odbiera od poniedziałku do czwartku przed 17:00 i w piątek przed 13:00. W pozostałych godzinach odbiera dyżur przez SOS Alarm."
+    }
+  },
+  "fallbackEmail": "varmdo.kommun@varmdo.se",
+  "disclaimer": {
+    "sv": "Fixa är en fristående app med öppen källkod och ingen del av Värmdö kommun. Appen skickar din anmälan direkt till kommunens e-tjänst för felanmälan, och kommunen hanterar ärendet på sitt vanliga sätt. Ring 112 om liv eller egendom är i fara.",
+    "en": "Fixa is an independent open-source app and is not part of Värmdö kommun. It sends your report straight to the municipality's fault-report e-service, and the municipality handles it the usual way. Call 112 if life or property is in danger.",
+    "fi": "Fixa on itsenäinen avoimen lähdekoodin sovellus, eikä se ole osa Värmdön kuntaa. Sovellus lähettää ilmoituksesi suoraan kunnan vikailmoitusten sähköiseen palveluun, ja kunta käsittelee sen tavalliseen tapaan. Soita 112, jos henki tai omaisuus on vaarassa.",
+    "ar": "Fixa تطبيق مستقل ومفتوح المصدر، وليس جزءاً من بلدية فارمدو. يرسل التطبيق بلاغك مباشرة إلى الخدمة الإلكترونية للبلدية الخاصة بالإبلاغ عن الأعطال، وتتعامل البلدية معه بالطريقة المعتادة. اتصل بالرقم 112 إذا كانت الأرواح أو الممتلكات في خطر.",
+    "uk": "Fixa — незалежний застосунок із відкритим кодом, який не належить комуні Вермдьо. Він надсилає ваше повідомлення безпосередньо до електронного сервісу комуни для повідомлень про несправності, і комуна розглядає його у звичайному порядку. Якщо є загроза життю чи майну, телефонуйте 112.",
+    "pl": "Fixa to niezależna aplikacja open source, która nie należy do gminy Värmdö. Wysyła Twoje zgłoszenie bezpośrednio do e-usługi gminy do zgłaszania usterek, a gmina zajmuje się nim w zwykły sposób. Jeśli zagrożone jest życie lub mienie, dzwoń pod 112."
+  }
+}
