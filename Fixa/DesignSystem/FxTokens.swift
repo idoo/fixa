@@ -26,9 +26,32 @@ extension SwiftUI.Color {
         self.init(uiColor: UIColor(dynamicProvider: provider))
     }
 
+    /// Light / dark plus Increase Contrast variants (`traits.accessibilityContrast == .high`),
+    /// which the iPhone setting and the in-app "Higher contrast" toggle both turn on.
+    nonisolated init(light: UIColor, dark: UIColor, hcLight: UIColor, hcDark: UIColor) {
+        let provider: @Sendable (UITraitCollection) -> UIColor = { traits in
+            let high = traits.accessibilityContrast == .high
+            if traits.userInterfaceStyle == .dark {
+                return high ? hcDark : dark
+            }
+            return high ? hcLight : light
+        }
+        self.init(uiColor: UIColor(dynamicProvider: provider))
+    }
+
     /// Hex convenience: `Color(light: 0xF7F5F0, dark: 0x121A22)`.
     init(light: UInt32, dark: UInt32) {
         self.init(light: UIColor(fxHex: light), dark: UIColor(fxHex: dark))
+    }
+
+    /// Hex convenience with Increase Contrast variants.
+    init(light: UInt32, dark: UInt32, hcLight: UInt32, hcDark: UInt32) {
+        self.init(
+            light: UIColor(fxHex: light),
+            dark: UIColor(fxHex: dark),
+            hcLight: UIColor(fxHex: hcLight),
+            hcDark: UIColor(fxHex: hcDark)
+        )
     }
 
     /// One colour in both appearances (the brand stamp, ink on pastel fills).
@@ -51,14 +74,16 @@ enum Fx {
         static let card = SwiftUI.Color(light: 0xFFFFFF, dark: 0x1B2530)
         /// Primary text.
         static let ink = SwiftUI.Color(light: 0x1E2136, dark: 0xF3EAD6)
-        /// Secondary text, icons at rest.
-        static let ink2 = SwiftUI.Color(light: 0x5B5F73, dark: 0xB9B2A2)
-        /// Hairline borders and rules (1 pt).
-        static let line = SwiftUI.Color(light: 0xD8D2C6, dark: 0x33414F)
+        /// Secondary text, icons at rest. Increase Contrast: 9.0 light / 10.3 dark.
+        static let ink2 = SwiftUI.Color(light: 0x5B5F73, dark: 0xB9B2A2, hcLight: 0x40434F, hcDark: 0xD9D2C2)
+        /// Hairline borders and rules on cards (1 pt). Increase Contrast: the `fieldBorder` values.
+        static let line = SwiftUI.Color(light: 0xD8D2C6, dark: 0x33414F, hcLight: 0x857F73, hcDark: 0x75879A)
+        /// Resting border of inputs, chips and add slots (WCAG 1.4.11, ≥ 3:1 on card and paper).
+        static let fieldBorder = SwiftUI.Color(light: 0x857F73, dark: 0x75879A, hcLight: 0x6B655A, hcDark: 0x93A4B5)
         /// Sea blue for text: links, selected, focus, map pins, switches.
         static let sea = SwiftUI.Color(light: 0x1F5A8A, dark: 0x8CC4F0)
-        /// Primary action fill (sea), with `onAction` text.
-        static let action = SwiftUI.Color(light: 0x1F5A8A, dark: 0x2E6FA3)
+        /// Primary action fill (sea), with `onAction` text. Increase Contrast dark: white on it 7.29.
+        static let action = SwiftUI.Color(light: 0x1F5A8A, dark: 0x2E6FA3, hcLight: 0x1F5A8A, hcDark: 0x245A86)
         /// Text and glyphs on `action`.
         static let onAction = SwiftUI.Color(fxHex: 0xFFFFFF)
         /// Brand accent, traffic-cone orange. Receipt stamp only.
@@ -147,6 +172,16 @@ enum Fx {
 
     /// Minimum hit target (HIG).
     static let minTarget: CGFloat = 44
+}
+
+// MARK: - Display preferences in the environment
+
+extension EnvironmentValues {
+    /// Small taps on presses and confirmations; off when the user turns Vibration off in Settings.
+    /// Components pass it as `condition:` to `.sensoryFeedback`.
+    @Entry var fxHaptics: Bool = true
+    /// The iPhone's Reduce Motion OR the in-app toggle (set at the root). Springs become short fades.
+    @Entry var fxReduceMotion: Bool = false
 }
 
 // MARK: - Pressed state

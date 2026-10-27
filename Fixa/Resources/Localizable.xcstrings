@@ -1,6 +1,86 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%lld reports are removed from this phone, with their case numbers. %@ still has them." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld reports are removed from this phone, with their case numbers. %@ still has them."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld anmälningar tas bort från telefonen, med sina ärendenummer. %@ har dem kvar."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld ilmoitusta poistetaan tästä puhelimesta asianumeroineen. %@ säilyttää ne."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "عدد البلاغات التي ستُحذف من هذا الهاتف مع أرقام قضاياها: %lld. تبقى لدى %@."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Звернень, які буде видалено з цього телефона разом із номерами справ: %lld. У %@ вони залишаться."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liczba zgłoszeń usuwanych z tego telefonu razem z numerami spraw: %lld. %@ nadal je ma."
+          }
+        }
+      }
+    },
+    "1 report is removed from this phone, with its case number. %@ still has it." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 report is removed from this phone, with its case number. %@ still has it."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 anmälan tas bort från telefonen, med sitt ärendenummer. %@ har den kvar."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 ilmoitus poistetaan tästä puhelimesta asianumeroineen. %@ säilyttää sen."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سيُحذف بلاغ واحد من هذا الهاتف مع رقم قضيته. يبقى لدى %@."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 звернення буде видалено з цього телефона разом із номером справи. У %@ воно залишиться."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 zgłoszenie zostanie usunięte z tego telefonu razem z numerem sprawy. %@ nadal je ma."
+          }
+        }
+      }
+    },
     "A swing at the playground is broken." : {
       "localizations" : {
         "en" : {
@@ -41,6 +121,46 @@
         }
       }
     },
+    "About" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Om"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tietoja"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حول"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Про застосунок"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informacje"
+          }
+        }
+      }
+    },
     "About Fixa" : {
       "localizations" : {
         "en" : {
@@ -77,46 +197,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "O aplikacji Fixa"
-          }
-        }
-      }
-    },
-    "Add a little more detail." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add a little more detail."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Skriv lite mer."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kerro vähän tarkemmin."
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أضف بعض التفاصيل."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Додайте трохи більше подробиць."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dodaj trochę więcej szczegółów."
           }
         }
       }
@@ -201,42 +281,122 @@
         }
       }
     },
-    "Adds this to the description" : {
+    "Adds it to the description in Swedish" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adds this to the description"
+            "value" : "Adds it to the description in Swedish"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lägger till det i beskrivningen"
+            "value" : "Lägger till det i beskrivningen på svenska"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lisää tämän kuvaukseen"
+            "value" : "Lisää sen kuvaukseen ruotsiksi"
           }
         },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "يضيف هذا إلى الوصف"
+            "value" : "يضيفها إلى الوصف باللغة السويدية"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Додає це до опису"
+            "value" : "Додає це до опису шведською"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dodaje to do opisu"
+            "value" : "Dodaje to do opisu po szwedzku"
+          }
+        }
+      }
+    },
+    "An independent app. Not run by the municipality." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An independent app. Not run by the municipality."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En fristående app. Drivs inte av kommunen."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Itsenäinen sovellus. Kunta ei ylläpidä sitä."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تطبيق مستقل. لا تديره البلدية."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Незалежний застосунок. Муніципалітет ним не керує."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niezależna aplikacja. Nie prowadzi jej gmina."
+          }
+        }
+      }
+    },
+    "Appearance" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appearance"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utseende"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ulkoasu"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المظهر"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вигляд"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wygląd"
           }
         }
       }
@@ -277,6 +437,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Załączone zdjęcie"
+          }
+        }
+      }
+    },
+    "Automatic" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatic"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatiskt"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automaattinen"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تلقائي"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Автоматично"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatyczny"
           }
         }
       }
@@ -401,6 +601,46 @@
         }
       }
     },
+    "Bold text" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bold text"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fet text"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lihavoitu teksti"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نص عريض"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Жирний текст"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pogrubiony tekst"
+          }
+        }
+      }
+    },
     "Broken glass" : {
       "localizations" : {
         "en" : {
@@ -477,6 +717,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zepsuty sprzęt na placu zabaw"
+          }
+        }
+      }
+    },
+    "Call" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Call"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ring"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soita"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اتصل"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подзвонити"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zadzwoń"
           }
         }
       }
@@ -601,6 +881,46 @@
         }
       }
     },
+    "Case number %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Case number %@"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ärendenummer %@"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asianumero %@"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "رقم البلاغ %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Номер звернення %@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Numer sprawy %@"
+          }
+        }
+      }
+    },
     "Category" : {
       "localizations" : {
         "en" : {
@@ -677,6 +997,86 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zmień"
+          }
+        }
+      }
+    },
+    "Change problem" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change problem"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ändra problem"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vaihda ongelma"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تغيير المشكلة"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Змінити проблему"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zmień problem"
+          }
+        }
+      }
+    },
+    "Change reply details" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change reply details"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ändra svarsuppgifter"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muuta vastaustietoja"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تغيير بيانات الرد"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Змінити дані для відповіді"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zmień dane do odpowiedzi"
           }
         }
       }
@@ -881,6 +1281,46 @@
         }
       }
     },
+    "Clear list" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear list"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rensa listan"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tyhjennä luettelo"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مسح القائمة"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очистити список"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyczyść listę"
+          }
+        }
+      }
+    },
     "Clear my details" : {
       "localizations" : {
         "en" : {
@@ -957,6 +1397,86 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wyczyść wyszukiwanie"
+          }
+        }
+      }
+    },
+    "Clear sent reports" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear sent reports"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rensa skickade anmälningar"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tyhjennä lähetetyt ilmoitukset"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مسح البلاغات المُرسلة"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очистити надіслані звернення"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyczyść wysłane zgłoszenia"
+          }
+        }
+      }
+    },
+    "Clear the list of sent reports?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear the list of sent reports?"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rensa listan över skickade anmälningar?"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tyhjennetäänkö lähetettyjen ilmoitusten luettelo?"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل تريد مسح قائمة البلاغات المُرسلة؟"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очистити список надісланих звернень?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyczyścić listę wysłanych zgłoszeń?"
           }
         }
       }
@@ -1081,42 +1601,82 @@
         }
       }
     },
-    "Contact me about this" : {
+    "Contact details" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Contact me about this"
+            "value" : "Contact details"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kontakta mig om detta"
+            "value" : "Kontaktuppgifter"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ottakaa minuun yhteyttä"
+            "value" : "Yhteystiedot"
           }
         },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تواصلوا معي بخصوص هذا"
+            "value" : "بيانات الاتصال"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Зв’яжіться зі мною щодо цього"
+            "value" : "Контактні дані"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Skontaktujcie się ze mną w tej sprawie"
+            "value" : "Dane kontaktowe"
+          }
+        }
+      }
+    },
+    "Continue" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortsätt"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jatka"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "متابعة"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Продовжити"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dalej"
           }
         }
       }
@@ -1241,42 +1801,42 @@
         }
       }
     },
-    "Couldn't find your location. Tap the map instead." : {
+    "Couldn't find where you are" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Couldn't find your location. Tap the map instead."
+            "value" : "Couldn't find where you are"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hittade inte din plats. Tryck på kartan i stället."
+            "value" : "Det gick inte att hitta var du är"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sijaintiasi ei löytynyt. Napauta karttaa."
+            "value" : "Sijaintiasi ei löytynyt"
           }
         },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "تعذّر العثور على موقعك. اضغط على الخريطة بدلًا من ذلك."
+            "value" : "تعذّر تحديد مكانك"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Не вдалося знайти ваше місцезнаходження. Торкніться мапи."
+            "value" : "Не вдалося визначити, де ви"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Nie udało się ustalić twojej lokalizacji. Dotknij mapy."
+            "value" : "Nie udało się ustalić, gdzie jesteś"
           }
         }
       }
@@ -1401,6 +1961,86 @@
         }
       }
     },
+    "Dark" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dark"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mörkt"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tumma"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "داكن"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Темний"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ciemny"
+          }
+        }
+      }
+    },
+    "Darker borders and text" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Darker borders and text"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mörkare kanter och text"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tummemmat reunat ja teksti"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حدود ونص أغمق"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Темніші рамки й текст"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ciemniejsze obramowania i tekst"
+          }
+        }
+      }
+    },
     "Deep hole" : {
       "localizations" : {
         "en" : {
@@ -1477,6 +2117,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Głęboka dziura na ścieżce rowerowej, po ciemku łatwo jej nie zauważyć."
+          }
+        }
+      }
+    },
+    "Delete all data" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete all data"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Radera allt"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poista kaikki tiedot"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حذف كل البيانات"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Видалити всі дані"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuń wszystkie dane"
+          }
+        }
+      }
+    },
+    "Delete all my data" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete all my data"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Radera alla mina uppgifter"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poista kaikki tietoni"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حذف كل بياناتي"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Видалити всі мої дані"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuń wszystkie moje dane"
+          }
+        }
+      }
+    },
+    "Delete all your data from this phone?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete all your data from this phone?"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Radera alla dina uppgifter från telefonen?"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poistetaanko kaikki tietosi tästä puhelimesta?"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل تريد حذف كل بياناتك من هذا الهاتف؟"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Видалити всі ваші дані з цього телефона?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usunąć wszystkie Twoje dane z tego telefonu?"
           }
         }
       }
@@ -1597,6 +2357,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opis w wysyłanej formie"
+          }
+        }
+      }
+    },
+    "Display" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Display"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skärm"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Näyttö"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "العرض"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Екран"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyświetlanie"
           }
         }
       }
@@ -1761,6 +2561,46 @@
         }
       }
     },
+    "Edit %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit %@"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ändra %@"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muokkaa: %@"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعديل %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Змінити: %@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edytuj: %@"
+          }
+        }
+      }
+    },
     "Fallen tree or branch" : {
       "localizations" : {
         "en" : {
@@ -1801,6 +2641,46 @@
         }
       }
     },
+    "Fewer moving effects" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fewer moving effects"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Färre rörliga effekter"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vähemmän liikkuvia tehosteita"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مؤثرات متحركة أقل"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Менше рухомих ефектів"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mniej ruchomych efektów"
+          }
+        }
+      }
+    },
     "Finding the address…" : {
       "localizations" : {
         "en" : {
@@ -1837,6 +2717,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Szukanie adresu…"
+          }
+        }
+      }
+    },
+    "Finding where you are…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finding where you are…"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Letar efter var du är…"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Etsitään sijaintiasi…"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "جارٍ تحديد مكانك…"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Шукаємо, де ви…"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szukamy, gdzie jesteś…"
           }
         }
       }
@@ -1921,6 +2841,86 @@
         }
       }
     },
+    "Fix %lld things before review. %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fix %lld things before review. %@"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saker att rätta innan granskning: %lld. %@"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Korjattavaa ennen tarkistusta: %lld. %@"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أمور يجب تصحيحها قبل المراجعة: %lld. %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Що виправити перед переглядом: %lld. %@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Do poprawienia przed sprawdzeniem: %lld. %@"
+          }
+        }
+      }
+    },
+    "Fixa adds this Swedish summary so the municipality understands." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa adds this Swedish summary so the municipality understands."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa lägger till den här sammanfattningen på svenska så att kommunen förstår."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa lisää tämän ruotsinkielisen yhteenvedon, jotta kunta ymmärtää."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يضيف Fixa هذا الملخص بالسويدية لكي تفهمه البلدية."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa додає цей короткий опис шведською, щоб муніципалітет зрозумів."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa dodaje to podsumowanie po szwedzku, żeby gmina zrozumiała."
+          }
+        }
+      }
+    },
     "Fixa couldn't start" : {
       "localizations" : {
         "en" : {
@@ -1957,6 +2957,206 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nie udało się uruchomić aplikacji Fixa"
+          }
+        }
+      }
+    },
+    "Fixa has no account, server or statistics. Photos lose their location before they are sent." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa has no account, server or statistics. Photos lose their location before they are sent."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa har inget konto, ingen server och ingen statistik. Bilderna förlorar sin plats innan de skickas."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixassa ei ole tiliä, palvelinta eikä tilastointia. Kuvista poistetaan sijainti ennen lähettämistä."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يوجد في Fixa حساب ولا خادم ولا إحصاءات. تُزال المواقع من الصور قبل إرسالها."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У Fixa немає облікового запису, сервера чи статистики. Фото втрачають геодані перед надсиланням."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa nie ma konta, serwera ani statystyk. Zdjęcia tracą lokalizację przed wysłaniem."
+          }
+        }
+      }
+    },
+    "Fixa is an independent app, so sometimes we notice a little later. Your report is saved on this phone. We'll fix Fixa as soon as we can." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa is an independent app, so sometimes we notice a little later. Your report is saved on this phone. We'll fix Fixa as soon as we can."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa är en fristående app, så ibland märker vi det lite senare. Din anmälan är sparad på telefonen. Vi rättar Fixa så snart vi kan."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa on itsenäinen sovellus, joten huomaamme muutokset joskus vähän myöhemmin. Ilmoituksesi on tallessa tässä puhelimessa. Korjaamme Fixan niin pian kuin voimme."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa تطبيق مستقل، لذلك قد نلاحظ التغييرات متأخرين قليلًا. بلاغك محفوظ على هذا الهاتف. سنصلح Fixa في أقرب وقت ممكن."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa є незалежним застосунком, тож іноді ми помічаємо зміни трохи пізніше. Ваше звернення збережено на цьому телефоні. Ми виправимо Fixa якнайшвидше."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa to niezależna aplikacja, więc czasem zauważamy zmiany trochę później. Twoje zgłoszenie jest zapisane na tym telefonie. Naprawimy Fixę najszybciej, jak się da."
+          }
+        }
+      }
+    },
+    "Fixa is an independent app. We are updating it. Your report is saved, and you can still send it by email." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa is an independent app. We are updating it. Your report is saved, and you can still send it by email."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa är en fristående app. Vi uppdaterar den. Din anmälan är sparad och du kan fortfarande skicka den med e-post."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa on itsenäinen sovellus. Päivitämme sitä. Ilmoituksesi on tallessa, ja voit yhä lähettää sen sähköpostilla."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa تطبيق مستقل. نحن نعمل على تحديثه. بلاغك محفوظ، ويمكنك إرساله بالبريد الإلكتروني."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa — незалежний застосунок. Ми його оновлюємо. Ваше повідомлення збережено, і ви все ще можете надіслати його електронною поштою."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa to niezależna aplikacja. Aktualizujemy ją. Twoje zgłoszenie jest zapisane i nadal możesz wysłać je e-mailem."
+          }
+        }
+      }
+    },
+    "Fixa isn't allowed to use your location" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa isn't allowed to use your location"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa får inte använda din plats"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa ei saa käyttää sijaintiasi"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يُسمح لـ Fixa باستخدام موقعك"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa не має дозволу на ваше місцезнаходження"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa nie ma dostępu do Twojej lokalizacji"
+          }
+        }
+      }
+    },
+    "Fixa only sends reports to %@. Search for the address of the problem, or move the map." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa only sends reports to %@. Search for the address of the problem, or move the map."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa skickar bara felanmälningar till %@. Sök efter adressen där problemet är, eller flytta kartan."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa lähettää ilmoitukset vain kohteeseen %@. Hae ongelman osoite tai siirrä karttaa."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يرسل Fixa البلاغات إلى %@ فقط. ابحث عن عنوان المشكلة أو حرّك الخريطة."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa надсилає звернення лише до: %@. Знайдіть адресу проблеми або посуньте мапу."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa wysyła zgłoszenia tylko do: %@. Wyszukaj adres problemu albo przesuń mapę."
           }
         }
       }
@@ -2037,6 +3237,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fixa zatrzymuje się przed ostatnim krokiem. Nic nie jest wysyłane."
+          }
+        }
+      }
+    },
+    "Fixa's buttons and texts change now. What you write is sent as you wrote it. The photo picker and permission questions follow the new language next time you open Fixa." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa's buttons and texts change now. What you write is sent as you wrote it. The photo picker and permission questions follow the new language next time you open Fixa."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixas knappar och texter byts direkt. Det du skriver skickas som du skrev det. Bildväljaren och frågor om behörighet följer det nya språket nästa gång du öppnar Fixa."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixan painikkeet ja tekstit vaihtuvat heti. Kirjoittamasi lähetetään sellaisenaan. Kuvavalitsin ja lupakysymykset vaihtavat kieltä, kun avaat Fixan seuraavan kerran."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تتغير أزرار ونصوص Fixa الآن. ما تكتبه يُرسل كما كتبته. منتقي الصور وأسئلة الأذونات تتبع اللغة الجديدة عند فتح Fixa في المرة القادمة."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Кнопки й тексти Fixa змінюються одразу. Те, що ви пишете, надсилається так, як ви написали. Вибір фото та запити дозволів зміняться, коли ви наступного разу відкриєте Fixa."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przyciski i teksty Fixy zmieniają się od razu. To, co piszesz, zostanie wysłane tak, jak napisałeś. Wybór zdjęć i pytania o zgody zmienią język przy następnym otwarciu Fixy."
           }
         }
       }
@@ -2241,6 +3481,126 @@
         }
       }
     },
+    "Higher contrast" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Higher contrast"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Högre kontrast"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suurempi kontrasti"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تباين أعلى"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вищий контраст"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyższy kontrast"
+          }
+        }
+      }
+    },
+    "How Fixa works" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How Fixa works"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Så fungerar Fixa"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Näin Fixa toimii"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "كيف يعمل Fixa"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Як працює Fixa"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jak działa Fixa"
+          }
+        }
+      }
+    },
+    "In an emergency, call 112." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In an emergency, call 112."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vid nödsituation, ring 112."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hätätilanteessa soita 112."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "في حالة الطوارئ، اتصل بالرقم 112."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У надзвичайній ситуації телефонуйте 112."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W nagłej sytuacji dzwoń pod 112."
+          }
+        }
+      }
+    },
     "In the cycle lane" : {
       "localizations" : {
         "en" : {
@@ -2361,6 +3721,166 @@
         }
       }
     },
+    "It disappears from Sent reports in Fixa. The report itself stays with %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It disappears from Sent reports in Fixa. The report itself stays with %@."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Den försvinner från Skickade anmälningar i Fixa. Själva anmälan finns kvar hos %@."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se katoaa Fixan lähetetyistä ilmoituksista. Itse ilmoitus jää kohteelle %@."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سيختفي من البلاغات المرسلة في Fixa. أما البلاغ نفسه فيبقى لدى %@."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Воно зникне з надісланих звернень у Fixa. Саме звернення залишиться в %@."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zniknie z wysłanych zgłoszeń w Fixie. Samo zgłoszenie zostaje w: %@."
+          }
+        }
+      }
+    },
+    "Language" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Språk"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kieli"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اللغة"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Мова"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Język"
+          }
+        }
+      }
+    },
+    "Language: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Language: %@"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Språk: %@"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kieli: %@"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اللغة: %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Мова: %@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Język: %@"
+          }
+        }
+      }
+    },
+    "Larger text" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Larger text"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Större text"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suurempi teksti"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نص أكبر"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Більший текст"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Większy tekst"
+          }
+        }
+      }
+    },
     "Last name (optional)" : {
       "localizations" : {
         "en" : {
@@ -2397,6 +3917,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nazwisko (opcjonalnie)"
+          }
+        }
+      }
+    },
+    "Light" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Light"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ljust"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vaalea"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فاتح"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Світлий"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jasny"
           }
         }
       }
@@ -2441,42 +4001,42 @@
         }
       }
     },
-    "Location is off for Fixa. You can turn it on in Settings, or tap the map instead." : {
+    "Location Services are off on this iPhone" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Location is off for Fixa. You can turn it on in Settings, or tap the map instead."
+            "value" : "Location Services are off on this iPhone"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Platstjänster är av för Fixa. Slå på dem i Inställningar eller tryck på kartan i stället."
+            "value" : "Platstjänster är avstängda på den här iPhonen"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixan sijaintipalvelut ovat pois päältä. Voit laittaa ne päälle Asetuksista tai napauttaa karttaa."
+            "value" : "Sijaintipalvelut ovat pois päältä tässä iPhonessa"
           }
         },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "خدمة الموقع متوقفة لـ Fixa. يمكنك تفعيلها من الإعدادات، أو اضغط على الخريطة بدلًا من ذلك."
+            "value" : "خدمات الموقع متوقفة على هذا الـ iPhone"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Для Fixa вимкнено геолокацію. Увімкніть її в Параметрах або торкніться мапи."
+            "value" : "Служби локації вимкнено на цьому iPhone"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lokalizacja jest wyłączona dla aplikacji Fixa. Włącz ją w Ustawieniach albo dotknij mapy."
+            "value" : "Usługi lokalizacji są wyłączone na tym iPhonie"
           }
         }
       }
@@ -2521,42 +4081,322 @@
         }
       }
     },
-    "Map. Tap to place the pin where the problem is." : {
+    "Map" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Map. Tap to place the pin where the problem is."
+            "value" : "Map"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Karta. Tryck för att sätta nålen där problemet finns."
+            "value" : "Karta"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kartta. Napauta ja aseta nasta ongelman kohdalle."
+            "value" : "Kartta"
           }
         },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "خريطة. اضغط لوضع الدبوس في مكان المشكلة."
+            "value" : "الخريطة"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Мапа. Торкніться, щоб поставити мітку там, де проблема."
+            "value" : "Мапа"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mapa. Dotknij, aby wbić pinezkę w miejscu problemu."
+            "value" : "Mapa"
+          }
+        }
+      }
+    },
+    "Map. Move the map so the problem is under the centre mark." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Map. Move the map so the problem is under the centre mark."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Karta. Flytta kartan så att problemet hamnar under markeringen i mitten."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kartta. Siirrä karttaa niin, että ongelma on keskellä olevan merkin alla."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "خريطة. حرّك الخريطة حتى تصبح المشكلة تحت العلامة في الوسط."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Мапа. Посуньте мапу так, щоб проблема була під позначкою в центрі."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapa. Przesuń mapę tak, aby problem był pod znacznikiem na środku."
+          }
+        }
+      }
+    },
+    "Move pin east 20 m" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move pin east 20 m"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flytta nålen 20 m österut"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siirrä nuppineulaa 20 m itään"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حرّك الدبوس 20 م شرقًا"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Посунути шпильку на 20 м на схід"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przesuń pinezkę 20 m na wschód"
+          }
+        }
+      }
+    },
+    "Move pin north 20 m" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move pin north 20 m"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flytta nålen 20 m norrut"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siirrä nuppineulaa 20 m pohjoiseen"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حرّك الدبوس 20 م شمالًا"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Посунути шпильку на 20 м на північ"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przesuń pinezkę 20 m na północ"
+          }
+        }
+      }
+    },
+    "Move pin south 20 m" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move pin south 20 m"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flytta nålen 20 m söderut"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siirrä nuppineulaa 20 m etelään"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حرّك الدبوس 20 م جنوبًا"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Посунути шпильку на 20 м на південь"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przesuń pinezkę 20 m na południe"
+          }
+        }
+      }
+    },
+    "Move pin west 20 m" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move pin west 20 m"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flytta nålen 20 m västerut"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siirrä nuppineulaa 20 m länteen"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حرّك الدبوس 20 م غربًا"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Посунути шпильку на 20 м на захід"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przesuń pinezkę 20 m na zachód"
+          }
+        }
+      }
+    },
+    "Move the map so the pin is on the problem." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Move the map so the pin is on the problem."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Flytta kartan så att nålen står på problemet."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siirrä karttaa niin, että nuppineula on ongelman kohdalla."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حرّك الخريطة حتى يكون الدبوس فوق المشكلة."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Посуньте мапу так, щоб шпилька була на місці проблеми."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przesuń mapę tak, aby pinezka była na miejscu problemu."
+          }
+        }
+      }
+    },
+    "My location" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My location"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Min plats"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sijaintini"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "موقعي"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Моє місцезнаходження"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moja lokalizacja"
           }
         }
       }
@@ -2641,6 +4481,46 @@
         }
       }
     },
+    "No account. Your details stay on this phone." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No account. Your details stay on this phone."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inget konto. Dina uppgifter stannar i telefonen."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ei tiliä. Tietosi pysyvät tässä puhelimessa."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا حساب. تبقى بياناتك على هذا الهاتف."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Без облікового запису. Ваші дані залишаються на цьому телефоні."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bez konta. Twoje dane zostają na tym telefonie."
+          }
+        }
+      }
+    },
     "No photo" : {
       "localizations" : {
         "en" : {
@@ -2677,6 +4557,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Brak zdjęcia"
+          }
+        }
+      }
+    },
+    "No place chosen yet." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No place chosen yet."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingen plats vald än."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paikkaa ei ole vielä valittu."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لم يُختر أي مكان بعد."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Місце ще не вибрано."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie wybrano jeszcze miejsca."
           }
         }
       }
@@ -2801,6 +4721,46 @@
         }
       }
     },
+    "Not added" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not added"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inte tillagda"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ei lisätty"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لم تُضَف"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не додано"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie dodano"
+          }
+        }
+      }
+    },
     "Not given by the e-service" : {
       "localizations" : {
         "en" : {
@@ -2917,6 +4877,86 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nie wysłano"
+          }
+        }
+      }
+    },
+    "Not sent. %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not sent. %@"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inte skickad. %@"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ei lähetetty. %@"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لم يُرسل. %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не надіслано. %@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie wysłano. %@"
+          }
+        }
+      }
+    },
+    "Now: size %lld of %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Now: size %lld of %lld"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nu: storlek %lld av %lld"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nyt: koko %lld/%lld"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الآن: الحجم %lld من %lld"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зараз: розмір %lld з %lld"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teraz: rozmiar %lld z %lld"
           }
         }
       }
@@ -3041,6 +5081,86 @@
         }
       }
     },
+    "Once in a while Fixa downloads an updated description of the municipality's form from GitHub. Nothing about you is sent." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Once in a while Fixa downloads an updated description of the municipality's form from GitHub. Nothing about you is sent."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Då och då hämtar Fixa en uppdaterad beskrivning av kommunens formulär från GitHub. Inget om dig skickas."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Silloin tällöin Fixa lataa GitHubista päivitetyn kuvauksen kunnan lomakkeesta. Sinusta ei lähetetä mitään."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يُنزّل Fixa من حين لآخر وصفًا محدّثًا لنموذج البلدية من GitHub. لا يُرسل أي شيء عنك."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Час від часу Fixa завантажує з GitHub оновлений опис форми муніципалітету. Нічого про вас не надсилається."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Od czasu do czasu Fixa pobiera z GitHuba zaktualizowany opis formularza gminy. Nic o Tobie nie jest wysyłane."
+          }
+        }
+      }
+    },
+    "Open Settings" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Settings"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öppna Inställningar"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avaa Asetukset"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "افتح الإعدادات"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити Параметри"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz Ustawienia"
+          }
+        }
+      }
+    },
     "Open source (EUPL-1.2) on GitHub" : {
       "localizations" : {
         "en" : {
@@ -3081,6 +5201,46 @@
         }
       }
     },
+    "Open the municipality's form" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open the municipality's form"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öppna kommunens formulär"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avaa kunnan lomake"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "افتح نموذج البلدية"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкрити форму муніципалітету"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz formularz gminy"
+          }
+        }
+      }
+    },
     "Opening the e-service…" : {
       "localizations" : {
         "en" : {
@@ -3117,6 +5277,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Otwieranie e-usługi…"
+          }
+        }
+      }
+    },
+    "Opens a GitHub page. Only the app version and the form's page are filled in." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens a GitHub page. Only the app version and the form's page are filled in."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öppnar en sida på GitHub. Bara appversionen och formulärets sida fylls i."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avaa GitHub-sivun. Siihen täytetään vain sovelluksen versio ja lomakkeen sivu."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يفتح صفحة على GitHub. لا يُملأ فيها سوى إصدار التطبيق وصفحة النموذج."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкриває сторінку GitHub. Заповнено лише версію застосунку та сторінку форми."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwiera stronę w GitHubie. Wypełniona jest tylko wersja aplikacji i strona formularza."
           }
         }
       }
@@ -3201,42 +5401,42 @@
         }
       }
     },
-    "Opens your profile to change it" : {
+    "Opens your contact details to change them" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Opens your profile to change it"
+            "value" : "Opens your contact details to change them"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Öppnar din profil så att du kan ändra den"
+            "value" : "Öppnar dina kontaktuppgifter så att du kan ändra dem"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Avaa profiilisi muokattavaksi"
+            "value" : "Avaa yhteystietosi muokattaviksi"
           }
         },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "يفتح ملفك الشخصي لتعديله"
+            "value" : "يفتح بيانات الاتصال لتغييرها"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Відкриває ваш профіль, щоб змінити його"
+            "value" : "Відкриває ваші контактні дані для змін"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Otwiera twój profil, aby go zmienić"
+            "value" : "Otwiera dane kontaktowe do zmiany"
           }
         }
       }
@@ -3321,6 +5521,46 @@
         }
       }
     },
+    "Optional. Only used when you ask for a reply, for the report you're writing." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optional. Only used when you ask for a reply, for the report you're writing."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frivilligt. Används bara när du vill ha svar, för anmälan du skriver nu."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vapaaehtoinen. Käytetään vain, kun pyydät vastausta, nyt kirjoittamaasi ilmoitukseen."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اختياري. تُستخدم فقط عندما تطلب ردًا، للبلاغ الذي تكتبه الآن."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Необов'язково. Використовуються лише, коли ви просите відповідь, для поточного повідомлення."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opcjonalne. Używane tylko, gdy prosisz o odpowiedź, w zgłoszeniu, które piszesz."
+          }
+        }
+      }
+    },
     "Optional. Only used when you ask for a reply. Saved on this phone." : {
       "localizations" : {
         "en" : {
@@ -3357,46 +5597,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opcjonalne. Używane tylko, gdy prosisz o odpowiedź. Zapisane na tym telefonie."
-          }
-        }
-      }
-    },
-    "Outside %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Outside %@"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Utanför %@"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alueen %@ ulkopuolella"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "خارج %@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "За межами «%@»"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Poza obszarem: %@"
           }
         }
       }
@@ -3681,6 +5881,86 @@
         }
       }
     },
+    "Pin placed where you are" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pin placed where you are"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nålen är satt där du är"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuppineula on asetettu sijaintiisi"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "وُضع الدبوس حيث أنت"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Шпильку поставлено там, де ви"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pinezka umieszczona tam, gdzie jesteś"
+          }
+        }
+      }
+    },
+    "Pin placed: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pin placed: %@"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nålen är utsatt: %@"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuppineula asetettu: %@"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم وضع الدبوس: %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Шпильку поставлено: %@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pinezka umieszczona: %@"
+          }
+        }
+      }
+    },
     "Place" : {
       "localizations" : {
         "en" : {
@@ -3717,6 +5997,206 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Miejsce"
+          }
+        }
+      }
+    },
+    "Place is outside %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Place is outside %@"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Platsen är utanför %@"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paikka on alueen %@ ulkopuolella"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المكان خارج %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Місце поза межами: %@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Miejsce jest poza obszarem: %@"
+          }
+        }
+      }
+    },
+    "Place: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Place: %@"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plats: %@"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paikka: %@"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "المكان: %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Місце: %@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Miejsce: %@"
+          }
+        }
+      }
+    },
+    "Preview" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Preview"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Förhandsvisning"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esikatselu"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "معاينة"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Попередній перегляд"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Podgląd"
+          }
+        }
+      }
+    },
+    "Privacy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Integritet"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yksityisyys"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الخصوصية"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Конфіденційність"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prywatność"
+          }
+        }
+      }
+    },
+    "Privacy policy" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy policy"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Integritetspolicy"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tietosuojakäytäntö"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سياسة الخصوصية"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Політика конфіденційності"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Polityka prywatności"
           }
         }
       }
@@ -3761,42 +6241,42 @@
         }
       }
     },
-    "Profile" : {
+    "Problem: %@" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Profile"
+            "value" : "Problem: %@"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Profil"
+            "value" : "Problem: %@"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Profiili"
+            "value" : "Ongelma: %@"
           }
         },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "الملف الشخصي"
+            "value" : "المشكلة: %@"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Профіль"
+            "value" : "Проблема: %@"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Profil"
+            "value" : "Problem: %@"
           }
         }
       }
@@ -3837,6 +6317,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Postęp"
+          }
+        }
+      }
+    },
+    "Put the pin at the centre" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Put the pin at the centre"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sätt nålen i mitten"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aseta nuppineula keskelle"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ضع الدبوس في الوسط"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Поставити шпильку в центрі"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umieść pinezkę na środku"
+          }
+        }
+      }
+    },
+    "Put the pin on the map first" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Put the pin on the map first"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sätt först ut nålen på kartan"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aseta ensin nuppineula kartalle"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ضع الدبوس على الخريطة أولًا"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Спершу поставте шпильку на мапі"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Najpierw umieść pinezkę na mapie"
+          }
+        }
+      }
+    },
+    "Puts the pin where you are standing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puts the pin where you are standing"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sätter nålen där du står"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asettaa nuppineulan siihen, missä seisot"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يضع الدبوس حيث تقف"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ставить шпильку там, де ви стоїте"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umieszcza pinezkę tam, gdzie stoisz"
           }
         }
       }
@@ -3921,6 +6521,126 @@
         }
       }
     },
+    "Reduce motion" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reduce motion"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minska rörelse"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vähennä liikettä"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تقليل الحركة"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Менше руху"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ogranicz ruch"
+          }
+        }
+      }
+    },
+    "Remember my details" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remember my details"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kom ihåg mina uppgifter"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muista tietoni"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تذكّر بياناتي"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Запам'ятати мої дані"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapamiętaj moje dane"
+          }
+        }
+      }
+    },
+    "Remove from this phone" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from this phone"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ta bort från telefonen"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poista tästä puhelimesta"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إزالة من هذا الهاتف"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Видалити з цього телефона"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuń z tego telefonu"
+          }
+        }
+      }
+    },
     "Remove photo %lld" : {
       "localizations" : {
         "en" : {
@@ -3957,6 +6677,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Usuń zdjęcie %lld"
+          }
+        }
+      }
+    },
+    "Remove this report from this phone?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove this report from this phone?"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ta bort den här anmälan från telefonen?"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poistetaanko tämä ilmoitus tästä puhelimesta?"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هل تريد إزالة هذا البلاغ من هذا الهاتف؟"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Видалити це звернення з телефона?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usunąć to zgłoszenie z tego telefonu?"
           }
         }
       }
@@ -4037,6 +6797,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Odpowiedź na %@"
+          }
+        }
+      }
+    },
+    "Reply to me by e-mail" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reply to me by e-mail"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Svara mig via e-post"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vastatkaa minulle sähköpostilla"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أرسلوا الرد إلى بريدي الإلكتروني"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відповісти мені електронною поштою"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odpowiedz mi e-mailem"
           }
         }
       }
@@ -4161,6 +6961,46 @@
         }
       }
     },
+    "Report a problem in Värmdö in a minute." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Report a problem in Värmdö in a minute."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmäl ett fel i Värmdö på en minut."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ilmoita ongelmasta Värmdössä minuutissa."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أبلِغ عن مشكلة في فارمدو خلال دقيقة."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повідомте про проблему у Вермде за хвилину."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zgłoś problem w Värmdö w minutę."
+          }
+        }
+      }
+    },
     "Report not found" : {
       "localizations" : {
         "en" : {
@@ -4201,6 +7041,46 @@
         }
       }
     },
+    "Reports already sent belong to %@; ask them to change or delete one. Reports sent by e-mail also stay in your Mail app." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reports already sent belong to %@; ask them to change or delete one. Reports sent by e-mail also stay in your Mail app."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmälningar som redan skickats tillhör %@; be dem ändra eller ta bort en. Anmälningar skickade med e-post finns också kvar i din e-postapp."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jo lähetetyt ilmoitukset kuuluvat kohteelle %@; pyydä heitä muuttamaan tai poistamaan ilmoitus. Sähköpostilla lähetetyt ilmoitukset jäävät myös Mail-sovellukseesi."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "البلاغات المُرسلة بالفعل تخص %@؛ اطلب منهم تعديل بلاغ أو حذفه. البلاغات المُرسلة بالبريد الإلكتروني تبقى أيضًا في تطبيق البريد."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Уже надіслані звернення належать %@; попросіть їх змінити чи видалити звернення. Звернення, надіслані електронною поштою, також залишаються у вашій поштовій програмі."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zgłoszenia już wysłane należą do: %@; poproś ich o zmianę lub usunięcie zgłoszenia. Zgłoszenia wysłane e-mailem zostają też w Twojej aplikacji Mail."
+          }
+        }
+      }
+    },
     "Review" : {
       "localizations" : {
         "en" : {
@@ -4237,6 +7117,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sprawdź"
+          }
+        }
+      }
+    },
+    "Same as iPhone (%@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Same as iPhone (%@)"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Samma som iPhone (%@)"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sama kuin iPhonessa (%@)"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مثل الآيفون (%@)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Як в iPhone (%@)"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jak w iPhonie (%@)"
           }
         }
       }
@@ -4321,6 +7241,46 @@
         }
       }
     },
+    "Saved on this phone for your next report." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved on this phone for your next report."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sparas på den här telefonen till nästa anmälan."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tallennetaan tähän puhelimeen seuraavaa ilmoitusta varten."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تُحفظ على هذا الهاتف لبلاغك التالي."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зберігаються на цьому телефоні для наступного повідомлення."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapisane na tym telefonie na następne zgłoszenie."
+          }
+        }
+      }
+    },
     "Search for an address or place" : {
       "localizations" : {
         "en" : {
@@ -4357,6 +7317,86 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Szukaj adresu lub miejsca"
+          }
+        }
+      }
+    },
+    "Search for the address above, or allow it in Settings." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search for the address above, or allow it in Settings."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sök efter adressen ovan, eller tillåt det i Inställningar."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hae osoite yllä tai salli sijainti Asetuksissa."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ابحث عن العنوان في الأعلى، أو اسمح بذلك في الإعدادات."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Знайдіть адресу вище або дозвольте це в Параметрах."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyszukaj adres powyżej albo zezwól na to w Ustawieniach."
+          }
+        }
+      }
+    },
+    "Search for the address above, or move the map." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search for the address above, or move the map."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sök efter adressen ovan, eller flytta kartan."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hae osoite yllä tai siirrä karttaa."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ابحث عن العنوان في الأعلى، أو حرّك الخريطة."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Знайдіть адресу вище або посуньте мапу."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyszukaj adres powyżej albo przesuń mapę."
           }
         }
       }
@@ -4561,6 +7601,46 @@
         }
       }
     },
+    "Sent reports (type, text, place, small photo, case number): on this phone until you delete them." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sent reports (type, text, place, small photo, case number): on this phone until you delete them."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skickade anmälningar (typ, text, plats, liten bild, ärendenummer): i telefonen tills du raderar dem."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lähetetyt ilmoitukset (tyyppi, teksti, paikka, pieni kuva, asianumero): tässä puhelimessa, kunnes poistat ne."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "البلاغات المُرسلة (النوع، النص، المكان، صورة صغيرة، رقم القضية): على هذا الهاتف حتى تحذفها."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Надіслані звернення (тип, текст, місце, маленьке фото, номер справи): на цьому телефоні, доки ви їх не видалите."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wysłane zgłoszenia (rodzaj, tekst, miejsce, małe zdjęcie, numer sprawy): na tym telefonie, dopóki ich nie usuniesz."
+          }
+        }
+      }
+    },
     "Sent to %@" : {
       "localizations" : {
         "en" : {
@@ -4597,6 +7677,86 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wysłano: %@"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inställningar"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asetukset"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الإعدادات"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Налаштування"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ustawienia"
+          }
+        }
+      }
+    },
+    "Settings › Privacy & Security › Location Services" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings › Privacy & Security › Location Services"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inställningar › Integritet och säkerhet › Platstjänster"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asetukset › Tietosuoja ja turvallisuus › Sijaintipalvelut"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الإعدادات › الخصوصية والأمن › خدمات الموقع"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Параметри › Приватність і безпека › Служби локації"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ustawienia › Prywatność i ochrona › Usługi lokalizacji"
           }
         }
       }
@@ -4721,6 +7881,46 @@
         }
       }
     },
+    "Size %lld of %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Size %lld of %lld"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Storlek %lld av %lld"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Koko %lld/%lld"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الحجم %lld من %lld"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Розмір %lld з %lld"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rozmiar %lld z %lld"
+          }
+        }
+      }
+    },
     "Slippery, needs gritting" : {
       "localizations" : {
         "en" : {
@@ -4757,6 +7957,86 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ślisko, trzeba posypać"
+          }
+        }
+      }
+    },
+    "Small taps when you press buttons" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Small taps when you press buttons"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Små knackningar när du trycker på knappar"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pieniä napautuksia, kun painat painikkeita"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نقرات خفيفة عند الضغط على الأزرار"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Легкі поштовхи, коли натискаєте кнопки"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lekkie stuknięcia przy naciskaniu przycisków"
+          }
+        }
+      }
+    },
+    "Smaller text" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smaller text"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mindre text"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pienempi teksti"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نص أصغر"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Менший текст"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mniejszy tekst"
           }
         }
       }
@@ -4881,6 +8161,86 @@
         }
       }
     },
+    "Stored in %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stored in %@"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sparas i %@"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tallennettu: %@"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "محفوظ في %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зберігається в %@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapisane w: %@"
+          }
+        }
+      }
+    },
+    "Street light out" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Street light out"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gatlampa släckt"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Katuvalo sammunut"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إنارة الشارع معطلة"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не світить ліхтар"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie świeci latarnia"
+          }
+        }
+      }
+    },
     "Subject: %@" : {
       "localizations" : {
         "en" : {
@@ -4961,42 +8321,42 @@
         }
       }
     },
-    "Tap the map where the problem is." : {
+    "Tell Fixa about it" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tap the map where the problem is."
+            "value" : "Tell Fixa about it"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tryck på kartan där problemet finns."
+            "value" : "Berätta för Fixa"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Napauta karttaa ongelman kohdalla."
+            "value" : "Kerro Fixalle"
           }
         },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "اضغط على الخريطة في مكان المشكلة."
+            "value" : "أخبر Fixa بذلك"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Торкніться мапи там, де проблема."
+            "value" : "Повідомити Fixa"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dotknij mapy w miejscu problemu."
+            "value" : "Powiedz o tym Fixie"
           }
         }
       }
@@ -5081,42 +8441,42 @@
         }
       }
     },
-    "The e-service answered in a way Fixa doesn't recognise. It may have changed." : {
+    "Text size" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The e-service answered in a way Fixa doesn't recognise. It may have changed."
+            "value" : "Text size"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "E-tjänsten svarade på ett sätt som Fixa inte känner igen. Den kan ha ändrats."
+            "value" : "Textstorlek"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verkkopalvelu vastasi tavalla, jota Fixa ei tunnista. Palvelu on ehkä muuttunut."
+            "value" : "Tekstin koko"
           }
         },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ردّت الخدمة الإلكترونية بطريقة لا يعرفها Fixa. ربما تغيّرت."
+            "value" : "حجم النص"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Е-сервіс відповів так, що Fixa не розпізнає відповідь. Можливо, сервіс змінився."
+            "value" : "Розмір тексту"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "E-usługa odpowiedziała w sposób, którego Fixa nie rozpoznaje. Mogła się zmienić."
+            "value" : "Rozmiar tekstu"
           }
         }
       }
@@ -5281,6 +8641,86 @@
         }
       }
     },
+    "The municipality seems to have changed its form" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The municipality seems to have changed its form"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kommunen verkar ha ändrat sitt formulär"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kunta näyttää muuttaneen lomakettaan"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يبدو أن البلدية غيّرت نموذجها"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Схоже, муніципалітет змінив свою форму"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wygląda na to, że gmina zmieniła swój formularz"
+          }
+        }
+      }
+    },
+    "The municipality's e-service has changed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The municipality's e-service has changed"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kommunens e-tjänst har ändrats"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kunnan e-palvelu on muuttunut"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تغيّرت الخدمة الإلكترونية للبلدية"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Електронний сервіс муніципалітету змінився"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-usługa gminy się zmieniła"
+          }
+        }
+      }
+    },
     "The photo couldn't be uploaded." : {
       "localizations" : {
         "en" : {
@@ -5317,6 +8757,86 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nie udało się przesłać zdjęcia."
+          }
+        }
+      }
+    },
+    "The pin is outside %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The pin is outside %@"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nålen är utanför %@"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuppineula on alueen %@ ulkopuolella"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الدبوس خارج %@"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Шпилька поза межами: %@"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pinezka jest poza obszarem: %@"
+          }
+        }
+      }
+    },
+    "The reply will be in Swedish. You can open it in Translate." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The reply will be in Swedish. You can open it in Translate."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Svaret kommer på svenska. Du kan öppna det i Översätt."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vastaus tulee ruotsiksi. Voit avata sen Käännä-appissa."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سيكون الرد باللغة السويدية. يمكنك فتحه في تطبيق الترجمة."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відповідь буде шведською. Її можна відкрити в Перекладачі."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odpowiedź będzie po szwedzku. Możesz otworzyć ją w Tłumaczu."
           }
         }
       }
@@ -5441,6 +8961,46 @@
         }
       }
     },
+    "These are included in your iPhone backup." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "These are included in your iPhone backup."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De ingår i säkerhetskopian av din iPhone."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nämä sisältyvät iPhonesi varmuuskopioon."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "هذه البيانات مضمّنة في النسخة الاحتياطية لجهاز iPhone."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Усе це входить до резервної копії вашого iPhone."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Te dane są częścią kopii zapasowej Twojego iPhone’a."
+          }
+        }
+      }
+    },
     "They pass it to the right team and reply by e-mail." : {
       "localizations" : {
         "en" : {
@@ -5517,6 +9077,86 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Przekażą je właściwemu zespołowi."
+          }
+        }
+      }
+    },
+    "This can take a few seconds outdoors" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This can take a few seconds outdoors"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Det kan ta några sekunder utomhus"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tämä voi kestää ulkona muutaman sekunnin"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "قد يستغرق ذلك بضع ثوانٍ في الخارج"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Надворі це може тривати кілька секунд"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Na zewnątrz może to potrwać kilka sekund"
+          }
+        }
+      }
+    },
+    "This deletes your contact details, your unsent report and the list of sent reports, including their photos. Reports already sent to %@ are not affected. Your language and display settings stay. This can't be undone." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This deletes your contact details, your unsent report and the list of sent reports, including their photos. Reports already sent to %@ are not affected. Your language and display settings stay. This can't be undone."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Det här raderar dina kontaktuppgifter, din oskickade anmälan och listan över skickade anmälningar, med bilder. Anmälningar som redan skickats till %@ påverkas inte. Dina inställningar för språk och visning finns kvar. Det går inte att ångra."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tämä poistaa yhteystietosi, lähettämättömän ilmoituksesi ja lähetettyjen ilmoitusten luettelon kuvineen. Jo kohteelle %@ lähetettyihin ilmoituksiin tämä ei vaikuta. Kieli- ja näyttöasetuksesi säilyvät. Tätä ei voi perua."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سيؤدي هذا إلى حذف بيانات التواصل الخاصة بك، وبلاغك غير المُرسل، وقائمة البلاغات المُرسلة مع صورها. لا يتأثر ما أُرسل بالفعل إلى %@. تبقى إعدادات اللغة والعرض كما هي. لا يمكن التراجع عن ذلك."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Буде видалено ваші контактні дані, ненадіслане звернення та список надісланих звернень разом із фото. Звернення, які вже надіслано до %@, це не зачепить. Налаштування мови та вигляду залишаться. Скасувати це неможливо."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To usunie Twoje dane kontaktowe, niewysłane zgłoszenie i listę wysłanych zgłoszeń razem ze zdjęciami. Zgłoszenia już wysłane do %@ pozostaną bez zmian. Ustawienia języka i wyglądu zostaną. Tego nie można cofnąć."
           }
         }
       }
@@ -5721,46 +9361,6 @@
         }
       }
     },
-    "This spot looks outside the municipality. Move the pin if that's wrong." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This spot looks outside the municipality. Move the pin if that's wrong."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Platsen verkar ligga utanför kommunen. Flytta nålen om det är fel."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Paikka näyttää olevan kunnan ulkopuolella. Siirrä nastaa, jos se on väärin."
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يبدو أن هذا المكان خارج حدود البلدية. حرّك الدبوس إذا كان هذا خطأ."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Схоже, це місце за межами муніципалітету. Перемістіть мітку, якщо це не так."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "To miejsce wygląda na leżące poza gminą. Przesuń pinezkę, jeśli to błąd."
-          }
-        }
-      }
-    },
     "To: %@" : {
       "localizations" : {
         "en" : {
@@ -5841,6 +9441,46 @@
         }
       }
     },
+    "Turn on Precise Location in Settings, or move the map yourself." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn on Precise Location in Settings, or move the map yourself."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slå på Exakt plats i Inställningar, eller flytta kartan själv."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laita Tarkka sijainti päälle Asetuksissa tai siirrä karttaa itse."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "فعّل الموقع الدقيق في الإعدادات، أو حرّك الخريطة بنفسك."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Увімкніть «Точне розташування» в Параметрах або посуньте мапу самі."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Włącz Dokładną lokalizację w Ustawieniach albo przesuń mapę samodzielnie."
+          }
+        }
+      }
+    },
     "Uploading the photo…" : {
       "localizations" : {
         "en" : {
@@ -5881,42 +9521,82 @@
         }
       }
     },
-    "Use my location" : {
+    "Use iPhone setting" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use my location"
+            "value" : "Use iPhone setting"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Använd min plats"
+            "value" : "Använd iPhones inställning"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Käytä sijaintiani"
+            "value" : "Käytä iPhonen asetusta"
           }
         },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "استخدم موقعي"
+            "value" : "استخدام إعداد الآيفون"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Моє місцезнаходження"
+            "value" : "Як в iPhone"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Użyj mojej lokalizacji"
+            "value" : "Użyj ustawienia iPhone'a"
+          }
+        }
+      }
+    },
+    "Use my current location" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use my current location"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Använd min nuvarande plats"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Käytä nykyistä sijaintiani"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "استخدم موقعي الحالي"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Використати моє поточне місцезнаходження"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Użyj mojej bieżącej lokalizacji"
           }
         }
       }
@@ -5961,6 +9641,46 @@
         }
       }
     },
+    "Used only for the report you're writing, then forgotten." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Used only for the report you're writing, then forgotten."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Används bara för anmälan du skriver nu och glöms sedan bort."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Käytetään vain nyt kirjoittamaasi ilmoitukseen, sitten unohdetaan."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تُستخدم فقط للبلاغ الذي تكتبه الآن، ثم تُنسى."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Використовуються лише для поточного повідомлення, потім забуваються."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Używane tylko w zgłoszeniu, które piszesz, potem zapominane."
+          }
+        }
+      }
+    },
     "Version %@" : {
       "localizations" : {
         "en" : {
@@ -6001,6 +9721,86 @@
         }
       }
     },
+    "Version %@ (%@)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %@ (%@)"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %@ (%@)"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versio %@ (%@)"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الإصدار %@ (%@)"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Версія %@ (%@)"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wersja %@ (%@)"
+          }
+        }
+      }
+    },
+    "Vibration" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vibration"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vibration"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Värinä"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "الاهتزاز"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вібрація"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wibracje"
+          }
+        }
+      }
+    },
     "Water leaking in the street" : {
       "localizations" : {
         "en" : {
@@ -6037,6 +9837,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Woda wycieka na ulicę"
+          }
+        }
+      }
+    },
+    "What Fixa stores" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What Fixa stores"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vad Fixa sparar"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mitä Fixa tallentaa"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ما الذي يحفظه Fixa"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Що зберігає Fixa"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Co zapisuje Fixa"
           }
         }
       }
@@ -6161,6 +10001,166 @@
         }
       }
     },
+    "Write a few more words (at least 10 letters)." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Write a few more words (at least 10 letters)."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skriv några ord till (minst 10 bokstäver)."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kirjoita vielä muutama sana (vähintään 10 kirjainta)."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اكتب بضع كلمات أخرى (10 أحرف على الأقل)."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Напишіть ще кілька слів (щонайменше 10 літер)."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Napisz jeszcze kilka słów (co najmniej 10 liter)."
+          }
+        }
+      }
+    },
+    "Your contact details: on this phone until you delete them." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your contact details: on this phone until you delete them."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dina kontaktuppgifter: i telefonen tills du raderar dem."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yhteystietosi: tässä puhelimessa, kunnes poistat ne."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بيانات التواصل الخاصة بك: على هذا الهاتف حتى تحذفها."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваші контактні дані: на цьому телефоні, доки ви їх не видалите."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twoje dane kontaktowe: na tym telefonie, dopóki ich nie usuniesz."
+          }
+        }
+      }
+    },
+    "Your data is deleted from this phone." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your data is deleted from this phone."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dina uppgifter är raderade från telefonen."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tietosi on poistettu tästä puhelimesta."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تم حذف بياناتك من هذا الهاتف."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваші дані видалено з цього телефона."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twoje dane zostały usunięte z tego telefonu."
+          }
+        }
+      }
+    },
+    "Your details" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your details"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dina uppgifter"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Omat tietosi"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بياناتك"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваші дані"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twoje dane"
+          }
+        }
+      }
+    },
     "Your e-mail, name and phone are removed from this phone, and new reports won't ask for a reply. Reports you already sent keep them." : {
       "localizations" : {
         "en" : {
@@ -6197,6 +10197,246 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Twój e-mail, imię i telefon zostaną usunięte z tego telefonu, a nowe zgłoszenia nie będą prosić o odpowiedź. Wysłane już zgłoszenia je zachowają."
+          }
+        }
+      }
+    },
+    "Your iPhone shares only an approximate location" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your iPhone shares only an approximate location"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Din iPhone delar bara en ungefärlig plats"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhonesi jakaa vain likimääräisen sijainnin"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يشارك iPhone موقعًا تقريبيًا فقط"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваш iPhone ділиться лише приблизним місцезнаходженням"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twój iPhone udostępnia tylko przybliżoną lokalizację"
+          }
+        }
+      }
+    },
+    "Your report goes straight to the municipality's own fault-report service, just like the website." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your report goes straight to the municipality's own fault-report service, just like the website."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Din anmälan går direkt till kommunens egen felanmälan, precis som på webbplatsen."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ilmoituksesi menee suoraan kunnan omaan vikailmoituspalveluun, aivan kuten verkkosivulla."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يذهب بلاغك مباشرة إلى خدمة البلاغات الخاصة بالبلدية، تمامًا كما في الموقع الإلكتروني."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваше звернення йде просто до власної служби звернень муніципалітету, так само як на сайті."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twoje zgłoszenie trafia prosto do własnej usługi zgłaszania usterek gminy, tak jak na stronie internetowej."
+          }
+        }
+      }
+    },
+    "Your report is saved on this phone." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your report is saved on this phone."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Din anmälan är sparad på telefonen."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ilmoituksesi on tallessa tässä puhelimessa."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بلاغك محفوظ على هذا الهاتف."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваше звернення збережено на цьому телефоні."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twoje zgłoszenie jest zapisane na tym telefonie."
+          }
+        }
+      }
+    },
+    "Your settings (language, text size)." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your settings (language, text size)."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dina inställningar (språk, textstorlek)."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Asetuksesi (kieli, tekstin koko)."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعداداتك (اللغة، حجم النص)."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваші налаштування (мова, розмір тексту)."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twoje ustawienia (język, rozmiar tekstu)."
+          }
+        }
+      }
+    },
+    "Your unsent report (text, place, up to 3 photos): until you send or discard it." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your unsent report (text, place, up to 3 photos): until you send or discard it."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Din oskickade anmälan (text, plats, upp till 3 bilder): tills du skickar eller kastar den."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lähettämätön ilmoituksesi (teksti, paikka, enintään 3 kuvaa): kunnes lähetät tai hylkäät sen."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "بلاغك غير المُرسل (النص، المكان، حتى 3 صور): حتى ترسله أو تتجاهله."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваше ненадіслане звернення (текст, місце, до 3 фото): доки ви його не надішлете чи не відкинете."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twoje niewysłane zgłoszenie (tekst, miejsce, do 3 zdjęć): dopóki go nie wyślesz lub nie odrzucisz."
+          }
+        }
+      }
+    },
+    "iPhone setting" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhone setting"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhones inställning"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iPhonen asetus"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "إعداد الآيفون"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Налаштування iPhone"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ustawienie iPhone'a"
           }
         }
       }

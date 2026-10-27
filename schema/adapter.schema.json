@@ -6,7 +6,8 @@
   "required": ["specVersion", "id", "municipality", "channel", "categories", "tiles", "validation", "disclaimer"],
   "additionalProperties": false,
   "properties": {
-    "specVersion": { "type": "integer", "enum": [1] },
+    "specVersion": { "type": "integer", "minimum": 1, "description": "Adapter format version. Apps skip a remote adapter whose version is newer than they support." },
+    "minAppBuild": { "type": "integer", "minimum": 1, "description": "Lowest app build (CFBundleVersion) that can run this adapter. Set only when the engine had to change." },
     "id": { "type": "string", "description": "Reverse-DNS id, e.g. se.varmdo.ksb" },
     "municipality": {
       "type": "object",
@@ -68,7 +69,18 @@
                     "key": { "type": "string", "description": "Input name ends in $<key>_field$<control>" },
                     "control": { "type": "string" },
                     "yesValue": { "type": "string" },
-                    "noValue": { "type": "string" }
+                    "noValue": { "type": "string" },
+                    "type": { "type": "string", "enum": ["select", "radio", "checkbox", "text", "textarea", "hidden"], "description": "HTML control type; a renamed control of the same type may be used when its label matches" },
+                    "labels": {
+                      "type": "object",
+                      "description": "Question texts per language, e.g. {\"sv\": [\"Beskriv felet här\"]}; matched case-, diacritic- and '*'-insensitively when the key is not on the page",
+                      "additionalProperties": { "type": "array", "items": { "type": "string" } }
+                    },
+                    "optionSynonyms": {
+                      "type": "object",
+                      "description": "Other values or visible texts for a radio option, keyed by yesValue/noValue",
+                      "additionalProperties": { "type": "array", "items": { "type": "string" } }
+                    }
                   }
                 }
               }
@@ -97,6 +109,7 @@
         "properties": {
           "id": { "type": "string" },
           "value": { "type": "string", "description": "Exact form value" },
+          "synonyms": { "type": "array", "items": { "type": "string" }, "description": "Other option values or visible texts meaning this category, tried after the value and its visible text" },
           "title": { "$ref": "#/$defs/localizedText" }
         }
       }

@@ -10,7 +10,7 @@ extension ValidationIssue {
         case (.description, .missing):
             String(localized: "Describe the problem in a few words.")
         case (.description, .tooShort):
-            String(localized: "Add a little more detail.")
+            String(localized: "Write a few more words (at least 10 letters).")
         case (.description, .tooLong):
             String(localized: "This is too long for the e-service. Shorten it a little.")
         case (.location, .outsideRegion):

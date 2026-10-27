@@ -16,6 +16,15 @@ struct HomeScreen: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Fx.Space.l) {
+                let status = model.adapterStatus
+                if status.state != .ok {
+                    FxBanner(
+                        kind: .warning,
+                        title: String(localized: "The municipality's e-service has changed"),
+                        message: status.message?.resolve()
+                            ?? String(localized: "Fixa is an independent app. We are updating it. Your report is saved, and you can still send it by email.")
+                    )
+                }
                 VStack(alignment: .leading, spacing: Fx.Space.xs) {
                     Text(verbatim: "Fixa")
                         .font(Fx.Font.largeTitle)
@@ -24,6 +33,8 @@ struct HomeScreen: View {
                     Text("Report a problem in \(placeName) in a minute.")
                         .font(Fx.Font.body)
                         .foregroundStyle(Fx.Color.ink2)
+                    languageChip
+                        .padding(.top, Fx.Space.xs)
                 }
 
                 LazyVGrid(columns: columns, spacing: Fx.Space.m) {
@@ -57,9 +68,10 @@ struct HomeScreen: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
-                    model.path.append(.profile)
+                    model.path.append(.settings)
                 } label: {
-                    Label("Profile", systemImage: "person.crop.circle")
+                    Label("Settings", systemImage: "gearshape")
+                        .labelStyle(.titleAndIcon)
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
@@ -67,9 +79,35 @@ struct HomeScreen: View {
                     model.path.append(.history)
                 } label: {
                     Label("Sent reports", systemImage: "clock.arrow.circlepath")
+                        .labelStyle(.titleAndIcon)
                 }
             }
         }
+    }
+
+    /// The current language in its own script ("Svenska"), so someone who can't read the UI
+    /// still finds the switch. Opens the Language page.
+    private var languageChip: some View {
+        let language = model.effectiveLanguage
+        return Button {
+            model.path.append(.language)
+        } label: {
+            Label {
+                Text(verbatim: language.nativeName)
+                    .environment(\.locale, language.locale)
+            } icon: {
+                Image(systemName: "globe")
+            }
+            .font(Fx.Font.subheadline)
+            .foregroundStyle(Fx.Color.sea)
+            .padding(.horizontal, Fx.Space.m)
+            .frame(minHeight: Fx.minTarget)
+            .fxOutline(Capsule(), outline: Fx.Color.fieldBorder)
+            .contentShape(Capsule())
+        }
+        .buttonStyle(FxPressStyle())
+        .accessibilityLabel(Text("Language: \(language.nativeName)"))
+        .accessibilityInputLabels([Text("Language"), Text(verbatim: language.nativeName)])
     }
 
     /// "Värmdö" from "Värmdö kommun": the subtitle stays descriptive.
@@ -85,10 +123,12 @@ struct HomeScreen: View {
     private func urgentRow(_ emergency: AdapterSpec.Emergency) -> some View {
         let contact = EmergencyRouter.contact(for: .now, emergency: emergency)
         let digits = contact.phone.filter(\.isNumber)
+        // Number first and unbreakable (NBSP, non-breaking hyphen): if the line wraps, only the name moves.
+        let number = contact.phone.replacingOccurrences(of: " ", with: "\u{00A0}").replacingOccurrences(of: "-", with: "\u{2011}")
         return FxCallRow(
             title: String(localized: "No water or a blocked sewer?"),
-            // Number first and unbreakable (NBSP, non-breaking hyphen): if the line wraps, only the name moves.
-            detail: "\(contact.phone.replacingOccurrences(of: " ", with: "\u{00A0}").replacingOccurrences(of: "-", with: "\u{2011}")) · \(contact.title.resolve())"
+            detail: "\(number.ltrIsolated) · \(contact.title.resolve())",
+            accessibilityValue: "\(contact.phone), \(contact.title.resolve())"
         ) {
             if let url = URL(string: "tel:\(digits)") {
                 openURL(url)

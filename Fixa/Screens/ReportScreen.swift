@@ -7,6 +7,12 @@ struct ReportScreen: View {
     let spec: AdapterSpec
     @Environment(AppModel.self) private var model
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.fxHaptics) private var haptics
+    @Environment(\.fxReduceMotion) private var reduceMotion
+    /// VoiceOver focus goes to the first section with an issue when Review fails.
+    @AccessibilityFocusState private var a11yFocus: Section?
+    /// Keyboard focus for the description and e-mail when they are the first issue.
+    @FocusState private var keyboardFocus: Section?
     @State private var pickerItems: [PhotosPickerItem] = []
     @State private var isCameraPresented = false
     @State private var cameraTaps = 0
@@ -21,7 +27,7 @@ struct ReportScreen: View {
     @State private var phraseTaps = 0
 
     /// Form sections, top to bottom: required first, optional last.
-    private enum Section: Int, Comparable {
+    private enum Section: Int, Comparable, Hashable {
         case problem, place, details, photos, reply
 
         init(_ field: ValidationIssue.Field) {
@@ -55,6 +61,8 @@ struct ReportScreen: View {
                             minHeight: 140,
                             showsTitle: false
                         )
+                        .focused($keyboardFocus, equals: .details)
+                        .accessibilityFocused($a11yFocus, equals: .details)
                         quickPhrases
                     }
                     .id(Section.details)
@@ -75,9 +83,9 @@ struct ReportScreen: View {
         .fxScreenBackground()
         .navigationTitle(Text("New report"))
         .navigationBarTitleDisplayMode(.inline)
-        .sensoryFeedback(.error, trigger: failedReviews)
-        .sensoryFeedback(.impact(weight: .light), trigger: cameraTaps)
-        .sensoryFeedback(.selection, trigger: phraseTaps)
+        .sensoryFeedback(.error, trigger: failedReviews) { _, _ in haptics }
+        .sensoryFeedback(.impact(weight: .light), trigger: cameraTaps) { _, _ in haptics }
+        .sensoryFeedback(.selection, trigger: phraseTaps) { _, _ in haptics }
         .onAppear { replyInline = !model.profileIsReady }
         .task { await model.prefillLocationIfAllowed() }
         .onChange(of: pickerItems) { _, items in
@@ -91,20 +99,40 @@ struct ReportScreen: View {
         }
     }
 
-    /// Goes to Review, or scrolls to the first section with an issue (inline messages show there).
+    /// Goes to Review, or scrolls to the first section with an issue (inline messages show there),
+    /// moves VoiceOver there and says what to fix.
     private func review(scrollingWith proxy: ScrollViewProxy) {
         guard !model.goToReview() else { return }
         failedReviews += 1
-        guard let first = model.issues.map({ Section($0.field) }).min() else { return }
-        withAnimation(Fx.Motion.select) {
+        let issues = model.issues.sorted { Section($0.field) < Section($1.field) }
+        guard let firstIssue = issues.first else { return }
+        let first = Section(firstIssue.field)
+        withAnimation(reduceMotion ? nil : Fx.Motion.select) {
             proxy.scrollTo(first, anchor: .top)
         }
+        a11yFocus = first
+        if first == .details || (first == .reply && replyInline && model.draft.wantsFeedback) {
+            keyboardFocus = first
+        }
+        AccessibilityNotification.Announcement(
+            String(localized: "Fix \(issues.count) things before review. \(firstIssue.message)")
+        ).post()
+    }
+
+    /// Title, Spacer and "Change" side by side; stacked at accessibility text sizes.
+    private var rowLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: Fx.Space.xs))
+            : AnyLayout(HStackLayout(spacing: Fx.Space.m))
     }
 
     // MARK: Category
 
     private var categorySection: some View {
-        VStack(alignment: .leading, spacing: Fx.Space.s) {
+        let tile = spec.tile(id: model.draft.tileID)
+        let title = tile?.title.resolve() ?? String(localized: "Choose a problem")
+        let issue = model.issue(for: .category)?.message
+        return VStack(alignment: .leading, spacing: Fx.Space.s) {
             FxSectionHeader(String(localized: "Problem"))
             Menu {
                 ForEach(spec.tiles, id: \.id) { tile in
@@ -116,26 +144,32 @@ struct ReportScreen: View {
                 }
             } label: {
                 FxCard {
-                    HStack(spacing: Fx.Space.m) {
-                        let tile = spec.tile(id: model.draft.tileID)
+                    rowLayout {
                         Image(systemName: tile?.symbol ?? "questionmark.circle")
                             .font(Fx.Font.headline)
                             .foregroundStyle(Fx.Color.sea)
                             .accessibilityHidden(true)
-                        Text(tile?.title.resolve() ?? String(localized: "Choose a problem"))
+                        Text(title)
                             .font(Fx.Font.headline)
                             .foregroundStyle(Fx.Color.ink)
-                        Spacer(minLength: Fx.Space.s)
+                            .multilineTextAlignment(.leading)
+                        if !dynamicTypeSize.isAccessibilitySize {
+                            Spacer(minLength: Fx.Space.s)
+                        }
                         Text("Change")
                             .font(Fx.Font.callout)
                             .foregroundStyle(Fx.Color.sea)
                     }
-                    .frame(minHeight: Fx.minTarget)
+                    .frame(maxWidth: .infinity, minHeight: Fx.minTarget, alignment: .leading)
                 }
             }
             .buttonStyle(FxPressStyle())
-            if let issue = model.issue(for: .category) {
-                issueText(issue.message)
+            .accessibilityLabel(Text("Problem: \(title)"))
+            .accessibilityValue(issue.map { Text($0) } ?? Text(""))
+            .accessibilityInputLabels([Text("Change problem"), Text("Problem")])
+            .accessibilityFocused($a11yFocus, equals: .problem)
+            if let issue {
+                issueText(issue)
             }
         }
     }
@@ -209,7 +243,8 @@ struct ReportScreen: View {
     // MARK: Location
 
     private var locationSection: some View {
-        VStack(alignment: .leading, spacing: Fx.Space.s) {
+        let issue = model.issue(for: .location)?.message
+        return VStack(alignment: .leading, spacing: Fx.Space.s) {
             FxSectionHeader(String(localized: "Where?"))
             Button {
                 model.isLocationPickerPresented = true
@@ -238,6 +273,7 @@ struct ReportScreen: View {
                             .font(Fx.Font.body)
                             .foregroundStyle(model.draft.coordinate == nil ? Fx.Color.ink2 : Fx.Color.ink)
                             .multilineTextAlignment(.leading)
+                            .lineLimit(3)
                         Spacer(minLength: Fx.Space.s)
                         Image(systemName: "chevron.forward")
                             .foregroundStyle(Fx.Color.ink2)
@@ -247,9 +283,13 @@ struct ReportScreen: View {
                 }
             }
             .buttonStyle(FxPressStyle())
+            .accessibilityLabel(Text("Place: \(locationSummary)"))
+            .accessibilityValue(issue.map { Text($0) } ?? Text(""))
             .accessibilityHint(Text("Opens the map"))
-            if let issue = model.issue(for: .location) {
-                issueText(issue.message)
+            .accessibilityInputLabels([Text("Place"), Text("Map")])
+            .accessibilityFocused($a11yFocus, equals: .place)
+            if let issue {
+                issueText(issue)
             }
         }
     }
@@ -266,21 +306,22 @@ struct ReportScreen: View {
 
     // MARK: Quick phrases
 
+    /// Chips read in the app's language but add the Swedish phrase: the municipality reads Swedish.
     private var quickPhrases: some View {
         let phrases = QuickPhrases.phrases(forTile: model.draft.tileID)
         return FlowLayout(spacing: Fx.Space.s) {
             ForEach(phrases, id: \.self) { phrase in
-                let added = model.draft.description.localizedCaseInsensitiveContains(phrase)
+                let added = model.draft.description.localizedCaseInsensitiveContains(phrase.swedish)
                 Button {
                     guard !added else { return }
-                    model.draft.description = QuickPhrases.append(phrase, to: model.draft.description)
+                    model.draft.description = QuickPhrases.append(phrase.swedish, to: model.draft.description)
                     phraseTaps += 1
                 } label: {
                     HStack(spacing: Fx.Space.xs) {
                         Image(systemName: added ? "checkmark" : "plus")
                             .font(Fx.Font.footnote.weight(.bold))
                             .accessibilityHidden(true)
-                        Text(phrase)
+                        Text(phrase.label)
                             .font(Fx.Font.callout)
                             .multilineTextAlignment(.leading)
                     }
@@ -289,13 +330,13 @@ struct ReportScreen: View {
                     .frame(minHeight: Fx.minTarget)
                     .background(Fx.Color.card, in: Capsule())
                     .overlay {
-                        Capsule().strokeBorder(added ? Fx.Color.sea : Fx.Color.line, lineWidth: added ? Fx.Border.emphasis : Fx.Border.hairline)
+                        Capsule().strokeBorder(added ? Fx.Color.sea : Fx.Color.fieldBorder, lineWidth: added ? Fx.Border.emphasis : Fx.Border.hairline)
                     }
                     .contentShape(Capsule())
                 }
                 .buttonStyle(FxPressStyle())
-                .accessibilityLabel(Text(phrase))
-                .accessibilityHint(added ? Text("") : Text("Adds this to the description"))
+                .accessibilityLabel(Text(phrase.label))
+                .accessibilityHint(added ? Text("") : Text("Adds it to the description in Swedish"))
                 .accessibilityAddTraits(added ? .isSelected : [])
             }
         }
@@ -312,13 +353,13 @@ struct ReportScreen: View {
             get: { model.draft.wantsFeedback },
             set: { isOn in
                 if isOn { replyInline = !model.profileIsReady }
-                withAnimation(Fx.Motion.select) { model.draft.wantsFeedback = isOn }
+                withAnimation(reduceMotion ? nil : Fx.Motion.select) { model.draft.wantsFeedback = isOn }
             }
         )
         return VStack(alignment: .leading, spacing: Fx.Space.m) {
             FxSectionHeader(String(localized: "Reply"), subtitle: String(localized: "Optional"))
             FxToggleRow(
-                title: String(localized: "Contact me about this"),
+                title: String(localized: "Reply to me by e-mail"),
                 isOn: wantsReply
             )
             if model.draft.wantsFeedback, !replyInline {
@@ -332,6 +373,8 @@ struct ReportScreen: View {
                     kind: .email,
                     issue: model.issue(for: .email)?.message
                 )
+                .focused($keyboardFocus, equals: .reply)
+                .accessibilityFocused($a11yFocus, equals: .reply)
                 nameLayout {
                     FxTextField(
                         title: String(localized: "First name (optional)"),
@@ -359,35 +402,41 @@ struct ReportScreen: View {
     private var replySummary: some View {
         let email = model.profile.email.trimmingCharacters(in: .whitespacesAndNewlines)
         return Button {
-            model.path.append(.profile)
+            model.path.append(.contactDetails)
         } label: {
             FxCard {
-                HStack(spacing: Fx.Space.m) {
+                rowLayout {
                     Image(systemName: "envelope")
                         .font(Fx.Font.headline)
                         .foregroundStyle(Fx.Color.sea)
                         .accessibilityHidden(true)
-                    Text("Reply to \(email)")
+                    Text("Reply to \(email.ltrIsolated)")
                         .font(Fx.Font.body)
                         .foregroundStyle(Fx.Color.ink)
                         .multilineTextAlignment(.leading)
-                    Spacer(minLength: Fx.Space.s)
+                    if !dynamicTypeSize.isAccessibilitySize {
+                        Spacer(minLength: Fx.Space.s)
+                    }
                     Text("Change")
                         .font(Fx.Font.callout)
                         .foregroundStyle(Fx.Color.sea)
                 }
-                .frame(minHeight: Fx.minTarget)
+                .frame(maxWidth: .infinity, minHeight: Fx.minTarget, alignment: .leading)
             }
         }
         .buttonStyle(FxPressStyle())
         .accessibilityElement(children: .combine)
-        .accessibilityHint(Text("Opens your profile to change it"))
+        .accessibilityHint(Text("Opens your contact details to change them"))
+        .accessibilityInputLabels([Text("Change reply details"), Text("Reply")])
+        .accessibilityFocused($a11yFocus, equals: .reply)
     }
 
+    /// Report-level issues are read as the control's value, so the text itself is hidden from VoiceOver.
     private func issueText(_ message: String) -> some View {
         Label(message, systemImage: "exclamationmark.circle")
             .font(Fx.Font.footnote)
             .foregroundStyle(Fx.Color.error)
+            .accessibilityHidden(true)
     }
 }
 
@@ -396,25 +445,42 @@ struct ReportScreen: View {
 /// Short phrases per tile that a tap adds to the description. App-side on purpose: the adapter
 /// stays a description of the e-service, and these are only typing help.
 enum QuickPhrases {
-    static func phrases(forTile tileID: String?) -> [String] {
+    /// `label` is in the app's language; `swedish` is what goes into the description.
+    struct Phrase: Hashable {
+        let label: String
+        let swedish: String
+    }
+
+    static func phrases(forTile tileID: String?) -> [Phrase] {
         switch tileID {
         case "streetlight":
-            [String(localized: "Completely dark"), String(localized: "Flickering"), String(localized: "On during the day")]
+            [phrase("Completely dark"), phrase("Flickering"), phrase("On during the day")]
         case "pothole":
-            [String(localized: "Deep hole"), String(localized: "In the cycle lane"), String(localized: "Dangerous for cyclists")]
+            [phrase("Deep hole"), phrase("In the cycle lane"), phrase("Dangerous for cyclists")]
         case "winter":
-            [String(localized: "Not ploughed"), String(localized: "Slippery, needs gritting"), String(localized: "Snow blocks the path")]
+            [phrase("Not ploughed"), phrase("Slippery, needs gritting"), phrase("Snow blocks the path")]
         case "sign":
-            [String(localized: "Sign has fallen over"), String(localized: "Barrier is broken"), String(localized: "Sign is hard to see")]
+            [phrase("Sign has fallen over"), phrase("Barrier is broken"), phrase("Sign is hard to see")]
         case "graffiti":
-            [String(localized: "Offensive text"), String(localized: "Broken glass"), String(localized: "On a school or playground")]
+            [phrase("Offensive text"), phrase("Broken glass"), phrase("On a school or playground")]
         case "park":
-            [String(localized: "Broken play equipment"), String(localized: "Fallen tree or branch"), String(localized: "Overflowing bins")]
+            [phrase("Broken play equipment"), phrase("Fallen tree or branch"), phrase("Overflowing bins")]
         case "water":
-            [String(localized: "Water leaking in the street"), String(localized: "Drain is blocked"), String(localized: "Bad smell")]
+            [phrase("Water leaking in the street"), phrase("Drain is blocked"), phrase("Bad smell")]
         default:
-            [String(localized: "Dangerous"), String(localized: "Been like this for a while"), String(localized: "Getting worse")]
+            [phrase("Dangerous"), phrase("Been like this for a while"), phrase("Getting worse")]
         }
+    }
+
+    /// The app's compiled Swedish strings; nil only if the sv localization is missing from the bundle.
+    private static let swedishBundle: Bundle? = Bundle.main
+        .path(forResource: "sv", ofType: "lproj")
+        .flatMap(Bundle.init(path:))
+
+    private static func phrase(_ resource: LocalizedStringResource) -> Phrase {
+        let label = String(localized: resource)
+        let swedish = swedishBundle?.localizedString(forKey: resource.key, value: label, table: nil) ?? label
+        return Phrase(label: label, swedish: swedish)
     }
 
     /// Adds `phrase` as its own sentence: "Out since Monday" + "Flickering" → "Out since Monday. Flickering".

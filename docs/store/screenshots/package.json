@@ -1,0 +1,13 @@
+{
+  "name": "fixa-appstore-screenshots",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "capture": "./capture.sh",
+    "render": "node render.mjs"
+  },
+  "dependencies": {
+    "pngjs": "7.0.0",
+    "puppeteer": "24.43.1"
+  }
+}

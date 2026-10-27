@@ -2,7 +2,10 @@ import Foundation
 
 /// A municipality adapter, decoded from `adapters/*.json`.
 public struct AdapterSpec: Codable, Sendable, Identifiable {
+    /// Adapter format version; an app runs only adapters up to `AdapterUpdatePolicy.supportedSpecVersion`.
     public let specVersion: Int
+    /// Lowest app build (CFBundleVersion) whose engine can run this adapter. Absent means any build.
+    public let minAppBuild: Int?
     public let id: String
     public let municipality: Municipality
     public let channel: Channel
@@ -83,6 +86,20 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
         public let yesValue: String?
         /// Radio value meaning no (mapChoice, feedback).
         public let noValue: String?
+        /// HTML control type (`select`, `radio`, `text`, `textarea`, `hidden`, `checkbox`). Lets the fallback
+        /// accept a control whose `<control>` class was renamed but which is still the same kind of input.
+        public let type: String?
+        /// Question texts of the field per language, e.g. `{"sv": ["Beskriv felet här"]}`. Used when the key
+        /// is not on the page: a control of the same kind under a matching label is used instead.
+        public let labels: [String: [String]]?
+        /// Other visible texts or values that mean the same radio option, keyed by `yesValue`/`noValue`.
+        public let optionSynonyms: [String: [String]]?
+
+        /// Every configured label, in a stable order (sv first), for matching and drift reports.
+        public var allLabels: [String] {
+            guard let labels else { return [] }
+            return labels.keys.sorted { ($0 == "sv" ? "" : $0) < ($1 == "sv" ? "" : $1) }.flatMap { labels[$0] ?? [] }
+        }
     }
 
     public struct UploadSpec: Codable, Sendable {
@@ -100,6 +117,8 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
         /// Exact value the form expects.
         public let value: String
         public let title: LocalizedText
+        /// Other option values or visible texts the form may use for this category after a rename.
+        public let synonyms: [String]?
     }
 
     public struct Tile: Codable, Sendable, Identifiable, Hashable {
@@ -183,7 +202,15 @@ public struct LocalizedText: Codable, Sendable, Hashable {
 
 public enum AdapterCatalog {
     public static func load(from url: URL) throws -> AdapterSpec {
-        try JSONDecoder().decode(AdapterSpec.self, from: Data(contentsOf: url))
+        try decode(Data(contentsOf: url))
+    }
+
+    /// Decodes an adapter and rejects it when `AdapterSpec.problems` is not empty.
+    public static func decode(_ data: Data) throws -> AdapterSpec {
+        let spec = try JSONDecoder().decode(AdapterSpec.self, from: data)
+        let problems = spec.problems
+        guard problems.isEmpty else { throw AdapterSpecError.invalid(problems) }
+        return spec
     }
 
     /// Adapters shipped inside FixaKit, sorted by id.

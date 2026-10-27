@@ -1,5 +1,6 @@
 {
   "specVersion": 1,
+  "minAppBuild": 3,
   "id": "se.varmdo.ksb",
   "municipality": {
     "name": "Värmdö kommun",
@@ -24,22 +25,22 @@
         "id": "FaultReport",
         "stage": "sendingReport",
         "fields": [
-          { "role": "category", "key": "KSB_14", "control": "dropDownListFieldControl" },
-          { "role": "place", "key": "KSB_18", "control": "textFieldControl" },
-          { "role": "mapChoice", "key": "KSB_20", "control": "radioButtonListFieldControl", "yesValue": "Ja, visa karta och ange position", "noValue": "Nej" },
-          { "role": "mapAnswer", "key": "KSB_19", "control": "MapAnswer" },
-          { "role": "description", "key": "U_29_1_1", "control": "textFieldControl" },
-          { "role": "feedback", "key": "KSB_54", "control": "radioButtonListFieldControl", "yesValue": "Ja", "noValue": "Nej" }
+          { "role": "category", "key": "KSB_14", "control": "dropDownListFieldControl", "type": "select", "labels": { "sv": ["Välj område", "Område", "Kategori"], "en": ["Choose area", "Category"] } },
+          { "role": "place", "key": "KSB_18", "control": "textFieldControl", "type": "text", "labels": { "sv": ["Plats", "Adress", "Plats eller adress"], "en": ["Place", "Location", "Address"] } },
+          { "role": "mapChoice", "key": "KSB_20", "control": "radioButtonListFieldControl", "type": "radio", "yesValue": "Ja, visa karta och ange position", "noValue": "Nej", "labels": { "sv": ["Jag vill också peka ut området", "Vill du peka ut området på karta"], "en": ["I also want to mark the area"] }, "optionSynonyms": { "Ja, visa karta och ange position": ["Ja", "Ja, visa karta", "Visa karta"], "Nej": ["Nej tack"] } },
+          { "role": "mapAnswer", "key": "KSB_19", "control": "MapAnswer", "type": "hidden", "labels": { "sv": ["Zooma och märk ut område på karta", "Märk ut område på karta"], "en": ["Mark the area on the map"] } },
+          { "role": "description", "key": "U_29_1_1", "control": "textFieldControl", "type": "textarea", "labels": { "sv": ["Beskriv felet här", "Beskriv felet", "Beskrivning"], "en": ["Describe the fault", "Description"] } },
+          { "role": "feedback", "key": "KSB_54", "control": "radioButtonListFieldControl", "type": "radio", "yesValue": "Ja", "noValue": "Nej", "labels": { "sv": ["Jag vill ha återkoppling", "Vill du ha återkoppling"], "en": ["I want feedback"] }, "optionSynonyms": { "Ja": ["Ja tack", "Ja, jag vill ha återkoppling"], "Nej": ["Nej tack", "Nej, ingen återkoppling"] } }
         ]
       },
       {
         "id": "PersonalEmailInformation",
         "stage": "sendingContact",
         "fields": [
-          { "role": "firstName", "key": "U_29_3_2", "control": "textFieldControl" },
-          { "role": "lastName", "key": "U_29_3_3", "control": "textFieldControl" },
-          { "role": "phone", "key": "KSB_17", "control": "textFieldControl" },
-          { "role": "email", "key": "U_29_3_1", "control": "AnswerTextBoxControl" }
+          { "role": "firstName", "key": "U_29_3_2", "control": "textFieldControl", "type": "text", "labels": { "sv": ["Förnamn"], "en": ["First name"] } },
+          { "role": "lastName", "key": "U_29_3_3", "control": "textFieldControl", "type": "text", "labels": { "sv": ["Efternamn"], "en": ["Last name"] } },
+          { "role": "phone", "key": "KSB_17", "control": "textFieldControl", "type": "text", "labels": { "sv": ["Telefon", "Telefonnummer", "Mobilnummer"], "en": ["Phone"] } },
+          { "role": "email", "key": "U_29_3_1", "control": "AnswerTextBoxControl", "type": "text", "labels": { "sv": ["E-post", "E-postadress", "Epost"], "en": ["Email", "E-mail"] } }
         ]
       },
       {
@@ -58,12 +59,12 @@
     }
   },
   "categories": [
-    { "id": "lighting", "value": "Belysning", "title": { "sv": "Belysning", "en": "Street lighting", "fi": "Katuvalaistus", "ar": "الإنارة", "uk": "Освітлення", "pl": "Oświetlenie" } },
-    { "id": "roads", "value": "Gator och cykelvägar", "title": { "sv": "Gator och cykelvägar", "en": "Streets and cycle paths", "fi": "Kadut ja pyörätiet", "ar": "الشوارع ومسارات الدراجات", "uk": "Вулиці та велодоріжки", "pl": "Ulice i drogi rowerowe" } },
-    { "id": "graffiti", "value": "Klotter och skadegörelse", "title": { "sv": "Klotter och skadegörelse", "en": "Graffiti and vandalism", "fi": "Töhryt ja ilkivalta", "ar": "الكتابة على الجدران والتخريب", "uk": "Графіті та вандалізм", "pl": "Graffiti i wandalizm" } },
-    { "id": "parks", "value": "Parker och grönytor", "title": { "sv": "Parker och grönytor", "en": "Parks and green spaces", "fi": "Puistot ja viheralueet", "ar": "الحدائق والمساحات الخضراء", "uk": "Парки та зелені зони", "pl": "Parki i tereny zielone" } },
-    { "id": "water", "value": "Vatten och avlopp", "title": { "sv": "Vatten och avlopp", "en": "Water and sewer", "fi": "Vesi ja viemäri", "ar": "المياه والصرف الصحي", "uk": "Водопостачання та каналізація", "pl": "Woda i kanalizacja" } },
-    { "id": "other", "value": "Övrigt", "title": { "sv": "Övrigt", "en": "Other", "fi": "Muu", "ar": "أخرى", "uk": "Інше", "pl": "Inne" } }
+    { "id": "lighting", "value": "Belysning", "synonyms": ["Gatubelysning", "Belysning och gatlampor", "Gatljus"], "title": { "sv": "Belysning", "en": "Street lighting", "fi": "Katuvalaistus", "ar": "الإنارة", "uk": "Освітлення", "pl": "Oświetlenie" } },
+    { "id": "roads", "value": "Gator och cykelvägar", "synonyms": ["Gator och vägar", "Gator, vägar och cykelvägar", "Gata och cykelväg", "Vägar"], "title": { "sv": "Gator och cykelvägar", "en": "Streets and cycle paths", "fi": "Kadut ja pyörätiet", "ar": "الشوارع ومسارات الدراجات", "uk": "Вулиці та велодоріжки", "pl": "Ulice i drogi rowerowe" } },
+    { "id": "graffiti", "value": "Klotter och skadegörelse", "synonyms": ["Klotter", "Skadegörelse", "Klotter och vandalisering"], "title": { "sv": "Klotter och skadegörelse", "en": "Graffiti and vandalism", "fi": "Töhryt ja ilkivalta", "ar": "الكتابة على الجدران والتخريب", "uk": "Графіті та вандалізм", "pl": "Graffiti i wandalizm" } },
+    { "id": "parks", "value": "Parker och grönytor", "synonyms": ["Parker och grönområden", "Park och natur", "Parker, lekplatser och grönytor", "Grönytor"], "title": { "sv": "Parker och grönytor", "en": "Parks and green spaces", "fi": "Puistot ja viheralueet", "ar": "الحدائق والمساحات الخضراء", "uk": "Парки та зелені зони", "pl": "Parki i tereny zielone" } },
+    { "id": "water", "value": "Vatten och avlopp", "synonyms": ["VA", "Vatten", "Avlopp", "Vatten, avlopp och dagvatten"], "title": { "sv": "Vatten och avlopp", "en": "Water and sewer", "fi": "Vesi ja viemäri", "ar": "المياه والصرف الصحي", "uk": "Водопостачання та каналізація", "pl": "Woda i kanalizacja" } },
+    { "id": "other", "value": "Övrigt", "synonyms": ["Annat", "Övriga ärenden", "Övrigt/annat"], "title": { "sv": "Övrigt", "en": "Other", "fi": "Muu", "ar": "أخرى", "uk": "Інше", "pl": "Inne" } }
   ],
   "tiles": [
     { "id": "streetlight", "symbol": "lightbulb.slash", "categoryID": "lighting", "swedishSummary": "Gatubelysning ur funktion", "title": { "sv": "Gatlampa släckt", "en": "Street light out", "fi": "Katuvalo ei pala", "ar": "إنارة الشارع معطلة", "uk": "Не світить ліхтар", "pl": "Nie świeci latarnia" } },

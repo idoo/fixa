@@ -49,7 +49,20 @@ Signing settings in `project.yml` are the maintainer's; change `DEVELOPMENT_TEAM
 
 ## Privacy
 
-Fixa sends your report only to the municipality's e-service. Your e-mail, name and phone, if you want a reply, are stored only on your phone. There is no analytics and no tracking. Details: [PRIVACY.md](PRIVACY.md).
+Fixa sends your report only to the municipality's e-service. Your e-mail, name and phone are stored only on your phone, and only while "Remember my details" is on. There is no analytics and no tracking. Details: [PRIVACY.md](PRIVACY.md).
+
+### Settings & privacy
+
+- Language (switches at once, right-to-left for Arabic), text size, appearance, bold text, higher contrast, reduce motion and vibration; each starts at the iPhone's own setting.
+- "What Fixa stores" lists everything on the phone in plain words, with the file and key names.
+- "Clear sent reports" and "Delete all my data" remove the history, the unsent report with its photos, and the contact details; display and language settings stay.
+- A one-page first-launch note (independent app, where the report goes, call 112 in an emergency), reachable again from About › How Fixa works.
+
+### If the municipality changes its form
+
+- A daily canary (`.github/workflows/canary.yml`) dry-runs the e-service and opens an issue and marks the adapter `degraded` in `adapters/status.json` when the form no longer matches.
+- The app reads `status.json` and the adapter from GitHub at most every six hours and shows a calm banner on Home: the report is saved and can still go by e-mail.
+- A fixed `adapters/*.json` reaches every phone without an App Store release, as long as this build accepts it.
 
 ## For municipalities
 

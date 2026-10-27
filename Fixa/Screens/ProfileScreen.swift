@@ -1,9 +1,12 @@
 import FixaKit
 import SwiftUI
 
-/// Optional reply details. Saved on this phone as you type; the report uses them when you ask for a reply.
+/// Contact details for replies (Settings › Your details). Saved on this phone as you type while
+/// "Remember my details" is on; otherwise used only for the report being written.
 struct ProfileScreen: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.fxReduceMotion) private var reduceMotion
+    @Environment(\.fxHaptics) private var haptics
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var isConfirmingClear = false
     /// Inline problems show once there is something to judge: a saved profile, or after Return.
@@ -18,10 +21,16 @@ struct ProfileScreen: View {
             : AnyLayout(HStackLayout(alignment: .top, spacing: Fx.Space.s))
         ScrollView {
             VStack(alignment: .leading, spacing: Fx.Space.l) {
-                Text("Optional. Only used when you ask for a reply. Saved on this phone.")
-                    .font(Fx.Font.callout)
-                    .foregroundStyle(Fx.Color.ink2)
-                    .fixedSize(horizontal: false, vertical: true)
+                Group {
+                    if model.rememberDetails {
+                        Text("Optional. Only used when you ask for a reply. Saved on this phone.")
+                    } else {
+                        Text("Optional. Only used when you ask for a reply, for the report you're writing.")
+                    }
+                }
+                .font(Fx.Font.callout)
+                .foregroundStyle(Fx.Color.ink2)
+                .fixedSize(horizontal: false, vertical: true)
 
                 FxTextField(
                     title: String(localized: "E-mail"),
@@ -47,7 +56,7 @@ struct ProfileScreen: View {
                     issue: issues.first { $0.field == .phone }?.message
                 )
 
-                if !model.profileIsEmpty {
+                if !model.profileIsEmpty && model.rememberDetails {
                     Label("Saved on this phone", systemImage: "checkmark.circle")
                         .font(Fx.Font.footnote)
                         .foregroundStyle(Fx.Color.ink2)
@@ -64,18 +73,15 @@ struct ProfileScreen: View {
                 }
                 .buttonStyle(FxPressStyle())
                 .disabled(model.profileIsEmpty)
-
-                aboutRow
-                    .padding(.top, Fx.Space.l)
             }
             .padding(Fx.Space.l)
-            .animation(Fx.Motion.select, value: model.profileIsEmpty)
+            .animation(reduceMotion ? .easeInOut(duration: 0.15) : Fx.Motion.select, value: model.profileIsEmpty)
         }
         .scrollDismissesKeyboard(.interactively)
         .fxScreenBackground()
-        .navigationTitle(Text("Profile"))
+        .navigationTitle(Text("Contact details"))
         .navigationBarTitleDisplayMode(.inline)
-        .sensoryFeedback(.success, trigger: clears)
+        .sensoryFeedback(.success, trigger: clears) { _, _ in haptics }
         .onSubmit { showIssues = true }
         .onAppear { showIssues = !model.profileIsEmpty }
         .onDisappear { model.saveProfileNow() }
@@ -89,32 +95,9 @@ struct ProfileScreen: View {
                 showIssues = false
                 clears += 1
             }
+            Button("Cancel", role: .cancel) {}
         } message: {
             Text("Your e-mail, name and phone are removed from this phone, and new reports won't ask for a reply. Reports you already sent keep them.")
         }
-    }
-
-    private var aboutRow: some View {
-        Button {
-            model.path.append(.about)
-        } label: {
-            FxCard {
-                HStack(spacing: Fx.Space.m) {
-                    Image(systemName: "info.circle")
-                        .font(Fx.Font.headline)
-                        .foregroundStyle(Fx.Color.sea)
-                        .accessibilityHidden(true)
-                    Text("About Fixa")
-                        .font(Fx.Font.headline)
-                        .foregroundStyle(Fx.Color.ink)
-                    Spacer(minLength: Fx.Space.s)
-                    Image(systemName: "chevron.forward")
-                        .foregroundStyle(Fx.Color.ink2)
-                        .accessibilityHidden(true)
-                }
-                .frame(minHeight: Fx.minTarget)
-            }
-        }
-        .buttonStyle(FxPressStyle())
     }
 }

@@ -102,8 +102,8 @@ extension SubmissionError {
             messages.isEmpty
                 ? String(localized: "The e-service didn't accept the report.")
                 : String(localized: "The e-service says: \(messages.joined(separator: " "))")
-        case .unexpectedPage:
-            String(localized: "The e-service answered in a way Fixa doesn't recognise. It may have changed.")
+        case .formChanged:
+            String(localized: "The municipality seems to have changed its form")
         case .uploadFailed:
             String(localized: "The photo couldn't be uploaded.")
         case .http(let code):
@@ -113,5 +113,35 @@ extension SubmissionError {
         case .invalidSpec:
             String(localized: "Fixa's settings for this municipality are broken. Please update the app.")
         }
+    }
+}
+
+extension AdapterSpec {
+    /// The municipality's own e-service form: the intro page of the channel.
+    var eServiceURL: URL? {
+        guard let base = URL(string: channel.baseURL) else { return nil }
+        return URL(string: channel.introPath, relativeTo: base)?.absoluteURL
+    }
+}
+
+extension FormDrift {
+    /// A prefilled GitHub issue so the owner can update the adapter. Technical facts only:
+    /// never the description, place, photo or contact details.
+    func issueURL(spec: AdapterSpec) -> URL? {
+        let info = Bundle.main.infoDictionary
+        let version = info?["CFBundleShortVersionString"] as? String ?? "?"
+        let build = info?["CFBundleVersion"] as? String ?? "?"
+        var lines = [
+            "App: Fixa \(version) (\(build))",
+            "Adapter: \(spec.id), spec version \(spec.specVersion)",
+            "Page: \(pageID ?? "unknown")",
+        ]
+        lines.append(missing.isEmpty ? "Missing: none listed" : "Missing: \(missing.joined(separator: ", "))")
+        var components = URLComponents(string: "https://github.com/idoo/fixa/issues/new")
+        components?.queryItems = [
+            URLQueryItem(name: "title", value: "Form changed: \(spec.id) page \(pageID ?? "unknown")"),
+            URLQueryItem(name: "body", value: lines.joined(separator: "\n")),
+        ]
+        return components?.url
     }
 }
