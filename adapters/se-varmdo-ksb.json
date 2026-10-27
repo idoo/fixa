@@ -470,6 +470,30 @@
         "el": "Σβηστός φανοστάτης",
         "hu": "Nem világít az utcai lámpa",
         "cs": "Nesvítí pouliční lampa"
+      },
+      "responsibility": {
+        "sv": "Gäller kommunens gator. Statliga vägar (t.ex. 222): Trafikverket 0771-921 921. Enskild väg: vägföreningen.",
+        "en": "For municipal streets. State roads (e.g. 222): Trafikverket 0771-921 921. Private roads: the road association.",
+        "fi": "Koskee kunnan katuja. Valtion tiet (esim. 222): Trafikverket 0771-921 921. Yksityistie: tiekunta.",
+        "ar": "للشوارع البلدية. الطرق الحكومية (مثل 222): Trafikverket على 0771-921 921. الطرق الخاصة: جمعية الطريق.",
+        "uk": "Для вулиць комуни. Державні дороги (напр. 222): Trafikverket 0771-921 921. Приватні дороги: дорожнє товариство.",
+        "pl": "Dotyczy ulic gminnych. Drogi państwowe (np. 222): Trafikverket 0771-921 921. Drogi prywatne: stowarzyszenie drogowe.",
+        "ru": "Для улиц коммуны. Государственные дороги (напр. 222): Trafikverket 0771-921 921. Частные дороги: дорожное товарищество.",
+        "de": "Gilt für Gemeindestraßen. Staatsstraßen (z. B. 222): Trafikverket 0771-921 921. Privatwege: die Straßengemeinschaft.",
+        "fr": "Pour les rues communales. Routes nationales (ex. 222) : Trafikverket 0771-921 921. Routes privées : l’association routière.",
+        "es": "Para calles municipales. Carreteras estatales (p. ej. 222): Trafikverket 0771-921 921. Caminos privados: la asociación vial.",
+        "it": "Per le strade comunali. Strade statali (es. 222): Trafikverket 0771-921 921. Strade private: il consorzio stradale.",
+        "pt": "Para ruas municipais. Estradas nacionais (ex. 222): Trafikverket 0771-921 921. Estradas privadas: a associação da estrada.",
+        "nl": "Voor gemeentestraten. Rijkswegen (bijv. 222): Trafikverket 0771-921 921. Privéwegen: de wegvereniging.",
+        "da": "Gælder kommunens gader. Statsveje (fx 222): Trafikverket 0771-921 921. Private veje: vejforeningen.",
+        "nb": "Gjelder kommunens gater. Statlige veier (f.eks. 222): Trafikverket 0771-921 921. Privat vei: veilaget.",
+        "et": "Kehtib valla tänavatele. Riigiteed (nt 222): Trafikverket 0771-921 921. Erateed: teeühistu.",
+        "lv": "Attiecas uz pašvaldības ielām. Valsts ceļi (piem., 222): Trafikverket 0771-921 921. Privātie ceļi: ceļu biedrība.",
+        "lt": "Taikoma savivaldybės gatvėms. Valstybiniai keliai (pvz., 222): Trafikverket 0771-921 921. Privatūs keliai: kelio bendrija.",
+        "ro": "Pentru străzile comunei. Drumuri naționale (ex. 222): Trafikverket 0771-921 921. Drumuri private: asociația drumului.",
+        "el": "Για δημοτικούς δρόμους. Κρατικοί δρόμοι (π.χ. 222): Trafikverket 0771-921 921. Ιδιωτικοί δρόμοι: ο σύλλογος του δρόμου.",
+        "hu": "Az önkormányzati utcákra vonatkozik. Állami utak (pl. 222): Trafikverket 0771-921 921. Magánút: az útegyesület.",
+        "cs": "Platí pro obecní ulice. Státní silnice (např. 222): Trafikverket 0771-921 921. Soukromé cesty: cestní spolek."
       }
     },
     {
@@ -500,6 +524,30 @@
         "el": "Λακκούβα ή φθορά στον δρόμο",
         "hu": "Kátyú vagy úthiba",
         "cs": "Výmol nebo poškozená silnice"
+      },
+      "responsibility": {
+        "sv": "Gäller kommunens gator. Statliga vägar (t.ex. 222): Trafikverket 0771-921 921. Enskild väg: vägföreningen.",
+        "en": "For municipal streets. State roads (e.g. 222): Trafikverket 0771-921 921. Private roads: the road association.",
+        "fi": "Koskee kunnan katuja. Valtion tiet (esim. 222): Trafikverket 0771-921 921. Yksityistie: tiekunta.",
+        "ar": "للشوارع البلدية. الطرق الحكومية (مثل 222): Trafikverket على 0771-921 921. الطرق الخاصة: جمعية الطريق.",
+        "uk": "Для вулиць комуни. Державні дороги (напр. 222): Trafikverket 0771-921 921. Приватні дороги: дорожнє товариство.",
+        "pl": "Dotyczy ulic gminnych. Drogi państwowe (np. 222): Trafikverket 0771-921 921. Drogi prywatne: stowarzyszenie drogowe.",
+        "ru": "Для улиц коммуны. Государственные дороги (напр. 222): Trafikverket 0771-921 921. Частные дороги: дорожное товарищество.",
+        "de": "Gilt für Gemeindestraßen. Staatsstraßen (z. B. 222): Trafikverket 0771-921 921. Privatwege: die Straßengemeinschaft.",
+        "fr": "Pour les rues communales. Routes nationales (ex. 222) : Trafikverket 0771-921 921. Routes privées : l’association routière.",
+        "es": "Para calles municipales. Carreteras estatales (p. ej. 222): Trafikverket 0771-921 921. Caminos privados: la asociación vial.",
+        "it": "Per le strade comunali. Strade statali (es. 222): Trafikverket 0771-921 921. Strade private: il consorzio stradale.",
+        "pt": "Para ruas municipais. Estradas nacionais (ex. 222): Trafikverket 0771-921 921. Estradas privadas: a associação da estrada.",
+        "nl": "Voor gemeentestraten. Rijkswegen (bijv. 222): Trafikverket 0771-921 921. Privéwegen: de wegvereniging.",
+        "da": "Gælder kommunens gader. Statsveje (fx 222): Trafikverket 0771-921 921. Private veje: vejforeningen.",
+        "nb": "Gjelder kommunens gater. Statlige veier (f.eks. 222): Trafikverket 0771-921 921. Privat vei: veilaget.",
+        "et": "Kehtib valla tänavatele. Riigiteed (nt 222): Trafikverket 0771-921 921. Erateed: teeühistu.",
+        "lv": "Attiecas uz pašvaldības ielām. Valsts ceļi (piem., 222): Trafikverket 0771-921 921. Privātie ceļi: ceļu biedrība.",
+        "lt": "Taikoma savivaldybės gatvėms. Valstybiniai keliai (pvz., 222): Trafikverket 0771-921 921. Privatūs keliai: kelio bendrija.",
+        "ro": "Pentru străzile comunei. Drumuri naționale (ex. 222): Trafikverket 0771-921 921. Drumuri private: asociația drumului.",
+        "el": "Για δημοτικούς δρόμους. Κρατικοί δρόμοι (π.χ. 222): Trafikverket 0771-921 921. Ιδιωτικοί δρόμοι: ο σύλλογος του δρόμου.",
+        "hu": "Az önkormányzati utcákra vonatkozik. Állami utak (pl. 222): Trafikverket 0771-921 921. Magánút: az útegyesület.",
+        "cs": "Platí pro obecní ulice. Státní silnice (např. 222): Trafikverket 0771-921 921. Soukromé cesty: cestní spolek."
       }
     },
     {
@@ -530,6 +578,30 @@
         "el": "Χιόνι ή πάγος",
         "hu": "Hó vagy jég",
         "cs": "Sníh nebo náledí"
+      },
+      "responsibility": {
+        "sv": "Gäller kommunens gator. Statliga vägar (t.ex. 222): Trafikverket 0771-921 921. Enskild väg: vägföreningen.",
+        "en": "For municipal streets. State roads (e.g. 222): Trafikverket 0771-921 921. Private roads: the road association.",
+        "fi": "Koskee kunnan katuja. Valtion tiet (esim. 222): Trafikverket 0771-921 921. Yksityistie: tiekunta.",
+        "ar": "للشوارع البلدية. الطرق الحكومية (مثل 222): Trafikverket على 0771-921 921. الطرق الخاصة: جمعية الطريق.",
+        "uk": "Для вулиць комуни. Державні дороги (напр. 222): Trafikverket 0771-921 921. Приватні дороги: дорожнє товариство.",
+        "pl": "Dotyczy ulic gminnych. Drogi państwowe (np. 222): Trafikverket 0771-921 921. Drogi prywatne: stowarzyszenie drogowe.",
+        "ru": "Для улиц коммуны. Государственные дороги (напр. 222): Trafikverket 0771-921 921. Частные дороги: дорожное товарищество.",
+        "de": "Gilt für Gemeindestraßen. Staatsstraßen (z. B. 222): Trafikverket 0771-921 921. Privatwege: die Straßengemeinschaft.",
+        "fr": "Pour les rues communales. Routes nationales (ex. 222) : Trafikverket 0771-921 921. Routes privées : l’association routière.",
+        "es": "Para calles municipales. Carreteras estatales (p. ej. 222): Trafikverket 0771-921 921. Caminos privados: la asociación vial.",
+        "it": "Per le strade comunali. Strade statali (es. 222): Trafikverket 0771-921 921. Strade private: il consorzio stradale.",
+        "pt": "Para ruas municipais. Estradas nacionais (ex. 222): Trafikverket 0771-921 921. Estradas privadas: a associação da estrada.",
+        "nl": "Voor gemeentestraten. Rijkswegen (bijv. 222): Trafikverket 0771-921 921. Privéwegen: de wegvereniging.",
+        "da": "Gælder kommunens gader. Statsveje (fx 222): Trafikverket 0771-921 921. Private veje: vejforeningen.",
+        "nb": "Gjelder kommunens gater. Statlige veier (f.eks. 222): Trafikverket 0771-921 921. Privat vei: veilaget.",
+        "et": "Kehtib valla tänavatele. Riigiteed (nt 222): Trafikverket 0771-921 921. Erateed: teeühistu.",
+        "lv": "Attiecas uz pašvaldības ielām. Valsts ceļi (piem., 222): Trafikverket 0771-921 921. Privātie ceļi: ceļu biedrība.",
+        "lt": "Taikoma savivaldybės gatvėms. Valstybiniai keliai (pvz., 222): Trafikverket 0771-921 921. Privatūs keliai: kelio bendrija.",
+        "ro": "Pentru străzile comunei. Drumuri naționale (ex. 222): Trafikverket 0771-921 921. Drumuri private: asociația drumului.",
+        "el": "Για δημοτικούς δρόμους. Κρατικοί δρόμοι (π.χ. 222): Trafikverket 0771-921 921. Ιδιωτικοί δρόμοι: ο σύλλογος του δρόμου.",
+        "hu": "Az önkormányzati utcákra vonatkozik. Állami utak (pl. 222): Trafikverket 0771-921 921. Magánút: az útegyesület.",
+        "cs": "Platí pro obecní ulice. Státní silnice (např. 222): Trafikverket 0771-921 921. Soukromé cesty: cestní spolek."
       }
     },
     {
@@ -560,6 +632,30 @@
         "el": "Χαλασμένη πινακίδα ή κιγκλίδωμα",
         "hu": "Sérült tábla vagy korlát",
         "cs": "Poškozená značka nebo zábradlí"
+      },
+      "responsibility": {
+        "sv": "Gäller kommunens gator. Statliga vägar (t.ex. 222): Trafikverket 0771-921 921. Enskild väg: vägföreningen.",
+        "en": "For municipal streets. State roads (e.g. 222): Trafikverket 0771-921 921. Private roads: the road association.",
+        "fi": "Koskee kunnan katuja. Valtion tiet (esim. 222): Trafikverket 0771-921 921. Yksityistie: tiekunta.",
+        "ar": "للشوارع البلدية. الطرق الحكومية (مثل 222): Trafikverket على 0771-921 921. الطرق الخاصة: جمعية الطريق.",
+        "uk": "Для вулиць комуни. Державні дороги (напр. 222): Trafikverket 0771-921 921. Приватні дороги: дорожнє товариство.",
+        "pl": "Dotyczy ulic gminnych. Drogi państwowe (np. 222): Trafikverket 0771-921 921. Drogi prywatne: stowarzyszenie drogowe.",
+        "ru": "Для улиц коммуны. Государственные дороги (напр. 222): Trafikverket 0771-921 921. Частные дороги: дорожное товарищество.",
+        "de": "Gilt für Gemeindestraßen. Staatsstraßen (z. B. 222): Trafikverket 0771-921 921. Privatwege: die Straßengemeinschaft.",
+        "fr": "Pour les rues communales. Routes nationales (ex. 222) : Trafikverket 0771-921 921. Routes privées : l’association routière.",
+        "es": "Para calles municipales. Carreteras estatales (p. ej. 222): Trafikverket 0771-921 921. Caminos privados: la asociación vial.",
+        "it": "Per le strade comunali. Strade statali (es. 222): Trafikverket 0771-921 921. Strade private: il consorzio stradale.",
+        "pt": "Para ruas municipais. Estradas nacionais (ex. 222): Trafikverket 0771-921 921. Estradas privadas: a associação da estrada.",
+        "nl": "Voor gemeentestraten. Rijkswegen (bijv. 222): Trafikverket 0771-921 921. Privéwegen: de wegvereniging.",
+        "da": "Gælder kommunens gader. Statsveje (fx 222): Trafikverket 0771-921 921. Private veje: vejforeningen.",
+        "nb": "Gjelder kommunens gater. Statlige veier (f.eks. 222): Trafikverket 0771-921 921. Privat vei: veilaget.",
+        "et": "Kehtib valla tänavatele. Riigiteed (nt 222): Trafikverket 0771-921 921. Erateed: teeühistu.",
+        "lv": "Attiecas uz pašvaldības ielām. Valsts ceļi (piem., 222): Trafikverket 0771-921 921. Privātie ceļi: ceļu biedrība.",
+        "lt": "Taikoma savivaldybės gatvėms. Valstybiniai keliai (pvz., 222): Trafikverket 0771-921 921. Privatūs keliai: kelio bendrija.",
+        "ro": "Pentru străzile comunei. Drumuri naționale (ex. 222): Trafikverket 0771-921 921. Drumuri private: asociația drumului.",
+        "el": "Για δημοτικούς δρόμους. Κρατικοί δρόμοι (π.χ. 222): Trafikverket 0771-921 921. Ιδιωτικοί δρόμοι: ο σύλλογος του δρόμου.",
+        "hu": "Az önkormányzati utcákra vonatkozik. Állami utak (pl. 222): Trafikverket 0771-921 921. Magánút: az útegyesület.",
+        "cs": "Platí pro obecní ulice. Státní silnice (např. 222): Trafikverket 0771-921 921. Soukromé cesty: cestní spolek."
       }
     },
     {

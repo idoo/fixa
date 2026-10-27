@@ -92,6 +92,7 @@ final class FixaFlowTests: XCTestCase {
         let review = element(app, "report.review")
         review.tap()
         let send = element(app, "review.send")
+        XCTAssertTrue(send.waitForHittable(timeout: 20), "Send never became available")
         shot("\(prefix)-review")
         send.tap()
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'DEMO-1234'")).firstMatch.waitForExistence(timeout: 10), "Receipt without case number")
@@ -150,7 +151,8 @@ final class FixaFlowTests: XCTestCase {
         shot("c-ax3-report")
         review.tap()
         let send = element(app, "review.send")
-        XCTAssertTrue(send.isHittable, "Send button hidden at accessibility3")
+        // Send stays disabled while the on-device translation runs (capped at 15 s).
+        XCTAssertTrue(send.waitForHittable(timeout: 20), "Send button hidden at accessibility3")
         XCTAssertTrue(send.label.contains("Värmdö"), "Send label lost the municipality: \(send.label)")
         shot("c-ax3-review")
     }

@@ -7,6 +7,7 @@ actor ScriptedAbou: HTTPTransport {
     enum Fault {
         case timeout
         case status(Int)
+        case statusWithHeaders(Int, [String: String])
         case html(String, at: String)
     }
 
@@ -39,6 +40,8 @@ actor ScriptedAbou: HTTPTransport {
                 throw URLError(.timedOut)
             case .status(let code):
                 return (Data(), HTTPURLResponse(url: request.url!, statusCode: code, httpVersion: nil, headerFields: nil)!)
+            case .statusWithHeaders(let code, let headers):
+                return (Data(), HTTPURLResponse(url: request.url!, statusCode: code, httpVersion: nil, headerFields: headers)!)
             case .html(let html, let at):
                 return (Data(html.utf8), HTTPURLResponse(url: URL(string: at)!, statusCode: 200, httpVersion: nil, headerFields: nil)!)
             }
@@ -55,7 +58,7 @@ private let common = "\(base)/EServices/Common/"
 
 final class SubmissionSafetyTests: XCTestCase {
     func submit(_ fake: ScriptedAbou, dryRun: Bool = false) async throws -> SubmissionReceipt? {
-        try await AbouSubmitter(spec: try varmdoSpec(), transport: fake).submit(validDraft(), dryRun: dryRun)
+        try await AbouSubmitter(spec: try varmdoSpec(), transport: fake, pageDelay: .zero).submit(validDraft(), dryRun: dryRun)
     }
 
     func expectError(_ fake: ScriptedAbou, dryRun: Bool = false, file: StaticString = #filePath, line: UInt = #line) async throws -> SubmissionError {
@@ -82,7 +85,7 @@ final class SubmissionSafetyTests: XCTestCase {
     func testHTTPErrorBeforeFinalSendIsRetrySafe() async throws {
         let fake = ScriptedAbou([.init(method: "POST", urlContains: "PageId=FaultReport", occurrence: 1, fault: .status(503))])
         let error = try await expectError(fake)
-        XCTAssertEqual(error, .http(503))
+        XCTAssertEqual(error, .unavailable(status: 503, retryAfter: nil))
         XCTAssertTrue(error.isRetrySafe)
     }
 
@@ -155,7 +158,7 @@ final class SubmissionSafetyTests: XCTestCase {
             fault: .html(try fixture("07-after-cancel"), at: "\(base)/Errors/GenericError.aspx?errorType=0")
         )])
         let log = StageLog()
-        let receipt = try await AbouSubmitter(spec: try varmdoSpec(), transport: fake).submit(validDraft()) { log.append($0) }
+        let receipt = try await AbouSubmitter(spec: try varmdoSpec(), transport: fake, pageDelay: .zero).submit(validDraft()) { log.append($0) }
         XCTAssertEqual(receipt?.caseNumber, "KSB-123456")
         XCTAssertEqual(log.stages.last, .done)
         let setups = await fake.count("GET", "Setup.aspx")
@@ -202,7 +205,10 @@ final class SubmissionSafetyTests: XCTestCase {
 
     func testIsRetrySafe() {
         XCTAssertTrue(SubmissionError.transport("x").isRetrySafe)
-        XCTAssertTrue(SubmissionError.http(502).isRetrySafe)
+        XCTAssertTrue(SubmissionError.http(404).isRetrySafe)
+        XCTAssertTrue(SubmissionError.unavailable(status: 429, retryAfter: 30).isRetrySafe)
+        XCTAssertEqual(SubmissionError.unavailable(status: nil, retryAfter: 30).retryAfter, 30)
+        XCTAssertNil(SubmissionError.http(500).retryAfter)
         XCTAssertFalse(SubmissionError.uncertain("x").isRetrySafe)
         XCTAssertFalse(SubmissionError.formChanged(FormDrift(pageID: nil, missing: [], detail: "")).isRetrySafe)
         XCTAssertFalse(SubmissionError.invalidSpec("x").isRetrySafe)
@@ -215,7 +221,7 @@ final class SubmissionSafetyTests: XCTestCase {
         let fake = ScriptedAbou([])
         var draft = validDraft()
         draft.photoJPEG = Data([0xFF, 0xD8, 0xFF, 0xD9])
-        _ = try await AbouSubmitter(spec: try varmdoSpec(), transport: fake).submit(draft, dryRun: true)
+        _ = try await AbouSubmitter(spec: try varmdoSpec(), transport: fake, pageDelay: .zero).submit(draft, dryRun: true)
         let requests = await fake.requests
         let upload = try XCTUnwrap(requests.first { $0.url!.path.hasPrefix("/Citizen/Field/UploadFile") })
         XCTAssertEqual(upload.timeoutInterval, SubmissionTimeouts.upload)

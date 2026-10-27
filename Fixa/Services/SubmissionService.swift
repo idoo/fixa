@@ -154,6 +154,8 @@ extension SubmissionError {
             String(localized: "The photo couldn't be uploaded.", bundle: L10n.bundle, locale: L10n.locale)
         case .http(let code):
             String(localized: "The e-service returned an error (\(code)).", bundle: L10n.bundle, locale: L10n.locale)
+        case .unavailable:
+            String(localized: "The e-service is temporarily unavailable. Fixa will try again later.", bundle: L10n.bundle, locale: L10n.locale)
         case .transport:
             String(localized: "Couldn't reach the e-service. Check your connection.", bundle: L10n.bundle, locale: L10n.locale)
         case .invalidSpec:
@@ -169,27 +171,5 @@ extension AdapterSpec {
     var eServiceURL: URL? {
         guard let base = URL(string: channel.baseURL) else { return nil }
         return URL(string: channel.introPath, relativeTo: base)?.absoluteURL
-    }
-}
-
-extension FormDrift {
-    /// A prefilled GitHub issue so the owner can update the adapter. Technical facts only:
-    /// never the description, place, photo or contact details.
-    func issueURL(spec: AdapterSpec) -> URL? {
-        let info = Bundle.main.infoDictionary
-        let version = info?["CFBundleShortVersionString"] as? String ?? "?"
-        let build = info?["CFBundleVersion"] as? String ?? "?"
-        var lines = [
-            "App: Fixa \(version) (\(build))",
-            "Adapter: \(spec.id), spec version \(spec.specVersion)",
-            "Page: \(pageID ?? "unknown")",
-        ]
-        lines.append(missing.isEmpty ? "Missing: none listed" : "Missing: \(missing.joined(separator: ", "))")
-        var components = URLComponents(string: "https://github.com/idoo/fixa/issues/new")
-        components?.queryItems = [
-            URLQueryItem(name: "title", value: "Form changed: \(spec.id) page \(pageID ?? "unknown")"),
-            URLQueryItem(name: "body", value: lines.joined(separator: "\n")),
-        ]
-        return components?.url
     }
 }

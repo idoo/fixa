@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 
 /// An adapter that cannot be run (`invalid`) or a downloaded one that may not replace the bundled one (`rejected`).
@@ -49,27 +50,60 @@ extension AdapterSpec {
     }
 }
 
+/// Ed25519 signatures on everything downloaded from `adapters/`. Each file `<name>` is published with
+/// `<name>.sig`, the base64 signature of its exact bytes made by `fixa-cli sign`. The private key never
+/// leaves the maintainer's Mac (`~/.config/fixa/adapter-signing.key`); the app only knows the public key.
+public enum AdapterSignature {
+    /// Raw 32-byte Ed25519 public key, base64. Replace only together with re-signing every adapter file.
+    public static let publicKeyBase64 = "c3sHp2tuw15Z9OL8rQW+jQlKNfxKVnZe7c63/hqX3Bo="
+
+    /// Largest `.sig` file accepted, in bytes (a signature is 88 base64 characters).
+    public static let maxSignatureBytes = 256
+
+    /// True when `signature` (the `.sig` file contents) is a valid signature of `data` by `publicKey`
+    /// (raw key, base64). Nil, oversized, malformed or wrong signatures are false.
+    public static func verify(_ data: Data, signature: Data?, publicKey: String = publicKeyBase64) -> Bool {
+        guard let signature, signature.count <= maxSignatureBytes,
+              let text = String(data: signature, encoding: .utf8),
+              let raw = Data(base64Encoded: text.trimmingCharacters(in: .whitespacesAndNewlines)), raw.count == 64,
+              let keyData = Data(base64Encoded: publicKey),
+              let key = try? Curve25519.Signing.PublicKey(rawRepresentation: keyData) else { return false }
+        return key.isValidSignature(raw, for: data)
+    }
+}
+
 /// Whether a municipality's e-service works right now, published in `adapters/status.json`.
+/// Only the state reaches the user, through the app's own strings: any other text in the file is ignored,
+/// so a tampered or mistaken status file cannot put words on the screen.
 public struct AdapterStatus: Codable, Sendable, Equatable {
     public enum State: String, Codable, Sendable {
         case ok, degraded, down
     }
 
     public var state: State
-    /// Kind words for the user, shown when `state != .ok`.
-    public var message: LocalizedText?
     public var updated: Date?
 
-    public init(state: State, message: LocalizedText? = nil, updated: Date? = nil) {
+    public init(state: State, updated: Date? = nil) {
         self.state = state
-        self.message = message
         self.updated = updated
     }
 
     public static let ok = AdapterStatus(state: .ok)
 
-    /// Decodes `status.json`: adapter id → status. Dates are ISO 8601.
-    public static func decodeMap(_ data: Data) throws -> [String: AdapterStatus] {
+    /// Decodes a signed `status.json`: adapter id → status. Dates are ISO 8601. Throws
+    /// `AdapterSpecError.rejected` unless `signature` verifies against `publicKey`.
+    public static func decodeMap(_ data: Data, signature: Data?, publicKey: String = AdapterSignature.publicKeyBase64) throws -> [String: AdapterStatus] {
+        guard data.count <= AdapterSpecValidator.maxBytes else {
+            throw AdapterSpecError.rejected(["status is \(data.count) bytes, over \(AdapterSpecValidator.maxBytes)"])
+        }
+        guard AdapterSignature.verify(data, signature: signature, publicKey: publicKey) else {
+            throw AdapterSpecError.rejected(["status signature does not verify"])
+        }
+        return try decodeUnverifiedMap(data)
+    }
+
+    /// `decodeMap` without the signature check, for tests of the format only.
+    static func decodeUnverifiedMap(_ data: Data) throws -> [String: AdapterStatus] {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         return try decoder.decode([String: AdapterStatus].self, from: data)
@@ -205,10 +239,26 @@ public enum AdapterUpdatePolicy {
     /// Highest adapter `specVersion` this engine can run.
     public static let supportedSpecVersion = 1
 
-    /// The remote adapter when it passes `AdapterSpecValidator.validateRemote` against the bundled adapter
-    /// (size, problems, same id, same destination), has a supported `specVersion` and a `minAppBuild` this
-    /// build meets. Throws the reason otherwise; the caller keeps the bundled or last good adapter.
-    public static func check(remote: Data, bundled: AdapterSpec, appBuild: Int) throws -> AdapterSpec {
+    /// The remote adapter when `signature` (its `.sig` file) verifies against `publicKey`, it passes
+    /// `AdapterSpecValidator.validateRemote` against the bundled adapter (size, problems, same id, same
+    /// destination), has a supported `specVersion` and a `minAppBuild` this build meets. Throws the reason
+    /// otherwise; the caller keeps the bundled or last good adapter.
+    public static func check(remote: Data, signature: Data?, bundled: AdapterSpec, appBuild: Int,
+                             publicKey: String = AdapterSignature.publicKeyBase64) throws -> AdapterSpec {
+        guard AdapterSignature.verify(remote, signature: signature, publicKey: publicKey) else {
+            throw AdapterSpecError.rejected(["adapter signature does not verify"])
+        }
+        return try validate(remote: remote, bundled: bundled, appBuild: appBuild)
+    }
+
+    /// `check` without the reason: the accepted adapter, or nil (keep the bundled one).
+    public static func accept(remote: Data, signature: Data?, bundled: AdapterSpec, appBuild: Int,
+                              publicKey: String = AdapterSignature.publicKeyBase64) -> AdapterSpec? {
+        try? check(remote: remote, signature: signature, bundled: bundled, appBuild: appBuild, publicKey: publicKey)
+    }
+
+    /// Every rule of `check` except the signature, so tests can exercise the content rules alone.
+    static func validate(remote: Data, bundled: AdapterSpec, appBuild: Int) throws -> AdapterSpec {
         let spec = try AdapterSpecValidator.validateRemote(remote, bundled: [bundled])
         guard spec.specVersion <= supportedSpecVersion else {
             throw AdapterSpecError.rejected(["specVersion \(spec.specVersion) is newer than \(supportedSpecVersion)"])
@@ -217,10 +267,5 @@ public enum AdapterUpdatePolicy {
             throw AdapterSpecError.rejected(["needs app build \(minAppBuild), this is \(appBuild)"])
         }
         return spec
-    }
-
-    /// `check` without the reason: the accepted adapter, or nil (keep the bundled one).
-    public static func accept(remote: Data, bundled: AdapterSpec, appBuild: Int) -> AdapterSpec? {
-        try? check(remote: remote, bundled: bundled, appBuild: appBuild)
     }
 }

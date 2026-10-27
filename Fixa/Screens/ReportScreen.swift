@@ -25,6 +25,16 @@ struct ReportScreen: View {
     @State private var replyInline = true
     /// Bumped by quick-phrase chips: drives the selection haptic.
     @State private var phraseTaps = 0
+    /// Place text the resident typed. A later pin (picked, found or from a photo) must not
+    /// overwrite it with an address, so it is put back after every pin change.
+    @State private var typedPlace: String?
+    /// The pin "my location" filled in on its own; a photo's place may replace it with one tap.
+    @State private var autoPin: Coordinate?
+    /// The pin when the map sheet last closed: a pin the resident chose there is never "auto".
+    @State private var pickedPin: Coordinate?
+    /// Where a picked photo was taken (inside the municipality), read from the original file
+    /// before it is re-encoded without metadata.
+    @State private var photoPlace: Coordinate?
 
     /// Form sections, top to bottom: required first, optional last.
     private enum Section: Int, Comparable, Hashable {
@@ -88,8 +98,38 @@ struct ReportScreen: View {
         .sensoryFeedback(.error, trigger: failedReviews) { _, _ in haptics }
         .sensoryFeedback(.impact(weight: .light), trigger: cameraTaps) { _, _ in haptics }
         .sensoryFeedback(.selection, trigger: phraseTaps) { _, _ in haptics }
-        .onAppear { replyInline = !model.profileIsReady }
+        .onAppear {
+            replyInline = !model.profileIsReady
+            // A restored place text without a pin was typed by the resident.
+            if model.draft.coordinate == nil, !model.draft.locationText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                typedPlace = model.draft.locationText
+            }
+        }
+        // A translation belongs to one text: Review makes a new one for the changed description.
+        .onChange(of: model.draft.description) { _, _ in
+            if model.draft.translation != nil { model.draft.translation = nil }
+        }
         .task { await model.prefillLocationIfAllowed() }
+        .onChange(of: model.isLocationPickerPresented) { _, presented in
+            guard !presented else { return }
+            pickedPin = model.draft.coordinate
+            // Confirming the same pin again rewrites the address without a pin change.
+            if let typedPlace, model.draft.locationText != typedPlace {
+                model.draft.locationText = typedPlace
+            }
+        }
+        .onChange(of: model.isFindingLocation) { wasFinding, finding in
+            guard wasFinding, !finding, let pin = model.draft.coordinate, pin != pickedPin else { return }
+            autoPin = pin
+        }
+        .onChange(of: model.draft.coordinate) { _, _ in
+            if let typedPlace, model.draft.locationText != typedPlace {
+                model.draft.locationText = typedPlace
+            }
+        }
+        .onChange(of: model.photos.isEmpty) { _, isEmpty in
+            if isEmpty { photoPlace = nil }
+        }
         .onChange(of: pickerItems) { _, items in
             loadPicked(items)
         }
@@ -170,6 +210,14 @@ struct ReportScreen: View {
             .accessibilityValue(issue.map { Text($0) } ?? Text(""))
             .accessibilityInputLabels([Text("Change problem"), Text("Problem")])
             .accessibilityFocused($a11yFocus, equals: .problem)
+            if let note = tile?.responsibility?.resolve(L10n.locale) {
+                Text(note)
+                    .font(Fx.Font.footnote)
+                    .foregroundStyle(Fx.Color.ink2)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("report.responsibility")
+            }
             if let issue {
                 issueText(issue)
             }
@@ -231,12 +279,18 @@ struct ReportScreen: View {
         pendingPhotos = min(items.count, AppModel.maxPhotos - model.photos.count)
         Task {
             var images: [UIImage] = []
+            var place: Coordinate?
             for item in items {
                 if let data = try? await item.loadTransferable(type: Data.self), let image = UIImage(data: data) {
                     images.append(image)
+                    // Read from the original data: the photo itself is re-encoded without GPS.
+                    if place == nil, let found = PhotoLocation.coordinate(in: data), spec.municipality.region.contains(found) {
+                        place = found
+                    }
                 }
             }
             model.addPhotos(images)
+            if let place { photoPlace = place }
             pickerItems = []
             pendingPhotos = 0
         }
@@ -275,9 +329,9 @@ struct ReportScreen: View {
                             .font(Fx.Font.body)
                             .foregroundStyle(model.draft.coordinate == nil ? Fx.Color.ink2 : Fx.Color.ink)
                             .multilineTextAlignment(.leading)
-                            // At accessibility sizes the address wraps word by word; never clip it.
-                            .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 3)
-                            .fixedSize(horizontal: false, vertical: dynamicTypeSize.isAccessibilitySize)
+                            // Wraps word by word at every text size; never shrinks or clips.
+                            .lineLimit(nil)
+                            .fixedSize(horizontal: false, vertical: true)
                         Spacer(minLength: Fx.Space.s)
                         Image(systemName: "chevron.forward")
                             .foregroundStyle(Fx.Color.ink2)
@@ -296,17 +350,97 @@ struct ReportScreen: View {
             if let issue {
                 issueText(issue)
             }
+            if let photoPlace, photoPlace != model.draft.coordinate,
+               model.draft.coordinate == nil || model.draft.coordinate == autoPin {
+                Button {
+                    usePhotoPlace(photoPlace)
+                } label: {
+                    Label {
+                        Text("Use the place where the photo was taken")
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                    } icon: {
+                        Image(systemName: "photo")
+                            .accessibilityHidden(true)
+                    }
+                    .font(Fx.Font.callout.weight(.semibold))
+                    .foregroundStyle(Fx.Color.sea)
+                    .frame(maxWidth: .infinity, minHeight: Fx.minTarget, alignment: .leading)
+                    .contentShape(.rect)
+                }
+                .buttonStyle(FxPressStyle())
+                .accessibilityHint(Text("Puts the pin where the photo was taken"))
+                .accessibilityIdentifier("report.photoPlace")
+            }
+            placeTextField
         }
     }
 
+    /// The place in words: prefilled with the pin's address, editable, and enough on its own.
+    private var placeTextField: some View {
+        let title = String(localized: "Describe the place", bundle: L10n.bundle, locale: L10n.locale)
+        let text = Binding(
+            get: { model.draft.locationText },
+            set: { newValue in
+                model.draft.locationText = newValue
+                typedPlace = newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : newValue
+            }
+        )
+        let focused = keyboardFocus == .place
+        return VStack(alignment: .leading, spacing: Fx.Space.xs) {
+            Text(title)
+                .font(Fx.Font.subheadline)
+                .foregroundStyle(Fx.Color.ink)
+                .accessibilityHidden(true)
+            TextField(
+                text: text,
+                prompt: Text("For example: by the bus stop on Skolvägen").foregroundStyle(Fx.Color.ink2),
+                axis: .vertical
+            ) {
+                Text(title)
+            }
+            .lineLimit(1...6)
+            .font(Fx.Font.body)
+            .foregroundStyle(Fx.Color.ink)
+            .textInputAutocapitalization(.sentences)
+            .focused($keyboardFocus, equals: .place)
+            .padding(.horizontal, Fx.Space.m)
+            .padding(.vertical, Fx.Space.s)
+            .frame(minHeight: Fx.minTarget + 4)
+            .fxOutline(
+                RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous),
+                outline: focused ? Fx.Color.sea : Fx.Color.fieldBorder,
+                width: focused ? Fx.Border.emphasis : Fx.Border.hairline
+            )
+            .accessibilityLabel(Text(title))
+            .accessibilityHint(Text("Sent as written. Enough on its own if you don't put a pin on the map."))
+            .accessibilityIdentifier("report.placeText")
+        }
+    }
+
+    /// One tap: the pin goes where the photo was taken; the address fills in unless the resident typed one.
+    private func usePhotoPlace(_ place: Coordinate) {
+        autoPin = nil
+        model.draft.coordinate = place
+        if typedPlace == nil { model.draft.locationText = "" }
+        Task {
+            let address = await ReverseGeocoder.address(for: place.clLocation)
+            guard model.draft.coordinate == place else { return }
+            if typedPlace == nil { model.draft.locationText = address ?? "" }
+            let announcement = address.map { String(localized: "Pin placed: \($0)", bundle: L10n.bundle, locale: L10n.locale) }
+                ?? String(localized: "Pin placed on the map", bundle: L10n.bundle, locale: L10n.locale)
+            AccessibilityNotification.Announcement(announcement).post()
+        }
+    }
+
+    /// The map card's line: the pin's state. The address itself is in "Describe the place".
     private var locationSummary: String {
         if model.draft.coordinate == nil {
             return model.isFindingLocation
                 ? String(localized: "Finding you…", bundle: L10n.bundle, locale: L10n.locale)
                 : String(localized: "Choose the place on a map", bundle: L10n.bundle, locale: L10n.locale)
         }
-        let text = model.draft.locationText.trimmingCharacters(in: .whitespaces)
-        return text.isEmpty ? String(localized: "Pin placed on the map", bundle: L10n.bundle, locale: L10n.locale) : text
+        return String(localized: "Pin placed on the map", bundle: L10n.bundle, locale: L10n.locale)
     }
 
     // MARK: Quick phrases

@@ -72,7 +72,7 @@ let descriptionAnchor = #"<div class="row"><div class="col-sm-12 field_container
 
 final class FormDriftTests: XCTestCase {
     func submit(_ fake: MutatedAbou, _ draft: ReportDraft = validDraft(), dryRun: Bool = true) async throws -> SubmissionReceipt? {
-        try await AbouSubmitter(spec: try varmdoSpec(), transport: fake).submit(draft, dryRun: dryRun)
+        try await AbouSubmitter(spec: try varmdoSpec(), transport: fake, pageDelay: .zero).submit(draft, dryRun: dryRun)
     }
 
     func expectDrift(_ fake: MutatedAbou, _ draft: ReportDraft = validDraft()) async throws -> FormDrift {

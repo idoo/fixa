@@ -15,13 +15,21 @@ struct HomeScreen: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Fx.Space.l) {
-                let status = model.adapterStatus
-                if status.state != .ok {
+                // Words come from the app by state, never from the downloaded status file.
+                switch model.adapterStatus.state {
+                case .ok:
+                    EmptyView()
+                case .degraded:
                     FxBanner(
                         kind: .warning,
                         title: String(localized: "The municipality's e-service has changed", bundle: L10n.bundle, locale: L10n.locale),
-                        message: status.message?.resolve(L10n.locale)
-                            ?? String(localized: "Fixa is an independent app. We are updating it. Your report is saved, and you can still send it by email.", bundle: L10n.bundle, locale: L10n.locale)
+                        message: String(localized: "Fixa is an independent app. We are updating it. Your report is saved, and you can still send it by email.", bundle: L10n.bundle, locale: L10n.locale)
+                    )
+                case .down:
+                    FxBanner(
+                        kind: .warning,
+                        title: String(localized: "The municipality's e-service is down", bundle: L10n.bundle, locale: L10n.locale),
+                        message: String(localized: "Your report is saved. You can send it by email now, or try again later.", bundle: L10n.bundle, locale: L10n.locale)
                     )
                 }
                 if let notice = model.outboxNotice {
@@ -79,8 +87,9 @@ struct HomeScreen: View {
                     model.path.append(.settings)
                 } label: {
                     Label("Settings", systemImage: "gearshape")
-                        .labelStyle(.titleAndIcon)
+                        .labelStyle(.iconOnly)
                 }
+                .accessibilityLabel(Text("Settings"))
                 .accessibilityIdentifier("home.settings")
             }
             ToolbarItem(placement: .topBarTrailing) {
@@ -88,8 +97,9 @@ struct HomeScreen: View {
                     model.path.append(.history)
                 } label: {
                     Label("Sent reports", systemImage: "clock.arrow.circlepath")
-                        .labelStyle(.titleAndIcon)
+                        .labelStyle(.iconOnly)
                 }
+                .accessibilityLabel(Text("Sent reports"))
                 .accessibilityIdentifier("home.history")
             }
         }

@@ -61,7 +61,7 @@ Fixa sends your report only to the municipality's e-service. Your e-mail, name a
 ### If the municipality changes its form
 
 - Nothing tests the live e-service automatically: Fixa sends the municipality no test traffic. If a send hits a changed form, it stops before the final step and offers e-mail; `adapters/status.json` is then set to `degraded` by hand.
-- The app reads `status.json` and the adapter from GitHub at most every six hours and shows a calm banner on Home: the report is saved and can still go by e-mail.
+- The app contacts GitHub only after a send has failed because the form changed: it then downloads the signed adapter and `status.json`, retries that send once if a newer adapter fixes it, and otherwise shows a calm banner: the report is saved and can still go by e-mail. No checks on launch or on a timer.
 - A fixed `adapters/*.json` reaches every phone without an App Store release, as long as this build accepts it.
 
 ## For municipalities

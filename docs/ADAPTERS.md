@@ -18,11 +18,11 @@ Today the only channel kind is `abou`, the Abou e-service platform (ASP.NET WebF
 | `municipality` | `name`, `countryCode`, and `region` with `center` and `bbox` (WGS84). The map opens on the region and the validator warns when the pin is outside the bbox. |
 | `channel` | How to reach the e-service; see below. |
 | `categories` | `id` (your stable slug), `value` (the exact `<option value>` of the form's category dropdown), optional `synonyms` (see Resilience) and a localized `title`. |
-| `tiles` | The home grid: `id`, `symbol` (SF Symbol), `categoryID`, localized `title`, and `swedishSummary`, which becomes the first line of the description sent to the municipality. |
+| `tiles` | The home grid: `id`, `symbol` (SF Symbol), `categoryID`, localized `title`, and `swedishSummary`, which becomes the first line of the description sent to the municipality. Optional localized `responsibility`: a short note on who looks after this kind of problem, for tiles where the municipality is not always the right place (Värmdö's road tiles: municipal streets vs Trafikverket's state roads and private road associations). |
 | `validation` | `descriptionMin`, `descriptionMax`, `emailRequiredWhenFeedback`, `requireLocation` (a pin or a place text). |
 | `emergency` | Optional. Phone `contacts`, `rules` (`isoWeekdays` 1 = Monday, `until` "HH:mm" local, `contactID`), `defaultContactID` when no rule matches, `timeZone`, and a localized `note`. |
 | `fallbackEmail` | Optional. Where the "send by e-mail instead" fallback goes. |
-| `disclaimer` | Localized. Shown before sending. |
+| `disclaimer` | Localized. Shown before sending. The app always shows the disclaimer of the adapter it shipped with, never a downloaded one. |
 
 Localized texts are plain objects keyed by language code: `{"sv": "…", "en": "…", "ru": "…", …}`, one key per app language (`en sv cs da de et es fr it lv lt hu nl nb pl pt ro fi el ru uk ar`). `sv` and `en` are required; a missing language falls back to English, then Swedish.
 
@@ -52,21 +52,37 @@ Municipalities edit their e-services. The submitter tolerates small changes and 
 - **Pages**: by `PageId`, or, if the id was renamed, by finding all of a page's fields on it. Pages without fields (the summary) are matched by id only.
 - **Drift**: anything else throws `SubmissionError.formChanged(FormDrift)` with `pageID`, `missing` (labels of fields or options Fixa can't fill, and of new required questions, the ones with a visible `*`) and a one-sentence `detail`. Network and server answers stay `transport`, `http`, `sessionLocked` and `serverValidation`.
 - **Session lost**: before the final send, a page with `sessionLockedMarker`, the platform's `GenericError` page, or a bounce back to `introPath` (the session expired) makes the submitter start over once from `introPath` with fresh cookies. A second loss surfaces as `sessionLocked` (lock) or `transport` (expiry).
-- **Final send**: posting the summary page is the one request that creates the case. If it, or the ThankYou re-posts after it, time out, fail, or end on a page that shows neither a case number nor received-wording ("Tack", "tagit emot", "kvittens"), the submitter throws `SubmissionError.uncertain`. Nothing after that point is retried or restarted. `SubmissionError.isRetrySafe` is true only for `transport` and `http`, which can only happen before the final send; the app must never resend an `uncertain` report automatically.
+- **Final send**: posting the summary page is the one request that creates the case. It is sent exactly once. If it, or the ThankYou re-posts after it, time out, fail, redirect, or end on a page that shows neither a case number nor received-wording ("Tack", "tagit emot", "kvittens"), the submitter throws `SubmissionError.uncertain`. Nothing after that point is retried or restarted. `SubmissionError.isRetrySafe` is true only for `transport`, `http` and `unavailable`, which can only happen before the final send; the app must never resend an `uncertain` report automatically.
+- **Server down**: before the final send, 429 and any 5xx become `unavailable(status, retryAfter)` (`Retry-After` read as seconds or a date, capped at 24 h), and so does a maintenance page served with 200. A login page served with 200 is `formChanged`. Neither is ever read as a receipt.
+- **Host**: requests go only to the adapter's host over https. Redirects off that host are not followed, and a form posting elsewhere is `formChanged`.
+- **Pace**: 400 ms between page requests, like a person moving through the form.
+- **Looks like the website**: Safari's User-Agent and headers, a WebKit-style multipart boundary and a camera-style photo name (`IMG_1234.jpg`). Nothing sent to the municipality names Fixa.
 - **Timeouts**: `SubmissionTimeouts.page` (30 s) for every page request, `SubmissionTimeouts.upload` (120 s) for the photo upload.
 
 `fixa-cli dry-run` exits 2 on drift (1 on any other failure), so you can tell "the form changed" from "the site was down". Run it by hand only, when a user reports a failed send or before changing an adapter: there is no scheduled job, so the municipality's e-service is never exercised automatically. When it reports drift, capture the new page, add the new texts to `labels`/`synonyms` or update `key`, and add a fixture test.
 
 ## When a municipality changes its form
 
-The app downloads `adapters/<id>.json` and `adapters/status.json` from `main` on GitHub (raw.githubusercontent.com) at launch and when it becomes active, at most every 6 hours. A downloaded adapter replaces the bundled one only if it decodes, passes the same consistency checks as the bundled copy (`AdapterSpec.problems`), has the same `id`, a `specVersion` the app supports, and a `minAppBuild` no higher than the installed build. Otherwise the app keeps what it has. A fix that only needs JSON therefore needs no App Store release.
+The app downloads `adapters/<id>.json` and `adapters/status.json` from `main` on GitHub (raw.githubusercontent.com), each with its signature `<name>.sig`, only after a send has failed with `formChanged`, and at most every 15 minutes (`AdapterStore.refreshAfterFormChange`). Never on launch or on a timer. If a newer adapter is accepted, the app retries that send once (drift stops before the final step, so this can't create a second case). A downloaded adapter replaces the bundled one only if its signature verifies, it decodes, passes the same consistency checks as the bundled copy (`AdapterSpec.problems`), has the same `id`, a `specVersion` the app supports, and a `minAppBuild` no higher than the installed build. A status file is used only if its signature verifies. Otherwise the app keeps what it has. A fix that only needs JSON therefore needs no App Store release.
 
 1. **Notice.** A send that hits a changed form stops before the final step with a drift report, and the app offers e-mail instead. There is no automatic check against the live e-service: Fixa never sends test traffic to the municipality.
-2. **Status.** Set the adapter's `state` in `adapters/status.json` to `degraded` (with a kind message in English and Swedish) by hand. Apps pick it up within 6 hours and show the message on Home. Reports stay saved and can still go by e-mail.
-3. **Fix.** Run `swift run fixa-cli dry-run --save-html page.html` once locally, then update `key`, `labels` or `synonyms` in `adapters/<id>.json`, copy it into `FixaKit/Sources/FixaKit/Resources/adapters/`, and add a fixture test.
-4. **Push** to `main` and set the status back to `ok`. Apps pick up the new adapter and status within 6 hours.
+2. **Status.** Set the adapter's `state` in `adapters/status.json` to `degraded` by hand and sign the file (below). Apps read it the next time a send hits the changed form and show their own banner on Home. The file carries only `state` and optional `updated` (`schema/status.schema.json`); there is no message field, the app words each state itself. Reports stay saved and can still go by e-mail.
+3. **Fix.** Run `swift run fixa-cli dry-run --save-html page.html` once locally, then update `key`, `labels` or `synonyms` in `adapters/<id>.json`, copy it into `FixaKit/Sources/FixaKit/Resources/adapters/`, sign it, and add a fixture test.
+4. **Push** to `main` and set the status back to `ok` (signed again). A phone picks up the new adapter the next time its send hits the changed form, and retries that send.
 
-Bump `minAppBuild` only when the adapter needs an engine change (a new field role, a new channel kind). Then ship the new build first; older builds keep their bundled adapter and keep showing the status message. Set `state` to `down` by hand in `status.json` if the e-service is off entirely.
+Bump `minAppBuild` only when the adapter needs an engine change (a new field role, a new channel kind). Then ship the new build first; older builds keep their bundled adapter and keep showing the status banner. Set `state` to `down` (signed) by hand in `status.json` if the e-service is off entirely.
+
+### Signing
+
+Every file the app downloads needs a valid Ed25519 signature, or the app ignores it. The public key is `AdapterSignature.publicKeyBase64` in `FixaKit/Sources/FixaKit/AdapterUpdate.swift`; the private key lives only on the maintainer's Mac at `~/.config/fixa/adapter-signing.key` (mode 600, never committed; `*.key` is in `.gitignore`).
+
+```sh
+cd FixaKit
+swift run fixa-cli sign ../adapters/se-varmdo-ksb.json   # writes ../adapters/se-varmdo-ksb.json.sig
+swift run fixa-cli sign ../adapters/status.json          # writes ../adapters/status.json.sig
+```
+
+Sign after the last edit and commit the `.sig` with the JSON: a signature covers the exact bytes, so even reformatting the file invalidates it. `AdapterSecurityTests.testPublishedFilesVerifyAgainstEmbeddedKey` fails if a committed `.sig` does not match. To rotate the key (lost or leaked), run `fixa-cli keygen` on a fresh path, put the printed public key into `AdapterSignature.publicKeyBase64`, re-sign every file, and ship an app build; builds with the old key keep their bundled or last accepted copy.
 
 ## Finding the Abou field keys
 

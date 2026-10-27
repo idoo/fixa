@@ -158,7 +158,8 @@ struct PendingReport: Codable, Identifiable, Sendable {
 
 /// One JSON file per pending report in Application Support/Fixa/Outbox, so reports survive the
 /// app being closed. Readable after the first unlock, so a send can finish in the background.
-/// Demo mode keeps everything in memory.
+/// The folder and every file are excluded from iCloud/computer backups: they hold the photo and
+/// the reply details. Demo mode keeps everything in memory.
 @Observable
 @MainActor
 final class OutboxStore {
@@ -216,18 +217,28 @@ final class OutboxStore {
     }
 
     private func write(_ item: PendingReport) -> Bool {
-        guard let directory else { return true }
+        guard var directory else { return true }
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         do {
             try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            try Self.excludeFromBackup(&directory)
+            var file = directory.appending(path: "\(item.id.uuidString).json")
             try encoder.encode(item).write(
-                to: directory.appending(path: "\(item.id.uuidString).json"),
+                to: file,
                 options: [.atomic, .completeFileProtectionUntilFirstUserAuthentication]
             )
+            // An atomic write replaces the file, so the flag is set again on every write.
+            try Self.excludeFromBackup(&file)
             return true
         } catch {
             return false
         }
+    }
+
+    private static func excludeFromBackup(_ url: inout URL) throws {
+        var values = URLResourceValues()
+        values.isExcludedFromBackup = true
+        try url.setResourceValues(values)
     }
 }

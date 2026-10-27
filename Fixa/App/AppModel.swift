@@ -1,3 +1,4 @@
+import BackgroundTasks
 import CoreLocation
 import FixaKit
 import Foundation
@@ -37,12 +38,30 @@ final class AppModel {
     private(set) var isSendingDraft = false
     /// Outbox reports being sent right now; each id is sent by at most one call at a time.
     private(set) var sendingIDs: Set<UUID> = []
+    /// A send `SendGuard` stopped: a repeat of a recent report (asks first) or one over the
+    /// hourly/daily cap (blocks). `RootView` shows it as an alert.
+    var sendGuardAlert: SendGuardAlert?
+    /// Backing store of `sentRecords`.
+    @ObservationIgnored private var guardRecords: [SentRecord] = []
     /// Last thing `NWPathMonitor` said; true until it has spoken.
     private(set) var isOnline = true
     @ObservationIgnored private var pathMonitor: NWPathMonitor?
     @ObservationIgnored private var lastPathOnline: Bool?
     @ObservationIgnored private var retryTask: Task<Void, Never>?
     @ObservationIgnored private var activeObserver: (any NSObjectProtocol)?
+    /// The one outbox flush running now. Every trigger (launch, foreground, connectivity, back-off
+    /// timer, background task) joins it instead of starting a second loop.
+    @ObservationIgnored private var flushTask: Task<Void, Never>?
+    /// A trigger arrived during the running flush: one more pass when it ends.
+    @ObservationIgnored private var flushAgain = false
+    @ObservationIgnored private var flushAgainIgnoringBackoff = false
+    /// iOS is ending the background task: let the send in flight finish, start no new one.
+    @ObservationIgnored var stopsOutboxAfterCurrentSend = false
+
+    enum SendGuardAlert: Equatable {
+        case duplicate(previous: Date)
+        case tooMany(retryAfter: Date)
+    }
 
     var path: [Route] = []
     /// What the report sends. `contact` always mirrors the profile while a reply is wanted and is
@@ -160,6 +179,7 @@ final class AppModel {
             open(screen)
         }
         if persists {
+            loadGuardRecords()
             startOutbox()
         }
     }
@@ -169,12 +189,22 @@ final class AppModel {
 
     // MARK: Flow
 
+    /// Idempotent: a second tap on a tile (or two tiles at once) sets the same one-screen path, so
+    /// only one Report screen is ever pushed.
     func startReport(tile: AdapterSpec.Tile) {
         if draft.tileID != tile.id {
             draft.tileID = tile.id
             draft.categoryID = tile.categoryID
         }
-        submission.reset()
+        // When the report was started; kept across edits and app restarts (saved with the draft).
+        // A draft left untouched (no text, no photo) starts again now.
+        if draft.createdAt == nil || !draftHasContent {
+            draft.createdAt = .now
+        }
+        // Never wipe the state of a send still under way.
+        if !submission.isSending {
+            submission.reset()
+        }
         path = [.report]
     }
 
@@ -205,10 +235,23 @@ final class AppModel {
     }
 
     /// Sends the current draft. One at a time: a second call while one is in flight returns at once,
-    /// whatever the button looks like. A failure that is safe to retry keeps the report as
+    /// whatever the button looks like, and a draft already on its receipt is never sent again.
+    /// Waits for the e-service's final answer. A failure that is safe to retry keeps the report as
     /// "waiting to send"; an `.uncertain` one is recorded as "may have been sent" and never retried.
+    /// `SendGuard` may stop it first: `sendGuardAlert` then asks (repeat) or explains (too many).
     func send() async {
-        guard let spec, !isSendingDraft else { return }
+        await send(confirmedDuplicate: false)
+    }
+
+    /// "Send anyway" on the repeat warning. The hourly/daily cap still applies.
+    func sendAnyway() async {
+        sendGuardAlert = nil
+        await send(confirmedDuplicate: true)
+    }
+
+    private func send(confirmedDuplicate: Bool) async {
+        // Demo seeds a receipt up front; everywhere else a set `sent` means this draft already went.
+        guard let spec, !isSendingDraft, options.demo || sent == nil else { return }
         isSendingDraft = true
         defer { isSendingDraft = false }
         if options.demo {
@@ -221,7 +264,27 @@ final class AppModel {
             return
         }
         let dryRun = options.dryRun
-        guard let result = await submission.submit(draft, spec: spec, dryRun: dryRun, recordResponses: options.liveTest) else {
+        if !dryRun {
+            switch sendGuardDecision(for: draft, checksDuplicate: !confirmedDuplicate) {
+            case .ok:
+                break
+            case .duplicate(let previous):
+                sendGuardAlert = .duplicate(previous: previous)
+                return
+            case .tooMany(let retryAfter):
+                sendGuardAlert = .tooMany(retryAfter: retryAfter)
+                return
+            }
+        }
+        var result = await submission.submit(draft, spec: spec, dryRun: dryRun, recordResponses: options.liveTest)
+        // The form changed: drift stops before the final step, so nothing reached the municipality.
+        // Try once more with a newer signed adapter if there is one; otherwise Review shows the drift.
+        if result == nil, case .formChanged? = submission.error,
+           await adapters.refreshAfterFormChange(), let fresh = self.spec {
+            submission.reset()
+            result = await submission.submit(draft, spec: fresh, dryRun: dryRun, recordResponses: options.liveTest)
+        }
+        guard let result else {
             if let error = submission.error, persists, !dryRun {
                 keepUnconfirmed(after: error)
             }
@@ -229,6 +292,7 @@ final class AppModel {
         }
         sent = result
         if !result.isDryRun {
+            recordSend(draft, date: result.date)
             let item = historyItem(id: UUID(), date: result.date, caseNumber: result.caseNumber, status: .sent)
             history.add(item)
             sent?.historyID = item.id
@@ -250,13 +314,17 @@ final class AppModel {
             return
         }
         let now = Date.now
+        if status == .maybeSent {
+            // It may have reached the municipality: counts for the repeat warning and the cap.
+            recordSend(draft, date: now)
+        }
         let id = UUID()
         let pending = PendingReport(
             id: id,
             draft: draft,
             createdAt: now,
             attempts: 1,
-            nextAttemptAt: now.addingTimeInterval(Self.retryDelay(afterAttempts: 1)),
+            nextAttemptAt: Self.nextAttemptDate(afterAttempts: 1, error: error, now: now),
             held: status != .waiting
         )
         // Keep the draft if the report can't be stored: Review's error and "Try again" stay.
@@ -343,10 +411,13 @@ final class AppModel {
         if persists {
             UserDefaults.standard.removeObject(forKey: Self.contactKey)
             DraftStore.clear()
+            BackgroundOutbox.schedule(earliest: nil)
+            UserDefaults.standard.removeObject(forKey: Self.sentRecordsKey)
         }
         draftStorage = freshDraft()
         showIssues = false
         outbox.deleteAll()
+        guardRecords = []
         history.deleteAll()
         sent = nil
         submission.reset()
@@ -546,6 +617,70 @@ final class AppModel {
         }
     }
 
+    /// The back-off, or the e-service's own `Retry-After` when it asks for longer (capped at a day).
+    static func nextAttemptDate(afterAttempts attempts: Int, error: SubmissionError, now: Date) -> Date {
+        let asked = min(error.retryAfter ?? 0, 24 * 60 * 60)
+        return now.addingTimeInterval(max(retryDelay(afterAttempts: attempts), asked))
+    }
+
+    // MARK: Send guard
+
+    /// Reports that reached, or may have reached, the municipality in the last 48 hours, for
+    /// `SendGuard`. Kept apart from Sent reports (UserDefaults `fixa.sentRecords`) so clearing that
+    /// list doesn't lift the guard; "Delete all data" removes them too.
+    var sentRecords: [SentRecord] {
+        let cutoff = Date.now.addingTimeInterval(-Self.sentRecordLifetime)
+        return guardRecords.filter { $0.date > cutoff }
+    }
+
+    private static let sentRecordsKey = "fixa.sentRecords"
+    /// The longest window `SendGuard` looks back over.
+    private static let sentRecordLifetime = max(SendGuard.duplicateWindow, SendGuard.limits.map { $0.window }.max() ?? 0)
+
+    /// A send whose final step went out: a receipt, or no answer (may have been sent).
+    private func recordSend(_ draft: ReportDraft, date: Date) {
+        guardRecords = sentRecords + [SentRecord(draft, date: date)]
+        saveGuardRecords()
+    }
+
+    private func saveGuardRecords() {
+        guard persists else { return }
+        if let data = try? JSONEncoder().encode(guardRecords) {
+            UserDefaults.standard.set(data, forKey: Self.sentRecordsKey)
+        }
+    }
+
+    /// Saved records; on the first launch with the guard, seeded from Sent reports.
+    private func loadGuardRecords() {
+        guard persists else { return }
+        if let data = UserDefaults.standard.data(forKey: Self.sentRecordsKey) {
+            guardRecords = (try? JSONDecoder().decode([SentRecord].self, from: data)) ?? []
+            return
+        }
+        guardRecords = history.items
+            .filter { $0.status == .sent || $0.status == .maybeSent }
+            .map { item in
+                var coordinate: Coordinate?
+                if let latitude = item.latitude, let longitude = item.longitude {
+                    coordinate = Coordinate(latitude: latitude, longitude: longitude)
+                }
+                return SentRecord(date: item.date, tileID: item.tileID, coordinate: coordinate, locationText: item.locationText)
+            }
+        guardRecords = sentRecords
+        saveGuardRecords()
+    }
+
+    /// `checksDuplicate: false` is for a send the user already confirmed (an outbox retry, "Send
+    /// anyway"): without a place it matches no earlier report, so only the rate limit can answer.
+    private func sendGuardDecision(for draft: ReportDraft, checksDuplicate: Bool) -> SendGuard.Decision {
+        var probe = draft
+        if !checksDuplicate {
+            probe.coordinate = nil
+            probe.locationText = ""
+        }
+        return SendGuard.check(probe, history: sentRecords, now: .now)
+    }
+
     /// For Home: reports Fixa still sends on its own, or that stopped and need the user.
     /// Reports that may have been sent are left to the receipt and Sent reports.
     struct OutboxNotice: Equatable {
@@ -564,8 +699,8 @@ final class AppModel {
         return OutboxNotice(
             title: String(localized: "Waiting to send", bundle: L10n.bundle, locale: L10n.locale),
             message: isOnline
-                ? String(localized: "Your report is saved on this phone. Fixa tries again in a little while.", bundle: L10n.bundle, locale: L10n.locale)
-                : String(localized: "Your report is saved on this phone. Fixa sends it when you're back online.", bundle: L10n.bundle, locale: L10n.locale)
+                ? String(localized: "Your report is saved on this phone. Fixa tries again in a little while, also in the background.", bundle: L10n.bundle, locale: L10n.locale)
+                : String(localized: "Your report is saved on this phone. Fixa sends it when you're back online, also in the background.", bundle: L10n.bundle, locale: L10n.locale)
         )
     }
 
@@ -587,12 +722,17 @@ final class AppModel {
 
     /// The user's explicit "Try again" on a report Fixa stopped sending, or a confirmed
     /// "Send again anyway" on one that may have arrived. Restarts the automatic tries.
+    /// Already confirmed, so no repeat warning, but the hourly/daily cap still applies.
     func sendNow(_ id: UUID) async {
         guard var item = outbox.item(id: id), !sendingIDs.contains(id) else { return }
         if options.demo {
             // No network in demo: pretend it went through.
             outbox.remove([id])
             markSent(id, caseNumber: DemoData.receipt.caseNumber, date: .now)
+            return
+        }
+        if case .tooMany(let retryAfter) = sendGuardDecision(for: item.draft, checksDuplicate: false) {
+            sendGuardAlert = .tooMany(retryAfter: retryAfter)
             return
         }
         item.held = false
@@ -613,7 +753,10 @@ final class AppModel {
         activeObserver = NotificationCenter.default.addObserver(
             forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main
         ) { @Sendable [weak self] _ in
-            Task { @MainActor [weak self] in await self?.flushOutbox(ignoringBackoff: false) }
+            Task { @MainActor [weak self] in
+                self?.stopsOutboxAfterCurrentSend = false
+                await self?.flushOutbox(ignoringBackoff: false)
+            }
         }
         scheduleRetry()
     }
@@ -627,27 +770,83 @@ final class AppModel {
         Task { await flushOutbox(ignoringBackoff: true) }
     }
 
+    /// Single flight: if a flush is already running, this asks it for one more pass and waits for
+    /// it, so foreground, connectivity, timer and background task firing together run one loop.
+    /// Returns when the outbox has had its try.
+    private func flushOutbox(ignoringBackoff: Bool) async {
+        guard persists else { return }
+        if let running = flushTask {
+            flushAgain = true
+            flushAgainIgnoringBackoff = flushAgainIgnoringBackoff || ignoringBackoff
+            await running.value
+            return
+        }
+        // Main-actor task: set before it can start, cleared by itself before it ends.
+        let task = Task { [self] in
+            var ignoring = ignoringBackoff
+            repeat {
+                flushAgain = false
+                flushAgainIgnoringBackoff = false
+                await flushPass(ignoringBackoff: ignoring)
+                ignoring = flushAgainIgnoringBackoff
+            } while flushAgain && !stopsOutboxAfterCurrentSend
+            flushTask = nil
+            scheduleRetry()
+        }
+        flushTask = task
+        await task.value
+    }
+
     /// One try for each waiting report: all of them on a connectivity change, otherwise those
     /// whose back-off has passed. Never touches held reports (may have been sent, not sent).
-    private func flushOutbox(ignoringBackoff: Bool) async {
-        guard persists, lastPathOnline == true else { return }
+    private func flushPass(ignoringBackoff: Bool) async {
+        guard lastPathOnline == true else { return }
         let now = Date.now
         let due = outbox.items.filter { !$0.held && (ignoringBackoff || $0.nextAttemptAt <= now) }.map(\.id)
         for id in due {
-            guard lastPathOnline == true else { break }
-            await attempt(id, automatic: true)
+            guard lastPathOnline == true, !stopsOutboxAfterCurrentSend else { break }
+            await attempt(id, automatic: true, ignoringBackoff: ignoringBackoff)
         }
-        scheduleRetry()
     }
 
-    private func attempt(_ id: UUID, automatic: Bool) async {
+    /// The background task's entry: waits briefly for the first connectivity answer of a fresh
+    /// background launch, then one flush that honours the back-off.
+    func drainOutboxInBackground() async {
+        guard persists else { return }
+        stopsOutboxAfterCurrentSend = false
+        var waited = 0
+        while lastPathOnline == nil, waited < 50 {
+            try? await Task.sleep(for: .milliseconds(100))
+            waited += 1
+        }
+        await flushOutbox(ignoringBackoff: false)
+    }
+
+    /// Sends one outbox report and waits for the e-service's final answer. Single flight per id:
+    /// the check and the insert into `sendingIDs` run on the main actor with no await between.
+    private func attempt(_ id: UUID, automatic: Bool, ignoringBackoff: Bool = true) async {
         guard persists, let spec, var item = outbox.item(id: id), !sendingIDs.contains(id) else { return }
         if automatic, item.held || item.attempts >= Self.maxAutomaticAttempts { return }
+        // Re-read: another trigger may have tried it since this pass picked it.
+        if automatic, !ignoringBackoff, item.nextAttemptAt > .now { return }
+        // Rate limit counts retries too; waiting for it is not a failed try.
+        if case .tooMany(let retryAfter) = sendGuardDecision(for: item.draft, checksDuplicate: false) {
+            item.nextAttemptAt = max(item.nextAttemptAt, retryAfter)
+            outbox.put(item)
+            return
+        }
         sendingIDs.insert(id)
         defer { sendingIDs.remove(id) }
         let service = SubmissionService()
-        let result = await service.submit(item.draft, spec: spec, dryRun: false)
+        var result = await service.submit(item.draft, spec: spec, dryRun: false)
+        // Form drift stops before the final step: once more with a newer signed adapter, if any.
+        if result == nil, case .formChanged? = service.error,
+           await adapters.refreshAfterFormChange(), let fresh = self.spec {
+            service.reset()
+            result = await service.submit(item.draft, spec: fresh, dryRun: false)
+        }
         if let result {
+            recordSend(item.draft, date: result.date)
             outbox.remove([id])
             markSent(id, caseNumber: result.caseNumber, date: result.date)
             return
@@ -657,9 +856,11 @@ final class AppModel {
         item.attempts += 1
         let status: HistoryItem.Status
         if error.isRetrySafe, item.attempts < Self.maxAutomaticAttempts {
-            item.nextAttemptAt = .now.addingTimeInterval(Self.retryDelay(afterAttempts: item.attempts))
+            item.nextAttemptAt = Self.nextAttemptDate(afterAttempts: item.attempts, error: error, now: .now)
             status = .waiting
         } else if case .uncertain = error {
+            // Never sent again on its own; counts as a send for the guard.
+            recordSend(item.draft, date: .now)
             item.held = true
             status = .maybeSent
         } else {
@@ -685,16 +886,26 @@ final class AppModel {
         }
     }
 
-    /// Wakes for the earliest back-off. The flush runs in its own task so rescheduling never
-    /// cancels a send already under way.
+    /// Wakes for the earliest back-off while the app runs, and asks iOS for a background task at
+    /// the same time for when it doesn't. The flush runs in its own task so rescheduling never
+    /// cancels a send already under way. Called whenever a report is queued or a back-off is set.
     private func scheduleRetry() {
         retryTask?.cancel()
-        guard persists, let next = outbox.items.filter({ !$0.held }).map(\.nextAttemptAt).min() else { return }
+        guard persists else { return }
+        let next = outbox.items.filter { !$0.held }.map(\.nextAttemptAt).min()
+        BackgroundOutbox.schedule(earliest: next)
+        guard let next else { return }
         retryTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(max(1, next.timeIntervalSinceNow)))
             guard !Task.isCancelled else { return }
             Task { @MainActor [weak self] in await self?.flushOutbox(ignoringBackoff: false) }
         }
+    }
+
+    /// When the app leaves the screen: makes sure iOS knows about waiting reports.
+    func scheduleBackgroundSend() {
+        guard persists else { return }
+        BackgroundOutbox.schedule(earliest: outbox.items.filter { !$0.held }.map(\.nextAttemptAt).min())
     }
 
     // MARK: Launch hooks
@@ -778,6 +989,89 @@ final class AppModel {
             path = [.settings, .privacy]
         case .onboarding:
             path = []
+        }
+    }
+}
+
+/// Sends waiting outbox reports while Fixa is not on screen. Two requests for the same work: a
+/// processing task that needs a network and an app refresh, whichever iOS grants first; both run
+/// `AppModel.drainOutboxInBackground`, which is single flight and honours the back-off. Held
+/// reports (may have been sent, not sent) are never touched. A force-quit app gets neither.
+enum BackgroundOutbox {
+    static let processingID = "se.jvcr.fixa.outbox"
+    static let refreshID = "se.jvcr.fixa.outbox.refresh"
+
+    private static var permitted: Set<String> {
+        Set(Bundle.main.object(forInfoDictionaryKey: "BGTaskSchedulerPermittedIdentifiers") as? [String] ?? [])
+    }
+
+    /// Must run before launch finishes (`FixaApp.init`). Only identifiers the Info.plist permits:
+    /// registering any other one is a crash.
+    @MainActor
+    static func register(_ model: AppModel) {
+        let allowed = permitted
+        for id in [processingID, refreshID] where allowed.contains(id) {
+            BGTaskScheduler.shared.register(forTaskWithIdentifier: id, using: .main) { task in
+                nonisolated(unsafe) let task = task
+                MainActor.assumeIsolated { run(task, model: model) }
+            }
+        }
+    }
+
+    /// `earliest` nil: nothing waiting, so no request stays pending.
+    @MainActor
+    static func schedule(earliest: Date?) {
+        let allowed = permitted
+        guard let earliest else {
+            BGTaskScheduler.shared.cancel(taskRequestWithIdentifier: processingID)
+            BGTaskScheduler.shared.cancel(taskRequestWithIdentifier: refreshID)
+            return
+        }
+        if allowed.contains(processingID) {
+            let request = BGProcessingTaskRequest(identifier: processingID)
+            request.requiresNetworkConnectivity = true
+            request.requiresExternalPower = false
+            request.earliestBeginDate = earliest
+            try? BGTaskScheduler.shared.submit(request)
+        }
+        if allowed.contains(refreshID) {
+            let request = BGAppRefreshTaskRequest(identifier: refreshID)
+            request.earliestBeginDate = earliest
+            try? BGTaskScheduler.shared.submit(request)
+        }
+    }
+
+    /// On expiry the send in flight is never cancelled (that could leave a case Fixa can't see);
+    /// it finishes under its own `beginBackgroundTask` time and no further report starts.
+    @MainActor
+    private static func run(_ task: BGTask, model: AppModel) {
+        let completion = Completion(task)
+        task.expirationHandler = {
+            Task { @MainActor in
+                model.stopsOutboxAfterCurrentSend = true
+                completion.finish(success: false)
+            }
+        }
+        Task { @MainActor in
+            await model.drainOutboxInBackground()
+            completion.finish(success: true)
+        }
+    }
+
+    /// `setTaskCompleted` exactly once, whichever of expiry and the drain comes first.
+    @MainActor
+    private final class Completion {
+        nonisolated(unsafe) private let task: BGTask
+        private var done = false
+
+        init(_ task: BGTask) {
+            self.task = task
+        }
+
+        func finish(success: Bool) {
+            guard !done else { return }
+            done = true
+            task.setTaskCompleted(success: success)
         }
     }
 }

@@ -4,7 +4,14 @@ import UIKit
 
 @main
 struct FixaApp: App {
-    @State private var model = AppModel()
+    @State private var model: AppModel
+
+    init() {
+        let model = AppModel()
+        _model = State(initialValue: model)
+        // Before launch finishes, as BGTaskScheduler requires.
+        BackgroundOutbox.register(model)
+    }
 
     var body: some Scene {
         WindowGroup {
@@ -73,16 +80,36 @@ struct RootView: View {
             .fullScreenCover(isPresented: $model.isOnboardingPresented) {
                 OnboardingScreen()
             }
-            // Checks for an updated adapter and the e-service status (at most every 6 hours).
-            .task(id: scenePhase) {
-                if scenePhase == .active, !model.options.demo {
-                    await model.adapters.refresh()
-                }
-            }
             .onChange(of: scenePhase) { _, phase in
                 if phase != .active {
                     model.persistNow()
                 }
+                if phase == .background {
+                    model.scheduleBackgroundSend()
+                }
+            }
+            // SendGuard: a repeat of a recent report asks first (Cancel is the default); too many
+            // reports in a short time blocks. Here so Review's Send stays a plain `model.send()`.
+            .alert(
+                sendGuardTitle,
+                isPresented: Binding(
+                    get: { model.sendGuardAlert != nil },
+                    set: { if !$0 { model.sendGuardAlert = nil } }
+                ),
+                presenting: model.sendGuardAlert
+            ) { alert in
+                switch alert {
+                case .duplicate:
+                    Button(String(localized: "Cancel", bundle: L10n.bundle, locale: L10n.locale), role: .cancel) {}
+                        .keyboardShortcut(.defaultAction)
+                    Button(String(localized: "Send anyway", bundle: L10n.bundle, locale: L10n.locale)) {
+                        Task { await model.sendAnyway() }
+                    }
+                case .tooMany:
+                    Button(String(localized: "OK", bundle: L10n.bundle, locale: L10n.locale), role: .cancel) {}
+                }
+            } message: { alert in
+                Text(sendGuardMessage(alert))
             }
         } else {
             ContentUnavailableView(
@@ -91,6 +118,36 @@ struct RootView: View {
                 description: Text("The settings for the municipality are missing. Please reinstall the app.")
             )
             .fxScreenBackground()
+        }
+    }
+
+    private var sendGuardTitle: String {
+        switch model.sendGuardAlert {
+        case .tooMany?:
+            String(localized: "Please wait a while", bundle: L10n.bundle, locale: L10n.locale)
+        default:
+            String(localized: "Already reported?", bundle: L10n.bundle, locale: L10n.locale)
+        }
+    }
+
+    private func sendGuardMessage(_ alert: AppModel.SendGuardAlert) -> String {
+        switch alert {
+        case .duplicate(let previous):
+            let formatter = DateComponentsFormatter()
+            formatter.unitsStyle = .full
+            formatter.maximumUnitCount = 1
+            formatter.allowedUnits = [.day, .hour, .minute]
+            var calendar = Calendar.current
+            calendar.locale = L10n.locale
+            formatter.calendar = calendar
+            let ago = formatter.string(from: max(60, Date.now.timeIntervalSince(previous))) ?? ""
+            return String(localized: "You reported this here \(ago) ago. The kommun already has it. Send another report?", bundle: L10n.bundle, locale: L10n.locale)
+        case .tooMany(let retryAfter):
+            let sameDay = Calendar.current.isDate(retryAfter, inSameDayAs: .now)
+            let time = retryAfter.formatted(
+                Date.FormatStyle(date: sameDay ? .omitted : .abbreviated, time: .shortened).locale(L10n.locale)
+            )
+            return String(localized: "You've sent many reports in a short time. Try again at \(time).", bundle: L10n.bundle, locale: L10n.locale)
         }
     }
 

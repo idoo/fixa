@@ -2,6 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>se.jvcr.fixa.outbox</string>
+		<string>se.jvcr.fixa.outbox.refresh</string>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -54,9 +59,14 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Fixa uses the camera so you can take a photo of the problem.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Fixa uses your location to place the pin where the problem is. It is only used when you tap Use my location.</string>
+	<string>Fixa uses your location to put the pin where the problem is: when you tap Use my current location, and on a new report once you have allowed it. Your position is only sent with a report you send.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Fixa lets you pick photos of the problem to attach to your report.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>processing</string>
+	</array>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UISupportedInterfaceOrientations</key>

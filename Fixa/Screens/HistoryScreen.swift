@@ -262,13 +262,16 @@ struct HistoryDetailScreen: View {
             isPresented: $isSendAgainConfirmPresented,
             titleVisibility: .visible
         ) {
-            Button {
+            Button(role: .destructive) {
                 Task { await model.sendNow(itemID) }
             } label: {
                 Text("Send again anyway")
             }
+            Button(role: .cancel) {} label: {
+                Text("Cancel")
+            }
         } message: {
-            Text("If the first one arrived, \(spec.municipality.name) gets the same report twice.")
+            Text("It may already have arrived. Sending it again can create a second case at \(spec.municipality.name) for the same problem.")
         }
     }
 
@@ -285,8 +288,8 @@ struct HistoryDetailScreen: View {
                     kind: .info,
                     title: String(localized: "Waiting to send", bundle: L10n.bundle, locale: L10n.locale),
                     message: model.isOnline
-                        ? String(localized: "Your report is saved on this phone. Fixa tries again in a little while.", bundle: L10n.bundle, locale: L10n.locale)
-                        : String(localized: "Your report is saved on this phone. Fixa sends it when you're back online.", bundle: L10n.bundle, locale: L10n.locale)
+                        ? String(localized: "Your report is saved on this phone. Fixa tries again in a little while, also in the background.", bundle: L10n.bundle, locale: L10n.locale)
+                        : String(localized: "Your report is saved on this phone. Fixa sends it when you're back online, also in the background.", bundle: L10n.bundle, locale: L10n.locale)
                 )
             case .maybeSent:
                 FxBanner(
@@ -298,7 +301,7 @@ struct HistoryDetailScreen: View {
                 )
                 if let text {
                     FxCopyButton(title: String(localized: "Copy report text", bundle: L10n.bundle, locale: L10n.locale), value: text)
-                    FxSecondaryButton(title: String(localized: "Send again anyway", bundle: L10n.bundle, locale: L10n.locale), systemImage: "arrow.clockwise") {
+                    FxSecondaryButton(title: String(localized: "Send again anyway", bundle: L10n.bundle, locale: L10n.locale), systemImage: "exclamationmark.arrow.circlepath") {
                         isSendAgainConfirmPresented = true
                     }
                     .disabled(isSending)

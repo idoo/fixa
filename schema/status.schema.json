@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fixa adapter status (adapters/status.json)",
+  "description": "Adapter id to the e-service state. Signed with fixa-cli sign (status.json.sig). There is no free text: the app shows its own words for each state.",
+  "type": "object",
+  "additionalProperties": {
+    "type": "object",
+    "required": ["state"],
+    "additionalProperties": false,
+    "properties": {
+      "state": { "enum": ["ok", "degraded", "down"], "description": "ok: works. degraded: the form changed, sends may stop and fall back to e-mail. down: the e-service is off." },
+      "updated": { "type": "string", "format": "date-time", "description": "ISO 8601 time the state was set." }
+    }
+  }
+}

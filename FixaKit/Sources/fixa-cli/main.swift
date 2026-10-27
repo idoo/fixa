@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 import FixaKit
 
@@ -36,9 +37,59 @@ usage:
       Exit 2 if any run found the form changed, 1 if any run failed otherwise.
   fixa-cli submit --live --i-understand-this-creates-a-real-case [--photo path.jpg] [--save-html out.html]
       Creates a REAL case with the municipality.
+  fixa-cli keygen [--key path]
+      Creates the Ed25519 adapter signing key (default ~/.config/fixa/adapter-signing.key, mode 600)
+      and prints its public key for AdapterSignature.publicKeyBase64. Never overwrites a key.
+  fixa-cli sign <file> [--key path]
+      Writes <file>.sig: the base64 Ed25519 signature of the file's exact bytes.
 """
 
 let args = Array(CommandLine.arguments.dropFirst())
+
+let keyPath = value(after: "--key", in: args)
+    ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent(".config/fixa/adapter-signing.key").path
+
+if args.first == "keygen" {
+    let fm = FileManager.default
+    guard !fm.fileExists(atPath: keyPath) else { fail("\(keyPath) already exists; refusing to overwrite a signing key") }
+    let key = Curve25519.Signing.PrivateKey()
+    let directory = (keyPath as NSString).deletingLastPathComponent
+    do {
+        try fm.createDirectory(atPath: directory, withIntermediateDirectories: true, attributes: [.posixPermissions: 0o700])
+        guard fm.createFile(atPath: keyPath, contents: Data((key.rawRepresentation.base64EncodedString() + "\n").utf8),
+                            attributes: [.posixPermissions: 0o600]) else { fail("Cannot write \(keyPath)") }
+        try fm.setAttributes([.posixPermissions: 0o600], ofItemAtPath: keyPath)
+    } catch {
+        fail("Cannot write \(keyPath): \(error)")
+    }
+    print("Private key: \(keyPath) (mode 600, never commit it)")
+    print("Public key:  \(key.publicKey.rawRepresentation.base64EncodedString())")
+    exit(0)
+}
+
+if args.first == "sign" {
+    guard args.count >= 2, !args[1].hasPrefix("--") else { fail(usage) }
+    let path = args[1]
+    guard let text = try? String(contentsOfFile: keyPath, encoding: .utf8),
+          let raw = Data(base64Encoded: text.trimmingCharacters(in: .whitespacesAndNewlines)),
+          let key = try? Curve25519.Signing.PrivateKey(rawRepresentation: raw) else {
+        fail("Cannot read signing key \(keyPath); run fixa-cli keygen first")
+    }
+    guard let bytes = FileManager.default.contents(atPath: path) else { fail("Cannot read \(path)") }
+    do {
+        let signature = try key.signature(for: bytes)
+        try Data((signature.base64EncodedString() + "\n").utf8).write(to: URL(fileURLWithPath: path + ".sig"), options: .atomic)
+    } catch {
+        fail("Cannot sign \(path): \(error)")
+    }
+    let published = AdapterSignature.publicKeyBase64
+    if key.publicKey.rawRepresentation.base64EncodedString() != published {
+        FileHandle.standardError.write(Data("warning: this key is not the one the app trusts (\(published))\n".utf8))
+    }
+    print("Signed \(path) → \(path).sig")
+    exit(0)
+}
+
 guard let command = args.first, ["dry-run", "submit"].contains(command) else { fail(usage) }
 
 guard let spec = AdapterCatalog.bundled().first(where: { $0.id == "se.varmdo.ksb" }) else {

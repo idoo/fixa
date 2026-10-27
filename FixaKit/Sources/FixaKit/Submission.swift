@@ -50,6 +50,10 @@ public enum SubmissionError: Error, Sendable, Equatable {
     case uploadFailed(String)
     case http(Int)
     case transport(String)
+    /// The e-service is down or asks us to slow down before the final confirmation: 429, any 5xx, or
+    /// a maintenance page. `status` is nil for a maintenance page served with 200; `retryAfter` is
+    /// the server's `Retry-After` in seconds, if it sent one.
+    case unavailable(status: Int?, retryAfter: TimeInterval?)
     /// The adapter itself is unusable (bad channel kind, URL or page list), independent of the live page.
     case invalidSpec(String)
     /// The final confirmation was sent but no receipt was read (timeout, dropped connection, unknown page).
@@ -60,9 +64,14 @@ public enum SubmissionError: Error, Sendable, Equatable {
     /// final confirmation was sent. Everything else needs a person (or a new adapter) first.
     public var isRetrySafe: Bool {
         switch self {
-        case .transport, .http: true
+        case .transport, .http, .unavailable: true
         case .sessionLocked, .serverValidation, .formChanged, .uploadFailed, .invalidSpec, .uncertain: false
         }
+    }
+
+    /// Seconds the e-service asked us to wait before trying again, if it said.
+    public var retryAfter: TimeInterval? {
+        if case .unavailable(_, let retryAfter) = self { retryAfter } else { nil }
     }
 }
 
@@ -83,7 +92,8 @@ public protocol HTTPTransport: Sendable {
     func send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse)
 }
 
-/// URLSession-backed transport. Follows redirects; keeps cookies only in its own session.
+/// URLSession-backed transport. Follows redirects only within the request's own host over HTTPS
+/// (see `RedirectGuard`); keeps cookies only in its own session.
 public struct URLSessionTransport: HTTPTransport {
     public let session: URLSession
 
@@ -112,10 +122,28 @@ public struct URLSessionTransport: HTTPTransport {
     }
 
     public func send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
-        let (data, response) = try await session.data(for: request)
+        let (data, response) = try await session.data(for: request, delegate: RedirectGuard())
         guard let http = response as? HTTPURLResponse else {
             throw SubmissionError.transport("Not an HTTP response")
         }
         return (data, http)
+    }
+}
+
+/// Refuses any redirect that leaves the original request's host or HTTPS. The 3xx response then
+/// reaches `AbouSubmitter`, which treats it as an error instead of following it.
+final class RedirectGuard: NSObject, URLSessionTaskDelegate, Sendable {
+    func urlSession(
+        _ session: URLSession,
+        task: URLSessionTask,
+        willPerformHTTPRedirection response: HTTPURLResponse,
+        newRequest request: URLRequest
+    ) async -> URLRequest? {
+        Self.allows(from: task.originalRequest?.url, to: request.url) ? request : nil
+    }
+
+    static func allows(from original: URL?, to target: URL?) -> Bool {
+        guard let host = original?.host?.lowercased(), let target, target.scheme?.lowercased() == "https" else { return false }
+        return target.host?.lowercased() == host
     }
 }

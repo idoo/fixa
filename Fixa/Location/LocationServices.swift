@@ -1,5 +1,6 @@
 import CoreLocation
 import FixaKit
+import ImageIO
 import MapKit
 
 extension Coordinate {
@@ -114,11 +115,35 @@ enum LocationProvider {
 /// Address text for a coordinate, via MapKit reverse geocoding.
 @MainActor
 enum ReverseGeocoder {
+    /// Farther than this from the pin, the found address is only "near" it.
+    static let exactRadiusMeters: CLLocationDistance = 100
+
+    /// The address of the nearest result in Swedish (the text goes to the municipality as written).
+    /// A result over `exactRadiusMeters` away is prefixed "nära " so it never claims the exact spot.
     static func address(for coordinate: CLLocationCoordinate2D) async -> String? {
         let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
         guard let request = MKReverseGeocodingRequest(location: location) else { return nil }
         request.preferredLocale = Locale(identifier: "sv_SE")
-        guard let item = try? await request.mapItems.first else { return nil }
-        return item.address?.shortAddress ?? item.address?.fullAddress ?? item.name
+        guard let items = try? await request.mapItems,
+              let item = items.min(by: { $0.location.distance(from: location) < $1.location.distance(from: location) }),
+              let text = item.address?.shortAddress ?? item.address?.fullAddress ?? item.name else { return nil }
+        return item.location.distance(from: location) > exactRadiusMeters ? "nära \(text)" : text
+    }
+}
+
+/// Where a photo was taken, read from its original file. Fixa re-encodes every photo before
+/// sending, which drops this metadata, so the place only ever reaches the report as a pin.
+enum PhotoLocation {
+    static func coordinate(in data: Data) -> Coordinate? {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
+              let gps = properties[kCGImagePropertyGPSDictionary] as? [CFString: Any],
+              let latitude = (gps[kCGImagePropertyGPSLatitude] as? NSNumber)?.doubleValue,
+              let longitude = (gps[kCGImagePropertyGPSLongitude] as? NSNumber)?.doubleValue else { return nil }
+        let south = (gps[kCGImagePropertyGPSLatitudeRef] as? String)?.uppercased() == "S"
+        let west = (gps[kCGImagePropertyGPSLongitudeRef] as? String)?.uppercased() == "W"
+        let coordinate = CLLocationCoordinate2D(latitude: south ? -latitude : latitude, longitude: west ? -longitude : longitude)
+        guard CLLocationCoordinate2DIsValid(coordinate), latitude != 0 || longitude != 0 else { return nil }
+        return Coordinate(coordinate)
     }
 }
