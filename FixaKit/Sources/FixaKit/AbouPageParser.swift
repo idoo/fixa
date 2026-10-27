@@ -54,7 +54,7 @@ public enum AbouPageParser {
 
         let title = matches(#"<title[^>]*>(.*?)</title>"#, in: html, options: [.caseInsensitive, .dotMatchesLineSeparators])
             .first.map { visibleText($0[1]) } ?? ""
-        let message = String(mainText(html).prefix(2000))
+        let message = String((receiptText(html) ?? mainText(html)).prefix(2000))
         let number = caseNumber(in: message) ?? caseNumber(in: title)
         guard number != nil || saysReceived(title + " " + message) else { return nil }
         return SubmissionReceipt(
@@ -80,15 +80,49 @@ public enum AbouPageParser {
             .first { $0.contains(where: \.isNumber) }
     }
 
-    static func mainText(_ html: String) -> String {
+    /// Removes elements whose content is never visible text (scripts span lines, hence `(?is)`).
+    static func withoutInvisible(_ html: String, tags: [String] = ["script", "style", "head", "noscript", "header", "footer", "nav", "svg"]) -> String {
         var body = html
-        for tag in ["script", "style", "head", "noscript", "header", "footer", "nav"] {
-            body = body.replacingOccurrences(of: "<\(tag)\\b[^>]*>.*?</\(tag)>", with: " ", options: [.regularExpression, .caseInsensitive])
+        for tag in tags {
+            body = body.replacingOccurrences(of: "(?is)<\(tag)\\b[^>]*>.*?</\(tag)>", with: " ", options: .regularExpression)
         }
+        return body
+    }
+
+    static func mainText(_ html: String) -> String {
+        var body = withoutInvisible(html)
         if let main = matches(#"<main\b[^>]*>(.*?)</main>"#, in: body, options: [.caseInsensitive, .dotMatchesLineSeparators]).first {
             body = main[1]
         }
         return visibleText(body)
+    }
+
+    /// The municipality's own words on Abou's thank-you page, one paragraph per line: the thank-you
+    /// block (`pagecontent thankYou`), then the grey info box ("svar inom 5 arbetsdagar"). Nil when the
+    /// page has no thank-you block.
+    static func receiptText(_ html: String) -> String? {
+        let body = withoutInvisible(html)
+        guard let start = body.range(of: #"<div[^>]+class="[^"]*\bpagecontent\b[^"]*"#, options: [.regularExpression, .caseInsensitive]) else { return nil }
+        var block = String(body[start.lowerBound...])
+        if let end = block.range(of: "</main>", options: .caseInsensitive) { block = String(block[..<end.lowerBound]) }
+        var parts = [paragraphs(block)]
+        if let grey = matches(#"<div[^>]+class="[^"]*\bgreyboxcontent\b[^"]*"[^>]*>(.*?)</div>"#, in: body, options: [.caseInsensitive, .dotMatchesLineSeparators]).first {
+            parts.append(paragraphs(grey[1]))
+        }
+        let text = parts.filter { !$0.isEmpty }.joined(separator: "\n")
+        return text.isEmpty ? nil : text
+    }
+
+    /// Visible text with block boundaries (`p`, `br`, headings, `div`, `li`) as line breaks; blank and
+    /// repeated lines dropped.
+    static func paragraphs(_ fragment: String) -> String {
+        let marked = fragment.replacingOccurrences(of: #"(?i)<br\s*/?>|</?(p|div|h[1-6]|li|ul|ol|tr|section)\b[^>]*>"#, with: "\n", options: .regularExpression)
+        var lines: [String] = []
+        for raw in marked.components(separatedBy: "\n") {
+            let line = visibleText(raw)
+            if !line.isEmpty, line != lines.last { lines.append(line) }
+        }
+        return lines.joined(separator: "\n")
     }
 
     static func visibleText(_ fragment: String) -> String {
@@ -110,7 +144,7 @@ public enum AbouPageParser {
 
     static func decodeEntities(_ s: String) -> String {
         guard s.contains("&") else { return s }
-        let named: [String: String] = ["amp": "&", "lt": "<", "gt": ">", "quot": "\"", "apos": "'", "nbsp": " "]
+        let named = namedEntities
         var out = ""
         var rest = Substring(s)
         while let amp = rest.firstIndex(of: "&") {
@@ -138,6 +172,24 @@ public enum AbouPageParser {
         out += rest
         return out
     }
+
+    /// HTML named character references: the full Latin-1 set (Swedish pages use `&aring;`, `&auml;`,
+    /// `&ouml;`) plus common punctuation.
+    static let namedEntities: [String: String] = {
+        var table: [String: String] = ["amp": "&", "lt": "<", "gt": ">", "quot": "\"", "apos": "'",
+            "ndash": "\u{2013}", "mdash": "\u{2014}", "hellip": "\u{2026}", "lsquo": "\u{2018}", "rsquo": "\u{2019}",
+            "sbquo": "\u{201A}", "ldquo": "\u{201C}", "rdquo": "\u{201D}", "bdquo": "\u{201E}", "bull": "\u{2022}",
+            "euro": "\u{20AC}", "trade": "\u{2122}", "thinsp": "\u{2009}", "ensp": "\u{2002}", "emsp": "\u{2003}",
+            "zwnj": "\u{200C}", "zwj": "\u{200D}", "lrm": "\u{200E}", "rlm": "\u{200F}", "OElig": "Œ", "oelig": "œ",
+            "Scaron": "Š", "scaron": "š", "Yuml": "Ÿ"]
+        // U+00A0 … U+00FF in HTML 4 order.
+        let latin1 = "nbsp iexcl cent pound curren yen brvbar sect uml copy ordf laquo not shy reg macr deg plusmn sup2 sup3 acute micro para middot cedil sup1 ordm raquo frac14 frac12 frac34 iquest Agrave Aacute Acirc Atilde Auml Aring AElig Ccedil Egrave Eacute Ecirc Euml Igrave Iacute Icirc Iuml ETH Ntilde Ograve Oacute Ocirc Otilde Ouml times Oslash Ugrave Uacute Ucirc Uuml Yacute THORN szlig agrave aacute acirc atilde auml aring aelig ccedil egrave eacute ecirc euml igrave iacute icirc iuml eth ntilde ograve oacute ocirc otilde ouml divide oslash ugrave uacute ucirc uuml yacute thorn yuml"
+        for (offset, name) in latin1.split(separator: " ").enumerated() {
+            table[String(name)] = String(Character(Unicode.Scalar(0xA0 + offset)!))
+        }
+        table["nbsp"] = " "
+        return table
+    }()
 
     /// Capture groups per match; group 0 is the whole match, missing groups are "".
     static func matches(_ pattern: String, in text: String, options: NSRegularExpression.Options = []) -> [[String]] {

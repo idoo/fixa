@@ -147,6 +147,16 @@ final class AbouPageParserTests: XCTestCase {
         let receipt = try XCTUnwrap(AbouPageParser.parseReceipt(html: try fixture("09-thankyou-receipt"), url: url, now: Date()))
         XCTAssertEqual(receipt.caseNumber, "261026-KSB-KS43")
         XCTAssertEqual(AbouPageParser.caseNumber(in: "Här är ditt ärendenummer 261026-KSB-KS43"), "261026-KSB-KS43")
+        // The kommun's own words, readable: entities decoded, no script, one paragraph per line.
+        XCTAssertEqual(receipt.message, """
+            Tack för att du använder vår e-tjänst!
+            Här är ditt ärendenummer 261026-KSB-KS43
+            Tack för din felanmälan!
+            Med vänlig hälsning
+            Värmdö kommun
+            Om du har valt återkoppling kommer du att få svar inom 5 arbetsdagar. Om din fråga kräver längre handläggningstid bekräftar vi inom samma tid att vi tagit emot ditt ärende och talar också om vem som handlägger ditt ärende.
+            """)
+        XCTAssertEqual(AbouPageParser.decodeEntities("f&aring;r &Auml;r &ouml; &eacute; &ndash; &#228; &#xE5; &bogus;"), "får Är ö é \u{2013} ä å &bogus;")
     }
 }
 

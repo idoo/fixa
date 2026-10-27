@@ -70,7 +70,7 @@ window.FRAMES = [
     id: "04", screen: "privacy", purpose: "objection: account and privacy",
     desire: "Report without signing up or handing over my details.",
     objection: "Another app that wants an account and my data.",
-    proof: "'What Fixa stores': every item kept on this phone until you delete it; 'Fixa has no account, server or statistics.'",
+    proof: "'What Fixa stores': 'Everything stays on your phone: your details, drafts and the reports you've sent. No account, no server, no tracking.'",
     evidence: ["Fixa/Screens/PrivacyScreen (FixaScreen privacy)", "Fixa/Screens/SettingsScreen.swift:154-168 Delete all data"],
     background: { from: "#F7F5F0", to: "#E4E7F0", glow: "#D3D9EA" },
     headline: { "sv": "Inget konto behövs", "en-US": "No account needed" },
@@ -78,10 +78,10 @@ window.FRAMES = [
       "sv": "Dina uppgifter stannar i telefonen. Radera dem när du vill.",
       "en-US": "Your details stay on your phone. Delete them anytime.",
     },
-    // "No account" row inside its card, measured: card top 1594, row separator 1893 (sv) / 1833 (en).
+    // First paragraph of the card ("Everything stays on your phone … No account …"), measured: text 450–650.
     pops: [{
       src: "privacy",
-      crop: { "sv": { x: 48, y: 1594, w: 1224, h: 290 }, "en-US": { x: 48, y: 1594, w: 1224, h: 230 } },
+      crop: { "sv": { x: 48, y: 430, w: 1224, h: 240 }, "en-US": { x: 48, y: 430, w: 1224, h: 240 } },
       scale: 0.94, radius: 40, rotate: 0,
     }],
   },
