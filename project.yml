@@ -36,18 +36,21 @@ targets:
         CFBundleLocalizations: [en, sv, cs, da, de, et, es, fr, it, lv, lt, hu, nl, nb, pl, pt, ro, fi, el, ru, uk, ar]
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
-        NSLocationWhenInUseUsageDescription: Fixa uses your location to place the pin where the problem is. It is only used when you tap Use my location.
+        NSLocationWhenInUseUsageDescription: "Fixa uses your location to put the pin where the problem is: when you tap Use my current location, and on a new report once you have allowed it. Your position is only sent with a report you send."
         NSCameraUsageDescription: Fixa uses the camera so you can take a photo of the problem.
         NSPhotoLibraryUsageDescription: Fixa lets you pick photos of the problem to attach to your report.
         LSApplicationQueriesSchemes: [mailto]
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         ITSAppUsesNonExemptEncryption: false
+        # Outbox: sends reports waiting for a connection while Fixa is not on screen (AppModel BackgroundOutbox).
+        BGTaskSchedulerPermittedIdentifiers: [se.jvcr.fixa.outbox, se.jvcr.fixa.outbox.refresh]
+        UIBackgroundModes: [fetch, processing]
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: se.jvcr.fixa
         MARKETING_VERSION: "1.0"
-        CURRENT_PROJECT_VERSION: "7"
+        CURRENT_PROJECT_VERSION: "8"
         TARGETED_DEVICE_FAMILY: "1"
         SUPPORTS_MACCATALYST: NO
         SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor

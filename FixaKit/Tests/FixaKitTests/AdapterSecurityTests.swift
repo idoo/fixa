@@ -1,3 +1,4 @@
+import CryptoKit
 import XCTest
 @testable import FixaKit
 
@@ -32,18 +33,110 @@ final class AdapterSecurityTests: XCTestCase {
         }
     }
 
+    /// A throwaway signing key, so content rules are tested on correctly signed data.
+    private let testKey = Curve25519.Signing.PrivateKey()
+    private var testPublicKey: String { testKey.publicKey.rawRepresentation.base64EncodedString() }
+
+    private func signature(_ data: Data, key: Curve25519.Signing.PrivateKey? = nil) throws -> Data {
+        Data(try (key ?? testKey).signature(for: data).base64EncodedString().utf8)
+    }
+
+    private func check(_ data: Data, appBuild: Int = 99) throws -> AdapterSpec {
+        try AdapterUpdatePolicy.check(remote: data, signature: try signature(data), bundled: try varmdoSpec(),
+                                      appBuild: appBuild, publicKey: testPublicKey)
+    }
+
     private func assertRejected(_ data: Data, _ message: String, file: StaticString = #filePath, line: UInt = #line) throws {
         let bundled = try varmdoSpec()
-        XCTAssertThrowsError(try AdapterUpdatePolicy.check(remote: data, bundled: bundled, appBuild: 99), message, file: file, line: line) { error in
+        XCTAssertThrowsError(try check(data), message, file: file, line: line) { error in
             XCTAssertNotNil(error as? AdapterSpecError, "\(message): \(error)", file: file, line: line)
         }
-        XCTAssertNil(AdapterUpdatePolicy.accept(remote: data, bundled: bundled, appBuild: 99), message, file: file, line: line)
+        XCTAssertNil(AdapterUpdatePolicy.accept(remote: data, signature: try signature(data), bundled: bundled,
+                                                appBuild: 99, publicKey: testPublicKey), message, file: file, line: line)
+    }
+
+    private func assertSignatureRejected(_ data: Data, signature: Data?, publicKey: String,
+                                         _ message: String, file: StaticString = #filePath, line: UInt = #line) throws {
+        XCTAssertThrowsError(try AdapterUpdatePolicy.check(remote: data, signature: signature, bundled: try varmdoSpec(),
+                                                           appBuild: 99, publicKey: publicKey), message, file: file, line: line) { error in
+            XCTAssertEqual(error as? AdapterSpecError, .rejected(["adapter signature does not verify"]), message, file: file, line: line)
+        }
     }
 
     func testBundledAdapterPassesPinning() throws {
         let bundled = try varmdoSpec()
         XCTAssertEqual(AdapterSpecValidator.pinningProblems(remote: bundled, bundled: bundled), [])
-        XCTAssertNotNil(AdapterUpdatePolicy.accept(remote: try changed { _ in }, bundled: bundled, appBuild: 99))
+        XCTAssertNotNil(try? check(try changed { _ in }))
+    }
+
+    // MARK: - Signatures
+
+    func testPublishedFilesVerifyAgainstEmbeddedKey() throws {
+        for name in ["se-varmdo-ksb.json", "status.json"] {
+            let url = repoRoot.appendingPathComponent("adapters/\(name)")
+            let data = try Data(contentsOf: url)
+            let sig = try Data(contentsOf: url.appendingPathExtension("sig"))
+            XCTAssertTrue(AdapterSignature.verify(data, signature: sig), "\(name).sig does not match the embedded public key; run fixa-cli sign")
+        }
+        let url = repoRoot.appendingPathComponent("adapters/se-varmdo-ksb.json")
+        let accepted = try AdapterUpdatePolicy.check(remote: Data(contentsOf: url), signature: Data(contentsOf: url.appendingPathExtension("sig")),
+                                                     bundled: try varmdoSpec(), appBuild: 99)
+        XCTAssertEqual(accepted.id, "se.varmdo.ksb")
+    }
+
+    func testValidSignatureIsAccepted() throws {
+        let data = try changed { _ in }
+        let withNewline = try signature(data) + Data("\n".utf8)
+        XCTAssertNotNil(AdapterUpdatePolicy.accept(remote: data, signature: withNewline, bundled: try varmdoSpec(),
+                                                   appBuild: 99, publicKey: testPublicKey))
+    }
+
+    func testUnsignedAdapterIsRejected() throws {
+        let data = try changed { _ in }
+        try assertSignatureRejected(data, signature: nil, publicKey: testPublicKey, "no .sig")
+        try assertSignatureRejected(data, signature: Data(), publicKey: testPublicKey, "empty .sig")
+        try assertSignatureRejected(data, signature: Data("not base64!".utf8), publicKey: testPublicKey, "garbage .sig")
+        try assertSignatureRejected(data, signature: Data(repeating: 0x41, count: 4096), publicKey: testPublicKey, "oversized .sig")
+        // The real app key: a downloaded file with no signature never replaces the bundled adapter.
+        XCTAssertNil(AdapterUpdatePolicy.accept(remote: data, signature: nil, bundled: try varmdoSpec(), appBuild: 99))
+    }
+
+    func testTamperedAdapterIsRejected() throws {
+        let original = try changed { _ in }
+        let sig = try signature(original)
+        // minAppBuild changed after signing: harmless content, still refused.
+        let tampered = try changed { json in json["minAppBuild"] = 1 }
+        try assertSignatureRejected(tampered, signature: sig, publicKey: testPublicKey, "edited after signing")
+        // Even a single appended byte (whitespace) breaks the signature of the exact bytes.
+        try assertSignatureRejected(original + Data(" ".utf8), signature: sig, publicKey: testPublicKey, "trailing byte")
+        // Signed by somebody else's key.
+        let other = try signature(original, key: Curve25519.Signing.PrivateKey())
+        try assertSignatureRejected(original, signature: other, publicKey: testPublicKey, "foreign key")
+        // The published signature does not cover a modified copy of the published file.
+        let url = repoRoot.appendingPathComponent("adapters/se-varmdo-ksb.json")
+        var published = try Data(contentsOf: url)
+        published.append(contentsOf: Array(" ".utf8))
+        try assertSignatureRejected(published, signature: try Data(contentsOf: url.appendingPathExtension("sig")),
+                                    publicKey: AdapterSignature.publicKeyBase64, "modified published adapter")
+    }
+
+    func testStatusSignatureIsRequired() throws {
+        let data = Data(#"{"se.varmdo.ksb": {"state": "down"}}"#.utf8)
+        XCTAssertEqual(try AdapterStatus.decodeMap(data, signature: try signature(data), publicKey: testPublicKey)["se.varmdo.ksb"]?.state, .down)
+        XCTAssertThrowsError(try AdapterStatus.decodeMap(data, signature: nil, publicKey: testPublicKey))
+        let tampered = Data(#"{"se.varmdo.ksb": {"state": "ok"}}"#.utf8)
+        XCTAssertThrowsError(try AdapterStatus.decodeMap(tampered, signature: try signature(data), publicKey: testPublicKey))
+    }
+
+    func testRoadTilesExplainResponsibilityInEveryLanguage() throws {
+        let spec = try varmdoSpec()
+        let languages: Set<String> = ["en", "sv", "cs", "da", "de", "et", "es", "fr", "it", "lv", "lt", "hu", "nl", "nb", "pl", "pt", "ro", "fi", "el", "ru", "uk", "ar"]
+        for id in ["pothole", "winter", "sign", "streetlight"] {
+            let note = try XCTUnwrap(spec.tile(id: id)?.responsibility, id)
+            XCTAssertEqual(Set(note.values.keys), languages, id)
+            XCTAssertTrue(note.values.values.allSatisfy { $0.contains("0771-921 921") }, id)
+        }
+        XCTAssertNil(spec.tile(id: "graffiti")?.responsibility)
     }
 
     func testBenignLabelChangeIsAccepted() throws {
@@ -57,7 +150,7 @@ final class AdapterSecurityTests: XCTestCase {
             json["channel"] = channel
             json["minAppBuild"] = 2
         }
-        let spec = try AdapterUpdatePolicy.check(remote: data, bundled: try varmdoSpec(), appBuild: 4)
+        let spec = try check(data, appBuild: 4)
         XCTAssertEqual(spec.channel.pages[0].fields[0].labels?["en"], ["Category"])
     }
 

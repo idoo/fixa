@@ -41,19 +41,19 @@ final class AdapterUpdateTests: XCTestCase {
     }
 
     func testStatusDecoding() throws {
-        let file = try AdapterStatus.decodeMap(Data(contentsOf: repoRoot.appendingPathComponent("adapters/status.json")))
+        let url = repoRoot.appendingPathComponent("adapters/status.json")
+        let file = try AdapterStatus.decodeMap(Data(contentsOf: url), signature: Data(contentsOf: url.appendingPathExtension("sig")))
         XCTAssertEqual(file["se.varmdo.ksb"], .ok)
 
+        // Free text in the file is ignored: only the state reaches the app, which words it itself.
         let degraded = Data(#"""
         {"se.varmdo.ksb": {"state": "degraded", "updated": "2026-10-27T06:20:00Z",
-          "message": {"en": "The e-service changed.", "sv": "E-tjänsten har ändrats."}}}
+          "message": {"en": "Call 0900-SCAM now.", "sv": "Ring 0900-SCAM nu."}}}
         """#.utf8)
-        let status = try XCTUnwrap(AdapterStatus.decodeMap(degraded)["se.varmdo.ksb"])
-        XCTAssertEqual(status.state, .degraded)
-        XCTAssertEqual(status.message?.resolve(Locale(identifier: "sv_SE")), "E-tjänsten har ändrats.")
-        XCTAssertEqual(status.updated, Date(timeIntervalSince1970: 1_793_082_000))
+        let status = try XCTUnwrap(AdapterStatus.decodeUnverifiedMap(degraded)["se.varmdo.ksb"])
+        XCTAssertEqual(status, AdapterStatus(state: .degraded, updated: Date(timeIntervalSince1970: 1_793_082_000)))
 
-        XCTAssertThrowsError(try AdapterStatus.decodeMap(Data(#"{"x": {"state": "broken"}}"#.utf8)))
+        XCTAssertThrowsError(try AdapterStatus.decodeUnverifiedMap(Data(#"{"x": {"state": "broken"}}"#.utf8)))
     }
 
     func testAcceptPolicy() throws {
@@ -61,24 +61,24 @@ final class AdapterUpdateTests: XCTestCase {
         var json = try varmdoJSON()
         json["minAppBuild"] = 5
 
-        XCTAssertNotNil(AdapterUpdatePolicy.accept(remote: try data(json), bundled: bundled, appBuild: 5))
-        XCTAssertNil(AdapterUpdatePolicy.accept(remote: try data(json), bundled: bundled, appBuild: 4), "build too old")
+        XCTAssertNotNil(try? AdapterUpdatePolicy.validate(remote: try data(json), bundled: bundled, appBuild: 5))
+        XCTAssertNil(try? AdapterUpdatePolicy.validate(remote: try data(json), bundled: bundled, appBuild: 4), "build too old")
 
         json.removeValue(forKey: "minAppBuild")
-        XCTAssertNotNil(AdapterUpdatePolicy.accept(remote: try data(json), bundled: bundled, appBuild: 1), "no minAppBuild")
+        XCTAssertNotNil(try? AdapterUpdatePolicy.validate(remote: try data(json), bundled: bundled, appBuild: 1), "no minAppBuild")
 
         var newer = json
         newer["specVersion"] = AdapterUpdatePolicy.supportedSpecVersion + 1
-        XCTAssertNil(AdapterUpdatePolicy.accept(remote: try data(newer), bundled: bundled, appBuild: 99), "newer spec")
+        XCTAssertNil(try? AdapterUpdatePolicy.validate(remote: try data(newer), bundled: bundled, appBuild: 99), "newer spec")
 
         var other = json
         other["id"] = "se.other.ksb"
-        XCTAssertNil(AdapterUpdatePolicy.accept(remote: try data(other), bundled: bundled, appBuild: 99), "other id")
+        XCTAssertNil(try? AdapterUpdatePolicy.validate(remote: try data(other), bundled: bundled, appBuild: 99), "other id")
 
         var invalid = json
         invalid["categories"] = [Any]()
-        XCTAssertNil(AdapterUpdatePolicy.accept(remote: try data(invalid), bundled: bundled, appBuild: 99), "fails checks")
+        XCTAssertNil(try? AdapterUpdatePolicy.validate(remote: try data(invalid), bundled: bundled, appBuild: 99), "fails checks")
 
-        XCTAssertNil(AdapterUpdatePolicy.accept(remote: Data("<html>404</html>".utf8), bundled: bundled, appBuild: 99), "garbage")
+        XCTAssertNil(try? AdapterUpdatePolicy.validate(remote: Data("<html>404</html>".utf8), bundled: bundled, appBuild: 99), "garbage")
     }
 }

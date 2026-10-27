@@ -27,6 +27,19 @@ public struct Contact: Codable, Sendable, Equatable {
     }
 }
 
+/// A Swedish machine translation of the resident's own text, sent alongside the original.
+public struct MachineTranslation: Codable, Sendable, Equatable {
+    /// BCP-47 code of the original text, e.g. `uk`, `ar`.
+    public var sourceLanguage: String
+    /// Swedish machine translation of `ReportDraft.description`.
+    public var text: String
+
+    public init(sourceLanguage: String, text: String) {
+        self.sourceLanguage = sourceLanguage
+        self.text = text
+    }
+}
+
 public struct ReportDraft: Codable, Sendable, Equatable {
     public var adapterID: String
     public var tileID: String?
@@ -38,6 +51,10 @@ public struct ReportDraft: Codable, Sendable, Equatable {
     public var photoJPEG: Data?
     public var wantsFeedback: Bool
     public var contact: Contact
+    /// Swedish machine translation of `description`, if the resident wrote in another language.
+    public var translation: MachineTranslation?
+    /// When the resident started the report. Optional so drafts saved before it existed still decode.
+    public var createdAt: Date?
 
     public init(
         adapterID: String,
@@ -48,7 +65,9 @@ public struct ReportDraft: Codable, Sendable, Equatable {
         locationText: String = "",
         photoJPEG: Data? = nil,
         wantsFeedback: Bool = false,
-        contact: Contact = Contact()
+        contact: Contact = Contact(),
+        translation: MachineTranslation? = nil,
+        createdAt: Date? = nil
     ) {
         self.adapterID = adapterID
         self.tileID = tileID
@@ -59,6 +78,27 @@ public struct ReportDraft: Codable, Sendable, Equatable {
         self.photoJPEG = photoJPEG
         self.wantsFeedback = wantsFeedback
         self.contact = contact
+        self.translation = translation
+        self.createdAt = createdAt
+    }
+}
+
+/// One report that reached the municipality, kept for `SendGuard`.
+public struct SentRecord: Codable, Sendable, Equatable {
+    public var date: Date
+    public var tileID: String?
+    public var coordinate: Coordinate?
+    public var locationText: String
+
+    public init(date: Date, tileID: String?, coordinate: Coordinate?, locationText: String) {
+        self.date = date
+        self.tileID = tileID
+        self.coordinate = coordinate
+        self.locationText = locationText
+    }
+
+    public init(_ draft: ReportDraft, date: Date) {
+        self.init(date: date, tileID: draft.tileID, coordinate: draft.coordinate, locationText: draft.locationText)
     }
 }
 
@@ -81,6 +121,10 @@ public struct ValidationIssue: Sendable, Equatable, Hashable {
 }
 
 public enum ReportValidator {
+    /// A description passes with at least this many letters, so a quick chip like "Blinkar" or
+    /// "Djupt hål" is enough; the tile summary already says what is wrong.
+    public static let minimumLetters = 3
+
     public static func validate(_ d: ReportDraft, spec: AdapterSpec) -> [ValidationIssue] {
         var issues: [ValidationIssue] = []
         let rules = spec.validation
@@ -92,9 +136,9 @@ public enum ReportValidator {
         let text = d.description.trimmingCharacters(in: .whitespacesAndNewlines)
         if text.isEmpty {
             issues.append(.init(field: .description, code: .missing))
-        } else if text.count < rules.descriptionMin {
+        } else if text.filter(\.isLetter).count < minimumLetters {
             issues.append(.init(field: .description, code: .tooShort))
-        } else if ReportComposer.description(for: d, spec: spec).count > rules.descriptionMax {
+        } else if ReportComposer.untruncatedLength(of: d, spec: spec) > rules.descriptionMax {
             issues.append(.init(field: .description, code: .tooLong))
         }
 

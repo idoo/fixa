@@ -2,7 +2,8 @@ import SwiftUI
 import UIKit
 
 /// The one brand accent: a cone-orange receipt stamp. Ink type on cone (5.54:1), simple double border,
-/// "MOTTAGET" + monospaced case number, rotated −6°, and a one-shot "stamp" landing (spring + success haptic).
+/// the localized stamp word ("MOTTAGET" in Swedish) + monospaced "Nr <case number>", rotated −6°, and a one-shot
+/// "stamp" landing (spring + success haptic).
 /// Reduce Motion: appears in place without the landing. Accessibility text sizes: capped at AX1, upright,
 /// and allowed to shrink to the width (the case number also appears as plain text on the receipt).
 struct FxStatusStamp: View {
@@ -42,9 +43,10 @@ struct FxStatusStamp: View {
     private var stamp: some View {
         let shape = RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous)
         return VStack(spacing: Fx.Space.xs) {
-            Text(verbatim: "MOTTAGET")
+            Text(String(localized: "RECEIVED", bundle: L10n.bundle, locale: L10n.locale, comment: "Word printed on the receipt stamp, in capitals where the script has them (Swedish: MOTTAGET)"))
                 .font(Fx.Font.stamp)
-                .tracking(4)
+                // Letter spacing breaks joined scripts (Arabic); only spaced out where letters stand apart.
+                .tracking(L10n.locale.language.characterDirection == .rightToLeft ? 0 : 4)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
             Text(verbatim: caseNumber.map { "Nr \($0)" } ?? "Fixa")

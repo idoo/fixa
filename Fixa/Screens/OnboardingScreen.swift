@@ -36,6 +36,11 @@ struct OnboardingScreen: View {
                         systemImage: "iphone",
                         text: String(localized: "No account. Your details stay on this phone.", bundle: L10n.bundle, locale: L10n.locale)
                     )
+                    FxDivider()
+                    FxIconRow(
+                        systemImage: "hand.raised",
+                        text: String(localized: "Nothing is sent until you press Send.", bundle: L10n.bundle, locale: L10n.locale)
+                    )
                 }
 
                 FxIconRow(systemImage: "phone", text: String(localized: "In an emergency, call 112.", bundle: L10n.bundle, locale: L10n.locale))

@@ -128,6 +128,9 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
         public let title: LocalizedText
         /// First line of the description sent to the municipality.
         public let swedishSummary: String
+        /// Who looks after this kind of problem, shown under the tile (e.g. municipal streets versus state
+        /// or private roads). Absent when the municipality is always the right place.
+        public let responsibility: LocalizedText?
     }
 
     public struct ValidationRules: Codable, Sendable {
@@ -221,6 +224,14 @@ public enum AdapterCatalog {
             .filter { seen.insert($0.id).inserted }
             .sorted { $0.id < $1.id }
     }
+
+    /// The shipped adapter with this id, decoded once. Text that must not come from a download
+    /// (the disclaimer) is read from here, never from the running, possibly downloaded, adapter.
+    public static func shipped(id: String) -> AdapterSpec? {
+        shippedAdapters.first { $0.id == id }
+    }
+
+    private static let shippedAdapters = bundled()
 
     static func bundledURLs() -> [URL] {
         let nested = Bundle.module.urls(forResourcesWithExtension: "json", subdirectory: "adapters") ?? []

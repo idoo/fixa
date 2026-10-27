@@ -83,6 +83,7 @@ struct LocationPickerSheet: View {
             guard phase == .active else { return }
             Task { await refreshAccess(autoLocate: false) }
         }
+        .task(id: search.query) { await announceSearchResults() }
         .onDisappear {
             locateTask?.cancel()
             geocodeTask?.cancel()
@@ -285,6 +286,8 @@ struct LocationPickerSheet: View {
                 .font(Fx.Font.footnote)
                 .foregroundStyle(Fx.Color.ink2)
                 .fixedSize(horizontal: false, vertical: true)
+                // Visual drag hint; VoiceOver hears the map's own label and pin actions instead.
+                .accessibilityHidden(true)
             HStack(alignment: .firstTextBaseline, spacing: Fx.Space.s) {
                 Image(systemName: "mappin.and.ellipse")
                     .foregroundStyle(Fx.Color.sea)
@@ -385,6 +388,12 @@ struct LocationPickerSheet: View {
                 guard !Task.isCancelled else { return }
                 locate = .failed
             }
+            guard !Task.isCancelled else { return }
+            // A found pin is announced with its address; every other outcome is said here.
+            if locate.isWarning {
+                let text = [locate.title, locate.subtitle(address: address)].compactMap { $0 }.joined(separator: ". ")
+                AccessibilityNotification.Announcement(text).post()
+            }
         }
     }
 
@@ -436,10 +445,26 @@ struct LocationPickerSheet: View {
         place(CLLocationCoordinate2D(latitude: latitude, longitude: longitude), address: nil, moveCamera: true)
     }
 
+    /// Once typing pauses, tells VoiceOver how many places the search found (or none).
+    private func announceSearchResults() async {
+        guard !search.query.trimmingCharacters(in: .whitespaces).isEmpty, searchFocused else { return }
+        guard (try? await Task.sleep(for: .seconds(1.5))) != nil, searchFocused else { return }
+        let count = search.suggestions.count
+        let text = count == 0
+            ? String(localized: "No places found. Try another spelling, or move the map.", bundle: L10n.bundle, locale: L10n.locale)
+            : String(localized: "Places found: \(count)", bundle: L10n.bundle, locale: L10n.locale)
+        AccessibilityNotification.Announcement(text).post()
+    }
+
     private func choose(_ suggestion: AddressSearch.Suggestion) {
         searchFocused = false
         Task {
-            guard let (coordinate, text) = await search.resolve(suggestion) else { return }
+            guard let (coordinate, text) = await search.resolve(suggestion) else {
+                AccessibilityNotification.Announcement(
+                    String(localized: "Couldn't look up that place. Try another search, or move the map.", bundle: L10n.bundle, locale: L10n.locale)
+                ).post()
+                return
+            }
             place(coordinate, address: text, moveCamera: false)
             moveCamera(to: coordinate, meters: 600)
             search.query = ""

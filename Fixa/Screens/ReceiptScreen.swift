@@ -6,7 +6,7 @@ struct ReceiptScreen: View {
     @Environment(AppModel.self) private var model
     @Environment(\.locale) private var locale
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @State private var isSendAgainConfirmPresented = false
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         let sent = model.sent ?? SentReport(caseNumber: nil, date: .now, isDryRun: false)
@@ -27,21 +27,6 @@ struct ReceiptScreen: View {
         }
         .navigationBarBackButtonHidden(true)
         .navigationBarTitleDisplayMode(.inline)
-        .confirmationDialog(
-            Text("Send this report again?"),
-            isPresented: $isSendAgainConfirmPresented,
-            titleVisibility: .visible
-        ) {
-            Button {
-                if let id = sent.historyID {
-                    Task { await model.sendNow(id) }
-                }
-            } label: {
-                Text("Send again anyway")
-            }
-        } message: {
-            Text("If the first one arrived, \(spec.municipality.name) gets the same report twice.")
-        }
     }
 
     @ViewBuilder
@@ -80,7 +65,9 @@ struct ReceiptScreen: View {
         }
     }
 
-    /// The final step went out but no confirmation came back. Never retried on its own.
+    /// The final step went out but no confirmation came back. Never retried on its own, and no
+    /// resend from here: the advice is to wait and check. Sending again lives in the report's
+    /// Sent reports detail, behind a warning.
     private func maybeSentContent(_ sent: SentReport) -> some View {
         VStack(spacing: Fx.Space.xl) {
             FxBadge(systemImage: "questionmark.circle", fill: Fx.Color.Pastel.sky, side: 64)
@@ -96,22 +83,39 @@ struct ReceiptScreen: View {
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
                 Text(sent.historyID.map { model.wantsReply($0) } == true
-                    ? String(localized: "Check your e-mail for a confirmation before you send it again.", bundle: L10n.bundle, locale: L10n.locale)
-                    : String(localized: "Sending it again may create a second case. If you're unsure, wait a day and see if the problem gets fixed.", bundle: L10n.bundle, locale: L10n.locale))
+                    ? String(localized: "Wait a day and check your e-mail for a confirmation from \(spec.municipality.name).", bundle: L10n.bundle, locale: L10n.locale)
+                    : String(localized: "Wait a day and see if the problem gets fixed. If you're unsure, call \(spec.municipality.name) and ask.", bundle: L10n.bundle, locale: L10n.locale))
                     .font(Fx.Font.callout)
                     .foregroundStyle(Fx.Color.ink2)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
             }
             VStack(spacing: Fx.Space.l) {
+                if let call = serviceCentreRow {
+                    call
+                }
                 if let id = sent.historyID, let text = model.reportText(for: id) {
                     FxCopyButton(title: String(localized: "Copy report text", bundle: L10n.bundle, locale: L10n.locale), value: text)
-                    FxSecondaryButton(title: String(localized: "Send again anyway", bundle: L10n.bundle, locale: L10n.locale), systemImage: "arrow.clockwise") {
-                        isSendAgainConfirmPresented = true
-                    }
-                    .disabled(model.sendingIDs.contains(id))
                 }
                 sentReportsButton
+            }
+        }
+    }
+
+    /// The municipality's service centre, from the adapter's contacts: the person to ask whether
+    /// the report arrived. Nil when the adapter lists none.
+    private var serviceCentreRow: FxCallRow? {
+        guard let contact = spec.emergency?.contacts.first(where: { $0.id == "servicecenter" }) else { return nil }
+        let digits = contact.phone.filter(\.isNumber)
+        // Number first and unbreakable (NBSP, non-breaking hyphen): if the line wraps, only the name moves.
+        let number = contact.phone.replacingOccurrences(of: " ", with: "\u{00A0}").replacingOccurrences(of: "-", with: "\u{2011}")
+        return FxCallRow(
+            title: String(localized: "Ask if it arrived", bundle: L10n.bundle, locale: L10n.locale),
+            detail: "\(number.ltrIsolated) · \(contact.title.resolve(L10n.locale))",
+            accessibilityValue: "\(contact.phone), \(contact.title.resolve(L10n.locale))"
+        ) {
+            if let url = URL(string: "tel:\(digits)") {
+                openURL(url)
             }
         }
     }

@@ -8,6 +8,8 @@ AuthKey_*
 private_keys/
 .env
 .env.*
+*.key
+adapter-signing.key
 
 # Build output
 build/

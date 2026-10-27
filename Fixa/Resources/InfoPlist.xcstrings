@@ -137,142 +137,6 @@
         }
       }
     },
-    "NSLocationWhenInUseUsageDescription" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يستخدم Fixa موقعك لوضع الدبوس في مكان المشكلة. لا يُستخدم الموقع إلا عند الضغط على «استخدم موقعي»."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa používá vaši polohu, aby umístila špendlík tam, kde je problém. Poloha se použije jen tehdy, když klepnete na Použít mou polohu."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa bruger din placering til at sætte nålen, hvor problemet er. Den bruges kun, når du trykker på Brug min placering."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa verwendet Ihren Standort, um die Stecknadel dort zu setzen, wo das Problem ist. Er wird nur verwendet, wenn Sie auf „Aktuellen Standort verwenden“ tippen."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Το Fixa χρησιμοποιεί την τοποθεσία σας για να τοποθετήσει την πινέζα εκεί όπου βρίσκεται το πρόβλημα. Χρησιμοποιείται μόνο όταν πατάτε Χρήση της τοποθεσίας μου."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa uses your location to place the pin where the problem is. It is only used when you tap Use my location."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa usa tu ubicación para colocar el marcador donde está el problema. Solo se usa cuando tocas Usar mi ubicación."
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa kasutab teie asukohta, et panna nööpnõel probleemi kohale. Asukohta kasutatakse ainult siis, kui puudutate nuppu Kasuta minu praegust asukohta."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa käyttää sijaintiasi asettaakseen nastan ongelman kohdalle. Sijaintia käytetään vain, kun napautat Käytä sijaintiani."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa utilise votre position pour placer l'épingle à l'endroit du problème. Elle n'est utilisée que lorsque vous touchez Utiliser ma position."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A Fixa a helyadatait arra használja, hogy a tűt a probléma helyére tegye. Csak akkor használja, ha a Jelenlegi helyzetem gombra koppint."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa usa la tua posizione per mettere il segnaposto dove si trova il problema. La usa solo quando tocchi Usa la mia posizione."
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa naudoja jūsų buvimo vietą, kad pažymėtų problemos vietą žemėlapyje. Ji naudojama tik tada, kai paliečiate „Naudoti mano vietą“."
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa izmanto jūsu atrašanās vietu, lai novietotu atzīmi tur, kur ir problēma. Tā tiek izmantota tikai tad, kad pieskaraties pogai Izmantot manu atrašanās vietu."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa bruker posisjonen din for å plassere nålen der problemet er. Den brukes bare når du trykker på Bruk min posisjon."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa gebruikt je locatie om de speld te plaatsen waar het probleem is. Je locatie wordt alleen gebruikt als je op Gebruik mijn locatie tikt."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa używa twojej lokalizacji, aby wbić pinezkę w miejscu problemu. Tylko gdy dotkniesz „Użyj mojej lokalizacji”."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A Fixa usa a sua localização para colocar o marcador onde está o problema. Só é usada quando toca em Usar a minha localização."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa folosește locația dumneavoastră pentru a plasa pinul acolo unde este problema. Locația este folosită doar când atingeți Folosiți locația mea."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa использует вашу геопозицию, чтобы поставить метку там, где находится проблема. Геопозиция используется, только когда вы нажимаете «Использовать мою геопозицию»."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa använder din plats för att sätta nålen där problemet finns. Platsen används bara när du trycker på Använd min plats."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa використовує ваше місцезнаходження, щоб поставити мітку там, де проблема. Лише коли ви торкаєтеся «Моє місцезнаходження»."
-          }
-        }
-      }
-    },
     "NSCameraUsageDescription" : {
       "localizations" : {
         "ar" : {
@@ -405,6 +269,142 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fixa використовує камеру, щоб ви могли сфотографувати проблему."
+          }
+        }
+      }
+    },
+    "NSLocationWhenInUseUsageDescription" : {
+      "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يستخدم Fixa موقعك لوضع الدبوس في مكان المشكلة: عند الضغط على «استخدم موقعي الحالي»، وفي البلاغ الجديد بعد أن تسمح بذلك. لا يُرسل موقعك إلا مع بلاغ ترسله أنت."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa používá vaši polohu k umístění špendlíku na místo závady: když klepnete na Použít mou aktuální polohu, a u nového hlášení, jakmile polohu povolíte. Poloha se odešle jen s hlášením, které odešlete."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa bruger din placering til at sætte nålen, hvor problemet er: når du trykker på Brug min nuværende placering, og på en ny anmeldelse, når du har givet adgang. Placeringen sendes kun med en anmeldelse, du sender."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa verwendet Ihren Standort, um die Stecknadel dort zu setzen, wo das Problem ist: wenn Sie auf „Aktuellen Standort verwenden“ tippen, und bei einer neuen Meldung, sobald Sie es erlaubt haben. Der Standort wird nur mit einer Meldung gesendet, die Sie absenden."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Το Fixa χρησιμοποιεί την τοποθεσία σας για να βάλει την πινέζα εκεί που είναι το πρόβλημα: όταν πατάτε «Χρήση της τρέχουσας τοποθεσίας μου» και σε νέα αναφορά αφού το επιτρέψετε. Η θέση σας στέλνεται μόνο με αναφορά που στέλνετε εσείς."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa uses your location to put the pin where the problem is: when you tap Use my current location, and on a new report once you have allowed it. Your position is only sent with a report you send."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa usa su ubicación para poner el marcador donde está el problema: cuando toca Usar mi ubicación actual y en un aviso nuevo una vez que lo ha permitido. Su posición solo se envía con un aviso que usted envíe."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa kasutab sinu asukohta, et panna nööpnõel probleemi kohale: kui puudutad nuppu Kasuta minu praegust asukohta ja uue teate puhul, kui oled selle lubanud. Asukoht saadetakse ainult koos teatega, mille sa saadad."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa käyttää sijaintiasi asettaakseen nuppineulan vian kohdalle: kun napautat Käytä nykyistä sijaintiani, ja uudessa ilmoituksessa, kun olet sallinut sen. Sijainti lähetetään vain lähettämäsi ilmoituksen mukana."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa utilise votre position pour placer l'épingle là où se trouve le problème : quand vous touchez Utiliser ma position actuelle, et sur un nouveau signalement une fois que vous l'avez autorisé. Votre position n'est envoyée qu'avec un signalement que vous envoyez."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A Fixa a helyzetét arra használja, hogy oda tegye a tűt, ahol a hiba van: amikor a Jelenlegi helyzetem gombra koppint, és új bejelentésnél, ha már engedélyezte. A helyzete csak az Ön által elküldött bejelentéssel megy el."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa usa la tua posizione per mettere il segnaposto dove si trova il problema: quando tocchi Usa la mia posizione attuale e in una nuova segnalazione dopo che l'hai consentito. La posizione viene inviata solo con una segnalazione che invii tu."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa naudoja jūsų vietą, kad padėtų smeigtuką ten, kur yra problema: kai paliečiate Naudoti mano dabartinę vietą, ir naujame pranešime, kai tai leidote. Vieta siunčiama tik su jūsų siunčiamu pranešimu."
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa izmanto jūsu atrašanās vietu, lai novietotu adatu problēmas vietā: kad pieskaraties Izmantot manu pašreizējo atrašanās vietu, un jaunā ziņojumā, kad esat to atļāvis. Atrašanās vieta tiek nosūtīta tikai ar ziņojumu, ko nosūtāt."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa bruker posisjonen din til å sette nålen der problemet er: når du trykker på Bruk min posisjon, og på en ny melding når du har gitt tillatelse. Posisjonen sendes bare med en melding du sender."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa gebruikt uw locatie om de speld te zetten waar het probleem is: als u op Gebruik mijn huidige locatie tikt, en bij een nieuwe melding zodra u het hebt toegestaan. Uw positie wordt alleen meegestuurd met een melding die u verstuurt."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa używa Twojej lokalizacji, by postawić pinezkę tam, gdzie jest usterka: gdy stukniesz Użyj mojej bieżącej lokalizacji, oraz w nowym zgłoszeniu, gdy już na to pozwolisz. Pozycja jest wysyłana tylko ze zgłoszeniem, które wyślesz."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A Fixa usa a sua localização para pôr o pino onde está o problema: quando toca em Usar a minha localização atual e numa nova participação depois de o permitir. A posição só é enviada com uma participação que envie."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa folosește locația dvs. pentru a pune pinul unde este problema: când atingeți Folosiți locația mea actuală și la o sesizare nouă, după ce ați permis. Poziția se trimite doar cu o sesizare pe care o trimiteți."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa использует вашу геопозицию, чтобы поставить метку там, где проблема: когда вы нажимаете «Использовать мою геопозицию», а также в новой заявке, если доступ уже разрешён. Геопозиция отправляется только с заявкой, которую вы отправите."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa använder din plats för att sätta nålen där felet är: när du trycker på Använd min nuvarande plats, och på en ny anmälan när du har gett lov. Positionen skickas bara med en anmälan du skickar."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa використовує ваше місцезнаходження, щоб поставити мітку там, де проблема: коли ви натискаєте «Використати моє поточне місцезнаходження», а також у новому зверненні, якщо доступ уже дозволено. Місцезнаходження надсилається лише зі зверненням, яке ви надішлете."
           }
         }
       }

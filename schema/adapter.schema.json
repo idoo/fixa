@@ -128,7 +128,8 @@
           "symbol": { "type": "string", "description": "SF Symbol name" },
           "categoryID": { "type": "string" },
           "title": { "$ref": "#/$defs/localizedText" },
-          "swedishSummary": { "type": "string" }
+          "swedishSummary": { "type": "string" },
+          "responsibility": { "$ref": "#/$defs/localizedText", "description": "Short note under the tile on who looks after this problem (e.g. municipal streets vs state or private roads). Omit when the municipality always handles it." }
         }
       }
     },

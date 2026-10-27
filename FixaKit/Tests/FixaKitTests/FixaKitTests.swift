@@ -272,12 +272,31 @@ final class ReportValidatorTests: XCTestCase {
 
     func testDescriptionLength() throws {
         var d = validDraft()
-        d.description = "  kort  "
-        XCTAssertEqual(ReportValidator.validate(d, spec: try varmdoSpec()), [.init(field: .description, code: .tooShort)])
+        for short in ["  ok  ", "12345 !!", "a1"] {
+            d.description = short
+            XCTAssertEqual(ReportValidator.validate(d, spec: try varmdoSpec()), [.init(field: .description, code: .tooShort)], short)
+        }
         d.description = String(repeating: "a", count: 4001)
         XCTAssertEqual(ReportValidator.validate(d, spec: try varmdoSpec()), [.init(field: .description, code: .tooLong)])
-        d.description = ""
-        XCTAssertEqual(ReportValidator.validate(d, spec: try varmdoSpec()), [.init(field: .description, code: .missing)])
+        for blank in ["", "   ", "\n\t "] {
+            d.description = blank
+            XCTAssertEqual(ReportValidator.validate(d, spec: try varmdoSpec()), [.init(field: .description, code: .missing)], blank)
+        }
+    }
+
+    func testChipPhrasesPass() throws {
+        var d = validDraft()
+        for chip in ["Blinkar", "Djupt hål", "Släckt", "Hål"] {
+            d.description = chip
+            XCTAssertEqual(ReportValidator.validate(d, spec: try varmdoSpec()), [], chip)
+        }
+    }
+
+    func testTranslationDoesNotMakeTextTooLong() throws {
+        var d = validDraft()
+        d.description = String(repeating: "а", count: 3000)
+        d.translation = MachineTranslation(sourceLanguage: "uk", text: String(repeating: "b", count: 3000))
+        XCTAssertEqual(ReportValidator.validate(d, spec: try varmdoSpec()), [])
     }
 
     func testEmailRules() throws {
@@ -339,11 +358,66 @@ final class ComposerTests: XCTestCase {
     func testDescriptionAndPlace() throws {
         let spec = try varmdoSpec()
         let d = validDraft()
-        XCTAssertEqual(ReportComposer.description(for: d, spec: spec), "Gatubelysning ur funktion\n\nLampan vid busshållplatsen är släckt sedan i måndags.")
+        XCTAssertEqual(
+            ReportComposer.description(for: d, spec: spec),
+            "Gatubelysning ur funktion\n\nLampan vid busshållplatsen är släckt sedan i måndags."
+        )
         XCTAssertEqual(ReportComposer.placeText(for: d), "Gustavsbergs centrum (59.3262, 18.3856)")
         var noCoordinate = d
         noCoordinate.coordinate = nil
         XCTAssertEqual(ReportComposer.placeText(for: noCoordinate), "Gustavsbergs centrum")
+    }
+
+    func testDescriptionWithTranslationAndDiscoveredTime() throws {
+        let spec = try varmdoSpec()
+        // 2026-10-27 08:15 UTC = 09:15 in Stockholm (CET, after the October change).
+        let created = Date(timeIntervalSince1970: 1_793_088_900)
+        var d = validDraft()
+        d.description = "Ліхтар не світить"
+        d.translation = MachineTranslation(sourceLanguage: "uk", text: "Lampan lyser inte")
+        d.createdAt = created
+        XCTAssertEqual(
+            ReportComposer.description(for: d, spec: spec, now: created.addingTimeInterval(2 * 3600)),
+            """
+            Gatubelysning ur funktion
+
+            Ліхтар не світить
+
+            Översatt från ukrainska:
+            Lampan lyser inte
+
+            Upptäckt: 2026-10-27 09:15
+            """
+        )
+        // Within the hour: no Upptäckt line.
+        XCTAssertFalse(ReportComposer.description(for: d, spec: spec, now: created.addingTimeInterval(3600)).contains("Upptäckt"))
+        d.createdAt = nil
+        XCTAssertFalse(ReportComposer.description(for: d, spec: spec, now: created.addingTimeInterval(9 * 3600)).contains("Upptäckt"))
+        XCTAssertEqual(ReportComposer.swedishLanguageName("ar"), "arabiska")
+    }
+
+    func testLongDescriptionIsCutSummaryAndTranslationKept() throws {
+        let spec = try varmdoSpec()
+        var d = validDraft()
+        d.description = String(repeating: "x", count: 3900)
+        d.translation = MachineTranslation(sourceLanguage: "uk", text: String(repeating: "y", count: 3800))
+        let text = ReportComposer.description(for: d, spec: spec)
+        XCTAssertLessThanOrEqual(text.count, spec.validation.descriptionMax)
+        XCTAssertTrue(text.hasPrefix("Gatubelysning ur funktion\n\n"))
+        XCTAssertTrue(text.hasSuffix(String(repeating: "y", count: 3800)))
+        XCTAssertTrue(text.contains("Översatt från ukrainska:\n" + String(repeating: "y", count: 3800)), "the Swedish translation is kept whole when the original can give way")
+        XCTAssertTrue(text.contains("x…"))
+    }
+
+    func testOldSavedDraftDecodes() throws {
+        let old = #"{"adapterID":"se.varmdo.ksb","tileID":"streetlight","description":"Släckt","locationText":"Brunn","wantsFeedback":false,"contact":{"firstName":"","lastName":"","phone":"","email":""}}"#
+        let d = try JSONDecoder().decode(ReportDraft.self, from: Data(old.utf8))
+        XCTAssertNil(d.translation)
+        XCTAssertNil(d.createdAt)
+        var new = d
+        new.translation = MachineTranslation(sourceLanguage: "ar", text: "Släckt")
+        new.createdAt = Date(timeIntervalSince1970: 1_000)
+        XCTAssertEqual(try JSONDecoder().decode(ReportDraft.self, from: JSONEncoder().encode(new)), new)
     }
 
     func testMailFallback() throws {
@@ -361,9 +435,16 @@ final class ComposerTests: XCTestCase {
             "Namn: Anna Svensson",
             "Telefon: 070-123 45 67",
             "E-post: anna@example.se",
+            "Jag skickar felanmälan med e-post eftersom e-tjänsten inte gick att nå.",
         ] {
             XCTAssertTrue(body.contains(expected), expected)
         }
+        XCTAssertFalse(body.localizedCaseInsensitiveContains("fixa"), "nothing in the e-mail names the app")
+        XCTAssertFalse(body.localizedCaseInsensitiveContains("appen"))
+        var old = d
+        let created = Date(timeIntervalSince1970: 1_793_088_900)
+        old.createdAt = created
+        XCTAssertTrue(MailFallback.body(old, spec: spec, now: created.addingTimeInterval(7200)).contains("Upptäckt: 2026-10-27 09:15"))
     }
 }
 
@@ -430,15 +511,15 @@ final class AbouSubmitterTests: XCTestCase {
         let spec = try varmdoSpec()
         let fake = FakeAbou()
         let log = StageLog()
-        let receipt = try await AbouSubmitter(spec: spec, transport: fake).submit(validDraft(), dryRun: true) { log.append($0) }
+        let receipt = try await AbouSubmitter(spec: spec, transport: fake, pageDelay: .zero).submit(validDraft(), dryRun: true) { log.append($0) }
         XCTAssertNil(receipt)
         XCTAssertEqual(log.stages, [.starting, .sendingReport, .sendingContact, .done])
 
         let requests = await fake.requests
         XCTAssertEqual(requests.map { $0.httpMethod ?? "" }, ["GET", "GET", "POST", "POST"])
         XCTAssertFalse(requests.contains { $0.url!.absoluteString.contains("SummaryPage") }, "dry run must not post the summary")
-        XCTAssertTrue(requests.allSatisfy { $0.value(forHTTPHeaderField: "User-Agent")?.hasPrefix("Fixa/") == true })
-        XCTAssertTrue(requests[0].value(forHTTPHeaderField: "User-Agent")!.contains("independent open-source app; +https://github.com/idoo/fixa"))
+        XCTAssertTrue(requests.allSatisfy { $0.value(forHTTPHeaderField: "User-Agent") == AbouSubmitter.userAgent })
+        XCTAssertFalse(AbouSubmitter.userAgent.localizedCaseInsensitiveContains("fixa"))
 
         let report = formFields(requests[2].httpBody)
         let hidden = AbouPageParser.hiddenFields(try fixture("02-faultreport"))
@@ -466,7 +547,7 @@ final class AbouSubmitterTests: XCTestCase {
         let fake = FakeAbou()
         var d = validDraft()
         d.coordinate = nil
-        _ = try await AbouSubmitter(spec: try varmdoSpec(), transport: fake).submit(d, dryRun: true)
+        _ = try await AbouSubmitter(spec: try varmdoSpec(), transport: fake, pageDelay: .zero).submit(d, dryRun: true)
         let report = formFields(await fake.requests[2].httpBody)
         XCTAssertEqual(report.first { $0.key.hasSuffix("$KSB_20_field$radioButtonListFieldControl") }?.value, "Nej")
         XCTAssertEqual(report.first { $0.key.hasSuffix("$KSB_19_field$MapAnswer") }?.value, "")
@@ -477,14 +558,16 @@ final class AbouSubmitterTests: XCTestCase {
         let log = StageLog()
         var d = validDraft()
         d.photoJPEG = Data([0xFF, 0xD8, 0xFF, 0xD9])
-        let receipt = try await AbouSubmitter(spec: try varmdoSpec(), transport: fake).submit(d) { log.append($0) }
+        let receipt = try await AbouSubmitter(spec: try varmdoSpec(), transport: fake, pageDelay: .zero).submit(d) { log.append($0) }
         XCTAssertEqual(receipt?.caseNumber, "KSB-123456")
         XCTAssertEqual(log.stages, [.starting, .uploadingPhoto, .sendingReport, .sendingContact, .confirming, .done])
 
         let requests = await fake.requests
         let upload = try XCTUnwrap(requests.first { $0.url!.path.hasPrefix("/Citizen/Field/UploadFile/U.29.1.2") })
         XCTAssertEqual(upload.value(forHTTPHeaderField: "X-Requested-With"), "XMLHttpRequest")
-        XCTAssertTrue(String(decoding: upload.httpBody!, as: UTF8.self).contains(#"name="files[]"; filename="foto.jpg""#))
+        let uploadBody = String(decoding: upload.httpBody!, as: UTF8.self)
+        XCTAssertNotNil(uploadBody.range(of: #"name="files\[\]"; filename="IMG_[0-9]{4}\.jpg""#, options: .regularExpression), uploadBody.prefix(300).description)
+        XCTAssertTrue(upload.value(forHTTPHeaderField: "Content-Type")!.hasPrefix("multipart/form-data; boundary=----WebKitFormBoundary"))
         let verify = try XCTUnwrap(requests.first { $0.url!.path == "/Citizen/Field/Action" })
         let verifyBody = try XCTUnwrap(JSONSerialization.jsonObject(with: verify.httpBody!) as? [String: Any])
         XCTAssertEqual(verifyBody["FieldId"] as? String, "U.29.1.2")
@@ -495,7 +578,7 @@ final class AbouSubmitterTests: XCTestCase {
 
     func testServerValidationSurfaced() async throws {
         do {
-            _ = try await AbouSubmitter(spec: try varmdoSpec(), transport: FakeAbou(mode: .validation)).submit(validDraft(), dryRun: true)
+            _ = try await AbouSubmitter(spec: try varmdoSpec(), transport: FakeAbou(mode: .validation), pageDelay: .zero).submit(validDraft(), dryRun: true)
             XCTFail("expected error")
         } catch let error as SubmissionError {
             XCTAssertEqual(error, .serverValidation([
@@ -511,7 +594,7 @@ final class AbouSubmitterTests: XCTestCase {
         let log = StageLog()
         var d = validDraft()
         d.wantsFeedback = false
-        let receipt = try await AbouSubmitter(spec: try varmdoSpec(), transport: fake).submit(d) { log.append($0) }
+        let receipt = try await AbouSubmitter(spec: try varmdoSpec(), transport: fake, pageDelay: .zero).submit(d) { log.append($0) }
         XCTAssertEqual(receipt?.caseNumber, "KSB-123456")
         XCTAssertEqual(log.stages, [.starting, .sendingReport, .confirming, .done])
         let requests = await fake.requests
@@ -524,7 +607,7 @@ final class AbouSubmitterTests: XCTestCase {
         let spec = try varmdoSpec()
         let fake = FakeAbou(mode: .thankYou)
         let log = StageLog()
-        let receipt = try await AbouSubmitter(spec: spec, transport: fake).submit(validDraft()) { log.append($0) }
+        let receipt = try await AbouSubmitter(spec: spec, transport: fake, pageDelay: .zero).submit(validDraft()) { log.append($0) }
         XCTAssertEqual(receipt?.caseNumber, "261026-KSB-KS43")
         XCTAssertEqual(log.stages.suffix(2), [.confirming, .done])
 
@@ -541,7 +624,7 @@ final class AbouSubmitterTests: XCTestCase {
 
     func testNoCompletionPostBackWithoutMarker() async throws {
         let fake = FakeAbou()
-        let receipt = try await AbouSubmitter(spec: try varmdoSpec(), transport: fake).submit(validDraft())
+        let receipt = try await AbouSubmitter(spec: try varmdoSpec(), transport: fake, pageDelay: .zero).submit(validDraft())
         XCTAssertEqual(receipt?.caseNumber, "KSB-123456")
         let requests = await fake.requests
         XCTAssertEqual(requests.map { $0.httpMethod ?? "" }, ["GET", "GET", "POST", "POST", "POST"])
@@ -550,7 +633,7 @@ final class AbouSubmitterTests: XCTestCase {
 
     func testSessionLockSurfaced() async throws {
         do {
-            _ = try await AbouSubmitter(spec: try varmdoSpec(), transport: FakeAbou(mode: .locked)).submit(validDraft(), dryRun: true)
+            _ = try await AbouSubmitter(spec: try varmdoSpec(), transport: FakeAbou(mode: .locked), pageDelay: .zero).submit(validDraft(), dryRun: true)
             XCTFail("expected error")
         } catch let error as SubmissionError {
             XCTAssertEqual(error, .sessionLocked)

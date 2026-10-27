@@ -1,6 +1,8 @@
 import FixaKit
 import MapKit
+import NaturalLanguage
 import SwiftUI
+import Translation
 import UIKit
 
 /// Exactly what will be sent, then Send (pinned at the bottom) with progress and fallbacks.
@@ -11,10 +13,17 @@ struct ReviewScreen: View {
     @Environment(\.fxReduceMotion) private var reduceMotion
     @State private var isMailPresented = false
     @State private var isSharePresented = false
+    /// Set to start "Tell Fixa about it" (an e-mail to the developer the user sees before sending).
+    @State private var developerReport: DeveloperReport?
+    /// Drives the on-device Swedish translation of the description; nil until one is needed.
+    @State private var translationConfig: TranslationSession.Configuration?
+    @State private var translationState: TranslationState = .idle
     /// VoiceOver focus moves here when sending fails: the status slot, or the form-changed card.
     @AccessibilityFocusState private var failureFocused: Bool
 
     private static let driftCardID = "formChanged"
+    /// Send waits at most this long for the Swedish translation, then the text goes as written.
+    private static let translationCap: Duration = .seconds(15)
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -37,7 +46,10 @@ struct ReviewScreen: View {
                             message: String(localized: "Fixa stops before the last step. Nothing is submitted.", bundle: L10n.bundle, locale: L10n.locale)
                         )
                     }
-                    FxBanner(kind: .info, title: String(localized: "Good to know", bundle: L10n.bundle, locale: L10n.locale), message: spec.disclaimer.resolve(L10n.locale))
+                    // The disclaimer always comes from the adapter shipped in the app, never from a download.
+                    if let disclaimer = AdapterCatalog.shipped(id: spec.id)?.disclaimer {
+                        FxBanner(kind: .info, title: String(localized: "Good to know", bundle: L10n.bundle, locale: L10n.locale), message: disclaimer.resolve(L10n.locale))
+                    }
                     if model.submission.error != nil, formDrift == nil, !MailComposer.canSendMail {
                         mailUnavailableFallback
                     }
@@ -61,7 +73,8 @@ struct ReviewScreen: View {
                 subject: MailFallback.subject(model.draft, spec: spec),
                 body: MailFallback.body(model.draft, spec: spec),
                 attachment: model.draft.photoJPEG.map {
-                    MailComposer.Attachment(data: $0, mimeType: "image/jpeg", fileName: "fixa.jpg")
+                    // Named like a camera file: nothing that reaches the municipality names the app.
+                    MailComposer.Attachment(data: $0, mimeType: "image/jpeg", fileName: String(format: "IMG_%04d.jpg", Int.random(in: 1...9999)))
                 },
                 onFinish: { _ in isMailPresented = false }
             )
@@ -70,6 +83,17 @@ struct ReviewScreen: View {
         .sheet(isPresented: $isSharePresented) {
             ShareSheet(items: shareItems)
                 .presentationDetents([.medium, .large])
+        }
+        .developerReport($developerReport)
+        .onAppear(perform: prepareTranslation)
+        .translationTask(translationConfig) { session in
+            await translate(with: session)
+        }
+        .task(id: translationState) {
+            guard translationState == .translating,
+                  (try? await Task.sleep(for: Self.translationCap)) != nil,
+                  translationState == .translating else { return }
+            translationState = .unavailable
         }
     }
 
@@ -109,9 +133,9 @@ struct ReviewScreen: View {
             divider
             editableRow(String(localized: "Description, as sent", bundle: L10n.bundle, locale: L10n.locale)) {
                 value(ReportComposer.description(for: model.draft, spec: spec))
-                Text("Fixa adds this Swedish summary so the municipality understands.")
+                translationNote
                     .font(Fx.Font.footnote)
-                    .foregroundStyle(Fx.Color.ink2)
+                    .foregroundStyle(Fx.Color.ink)
                     .fixedSize(horizontal: false, vertical: true)
             }
             divider
@@ -150,6 +174,84 @@ struct ReviewScreen: View {
     private var placeText: String {
         let text = model.draft.locationText.trimmingCharacters(in: .whitespacesAndNewlines)
         return text.isEmpty ? String(localized: "Pin on the map", bundle: L10n.bundle, locale: L10n.locale) : text
+    }
+
+    // MARK: Translation
+
+    private enum TranslationState: Equatable {
+        case idle, translating, unavailable
+    }
+
+    /// What happens to the resident's text, in plain words. The translation itself is in the
+    /// description above, under "Översatt från …:", exactly as the municipality receives it.
+    private var translationNote: Text {
+        if model.draft.translation != nil {
+            return Text("The problem type is added in Swedish. Your text is sent as written, with a Swedish translation added under “Översatt från”.")
+        }
+        switch translationState {
+        case .translating:
+            return Text("Translating your text into Swedish…")
+        case .unavailable:
+            return Text("The problem type is added in Swedish. Your text is sent as written; no Swedish translation could be made on this iPhone.")
+        case .idle:
+            return Text("The problem type is added in Swedish. Your text is sent as written.")
+        }
+    }
+
+    /// The language to translate from: the text's own language when it is clear, else the app's.
+    /// Nil when there is nothing to translate (no text, or it is already Swedish).
+    private var translationSource: Locale.Language? {
+        let text = model.draft.description.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !text.isEmpty else { return nil }
+        let recognizer = NLLanguageRecognizer()
+        recognizer.processString(text)
+        var source = L10n.locale.language
+        if let detected = recognizer.dominantLanguage,
+           (recognizer.languageHypotheses(withMaximum: 1)[detected] ?? 0) >= 0.6 {
+            source = Locale.Language(identifier: detected.rawValue)
+        }
+        return source.languageCode?.identifier == "sv" ? nil : source
+    }
+
+    /// Starts an on-device translation into Swedish when the text needs one and has none yet.
+    /// The Report screen clears `draft.translation` whenever the description changes.
+    private func prepareTranslation() {
+        guard let source = translationSource else {
+            model.draft.translation = nil
+            translationState = .idle
+            return
+        }
+        if let existing = model.draft.translation, existing.sourceLanguage == source.languageCode?.identifier { return }
+        model.draft.translation = nil
+        translationState = .translating
+        if translationConfig?.source == source {
+            translationConfig?.invalidate()
+        } else {
+            translationConfig = TranslationSession.Configuration(source: source, target: Locale.Language(identifier: "sv"))
+        }
+    }
+
+    /// Translates with Apple's on-device Translation. If the languages aren't available or the
+    /// download is declined, the text goes as written and the note says so.
+    private func translate(with session: TranslationSession) async {
+        let text = model.draft.description.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let code = translationSource?.languageCode?.identifier, !text.isEmpty else { return }
+        do {
+            // The session belongs to this `.translationTask` call and is used only here, as in Apple's
+            // samples; region isolation can't see that, so opt out for this one call.
+            nonisolated(unsafe) let session = session
+            let response = try await session.translate(text)
+            // The resident may have gone back and changed the text, or already sent it.
+            guard model.draft.description.trimmingCharacters(in: .whitespacesAndNewlines) == text,
+                  !model.submission.isSending else { return }
+            let swedish = response.targetText.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !swedish.isEmpty, swedish != text {
+                model.draft.translation = MachineTranslation(sourceLanguage: code, text: swedish)
+            }
+            translationState = .idle
+        } catch {
+            translationState = .unavailable
+        }
     }
 
     /// E-mail and phone are isolated left-to-right so "+46…" and "@" keep their order in Arabic.
@@ -209,7 +311,7 @@ struct ReviewScreen: View {
                 header {
                     Text(title)
                         .font(Fx.Font.subheadline)
-                        .foregroundStyle(Fx.Color.ink2)
+                        .foregroundStyle(Fx.Color.ink)
                     if !dynamicTypeSize.isAccessibilitySize {
                         Spacer(minLength: Fx.Space.s)
                     }
@@ -267,17 +369,18 @@ struct ReviewScreen: View {
                     }
                 }
                 FxCopyButton(title: String(localized: "Copy report text", bundle: L10n.bundle, locale: L10n.locale), value: mailText)
-                if let url = drift.issueURL(spec: spec) {
-                    Link(destination: url) {
-                        Text("Tell Fixa about it")
-                            .font(Fx.Font.callout)
-                            .foregroundStyle(Fx.Color.sea)
-                            .underline()
-                            .frame(maxWidth: .infinity, minHeight: Fx.minTarget, alignment: .leading)
-                            .contentShape(.rect)
-                    }
-                    .accessibilityHint(Text("Opens a GitHub page. Only the app version and the form's page are filled in."))
+                Button {
+                    developerReport = DeveloperReport(spec: spec, error: .formChanged(drift))
+                } label: {
+                    Text("Tell Fixa about it")
+                        .font(Fx.Font.callout)
+                        .foregroundStyle(Fx.Color.sea)
+                        .underline()
+                        .frame(maxWidth: .infinity, minHeight: Fx.minTarget, alignment: .leading)
+                        .contentShape(.rect)
                 }
+                .buttonStyle(.plain)
+                .accessibilityHint(Text("Opens an e-mail to the developer with technical details only. You see it before it's sent."))
             }
         }
     }
@@ -304,10 +407,14 @@ struct ReviewScreen: View {
                 statusSlot
                     .transition(.opacity)
             }
+            // Waits for the Swedish translation (at most `translationCap`) so it goes with the report.
+            let translating = translationState == .translating && !submission.isSending
             FxPrimaryButton(
-                title: String(localized: "Send to \(spec.municipality.name)", bundle: L10n.bundle, locale: L10n.locale),
+                title: translating
+                    ? String(localized: "Translating…", bundle: L10n.bundle, locale: L10n.locale)
+                    : String(localized: "Send to \(spec.municipality.name)", bundle: L10n.bundle, locale: L10n.locale),
                 systemImage: "paperplane",
-                isLoading: submission.isSending,
+                isLoading: submission.isSending || translating,
                 action: send
             )
             .accessibilityIdentifier("review.send")

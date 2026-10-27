@@ -10,6 +10,8 @@ struct SettingsScreen: View {
     @State private var isDeleteAllPresented = false
     /// Bumped after "Delete all my data": shows the banner and plays the success haptic.
     @State private var deletions = 0
+    /// Set to start "Report a problem with the app" (an e-mail the user sees before sending).
+    @State private var developerReport: DeveloperReport?
 
     var body: some View {
         @Bindable var model = model
@@ -93,6 +95,15 @@ struct SettingsScreen: View {
                         link: Self.privacyPolicyURL
                     )
                     FxDivider()
+                    SettingsNavRow(
+                        systemImage: "envelope.badge",
+                        title: String(localized: "Report a problem with the app", bundle: L10n.bundle, locale: L10n.locale),
+                        value: String(localized: "An e-mail to the developer. You see it before it's sent.", bundle: L10n.bundle, locale: L10n.locale)
+                    ) {
+                        developerReport = DeveloperReport(spec: model.spec, error: model.submission.error)
+                    }
+                    .accessibilityIdentifier("settings.reportProblem")
+                    FxDivider()
                     FxIconRow(systemImage: "number", text: versionText)
                 }
             }
@@ -102,6 +113,7 @@ struct SettingsScreen: View {
         .navigationTitle(Text("Settings"))
         .navigationBarTitleDisplayMode(.inline)
         .sensoryFeedback(.success, trigger: deletions) { _, _ in haptics }
+        .developerReport($developerReport)
     }
 
     private var privacySection: some View {
