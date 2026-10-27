@@ -13,23 +13,23 @@ struct AboutScreen: View {
                 FxCard {
                     FxIconRow(
                         systemImage: "chevron.left.forwardslash.chevron.right",
-                        text: String(localized: "Open source (EUPL-1.2) on GitHub"),
+                        text: String(localized: "Open source (EUPL-1.2) on GitHub", bundle: L10n.bundle, locale: L10n.locale),
                         link: Self.repoURL
                     )
                     FxIconRow(
                         systemImage: "iphone",
-                        text: String(localized: "No account, no server. Your data stays on this phone, and photos lose their location.")
+                        text: String(localized: "No account, no server. Your data stays on this phone, and photos lose their location.", bundle: L10n.bundle, locale: L10n.locale)
                     )
                     FxIconRow(
                         systemImage: "building.columns",
-                        text: String(localized: "Independent app, not part of \(spec.municipality.name).")
+                        text: String(localized: "Independent app, not part of \(spec.municipality.name).", bundle: L10n.bundle, locale: L10n.locale)
                     )
                 }
 
                 FxCard {
                     SettingsNavRow(
                         systemImage: "questionmark.circle",
-                        title: String(localized: "How Fixa works"),
+                        title: String(localized: "How Fixa works", bundle: L10n.bundle, locale: L10n.locale),
                         value: nil
                     ) {
                         model.showOnboarding()
@@ -38,7 +38,7 @@ struct AboutScreen: View {
 
                 FxIconRow(
                     systemImage: "phone",
-                    text: String(localized: "Call 112 if life or property is in danger.")
+                    text: String(localized: "Call 112 if life or property is in danger.", bundle: L10n.bundle, locale: L10n.locale)
                 )
 
                 Text("Version \(Self.version)")

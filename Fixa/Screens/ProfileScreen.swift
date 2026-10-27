@@ -33,24 +33,24 @@ struct ProfileScreen: View {
                 .fixedSize(horizontal: false, vertical: true)
 
                 FxTextField(
-                    title: String(localized: "E-mail"),
+                    title: String(localized: "E-mail", bundle: L10n.bundle, locale: L10n.locale),
                     text: $model.profile.email,
-                    prompt: String(localized: "name@example.com"),
+                    prompt: String(localized: "name@example.com", bundle: L10n.bundle, locale: L10n.locale),
                     kind: .email,
                     issue: issues.first { $0.field == .email }?.message
                 )
                 nameLayout {
                     FxTextField(
-                        title: String(localized: "First name (optional)"),
+                        title: String(localized: "First name (optional)", bundle: L10n.bundle, locale: L10n.locale),
                         text: $model.profile.firstName
                     )
                     FxTextField(
-                        title: String(localized: "Last name (optional)"),
+                        title: String(localized: "Last name (optional)", bundle: L10n.bundle, locale: L10n.locale),
                         text: $model.profile.lastName
                     )
                 }
                 FxTextField(
-                    title: String(localized: "Phone (optional)"),
+                    title: String(localized: "Phone (optional)", bundle: L10n.bundle, locale: L10n.locale),
                     text: $model.profile.phone,
                     kind: .phone,
                     issue: issues.first { $0.field == .phone }?.message

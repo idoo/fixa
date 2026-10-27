@@ -84,10 +84,12 @@ final class AppModel {
         }
     }
     /// The chosen UI language; `nil` is "Same as iPhone" (UserDefaults `fixa.language`).
-    /// Slice Language makes the UI follow it.
+    /// Switches the UI at once through `L10n`; `RootView` redraws on `effectiveLanguage`.
     var language: AppLanguage? {
         didSet {
-            guard persists, language != oldValue else { return }
+            guard language != oldValue else { return }
+            L10n.apply(language, savesSystemSetting: persists)
+            guard persists else { return }
             if let language {
                 UserDefaults.standard.set(language.rawValue, forKey: AppLanguage.storageKey)
             } else {
@@ -119,7 +121,9 @@ final class AppModel {
         }
         display = savedDisplay
         rememberDetails = UserDefaults.standard.object(forKey: Self.rememberKey) as? Bool ?? true
-        language = UserDefaults.standard.string(forKey: AppLanguage.storageKey).flatMap(AppLanguage.init(rawValue:))
+        let savedLanguage = UserDefaults.standard.string(forKey: AppLanguage.storageKey).flatMap(AppLanguage.init(rawValue:))
+        language = savedLanguage
+        L10n.apply(savedLanguage, savesSystemSetting: !options.demo && !options.liveTest)
         // Demo, test and screenshot launches skip it unless they ask for `-FixaScreen onboarding`.
         if options.screen == .onboarding {
             isOnboardingPresented = true

@@ -276,8 +276,8 @@ struct LocationPickerSheet: View {
             if isOutside {
                 FxBanner(
                     kind: .warning,
-                    title: String(localized: "The pin is outside \(spec.municipality.name)"),
-                    message: String(localized: "Fixa only sends reports to \(spec.municipality.name). Search for the address of the problem, or move the map.")
+                    title: String(localized: "The pin is outside \(spec.municipality.name)", bundle: L10n.bundle, locale: L10n.locale),
+                    message: String(localized: "Fixa only sends reports to \(spec.municipality.name). Search for the address of the problem, or move the map.", bundle: L10n.bundle, locale: L10n.locale)
                 )
             }
             Text("Move the map so the pin is on the problem.")
@@ -311,17 +311,17 @@ struct LocationPickerSheet: View {
 
     private var confirmTitle: String {
         isOutside
-            ? String(localized: "Place is outside \(spec.municipality.name)")
-            : String(localized: "Use this place")
+            ? String(localized: "Place is outside \(spec.municipality.name)", bundle: L10n.bundle, locale: L10n.locale)
+            : String(localized: "Use this place", bundle: L10n.bundle, locale: L10n.locale)
     }
 
     private var confirmHint: String {
-        pin == nil ? String(localized: "Put the pin on the map first") : ""
+        pin == nil ? String(localized: "Put the pin on the map first", bundle: L10n.bundle, locale: L10n.locale) : ""
     }
 
     private var pinSummary: String {
-        guard pin != nil else { return String(localized: "No place chosen yet.") }
-        return address.isEmpty ? String(localized: "Finding the address…") : address
+        guard pin != nil else { return String(localized: "No place chosen yet.", bundle: L10n.bundle, locale: L10n.locale) }
+        return address.isEmpty ? String(localized: "Finding the address…", bundle: L10n.bundle, locale: L10n.locale) : address
     }
 
     // MARK: Actions
@@ -420,9 +420,9 @@ struct LocationPickerSheet: View {
     }
 
     private func announcePlacement() {
-        var text = String(localized: "Pin placed: \(address)")
+        var text = String(localized: "Pin placed: \(address)", bundle: L10n.bundle, locale: L10n.locale)
         if isOutside {
-            text += " " + String(localized: "The pin is outside \(spec.municipality.name)")
+            text += " " + String(localized: "The pin is outside \(spec.municipality.name)", bundle: L10n.bundle, locale: L10n.locale)
         }
         AccessibilityNotification.Announcement(text).post()
     }
@@ -488,33 +488,33 @@ private enum LocateState: Equatable {
 
         var title: String {
             switch self {
-            case .openSettings: String(localized: "Open Settings")
-            case .tryAgain: String(localized: "Try again")
+            case .openSettings: String(localized: "Open Settings", bundle: L10n.bundle, locale: L10n.locale)
+            case .tryAgain: String(localized: "Try again", bundle: L10n.bundle, locale: L10n.locale)
             }
         }
     }
 
     var title: String {
         switch self {
-        case .idle: String(localized: "Use my current location")
-        case .finding: String(localized: "Finding where you are…")
-        case .found: String(localized: "Pin placed where you are")
-        case .notAllowed: String(localized: "Fixa isn't allowed to use your location")
-        case .approximate: String(localized: "Your iPhone shares only an approximate location")
-        case .servicesOff: String(localized: "Location Services are off on this iPhone")
-        case .failed: String(localized: "Couldn't find where you are")
+        case .idle: String(localized: "Use my current location", bundle: L10n.bundle, locale: L10n.locale)
+        case .finding: String(localized: "Finding where you are…", bundle: L10n.bundle, locale: L10n.locale)
+        case .found: String(localized: "Pin placed where you are", bundle: L10n.bundle, locale: L10n.locale)
+        case .notAllowed: String(localized: "Fixa isn't allowed to use your location", bundle: L10n.bundle, locale: L10n.locale)
+        case .approximate: String(localized: "Your iPhone shares only an approximate location", bundle: L10n.bundle, locale: L10n.locale)
+        case .servicesOff: String(localized: "Location Services are off on this iPhone", bundle: L10n.bundle, locale: L10n.locale)
+        case .failed: String(localized: "Couldn't find where you are", bundle: L10n.bundle, locale: L10n.locale)
         }
     }
 
     func subtitle(address: String) -> String? {
         switch self {
-        case .idle: String(localized: "Puts the pin where you are standing")
-        case .finding: String(localized: "This can take a few seconds outdoors")
-        case .found: address.isEmpty ? String(localized: "Finding the address…") : address
-        case .notAllowed: String(localized: "Search for the address above, or allow it in Settings.")
-        case .approximate: String(localized: "Turn on Precise Location in Settings, or move the map yourself.")
-        case .servicesOff: String(localized: "Settings › Privacy & Security › Location Services")
-        case .failed: String(localized: "Search for the address above, or move the map.")
+        case .idle: String(localized: "Puts the pin where you are standing", bundle: L10n.bundle, locale: L10n.locale)
+        case .finding: String(localized: "This can take a few seconds outdoors", bundle: L10n.bundle, locale: L10n.locale)
+        case .found: address.isEmpty ? String(localized: "Finding the address…", bundle: L10n.bundle, locale: L10n.locale) : address
+        case .notAllowed: String(localized: "Search for the address above, or allow it in Settings.", bundle: L10n.bundle, locale: L10n.locale)
+        case .approximate: String(localized: "Turn on Precise Location in Settings, or move the map yourself.", bundle: L10n.bundle, locale: L10n.locale)
+        case .servicesOff: String(localized: "Settings › Privacy & Security › Location Services", bundle: L10n.bundle, locale: L10n.locale)
+        case .failed: String(localized: "Search for the address above, or move the map.", bundle: L10n.bundle, locale: L10n.locale)
         }
     }
 

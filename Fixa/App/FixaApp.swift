@@ -21,7 +21,19 @@ struct RootView: View {
 
     var body: some View {
         let display = model.display
+        let language = model.effectiveLanguage
         content
+            // In-app language: locale for Text/formatting, direction for Arabic, and a full redraw
+            // so plain Strings built with String(localized:) pick up the new .lproj too.
+            .environment(\.locale, L10n.locale)
+            .environment(\.layoutDirection, L10n.isRTL ? .rightToLeft : .leftToRight)
+            .id(language)
+            // `-FixaLanguage`: switches in-app after the first frame, like a tap on the Language page.
+            .task {
+                if let forced = model.options.language {
+                    model.language = forced
+                }
+            }
             // In-app display settings; each one leaves the iPhone's setting alone unless chosen.
             .transformEnvironment(\.dynamicTypeSize) { size in
                 if let step = display.textSize {

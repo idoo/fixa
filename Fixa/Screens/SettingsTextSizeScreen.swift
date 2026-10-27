@@ -14,8 +14,8 @@ struct SettingsTextSizeScreen: View {
 
                 FxCard {
                     FxToggleRow(
-                        title: String(localized: "Use iPhone setting"),
-                        subtitle: String(localized: "Now: size \(systemStep.number) of \(TextSizeStep.allCases.count)"),
+                        title: String(localized: "Use iPhone setting", bundle: L10n.bundle, locale: L10n.locale),
+                        subtitle: String(localized: "Now: size \(systemStep.number) of \(TextSizeStep.allCases.count)", bundle: L10n.bundle, locale: L10n.locale),
                         isOn: followsSystem
                     )
                 }
@@ -36,11 +36,11 @@ struct SettingsTextSizeScreen: View {
         .fxBottomBar {
             if let step = model.display.textSize {
                 HStack(spacing: Fx.Space.m) {
-                    FxSecondaryButton(title: String(localized: "Smaller text"), systemImage: "textformat.size.smaller") {
+                    FxSecondaryButton(title: String(localized: "Smaller text", bundle: L10n.bundle, locale: L10n.locale), systemImage: "textformat.size.smaller") {
                         model.display.textSize = step.smaller ?? step
                     }
                     .disabled(step.smaller == nil)
-                    FxSecondaryButton(title: String(localized: "Larger text"), systemImage: "textformat.size.larger") {
+                    FxSecondaryButton(title: String(localized: "Larger text", bundle: L10n.bundle, locale: L10n.locale), systemImage: "textformat.size.larger") {
                         model.display.textSize = step.larger ?? step
                     }
                     .disabled(step.larger == nil)
@@ -62,7 +62,7 @@ struct SettingsTextSizeScreen: View {
                 .font(Fx.Font.body)
                 .foregroundStyle(Fx.Color.ink)
                 .fixedSize(horizontal: false, vertical: true)
-            FxTile(title: String(localized: "Street light out"), systemImage: "lightbulb.slash", index: 2) {}
+            FxTile(title: String(localized: "Street light out", bundle: L10n.bundle, locale: L10n.locale), systemImage: "lightbulb.slash", index: 2) {}
                 .allowsHitTesting(false)
                 .accessibilityHidden(true)
         }

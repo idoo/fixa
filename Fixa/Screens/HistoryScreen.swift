@@ -54,7 +54,7 @@ struct HistoryScreen: View {
                 .foregroundStyle(Fx.Color.ink)
                 .multilineTextAlignment(.center)
                 .accessibilityAddTraits(.isHeader)
-            FxPrimaryButton(title: String(localized: "Report a problem"), systemImage: "plus") {
+            FxPrimaryButton(title: String(localized: "Report a problem", bundle: L10n.bundle, locale: L10n.locale), systemImage: "plus") {
                 model.path = []
             }
             .padding(.top, Fx.Space.s)
@@ -79,7 +79,7 @@ private struct HistoryRow: View {
         layout {
             HistoryThumbnail(item: item, spec: spec, side: min(thumbnailSide, 80))
             VStack(alignment: .leading, spacing: Fx.Space.xs) {
-                Text(spec.tile(id: item.tileID)?.title.resolve() ?? String(localized: "Report"))
+                Text(spec.tile(id: item.tileID)?.title.resolve(L10n.locale) ?? String(localized: "Report", bundle: L10n.bundle, locale: L10n.locale))
                     .font(Fx.Font.headline)
                     .foregroundStyle(Fx.Color.ink)
                 Text(item.locationText.isEmpty ? item.description : item.locationText)
@@ -147,13 +147,13 @@ struct HistoryDetailScreen: View {
                         FxCard {
                             if let caseNumber = item.caseNumber {
                                 VStack(alignment: .leading, spacing: Fx.Space.s) {
-                                    field(String(localized: "Case number"), value: caseNumber)
-                                    FxCopyButton(title: String(localized: "Copy case number"), value: caseNumber)
+                                    field(String(localized: "Case number", bundle: L10n.bundle, locale: L10n.locale), value: caseNumber)
+                                    FxCopyButton(title: String(localized: "Copy case number", bundle: L10n.bundle, locale: L10n.locale), value: caseNumber)
                                 }
                             } else {
-                                field(String(localized: "Case number"), value: String(localized: "Not given by the e-service"))
+                                field(String(localized: "Case number", bundle: L10n.bundle, locale: L10n.locale), value: String(localized: "Not given by the e-service", bundle: L10n.bundle, locale: L10n.locale))
                             }
-                            field(String(localized: "Place"), value: placeText(for: item))
+                            field(String(localized: "Place", bundle: L10n.bundle, locale: L10n.locale), value: placeText(for: item))
                             if let lat = item.latitude, let lng = item.longitude {
                                 let center = CLLocationCoordinate2D(latitude: lat, longitude: lng)
                                 Map(initialPosition: .region(MKCoordinateRegion(
@@ -170,17 +170,17 @@ struct HistoryDetailScreen: View {
                                 .allowsHitTesting(false)
                                 .accessibilityHidden(true)
                             }
-                            field(String(localized: "Description"), value: item.description)
+                            field(String(localized: "Description", bundle: L10n.bundle, locale: L10n.locale), value: item.description)
                             if item.thumbnail != nil {
                                 HistoryThumbnail(
                                     item: item,
                                     spec: spec,
                                     side: 120,
-                                    accessibilityLabel: String(localized: "Attached photo")
+                                    accessibilityLabel: String(localized: "Attached photo", bundle: L10n.bundle, locale: L10n.locale)
                                 )
                             }
                         }
-                        FxSecondaryButton(title: String(localized: "Remove from this phone"), systemImage: "trash") {
+                        FxSecondaryButton(title: String(localized: "Remove from this phone", bundle: L10n.bundle, locale: L10n.locale), systemImage: "trash") {
                             isRemoveConfirmPresented = true
                         }
                     }
@@ -193,7 +193,7 @@ struct HistoryDetailScreen: View {
             }
         }
         .fxScreenBackground()
-        .navigationTitle(Text(item.map(title(for:)) ?? String(localized: "Report")))
+        .navigationTitle(Text(item.map(title(for:)) ?? String(localized: "Report", bundle: L10n.bundle, locale: L10n.locale)))
         .navigationBarTitleDisplayMode(.inline)
         .confirmationDialog(
             Text("Remove this report from this phone?"),
@@ -209,7 +209,7 @@ struct HistoryDetailScreen: View {
     }
 
     private func title(for item: HistoryItem) -> String {
-        spec.tile(id: item.tileID)?.title.resolve() ?? String(localized: "Report")
+        spec.tile(id: item.tileID)?.title.resolve(L10n.locale) ?? String(localized: "Report", bundle: L10n.bundle, locale: L10n.locale)
     }
 
     private func remove() {
@@ -223,7 +223,7 @@ struct HistoryDetailScreen: View {
     private func placeText(for item: HistoryItem) -> String {
         let text = item.locationText.trimmingCharacters(in: .whitespacesAndNewlines)
         if !text.isEmpty { return text }
-        return item.latitude != nil ? String(localized: "Pin on the map") : "–"
+        return item.latitude != nil ? String(localized: "Pin on the map", bundle: L10n.bundle, locale: L10n.locale) : "–"
     }
 
     private func field(_ title: String, value: String) -> some View {

@@ -192,7 +192,7 @@ public struct LocalizedText: Codable, Sendable, Hashable {
     }
 
     /// The locale's language, else English, else Swedish.
-    public func resolve(_ locale: Locale = .current) -> String {
+    public func resolve(_ locale: Locale) -> String {
         if let code = locale.language.languageCode?.identifier, let text = values[code] {
             return text
         }

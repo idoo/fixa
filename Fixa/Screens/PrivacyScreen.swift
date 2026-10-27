@@ -10,38 +10,38 @@ struct PrivacyScreen: View {
             VStack(alignment: .leading, spacing: Fx.Space.l) {
                 FxCard {
                     item(
-                        String(localized: "Your contact details: on this phone until you delete them."),
+                        String(localized: "Your contact details: on this phone until you delete them.", bundle: L10n.bundle, locale: L10n.locale),
                         storage: "UserDefaults fixa.contact"
                     )
                     FxDivider()
                     item(
-                        String(localized: "Your unsent report (text, place, up to 3 photos): until you send or discard it."),
+                        String(localized: "Your unsent report (text, place, up to 3 photos): until you send or discard it.", bundle: L10n.bundle, locale: L10n.locale),
                         storage: "UserDefaults fixa.draft · Caches/fixa-draft"
                     )
                     FxDivider()
                     item(
-                        String(localized: "Sent reports (type, text, place, small photo, case number): on this phone until you delete them."),
+                        String(localized: "Sent reports (type, text, place, small photo, case number): on this phone until you delete them.", bundle: L10n.bundle, locale: L10n.locale),
                         storage: "Application Support/Fixa/history.json"
                     )
                     FxDivider()
                     item(
-                        String(localized: "Your settings (language, text size)."),
+                        String(localized: "Your settings (language, text size).", bundle: L10n.bundle, locale: L10n.locale),
                         storage: "UserDefaults fixa.language · fixa.display · fixa.rememberDetails · fixa.onboarded"
                     )
                 }
 
                 FxCard {
-                    item(String(localized: "Fixa has no account, server or statistics. Photos lose their location before they are sent."), storage: nil)
+                    item(String(localized: "Fixa has no account, server or statistics. Photos lose their location before they are sent.", bundle: L10n.bundle, locale: L10n.locale), storage: nil)
                     FxDivider()
-                    item(String(localized: "These are included in your iPhone backup."), storage: nil)
+                    item(String(localized: "These are included in your iPhone backup.", bundle: L10n.bundle, locale: L10n.locale), storage: nil)
                     FxDivider()
                     item(
-                        String(localized: "Once in a while Fixa downloads an updated description of the municipality's form from GitHub. Nothing about you is sent."),
+                        String(localized: "Once in a while Fixa downloads an updated description of the municipality's form from GitHub. Nothing about you is sent.", bundle: L10n.bundle, locale: L10n.locale),
                         storage: "raw.githubusercontent.com/idoo/fixa · Application Support/Adapters"
                     )
                     FxDivider()
                     item(
-                        String(localized: "Reports already sent belong to \(spec.municipality.name); ask them to change or delete one. Reports sent by e-mail also stay in your Mail app."),
+                        String(localized: "Reports already sent belong to \(spec.municipality.name); ask them to change or delete one. Reports sent by e-mail also stay in your Mail app.", bundle: L10n.bundle, locale: L10n.locale),
                         storage: nil
                     )
                 }

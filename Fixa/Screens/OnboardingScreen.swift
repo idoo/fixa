@@ -24,21 +24,21 @@ struct OnboardingScreen: View {
                 FxCard {
                     FxIconRow(
                         systemImage: "building.columns",
-                        text: String(localized: "An independent app. Not run by the municipality.")
+                        text: String(localized: "An independent app. Not run by the municipality.", bundle: L10n.bundle, locale: L10n.locale)
                     )
                     FxDivider()
                     FxIconRow(
                         systemImage: "paperplane",
-                        text: String(localized: "Your report goes straight to the municipality's own fault-report service, just like the website.")
+                        text: String(localized: "Your report goes straight to the municipality's own fault-report service, just like the website.", bundle: L10n.bundle, locale: L10n.locale)
                     )
                     FxDivider()
                     FxIconRow(
                         systemImage: "iphone",
-                        text: String(localized: "No account. Your details stay on this phone.")
+                        text: String(localized: "No account. Your details stay on this phone.", bundle: L10n.bundle, locale: L10n.locale)
                     )
                 }
 
-                FxIconRow(systemImage: "phone", text: String(localized: "In an emergency, call 112."))
+                FxIconRow(systemImage: "phone", text: String(localized: "In an emergency, call 112.", bundle: L10n.bundle, locale: L10n.locale))
 
                 languageChip
             }
@@ -48,7 +48,7 @@ struct OnboardingScreen: View {
         }
         .fxScreenBackground()
         .fxBottomBar {
-            FxPrimaryButton(title: String(localized: "Continue")) {
+            FxPrimaryButton(title: String(localized: "Continue", bundle: L10n.bundle, locale: L10n.locale)) {
                 model.finishOnboarding()
             }
         }
