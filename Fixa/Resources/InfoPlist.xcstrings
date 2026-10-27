@@ -3,13 +3,49 @@
   "strings" : {
     "CFBundleDisplayName" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fixa"
           }
         },
-        "sv" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa"
+          }
+        },
+        "et" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fixa"
@@ -21,19 +57,79 @@
             "value" : "Fixa"
           }
         },
-        "ar" : {
+        "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fixa"
           }
         },
-        "uk" : {
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa"
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa"
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fixa"
           }
         },
         "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa"
+          }
+        },
+        "uk" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fixa"
@@ -43,16 +139,52 @@
     },
     "NSLocationWhenInUseUsageDescription" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يستخدم Fixa موقعك لوضع الدبوس في مكان المشكلة. لا يُستخدم الموقع إلا عند الضغط على «استخدم موقعي»."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa používá vaši polohu, aby umístila špendlík tam, kde je problém. Poloha se použije jen tehdy, když klepnete na Použít mou polohu."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa bruger din placering til at sætte nålen, hvor problemet er. Den bruges kun, når du trykker på Brug min placering."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa verwendet Ihren Standort, um die Stecknadel dort zu setzen, wo das Problem ist. Er wird nur verwendet, wenn Sie auf „Aktuellen Standort verwenden“ tippen."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Το Fixa χρησιμοποιεί την τοποθεσία σας για να τοποθετήσει την πινέζα εκεί όπου βρίσκεται το πρόβλημα. Χρησιμοποιείται μόνο όταν πατάτε Χρήση της τοποθεσίας μου."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fixa uses your location to place the pin where the problem is. It is only used when you tap Use my location."
           }
         },
-        "sv" : {
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa använder din plats för att sätta nålen där problemet finns. Platsen används bara när du trycker på Använd min plats."
+            "value" : "Fixa usa tu ubicación para colocar el marcador donde está el problema. Solo se usa cuando tocas Usar mi ubicación."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa kasutab teie asukohta, et panna nööpnõel probleemi kohale. Asukohta kasutatakse ainult siis, kui puudutate nuppu Kasuta minu praegust asukohta."
           }
         },
         "fi" : {
@@ -61,16 +193,46 @@
             "value" : "Fixa käyttää sijaintiasi asettaakseen nastan ongelman kohdalle. Sijaintia käytetään vain, kun napautat Käytä sijaintiani."
           }
         },
-        "ar" : {
+        "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "يستخدم Fixa موقعك لوضع الدبوس في مكان المشكلة. لا يُستخدم الموقع إلا عند الضغط على «استخدم موقعي»."
+            "value" : "Fixa utilise votre position pour placer l'épingle à l'endroit du problème. Elle n'est utilisée que lorsque vous touchez Utiliser ma position."
           }
         },
-        "uk" : {
+        "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa використовує ваше місцезнаходження, щоб поставити мітку там, де проблема. Лише коли ви торкаєтеся «Моє місцезнаходження»."
+            "value" : "A Fixa a helyadatait arra használja, hogy a tűt a probléma helyére tegye. Csak akkor használja, ha a Jelenlegi helyzetem gombra koppint."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa usa la tua posizione per mettere il segnaposto dove si trova il problema. La usa solo quando tocchi Usa la mia posizione."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa naudoja jūsų buvimo vietą, kad pažymėtų problemos vietą žemėlapyje. Ji naudojama tik tada, kai paliečiate „Naudoti mano vietą“."
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa izmanto jūsu atrašanās vietu, lai novietotu atzīmi tur, kur ir problēma. Tā tiek izmantota tikai tad, kad pieskaraties pogai Izmantot manu atrašanās vietu."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa bruker posisjonen din for å plassere nålen der problemet er. Den brukes bare når du trykker på Bruk min posisjon."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa gebruikt je locatie om de speld te plaatsen waar het probleem is. Je locatie wordt alleen gebruikt als je op Gebruik mijn locatie tikt."
           }
         },
         "pl" : {
@@ -78,21 +240,87 @@
             "state" : "translated",
             "value" : "Fixa używa twojej lokalizacji, aby wbić pinezkę w miejscu problemu. Tylko gdy dotkniesz „Użyj mojej lokalizacji”."
           }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A Fixa usa a sua localização para colocar o marcador onde está o problema. Só é usada quando toca em Usar a minha localização."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa folosește locația dumneavoastră pentru a plasa pinul acolo unde este problema. Locația este folosită doar când atingeți Folosiți locația mea."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa использует вашу геопозицию, чтобы поставить метку там, где находится проблема. Геопозиция используется, только когда вы нажимаете «Использовать мою геопозицию»."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa använder din plats för att sätta nålen där problemet finns. Platsen används bara när du trycker på Använd min plats."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa використовує ваше місцезнаходження, щоб поставити мітку там, де проблема. Лише коли ви торкаєтеся «Моє місцезнаходження»."
+          }
         }
       }
     },
     "NSCameraUsageDescription" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يستخدم Fixa الكاميرا لتتمكن من التقاط صورة للمشكلة."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa používá fotoaparát, abyste mohli problém vyfotit."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa bruger kameraet, så du kan tage et billede af problemet."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa verwendet die Kamera, damit Sie ein Foto vom Problem machen können."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Το Fixa χρησιμοποιεί την κάμερα για να μπορείτε να φωτογραφίσετε το πρόβλημα."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fixa uses the camera so you can take a photo of the problem."
           }
         },
-        "sv" : {
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa använder kameran så att du kan ta en bild av problemet."
+            "value" : "Fixa usa la cámara para que puedas hacer una foto del problema."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa kasutab kaamerat, et saaksite probleemist foto teha."
           }
         },
         "fi" : {
@@ -101,16 +329,46 @@
             "value" : "Fixa käyttää kameraa, jotta voit ottaa kuvan ongelmasta."
           }
         },
-        "ar" : {
+        "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "يستخدم Fixa الكاميرا لتتمكن من التقاط صورة للمشكلة."
+            "value" : "Fixa utilise l'appareil photo pour que vous puissiez photographier le problème."
           }
         },
-        "uk" : {
+        "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa використовує камеру, щоб ви могли сфотографувати проблему."
+            "value" : "A Fixa a kamerát használja, hogy fényképet készíthessen a problémáról."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa usa la fotocamera per permetterti di fotografare il problema."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa naudoja kamerą, kad galėtumėte nufotografuoti problemą."
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa izmanto kameru, lai jūs varētu nofotografēt problēmu."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa bruker kameraet slik at du kan ta et bilde av problemet."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa gebruikt de camera zodat je een foto van het probleem kunt maken."
           }
         },
         "pl" : {
@@ -118,21 +376,87 @@
             "state" : "translated",
             "value" : "Fixa używa aparatu, aby można było zrobić zdjęcie problemu."
           }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A Fixa usa a câmara para que possa tirar uma fotografia do problema."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa folosește camera ca să puteți fotografia problema."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa использует камеру, чтобы вы могли сфотографировать проблему."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa använder kameran så att du kan ta en bild av problemet."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa використовує камеру, щоб ви могли сфотографувати проблему."
+          }
         }
       }
     },
     "NSPhotoLibraryUsageDescription" : {
       "localizations" : {
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يتيح لك Fixa اختيار صور للمشكلة لإرفاقها ببلاغك."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ve Fixe můžete vybrat fotky problému a přiložit je k hlášení."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Med Fixa kan du vælge billeder af problemet og vedhæfte dem din anmeldelse."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit Fixa können Sie Fotos vom Problem auswählen und Ihrer Meldung beifügen."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Με το Fixa μπορείτε να επιλέξετε φωτογραφίες του προβλήματος και να τις επισυνάψετε στην αναφορά σας."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fixa lets you pick photos of the problem to attach to your report."
           }
         },
-        "sv" : {
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Med Fixa kan du välja bilder på problemet och bifoga dem i anmälan."
+            "value" : "Fixa te permite elegir fotos del problema para adjuntarlas a tu aviso."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa abil saate valida probleemi fotod ja lisada need teatele."
           }
         },
         "fi" : {
@@ -141,22 +465,82 @@
             "value" : "Fixalla voit valita kuvia ongelmasta ja liittää ne ilmoitukseen."
           }
         },
-        "ar" : {
+        "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "يتيح لك Fixa اختيار صور للمشكلة لإرفاقها ببلاغك."
+            "value" : "Fixa vous permet de choisir des photos du problème à joindre à votre signalement."
           }
         },
-        "uk" : {
+        "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "У Fixa можна вибрати фото проблеми й додати їх до звернення."
+            "value" : "A Fixával fényképeket választhat a problémáról, és csatolhatja őket a bejelentéshez."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Con Fixa puoi scegliere foto del problema da allegare alla segnalazione."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa leidžia pasirinkti problemos nuotraukas ir pridėti jas prie pranešimo."
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fixa ļauj izvēlēties problēmas fotoattēlus, ko pievienot ziņojumam."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Med Fixa kan du velge bilder av problemet og legge dem ved meldingen."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Met Fixa kun je foto's van het probleem kiezen en aan je melding toevoegen."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "W aplikacji Fixa możesz wybrać zdjęcia problemu i dołączyć je do zgłoszenia."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A Fixa permite-lhe escolher fotografias do problema para anexar à sua participação."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cu Fixa puteți alege fotografii ale problemei pe care să le atașați la sesizare."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В Fixa можно выбрать фото проблемы и прикрепить их к заявке."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Med Fixa kan du välja bilder på problemet och bifoga dem i anmälan."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "У Fixa можна вибрати фото проблеми й додати їх до звернення."
           }
         }
       }

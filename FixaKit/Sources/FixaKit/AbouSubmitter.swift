@@ -16,6 +16,10 @@ public struct AbouSubmitter: Sendable {
     }
 
     /// dryRun=true stops at the Summary page and returns nil receipt (no case created).
+    ///
+    /// A locked or expired session before the final confirmation starts over once from `introPath`
+    /// with fresh cookies. Once the final confirmation has been sent nothing is retried or restarted:
+    /// any failure to read the receipt is `.uncertain`.
     public func submit(
         _ draft: ReportDraft,
         dryRun: Bool = false,
@@ -28,10 +32,34 @@ public struct AbouSubmitter: Sendable {
         }
 
         progress(.starting)
+        do {
+            return try await walk(draft, base: base, dryRun: dryRun, progress: progress)
+        } catch is SessionLost {
+            do {
+                return try await walk(draft, base: base, dryRun: dryRun, progress: progress)
+            } catch let lost as SessionLost {
+                throw lost.error
+            }
+        }
+    }
+
+    /// The session ended under us before the final send; `submit` may start over once.
+    struct SessionLost: Error {
+        let error: SubmissionError
+    }
+
+    /// One pass from a fresh session to the receipt. Throws `SessionLost` only before the final send.
+    private func walk(
+        _ draft: ReportDraft,
+        base: URL,
+        dryRun: Bool,
+        progress: @Sendable (SubmissionStage) -> Void
+    ) async throws -> SubmissionReceipt? {
+        let channel = spec.channel
         (transport as? URLSessionTransport)?.clearCookies()
         _ = try await get(try url(channel.introPath, base: base))
         var page = try await get(try url(channel.startPath, base: base))
-        if isLocked(page.html) { throw SubmissionError.sessionLocked }
+        try checkSession(page)
 
         // The platform may skip pages (Värmdö skips contact details when no reply is wanted),
         // so each response may land on the expected page or any later one.
@@ -46,18 +74,7 @@ public struct AbouSubmitter: Sendable {
                     return nil
                 }
                 progress(.confirming)
-                page = try await post(page, values: [])
-                page = try await finishProcessing(page)
-                if isLocked(page.html) { throw SubmissionError.sessionLocked }
-                let errors = AbouPageParser.validationErrors(page.html)
-                if !errors.isEmpty { throw SubmissionError.serverValidation(errors) }
-                guard let receipt = AbouPageParser.parseReceipt(html: page.html, url: page.url, now: Date()) else {
-                    throw SubmissionError.formChanged(FormDrift(
-                        pageID: currentPageID(page),
-                        missing: [],
-                        detail: "After the final confirmation the e-service showed a page without a receipt (\(page.url.absoluteString))."
-                    ))
-                }
+                let receipt = try await confirm(page)
                 progress(.done)
                 return receipt
             }
@@ -74,6 +91,32 @@ public struct AbouSubmitter: Sendable {
         throw SubmissionError.invalidSpec("No summary page")
     }
 
+    /// Sends Slutför on the summary page and reads the receipt.
+    private func confirm(_ summary: Page) async throws -> SubmissionReceipt {
+        let request = try postRequest(summary, values: [])
+        // ---- FINAL SEND: from the next line on the case may exist. ----
+        // No retry and no session restart past this point; anything but a receipt or the server's own
+        // validation messages is `.uncertain`.
+        var page: Page
+        do {
+            page = try await self.page(request)
+            page = try await finishProcessing(page)
+        } catch let error as SubmissionError {
+            throw SubmissionError.uncertain("No answer after the final confirmation was sent: \(error)")
+        } catch {
+            throw SubmissionError.uncertain("No answer after the final confirmation was sent: \(error.localizedDescription)")
+        }
+        if isLocked(page.html) {
+            throw SubmissionError.uncertain("After the final confirmation the e-service said a case is already open (\(page.url.absoluteString)).")
+        }
+        let errors = AbouPageParser.validationErrors(page.html)
+        if !errors.isEmpty { throw SubmissionError.serverValidation(errors) }
+        guard let receipt = AbouPageParser.parseReceipt(html: page.html, url: page.url, now: Date()) else {
+            throw SubmissionError.uncertain("After the final confirmation the e-service showed a page without a receipt (\(page.url.absoluteString)).")
+        }
+        return receipt
+    }
+
     // MARK: - Pages
 
     struct Page {
@@ -84,6 +127,19 @@ public struct AbouSubmitter: Sendable {
     private func isLocked(_ html: String) -> Bool {
         html.contains(spec.channel.sessionLockedMarker)
             || AbouPageParser.decodeEntities(html).contains(spec.channel.sessionLockedMarker)
+    }
+
+    /// Before the final send: a page saying another case is open, or the platform's generic error /
+    /// intro page instead of a form page (the session expired), means start over.
+    private func checkSession(_ page: Page) throws {
+        if isLocked(page.html) { throw SessionLost(error: .sessionLocked) }
+        let action = AbouPageParser.formAction(page.html) ?? ""
+        let bouncedToIntro = page.url.path.caseInsensitiveCompare(spec.channel.introPath) == .orderedSame
+        if page.url.path.localizedCaseInsensitiveContains("GenericError")
+            || action.localizedCaseInsensitiveContains("GenericError")
+            || bouncedToIntro {
+            throw SessionLost(error: .transport("The e-service ended the session (\(page.url.absoluteString))."))
+        }
     }
 
     private func currentPageID(_ page: Page) -> String? {
@@ -100,7 +156,7 @@ public struct AbouSubmitter: Sendable {
         let pages = spec.channel.pages
         let current = currentPageID(page)
         if let index = pages[start...].firstIndex(where: { $0.id == current }) { return index }
-        if isLocked(page.html) { throw SubmissionError.sessionLocked }
+        try checkSession(page)
         let errors = AbouPageParser.validationErrors(page.html)
         if !errors.isEmpty { throw SubmissionError.serverValidation(errors) }
 
@@ -208,7 +264,7 @@ public struct AbouSubmitter: Sendable {
         body.append(photo)
         body.append(Data("\r\n--\(boundary)--\r\n".utf8))
 
-        var request = makeRequest(try url(upload.path, base: base), method: "POST")
+        var request = makeRequest(try url(upload.path, base: base), method: "POST", timeout: SubmissionTimeouts.upload)
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         request.setValue("XMLHttpRequest", forHTTPHeaderField: "X-Requested-With")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
@@ -248,8 +304,8 @@ public struct AbouSubmitter: Sendable {
         return url
     }
 
-    private func makeRequest(_ url: URL, method: String) -> URLRequest {
-        var request = URLRequest(url: url, timeoutInterval: 30)
+    private func makeRequest(_ url: URL, method: String, timeout: TimeInterval = SubmissionTimeouts.page) -> URLRequest {
+        var request = URLRequest(url: url, timeoutInterval: timeout)
         request.httpMethod = method
         request.setValue(Self.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("sv-SE,sv;q=0.9", forHTTPHeaderField: "Accept-Language")
@@ -277,6 +333,11 @@ public struct AbouSubmitter: Sendable {
 
     /// Posts the page's form with all hidden inputs, an event target (the Next button by default) and `values`.
     private func post(_ page: Page, values: [(String, String)], eventTarget: String? = nil) async throws -> Page {
+        try await self.page(try postRequest(page, values: values, eventTarget: eventTarget))
+    }
+
+    /// The form POST for `page`, built without sending anything.
+    private func postRequest(_ page: Page, values: [(String, String)], eventTarget: String? = nil) throws -> URLRequest {
         guard let action = AbouPageParser.formAction(page.html),
               let target = URL(string: action, relativeTo: page.url)?.absoluteURL else {
             throw SubmissionError.formChanged(FormDrift(
@@ -294,7 +355,7 @@ public struct AbouSubmitter: Sendable {
         request.setValue("application/x-www-form-urlencoded; charset=utf-8", forHTTPHeaderField: "Content-Type")
         request.setValue("text/html,application/xhtml+xml", forHTTPHeaderField: "Accept")
         request.httpBody = Data(Self.formEncode(fields.sorted { $0.key < $1.key }).utf8)
-        return try await self.page(request)
+        return request
     }
 
     private func page(_ request: URLRequest) async throws -> Page {

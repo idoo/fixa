@@ -1,8 +1,9 @@
 import Foundation
 
-/// An adapter that decodes but cannot be run, with the reasons.
+/// An adapter that cannot be run (`invalid`) or a downloaded one that may not replace the bundled one (`rejected`).
 public enum AdapterSpecError: Error, Sendable, Equatable {
     case invalid([String])
+    case rejected([String])
 }
 
 extension AdapterSpec {
@@ -17,7 +18,8 @@ extension AdapterSpec {
         if let minAppBuild, minAppBuild < 1 { problems.append("minAppBuild must be at least 1") }
         if id.isEmpty { problems.append("empty id") }
         if channel.kind != "abou" { problems.append("unknown channel kind \(channel.kind)") }
-        if URL(string: channel.baseURL)?.scheme != "https" { problems.append("baseURL must be https") }
+        problems += AdapterSpecValidator.channelProblems(channel)
+        problems += AdapterSpecValidator.sizeProblems(self)
         if channel.pages.isEmpty { problems.append("no pages") }
         unique(channel.pages.map(\.id), "page")
         let roles = Set(channel.pages.flatMap(\.fields).map(\.role))
@@ -74,19 +76,151 @@ public struct AdapterStatus: Codable, Sendable, Equatable {
     }
 }
 
+/// Safety rules for adapters. The adapter decides where the user's name, e-mail, phone, photo and location
+/// are posted, so a downloaded adapter may change how the form is filled but never where reports go.
+public enum AdapterSpecValidator {
+    /// Largest adapter download accepted, in bytes.
+    public static let maxBytes = 256 * 1024
+    public static let maxPages = 20
+    public static let maxFieldsPerPage = 50
+    public static let maxCategories = 100
+    public static let maxTiles = 100
+    /// Upper bound for labels or synonyms per entry and for emergency contacts and rules.
+    public static let maxListItems = 50
+    public static let maxCompletionPostBacks = 5
+
+    /// Decodes a downloaded adapter and checks it against the bundled adapter with the same id.
+    /// Throws `AdapterSpecError.rejected` for oversized data, unknown ids and any change of destination.
+    public static func validateRemote(_ data: Data, bundled: [AdapterSpec]) throws -> AdapterSpec {
+        guard data.count <= maxBytes else {
+            throw AdapterSpecError.rejected(["download is \(data.count) bytes, over \(maxBytes)"])
+        }
+        let spec = try AdapterCatalog.decode(data)
+        guard let pinned = bundled.first(where: { $0.id == spec.id }) else {
+            throw AdapterSpecError.rejected(["unknown adapter id \(spec.id)"])
+        }
+        let problems = pinningProblems(remote: spec, bundled: pinned)
+        guard problems.isEmpty else { throw AdapterSpecError.rejected(problems) }
+        return spec
+    }
+
+    /// Everything a downloaded adapter may not change: where reports go (channel kind, host, service),
+    /// the fallback e-mail address and the emergency phone numbers. Empty means the remote may be used.
+    public static func pinningProblems(remote: AdapterSpec, bundled: AdapterSpec) -> [String] {
+        var problems: [String] = []
+        if remote.id != bundled.id { problems.append("unknown adapter id \(remote.id)") }
+        if remote.channel.kind != bundled.channel.kind { problems.append("channel kind changed") }
+        let remoteOrigin = origin(remote.channel.baseURL)
+        if remoteOrigin == nil || remoteOrigin != origin(bundled.channel.baseURL) {
+            problems.append("channel host changed")
+        }
+        if remote.channel.service != bundled.channel.service { problems.append("service changed") }
+        if remote.fallbackEmail?.lowercased() != bundled.fallbackEmail?.lowercased() {
+            problems.append("fallback e-mail changed")
+        }
+        let phones = { (spec: AdapterSpec) in (spec.emergency?.contacts.map(\.phone) ?? []).sorted() }
+        if phones(remote) != phones(bundled) { problems.append("emergency phone numbers changed") }
+        return problems
+    }
+
+    /// `https://host` with a plain ASCII host and no user, password, port, path, query or fragment.
+    /// Returns the lowercased origin, or nil when the URL is anything else.
+    static func origin(_ string: String) -> String? {
+        guard !string.contains("\\"),
+              let c = URLComponents(string: string),
+              c.scheme?.lowercased() == "https",
+              let host = c.host?.lowercased(), !host.isEmpty, !host.hasPrefix("."), !host.hasSuffix("."),
+              host.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "." || $0 == "-") }),
+              c.user == nil, c.password == nil, c.port == nil,
+              c.path.isEmpty || c.path == "/", c.query == nil, c.fragment == nil
+        else { return nil }
+        return "https://\(host)"
+    }
+
+    /// A path the submitter may request: starts with one `/`, no scheme, `//`, backslash, whitespace or
+    /// non-ASCII, and still resolves to `origin` (same scheme and host, no port or user).
+    static func isSafePath(_ path: String, origin: String) -> Bool {
+        guard path.hasPrefix("/"), !path.contains("//"), !path.contains(":"), !path.contains("\\"),
+              path.unicodeScalars.allSatisfy({ $0.value > 0x20 && $0.value < 0x7F }),
+              let base = URL(string: origin),
+              let resolved = URL(string: path, relativeTo: base)?.absoluteURL,
+              let resolvedOrigin = URL(string: "/", relativeTo: resolved)?.absoluteURL
+        else { return false }
+        return resolved.scheme == "https" && resolved.port == nil && resolved.user == nil
+            && resolved.host?.lowercased() == base.host?.lowercased()
+            && resolvedOrigin.absoluteString.lowercased() == origin + "/"
+    }
+
+    /// Channel rules every adapter must meet, bundled or downloaded.
+    static func channelProblems(_ channel: AdapterSpec.Channel) -> [String] {
+        guard let origin = origin(channel.baseURL) else {
+            return ["baseURL must be a plain https origin (no user, port, path or query)"]
+        }
+        var problems: [String] = []
+        var paths = [("introPath", channel.introPath), ("startPath", channel.startPath)]
+        if let upload = channel.upload {
+            paths += [("upload.path", upload.path), ("upload.actionPath", upload.actionPath)]
+            // Both go into a multipart Content-Disposition header.
+            for (name, value) in [("upload.filePartName", upload.filePartName), ("upload.fileName", upload.fileName)]
+            where value.isEmpty || value.unicodeScalars.contains(where: { $0.value < 0x20 || $0.value == 0x7F || "\"\\/;".unicodeScalars.contains($0) }) {
+                problems.append("\(name) has unsafe characters")
+            }
+        }
+        for (name, path) in paths where !isSafePath(path, origin: origin) {
+            problems.append("\(name) must be a path on \(origin)")
+        }
+        if let n = channel.maxCompletionPostBacks, !(0...maxCompletionPostBacks).contains(n) {
+            problems.append("maxCompletionPostBacks must be 0...\(maxCompletionPostBacks)")
+        }
+        return problems
+    }
+
+    /// Upper bounds on list sizes, so an adapter cannot make the engine do absurd amounts of work.
+    static func sizeProblems(_ spec: AdapterSpec) -> [String] {
+        var problems: [String] = []
+        let pages = spec.channel.pages
+        if pages.count > maxPages { problems.append("more than \(maxPages) pages") }
+        if pages.contains(where: { $0.fields.count > maxFieldsPerPage }) {
+            problems.append("more than \(maxFieldsPerPage) fields on a page")
+        }
+        if spec.categories.count > maxCategories { problems.append("more than \(maxCategories) categories") }
+        if spec.tiles.count > maxTiles { problems.append("more than \(maxTiles) tiles") }
+        let fields = pages.flatMap(\.fields)
+        var lists: [Int] = [spec.emergency?.contacts.count ?? 0, spec.emergency?.rules.count ?? 0]
+        for field in fields {
+            let labels: [String: [String]] = field.labels ?? [:]
+            let synonyms: [String: [String]] = field.optionSynonyms ?? [:]
+            lists.append(labels.count + synonyms.count)
+            lists += labels.values.map(\.count)
+            lists += synonyms.values.map(\.count)
+        }
+        lists += spec.categories.map { $0.synonyms?.count ?? 0 }
+        if lists.contains(where: { $0 > maxListItems }) { problems.append("a list has more than \(maxListItems) items") }
+        return problems
+    }
+}
+
 /// Decides whether a downloaded adapter may replace the one the app ships with.
 public enum AdapterUpdatePolicy {
     /// Highest adapter `specVersion` this engine can run.
     public static let supportedSpecVersion = 1
 
-    /// The remote adapter when it decodes, passes `AdapterSpec.problems`, has the bundled adapter's id,
-    /// a supported `specVersion` and a `minAppBuild` this build meets; otherwise nil (keep the bundled one).
-    public static func accept(remote: Data, bundled: AdapterSpec, appBuild: Int) -> AdapterSpec? {
-        guard let spec = try? AdapterCatalog.decode(remote),
-              spec.id == bundled.id,
-              spec.specVersion <= supportedSpecVersion,
-              (spec.minAppBuild ?? 0) <= appBuild
-        else { return nil }
+    /// The remote adapter when it passes `AdapterSpecValidator.validateRemote` against the bundled adapter
+    /// (size, problems, same id, same destination), has a supported `specVersion` and a `minAppBuild` this
+    /// build meets. Throws the reason otherwise; the caller keeps the bundled or last good adapter.
+    public static func check(remote: Data, bundled: AdapterSpec, appBuild: Int) throws -> AdapterSpec {
+        let spec = try AdapterSpecValidator.validateRemote(remote, bundled: [bundled])
+        guard spec.specVersion <= supportedSpecVersion else {
+            throw AdapterSpecError.rejected(["specVersion \(spec.specVersion) is newer than \(supportedSpecVersion)"])
+        }
+        if let minAppBuild = spec.minAppBuild, minAppBuild > appBuild {
+            throw AdapterSpecError.rejected(["needs app build \(minAppBuild), this is \(appBuild)"])
+        }
         return spec
+    }
+
+    /// `check` without the reason: the accepted adapter, or nil (keep the bundled one).
+    public static func accept(remote: Data, bundled: AdapterSpec, appBuild: Int) -> AdapterSpec? {
+        try? check(remote: remote, bundled: bundled, appBuild: appBuild)
     }
 }

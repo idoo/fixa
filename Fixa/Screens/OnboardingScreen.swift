@@ -51,6 +51,7 @@ struct OnboardingScreen: View {
             FxPrimaryButton(title: String(localized: "Continue", bundle: L10n.bundle, locale: L10n.locale)) {
                 model.finishOnboarding()
             }
+            .accessibilityIdentifier("onboarding.continue")
         }
         .interactiveDismissDisabled()
         .sheet(isPresented: $isLanguagePresented) {

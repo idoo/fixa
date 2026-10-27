@@ -5,6 +5,8 @@ import Foundation
 ///   -FixaScreen home|report|location|review|receipt|history|about|settings|textsize|language|contact|privacy|onboarding
 ///                   (onboarding shows the first-launch disclaimer; every other screen, and -FixaDemo, skips it)
 ///   -FixaStatus degraded|down  forces the municipality e-service status Home shows (status banner)
+///   -FixaStatus offline|uncertain  with -FixaDemo 1: the demo report as "Waiting to send" (offline)
+///                   or "May have been sent" (uncertain) on the receipt, in Sent reports and on Home
 ///   -FixaTextSize medium|large|xLarge|xxLarge|xxxLarge|accessibility1|accessibility2|accessibility3
 ///                   overrides the saved text size for this launch (saved only by a real change in Settings)
 ///   -FixaLanguage en|sv|fi|ar|uk|pl|system  switches the UI language in-app right after launch,
@@ -20,12 +22,18 @@ struct LaunchOptions: Sendable {
         case home, report, location, review, receipt, history, about, settings, textsize, language, contact, privacy, onboarding
     }
 
+    /// `-FixaStatus offline|uncertain`: a send outcome to show without sending anything.
+    enum SendState: String, Sendable {
+        case offline, uncertain
+    }
+
     var screen: Screen?
     var textSize: TextSizeStep?
     /// `-FixaLanguage`: `.some(nil)` is "Same as iPhone"; nil leaves the saved choice.
     var language: AppLanguage??
     /// `-FixaStatus`: a forced e-service status, or nil to use the real one.
     var status: AdapterStatus?
+    var sendState: SendState?
     var demo: Bool
     var emptyHistory: Bool
     var dryRun: Bool
@@ -54,6 +62,7 @@ struct LaunchOptions: Sendable {
         status = value("-FixaStatus")
             .flatMap { AdapterStatus.State(rawValue: $0.lowercased()) }
             .map { AdapterStatus(state: $0) }
+        sendState = value("-FixaStatus").flatMap { SendState(rawValue: $0.lowercased()) }
         demo = isOn("-FixaDemo")
         emptyHistory = isOn("-FixaEmptyHistory")
         dryRun = isOn("-FixaDryRun")

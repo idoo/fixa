@@ -18,7 +18,7 @@ Värmdö's fault-report form is Swedish only, spans five web pages, accepts one 
 - GPS, a real map and address search; coordinates go into both the place text and the form's map field;
 - up to three photos, merged into the single attachment the form accepts, with metadata stripped;
 - a one-tap emergency call that picks the right number for the time of day (service centre or the after-hours water/sewer duty line);
-- the interface in Swedish, English, Finnish, Arabic, Ukrainian and Polish;
+- the interface in 22 languages: Swedish, English, Finnish, Arabic, Ukrainian, Russian, Polish, German, French, Spanish, Italian, Portuguese, Dutch, Danish, Norwegian, Estonian, Latvian, Lithuanian, Romanian, Greek, Hungarian and Czech;
 - a local history of what you sent;
 - e-mail as a fallback when the e-service is down.
 

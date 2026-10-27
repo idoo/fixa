@@ -15,7 +15,7 @@ CATALOGS = [
     ROOT / "Fixa/Resources/Localizable.xcstrings",
     ROOT / "Fixa/Resources/InfoPlist.xcstrings",
 ]
-LANGUAGES = ["en", "sv", "fi", "ar", "uk", "pl"]
+LANGUAGES = ["en", "sv", "cs", "da", "de", "et", "es", "fr", "it", "lv", "lt", "hu", "nl", "nb", "pl", "pt", "ro", "fi", "el", "ru", "uk", "ar"]
 # %@, %lld, %d, %.5f, positional %1$@ … ; %% is a literal percent sign.
 SPECIFIER = re.compile(r"%(?:\d+\$)?[-+ 0#]*\d*(?:\.\d+)?(?:hh|h|ll|l|q|z|t|j)?[@dDuUxXoOfFeEgGcCsSaAp%]")
 

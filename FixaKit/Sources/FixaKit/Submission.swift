@@ -52,6 +52,27 @@ public enum SubmissionError: Error, Sendable, Equatable {
     case transport(String)
     /// The adapter itself is unusable (bad channel kind, URL or page list), independent of the live page.
     case invalidSpec(String)
+    /// The final confirmation was sent but no receipt was read (timeout, dropped connection, unknown page).
+    /// The case may or may not exist; never retry automatically, it could file a duplicate.
+    case uncertain(String)
+
+    /// True only when nothing reached the municipality as a case: a network or HTTP failure before the
+    /// final confirmation was sent. Everything else needs a person (or a new adapter) first.
+    public var isRetrySafe: Bool {
+        switch self {
+        case .transport, .http: true
+        case .sessionLocked, .serverValidation, .formChanged, .uploadFailed, .invalidSpec, .uncertain: false
+        }
+    }
+}
+
+/// Per-request timeouts, kept in one place. Mobile networks stall; a page should never hang a send
+/// for minutes, but a photo upload over a weak connection legitimately takes longer.
+public enum SubmissionTimeouts {
+    /// GET and form POST of one e-service page.
+    public static let page: TimeInterval = 30
+    /// Multipart photo upload.
+    public static let upload: TimeInterval = 120
 }
 
 public enum SubmissionStage: Sendable, Equatable {
@@ -70,10 +91,12 @@ public struct URLSessionTransport: HTTPTransport {
         self.session = session
     }
 
-    /// Ephemeral configuration (private cookie jar, no disk cache), 30 s timeout.
+    /// Ephemeral configuration (private cookie jar, no disk cache). Each request carries its own
+    /// timeout from `SubmissionTimeouts`; the session only bounds a whole resource.
     public static func ephemeral() -> URLSessionTransport {
         let configuration = URLSessionConfiguration.ephemeral
-        configuration.timeoutIntervalForRequest = 30
+        configuration.timeoutIntervalForRequest = SubmissionTimeouts.upload
+        configuration.timeoutIntervalForResource = SubmissionTimeouts.upload * 2
         configuration.httpCookieAcceptPolicy = .always
         configuration.httpShouldSetCookies = true
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData

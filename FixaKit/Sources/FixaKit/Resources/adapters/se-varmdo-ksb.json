@@ -6,8 +6,16 @@
     "name": "Värmdö kommun",
     "countryCode": "SE",
     "region": {
-      "center": { "latitude": 59.31, "longitude": 18.55 },
-      "bbox": { "minLatitude": 59.15, "maxLatitude": 59.45, "minLongitude": 18.25, "maxLongitude": 19.05 }
+      "center": {
+        "latitude": 59.31,
+        "longitude": 18.55
+      },
+      "bbox": {
+        "minLatitude": 59.15,
+        "maxLatitude": 59.45,
+        "minLongitude": 18.25,
+        "maxLongitude": 19.05
+      }
     }
   },
   "channel": {
@@ -25,22 +33,194 @@
         "id": "FaultReport",
         "stage": "sendingReport",
         "fields": [
-          { "role": "category", "key": "KSB_14", "control": "dropDownListFieldControl", "type": "select", "labels": { "sv": ["Välj område", "Område", "Kategori"], "en": ["Choose area", "Category"] } },
-          { "role": "place", "key": "KSB_18", "control": "textFieldControl", "type": "text", "labels": { "sv": ["Plats", "Adress", "Plats eller adress"], "en": ["Place", "Location", "Address"] } },
-          { "role": "mapChoice", "key": "KSB_20", "control": "radioButtonListFieldControl", "type": "radio", "yesValue": "Ja, visa karta och ange position", "noValue": "Nej", "labels": { "sv": ["Jag vill också peka ut området", "Vill du peka ut området på karta"], "en": ["I also want to mark the area"] }, "optionSynonyms": { "Ja, visa karta och ange position": ["Ja", "Ja, visa karta", "Visa karta"], "Nej": ["Nej tack"] } },
-          { "role": "mapAnswer", "key": "KSB_19", "control": "MapAnswer", "type": "hidden", "labels": { "sv": ["Zooma och märk ut område på karta", "Märk ut område på karta"], "en": ["Mark the area on the map"] } },
-          { "role": "description", "key": "U_29_1_1", "control": "textFieldControl", "type": "textarea", "labels": { "sv": ["Beskriv felet här", "Beskriv felet", "Beskrivning"], "en": ["Describe the fault", "Description"] } },
-          { "role": "feedback", "key": "KSB_54", "control": "radioButtonListFieldControl", "type": "radio", "yesValue": "Ja", "noValue": "Nej", "labels": { "sv": ["Jag vill ha återkoppling", "Vill du ha återkoppling"], "en": ["I want feedback"] }, "optionSynonyms": { "Ja": ["Ja tack", "Ja, jag vill ha återkoppling"], "Nej": ["Nej tack", "Nej, ingen återkoppling"] } }
+          {
+            "role": "category",
+            "key": "KSB_14",
+            "control": "dropDownListFieldControl",
+            "type": "select",
+            "labels": {
+              "sv": [
+                "Välj område",
+                "Område",
+                "Kategori"
+              ],
+              "en": [
+                "Choose area",
+                "Category"
+              ]
+            }
+          },
+          {
+            "role": "place",
+            "key": "KSB_18",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Plats",
+                "Adress",
+                "Plats eller adress"
+              ],
+              "en": [
+                "Place",
+                "Location",
+                "Address"
+              ]
+            }
+          },
+          {
+            "role": "mapChoice",
+            "key": "KSB_20",
+            "control": "radioButtonListFieldControl",
+            "type": "radio",
+            "yesValue": "Ja, visa karta och ange position",
+            "noValue": "Nej",
+            "labels": {
+              "sv": [
+                "Jag vill också peka ut området",
+                "Vill du peka ut området på karta"
+              ],
+              "en": [
+                "I also want to mark the area"
+              ]
+            },
+            "optionSynonyms": {
+              "Ja, visa karta och ange position": [
+                "Ja",
+                "Ja, visa karta",
+                "Visa karta"
+              ],
+              "Nej": [
+                "Nej tack"
+              ]
+            }
+          },
+          {
+            "role": "mapAnswer",
+            "key": "KSB_19",
+            "control": "MapAnswer",
+            "type": "hidden",
+            "labels": {
+              "sv": [
+                "Zooma och märk ut område på karta",
+                "Märk ut område på karta"
+              ],
+              "en": [
+                "Mark the area on the map"
+              ]
+            }
+          },
+          {
+            "role": "description",
+            "key": "U_29_1_1",
+            "control": "textFieldControl",
+            "type": "textarea",
+            "labels": {
+              "sv": [
+                "Beskriv felet här",
+                "Beskriv felet",
+                "Beskrivning"
+              ],
+              "en": [
+                "Describe the fault",
+                "Description"
+              ]
+            }
+          },
+          {
+            "role": "feedback",
+            "key": "KSB_54",
+            "control": "radioButtonListFieldControl",
+            "type": "radio",
+            "yesValue": "Ja",
+            "noValue": "Nej",
+            "labels": {
+              "sv": [
+                "Jag vill ha återkoppling",
+                "Vill du ha återkoppling"
+              ],
+              "en": [
+                "I want feedback"
+              ]
+            },
+            "optionSynonyms": {
+              "Ja": [
+                "Ja tack",
+                "Ja, jag vill ha återkoppling"
+              ],
+              "Nej": [
+                "Nej tack",
+                "Nej, ingen återkoppling"
+              ]
+            }
+          }
         ]
       },
       {
         "id": "PersonalEmailInformation",
         "stage": "sendingContact",
         "fields": [
-          { "role": "firstName", "key": "U_29_3_2", "control": "textFieldControl", "type": "text", "labels": { "sv": ["Förnamn"], "en": ["First name"] } },
-          { "role": "lastName", "key": "U_29_3_3", "control": "textFieldControl", "type": "text", "labels": { "sv": ["Efternamn"], "en": ["Last name"] } },
-          { "role": "phone", "key": "KSB_17", "control": "textFieldControl", "type": "text", "labels": { "sv": ["Telefon", "Telefonnummer", "Mobilnummer"], "en": ["Phone"] } },
-          { "role": "email", "key": "U_29_3_1", "control": "AnswerTextBoxControl", "type": "text", "labels": { "sv": ["E-post", "E-postadress", "Epost"], "en": ["Email", "E-mail"] } }
+          {
+            "role": "firstName",
+            "key": "U_29_3_2",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Förnamn"
+              ],
+              "en": [
+                "First name"
+              ]
+            }
+          },
+          {
+            "role": "lastName",
+            "key": "U_29_3_3",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Efternamn"
+              ],
+              "en": [
+                "Last name"
+              ]
+            }
+          },
+          {
+            "role": "phone",
+            "key": "KSB_17",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Telefon",
+                "Telefonnummer",
+                "Mobilnummer"
+              ],
+              "en": [
+                "Phone"
+              ]
+            }
+          },
+          {
+            "role": "email",
+            "key": "U_29_3_1",
+            "control": "AnswerTextBoxControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "E-post",
+                "E-postadress",
+                "Epost"
+              ],
+              "en": [
+                "Email",
+                "E-mail"
+              ]
+            }
+          }
         ]
       },
       {
@@ -59,22 +239,449 @@
     }
   },
   "categories": [
-    { "id": "lighting", "value": "Belysning", "synonyms": ["Gatubelysning", "Belysning och gatlampor", "Gatljus"], "title": { "sv": "Belysning", "en": "Street lighting", "fi": "Katuvalaistus", "ar": "الإنارة", "uk": "Освітлення", "pl": "Oświetlenie" } },
-    { "id": "roads", "value": "Gator och cykelvägar", "synonyms": ["Gator och vägar", "Gator, vägar och cykelvägar", "Gata och cykelväg", "Vägar"], "title": { "sv": "Gator och cykelvägar", "en": "Streets and cycle paths", "fi": "Kadut ja pyörätiet", "ar": "الشوارع ومسارات الدراجات", "uk": "Вулиці та велодоріжки", "pl": "Ulice i drogi rowerowe" } },
-    { "id": "graffiti", "value": "Klotter och skadegörelse", "synonyms": ["Klotter", "Skadegörelse", "Klotter och vandalisering"], "title": { "sv": "Klotter och skadegörelse", "en": "Graffiti and vandalism", "fi": "Töhryt ja ilkivalta", "ar": "الكتابة على الجدران والتخريب", "uk": "Графіті та вандалізм", "pl": "Graffiti i wandalizm" } },
-    { "id": "parks", "value": "Parker och grönytor", "synonyms": ["Parker och grönområden", "Park och natur", "Parker, lekplatser och grönytor", "Grönytor"], "title": { "sv": "Parker och grönytor", "en": "Parks and green spaces", "fi": "Puistot ja viheralueet", "ar": "الحدائق والمساحات الخضراء", "uk": "Парки та зелені зони", "pl": "Parki i tereny zielone" } },
-    { "id": "water", "value": "Vatten och avlopp", "synonyms": ["VA", "Vatten", "Avlopp", "Vatten, avlopp och dagvatten"], "title": { "sv": "Vatten och avlopp", "en": "Water and sewer", "fi": "Vesi ja viemäri", "ar": "المياه والصرف الصحي", "uk": "Водопостачання та каналізація", "pl": "Woda i kanalizacja" } },
-    { "id": "other", "value": "Övrigt", "synonyms": ["Annat", "Övriga ärenden", "Övrigt/annat"], "title": { "sv": "Övrigt", "en": "Other", "fi": "Muu", "ar": "أخرى", "uk": "Інше", "pl": "Inne" } }
+    {
+      "id": "lighting",
+      "value": "Belysning",
+      "synonyms": [
+        "Gatubelysning",
+        "Belysning och gatlampor",
+        "Gatljus"
+      ],
+      "title": {
+        "sv": "Belysning",
+        "en": "Street lighting",
+        "fi": "Katuvalaistus",
+        "ar": "الإنارة",
+        "uk": "Освітлення",
+        "pl": "Oświetlenie",
+        "ru": "Уличное освещение",
+        "de": "Straßenbeleuchtung",
+        "fr": "Éclairage public",
+        "es": "Alumbrado público",
+        "it": "Illuminazione pubblica",
+        "pt": "Iluminação pública",
+        "nl": "Straatverlichting",
+        "da": "Gadebelysning",
+        "nb": "Gatelys",
+        "et": "Tänavavalgustus",
+        "lv": "Ielu apgaismojums",
+        "lt": "Gatvių apšvietimas",
+        "ro": "Iluminat stradal",
+        "el": "Οδικός φωτισμός",
+        "hu": "Közvilágítás",
+        "cs": "Veřejné osvětlení"
+      }
+    },
+    {
+      "id": "roads",
+      "value": "Gator och cykelvägar",
+      "synonyms": [
+        "Gator och vägar",
+        "Gator, vägar och cykelvägar",
+        "Gata och cykelväg",
+        "Vägar"
+      ],
+      "title": {
+        "sv": "Gator och cykelvägar",
+        "en": "Streets and cycle paths",
+        "fi": "Kadut ja pyörätiet",
+        "ar": "الشوارع ومسارات الدراجات",
+        "uk": "Вулиці та велодоріжки",
+        "pl": "Ulice i drogi rowerowe",
+        "ru": "Улицы и велодорожки",
+        "de": "Straßen und Radwege",
+        "fr": "Rues et pistes cyclables",
+        "es": "Calles y carriles bici",
+        "it": "Strade e piste ciclabili",
+        "pt": "Ruas e ciclovias",
+        "nl": "Straten en fietspaden",
+        "da": "Gader og cykelstier",
+        "nb": "Gater og sykkelveier",
+        "et": "Tänavad ja jalgrattateed",
+        "lv": "Ielas un veloceliņi",
+        "lt": "Gatvės ir dviračių takai",
+        "ro": "Străzi și piste de biciclete",
+        "el": "Δρόμοι και ποδηλατόδρομοι",
+        "hu": "Utcák és kerékpárutak",
+        "cs": "Ulice a cyklostezky"
+      }
+    },
+    {
+      "id": "graffiti",
+      "value": "Klotter och skadegörelse",
+      "synonyms": [
+        "Klotter",
+        "Skadegörelse",
+        "Klotter och vandalisering"
+      ],
+      "title": {
+        "sv": "Klotter och skadegörelse",
+        "en": "Graffiti and vandalism",
+        "fi": "Töhryt ja ilkivalta",
+        "ar": "الكتابة على الجدران والتخريب",
+        "uk": "Графіті та вандалізм",
+        "pl": "Graffiti i wandalizm",
+        "ru": "Граффити и вандализм",
+        "de": "Graffiti und Vandalismus",
+        "fr": "Graffitis et vandalisme",
+        "es": "Grafitis y vandalismo",
+        "it": "Graffiti e vandalismo",
+        "pt": "Grafitos e vandalismo",
+        "nl": "Graffiti en vandalisme",
+        "da": "Graffiti og hærværk",
+        "nb": "Graffiti og hærverk",
+        "et": "Grafiti ja vandalism",
+        "lv": "Grafiti un vandālisms",
+        "lt": "Grafičiai ir vandalizmas",
+        "ro": "Graffiti și vandalism",
+        "el": "Γκράφιτι και βανδαλισμοί",
+        "hu": "Graffiti és rongálás",
+        "cs": "Graffiti a vandalismus"
+      }
+    },
+    {
+      "id": "parks",
+      "value": "Parker och grönytor",
+      "synonyms": [
+        "Parker och grönområden",
+        "Park och natur",
+        "Parker, lekplatser och grönytor",
+        "Grönytor"
+      ],
+      "title": {
+        "sv": "Parker och grönytor",
+        "en": "Parks and green spaces",
+        "fi": "Puistot ja viheralueet",
+        "ar": "الحدائق والمساحات الخضراء",
+        "uk": "Парки та зелені зони",
+        "pl": "Parki i tereny zielone",
+        "ru": "Парки и зелёные зоны",
+        "de": "Parks und Grünflächen",
+        "fr": "Parcs et espaces verts",
+        "es": "Parques y zonas verdes",
+        "it": "Parchi e aree verdi",
+        "pt": "Parques e espaços verdes",
+        "nl": "Parken en groen",
+        "da": "Parker og grønne områder",
+        "nb": "Parker og grøntområder",
+        "et": "Pargid ja haljasalad",
+        "lv": "Parki un zaļās zonas",
+        "lt": "Parkai ir žaliosios zonos",
+        "ro": "Parcuri și spații verzi",
+        "el": "Πάρκα και χώροι πρασίνου",
+        "hu": "Parkok és zöldterületek",
+        "cs": "Parky a zeleň"
+      }
+    },
+    {
+      "id": "water",
+      "value": "Vatten och avlopp",
+      "synonyms": [
+        "VA",
+        "Vatten",
+        "Avlopp",
+        "Vatten, avlopp och dagvatten"
+      ],
+      "title": {
+        "sv": "Vatten och avlopp",
+        "en": "Water and sewer",
+        "fi": "Vesi ja viemäri",
+        "ar": "المياه والصرف الصحي",
+        "uk": "Водопостачання та каналізація",
+        "pl": "Woda i kanalizacja",
+        "ru": "Водоснабжение и канализация",
+        "de": "Wasser und Abwasser",
+        "fr": "Eau et assainissement",
+        "es": "Agua y alcantarillado",
+        "it": "Acqua e fognature",
+        "pt": "Água e saneamento",
+        "nl": "Water en riolering",
+        "da": "Vand og kloak",
+        "nb": "Vann og avløp",
+        "et": "Vesi ja kanalisatsioon",
+        "lv": "Ūdensapgāde un kanalizācija",
+        "lt": "Vanduo ir nuotekos",
+        "ro": "Apă și canalizare",
+        "el": "Ύδρευση και αποχέτευση",
+        "hu": "Víz és csatorna",
+        "cs": "Voda a kanalizace"
+      }
+    },
+    {
+      "id": "other",
+      "value": "Övrigt",
+      "synonyms": [
+        "Annat",
+        "Övriga ärenden",
+        "Övrigt/annat"
+      ],
+      "title": {
+        "sv": "Övrigt",
+        "en": "Other",
+        "fi": "Muu",
+        "ar": "أخرى",
+        "uk": "Інше",
+        "pl": "Inne",
+        "ru": "Другое",
+        "de": "Sonstiges",
+        "fr": "Autre",
+        "es": "Otros",
+        "it": "Altro",
+        "pt": "Outros",
+        "nl": "Overig",
+        "da": "Andet",
+        "nb": "Annet",
+        "et": "Muu",
+        "lv": "Cits",
+        "lt": "Kita",
+        "ro": "Altele",
+        "el": "Άλλο",
+        "hu": "Egyéb",
+        "cs": "Ostatní"
+      }
+    }
   ],
   "tiles": [
-    { "id": "streetlight", "symbol": "lightbulb.slash", "categoryID": "lighting", "swedishSummary": "Gatubelysning ur funktion", "title": { "sv": "Gatlampa släckt", "en": "Street light out", "fi": "Katuvalo ei pala", "ar": "إنارة الشارع معطلة", "uk": "Не світить ліхтар", "pl": "Nie świeci latarnia" } },
-    { "id": "pothole", "symbol": "road.lanes", "categoryID": "roads", "swedishSummary": "Hål eller skada i vägen", "title": { "sv": "Hål eller skada i vägen", "en": "Pothole or damaged road", "fi": "Kuoppa tai vaurio tiessä", "ar": "حفرة أو ضرر في الطريق", "uk": "Вибоїна або пошкоджена дорога", "pl": "Dziura lub uszkodzona droga" } },
-    { "id": "winter", "symbol": "snowflake", "categoryID": "roads", "swedishSummary": "Snö eller halka", "title": { "sv": "Snö eller halka", "en": "Snow or ice", "fi": "Lumi tai liukkaus", "ar": "ثلج أو جليد", "uk": "Сніг або ожеледиця", "pl": "Śnieg lub gołoledź" } },
-    { "id": "sign", "symbol": "exclamationmark.triangle", "categoryID": "roads", "swedishSummary": "Skadad skylt eller räcke", "title": { "sv": "Skadad skylt eller räcke", "en": "Damaged sign or barrier", "fi": "Vaurioitunut kyltti tai kaide", "ar": "لافتة أو حاجز متضرر", "uk": "Пошкоджений знак або огорожа", "pl": "Uszkodzony znak lub barierka" } },
-    { "id": "graffiti", "symbol": "paintbrush.pointed", "categoryID": "graffiti", "swedishSummary": "Klotter eller skadegörelse", "title": { "sv": "Klotter eller skadegörelse", "en": "Graffiti or vandalism", "fi": "Töhryjä tai ilkivaltaa", "ar": "كتابة على الجدران أو تخريب", "uk": "Графіті або вандалізм", "pl": "Graffiti lub wandalizm" } },
-    { "id": "park", "symbol": "tree", "categoryID": "parks", "swedishSummary": "Park, lekplats eller träd", "title": { "sv": "Park, lekplats eller träd", "en": "Park, playground or tree", "fi": "Puisto, leikkipaikka tai puu", "ar": "حديقة أو ملعب أطفال أو شجرة", "uk": "Парк, дитячий майданчик або дерево", "pl": "Park, plac zabaw lub drzewo" } },
-    { "id": "water", "symbol": "drop", "categoryID": "water", "swedishSummary": "Vatten eller avlopp", "title": { "sv": "Vatten eller avlopp", "en": "Water or sewer", "fi": "Vesi tai viemäri", "ar": "المياه أو الصرف الصحي", "uk": "Вода або каналізація", "pl": "Woda lub kanalizacja" } },
-    { "id": "other", "symbol": "ellipsis.circle", "categoryID": "other", "swedishSummary": "Övrigt", "title": { "sv": "Något annat", "en": "Something else", "fi": "Jotain muuta", "ar": "شيء آخر", "uk": "Щось інше", "pl": "Coś innego" } }
+    {
+      "id": "streetlight",
+      "symbol": "lightbulb.slash",
+      "categoryID": "lighting",
+      "swedishSummary": "Gatubelysning ur funktion",
+      "title": {
+        "sv": "Gatlampa släckt",
+        "en": "Street light out",
+        "fi": "Katuvalo ei pala",
+        "ar": "إنارة الشارع معطلة",
+        "uk": "Не світить ліхтар",
+        "pl": "Nie świeci latarnia",
+        "ru": "Не горит фонарь",
+        "de": "Straßenlaterne aus",
+        "fr": "Lampadaire éteint",
+        "es": "Farola apagada",
+        "it": "Lampione spento",
+        "pt": "Candeeiro apagado",
+        "nl": "Straatlantaarn kapot",
+        "da": "Gadelampe slukket",
+        "nb": "Gatelys som ikke lyser",
+        "et": "Tänavavalgusti ei põle",
+        "lv": "Nedeg ielas laterna",
+        "lt": "Nešviečia gatvės žibintas",
+        "ro": "Felinar stins",
+        "el": "Σβηστός φανοστάτης",
+        "hu": "Nem világít az utcai lámpa",
+        "cs": "Nesvítí pouliční lampa"
+      }
+    },
+    {
+      "id": "pothole",
+      "symbol": "road.lanes",
+      "categoryID": "roads",
+      "swedishSummary": "Hål eller skada i vägen",
+      "title": {
+        "sv": "Hål eller skada i vägen",
+        "en": "Pothole or damaged road",
+        "fi": "Kuoppa tai vaurio tiessä",
+        "ar": "حفرة أو ضرر في الطريق",
+        "uk": "Вибоїна або пошкоджена дорога",
+        "pl": "Dziura lub uszkodzona droga",
+        "ru": "Яма или повреждение дороги",
+        "de": "Schlagloch oder Straßenschaden",
+        "fr": "Nid-de-poule ou route abîmée",
+        "es": "Bache o calzada dañada",
+        "it": "Buca o strada danneggiata",
+        "pt": "Buraco ou estrada danificada",
+        "nl": "Gat of schade in de weg",
+        "da": "Hul eller skade i vejen",
+        "nb": "Hull eller skade i veien",
+        "et": "Auk või kahjustus teel",
+        "lv": "Bedre vai bojāts ceļš",
+        "lt": "Duobė ar pažeistas kelias",
+        "ro": "Groapă sau drum deteriorat",
+        "el": "Λακκούβα ή φθορά στον δρόμο",
+        "hu": "Kátyú vagy úthiba",
+        "cs": "Výmol nebo poškozená silnice"
+      }
+    },
+    {
+      "id": "winter",
+      "symbol": "snowflake",
+      "categoryID": "roads",
+      "swedishSummary": "Snö eller halka",
+      "title": {
+        "sv": "Snö eller halka",
+        "en": "Snow or ice",
+        "fi": "Lumi tai liukkaus",
+        "ar": "ثلج أو جليد",
+        "uk": "Сніг або ожеледиця",
+        "pl": "Śnieg lub gołoledź",
+        "ru": "Снег или гололёд",
+        "de": "Schnee oder Glätte",
+        "fr": "Neige ou verglas",
+        "es": "Nieve o hielo",
+        "it": "Neve o ghiaccio",
+        "pt": "Neve ou gelo",
+        "nl": "Sneeuw of gladheid",
+        "da": "Sne eller glat føre",
+        "nb": "Snø eller is",
+        "et": "Lumi või libedus",
+        "lv": "Sniegs vai apledojums",
+        "lt": "Sniegas ar plikledis",
+        "ro": "Zăpadă sau gheață",
+        "el": "Χιόνι ή πάγος",
+        "hu": "Hó vagy jég",
+        "cs": "Sníh nebo náledí"
+      }
+    },
+    {
+      "id": "sign",
+      "symbol": "exclamationmark.triangle",
+      "categoryID": "roads",
+      "swedishSummary": "Skadad skylt eller räcke",
+      "title": {
+        "sv": "Skadad skylt eller räcke",
+        "en": "Damaged sign or barrier",
+        "fi": "Vaurioitunut kyltti tai kaide",
+        "ar": "لافتة أو حاجز متضرر",
+        "uk": "Пошкоджений знак або огорожа",
+        "pl": "Uszkodzony znak lub barierka",
+        "ru": "Повреждён знак или ограждение",
+        "de": "Schild oder Absperrung beschädigt",
+        "fr": "Panneau ou barrière abîmés",
+        "es": "Señal o valla dañada",
+        "it": "Cartello o barriera danneggiati",
+        "pt": "Sinal ou barreira danificados",
+        "nl": "Beschadigd bord of hek",
+        "da": "Beskadiget skilt eller rækværk",
+        "nb": "Skadet skilt eller rekkverk",
+        "et": "Kahjustatud silt või piire",
+        "lv": "Bojāta zīme vai barjera",
+        "lt": "Pažeistas ženklas ar užtvara",
+        "ro": "Indicator sau parapet deteriorat",
+        "el": "Χαλασμένη πινακίδα ή κιγκλίδωμα",
+        "hu": "Sérült tábla vagy korlát",
+        "cs": "Poškozená značka nebo zábradlí"
+      }
+    },
+    {
+      "id": "graffiti",
+      "symbol": "paintbrush.pointed",
+      "categoryID": "graffiti",
+      "swedishSummary": "Klotter eller skadegörelse",
+      "title": {
+        "sv": "Klotter eller skadegörelse",
+        "en": "Graffiti or vandalism",
+        "fi": "Töhryjä tai ilkivaltaa",
+        "ar": "كتابة على الجدران أو تخريب",
+        "uk": "Графіті або вандалізм",
+        "pl": "Graffiti lub wandalizm",
+        "ru": "Граффити или вандализм",
+        "de": "Graffiti oder Vandalismus",
+        "fr": "Graffiti ou vandalisme",
+        "es": "Grafiti o vandalismo",
+        "it": "Graffiti o vandalismo",
+        "pt": "Grafitos ou vandalismo",
+        "nl": "Graffiti of vandalisme",
+        "da": "Graffiti eller hærværk",
+        "nb": "Graffiti eller hærverk",
+        "et": "Grafiti või vandalism",
+        "lv": "Grafiti vai vandālisms",
+        "lt": "Grafitis ar vandalizmas",
+        "ro": "Graffiti sau vandalism",
+        "el": "Γκράφιτι ή βανδαλισμός",
+        "hu": "Graffiti vagy rongálás",
+        "cs": "Graffiti nebo vandalismus"
+      }
+    },
+    {
+      "id": "park",
+      "symbol": "tree",
+      "categoryID": "parks",
+      "swedishSummary": "Park, lekplats eller träd",
+      "title": {
+        "sv": "Park, lekplats eller träd",
+        "en": "Park, playground or tree",
+        "fi": "Puisto, leikkipaikka tai puu",
+        "ar": "حديقة أو ملعب أطفال أو شجرة",
+        "uk": "Парк, дитячий майданчик або дерево",
+        "pl": "Park, plac zabaw lub drzewo",
+        "ru": "Парк, детская площадка или дерево",
+        "de": "Park, Spielplatz oder Baum",
+        "fr": "Parc, aire de jeux ou arbre",
+        "es": "Parque, parque infantil o árbol",
+        "it": "Parco, parco giochi o albero",
+        "pt": "Parque, parque infantil ou árvore",
+        "nl": "Park, speeltuin of boom",
+        "da": "Park, legeplads eller træ",
+        "nb": "Park, lekeplass eller tre",
+        "et": "Park, mänguväljak või puu",
+        "lv": "Parks, rotaļu laukums vai koks",
+        "lt": "Parkas, žaidimų aikštelė ar medis",
+        "ro": "Parc, loc de joacă sau copac",
+        "el": "Πάρκο, παιδική χαρά ή δέντρο",
+        "hu": "Park, játszótér vagy fa",
+        "cs": "Park, hřiště nebo strom"
+      }
+    },
+    {
+      "id": "water",
+      "symbol": "drop",
+      "categoryID": "water",
+      "swedishSummary": "Vatten eller avlopp",
+      "title": {
+        "sv": "Vatten eller avlopp",
+        "en": "Water or sewer",
+        "fi": "Vesi tai viemäri",
+        "ar": "المياه أو الصرف الصحي",
+        "uk": "Вода або каналізація",
+        "pl": "Woda lub kanalizacja",
+        "ru": "Водоснабжение или канализация",
+        "de": "Wasser oder Abwasser",
+        "fr": "Eau ou assainissement",
+        "es": "Agua o alcantarillado",
+        "it": "Acqua o fognature",
+        "pt": "Água ou saneamento",
+        "nl": "Water of riolering",
+        "da": "Vand eller kloak",
+        "nb": "Vann eller avløp",
+        "et": "Vesi või kanalisatsioon",
+        "lv": "Ūdensapgāde vai kanalizācija",
+        "lt": "Vanduo ar nuotekos",
+        "ro": "Apă sau canalizare",
+        "el": "Ύδρευση ή αποχέτευση",
+        "hu": "Víz vagy csatorna",
+        "cs": "Voda nebo kanalizace"
+      }
+    },
+    {
+      "id": "other",
+      "symbol": "ellipsis.circle",
+      "categoryID": "other",
+      "swedishSummary": "Övrigt",
+      "title": {
+        "sv": "Något annat",
+        "en": "Something else",
+        "fi": "Jotain muuta",
+        "ar": "شيء آخر",
+        "uk": "Щось інше",
+        "pl": "Coś innego",
+        "ru": "Другое",
+        "de": "Etwas anderes",
+        "fr": "Autre chose",
+        "es": "Otra cosa",
+        "it": "Altro problema",
+        "pt": "Outra coisa",
+        "nl": "Iets anders",
+        "da": "Noget andet",
+        "nb": "Noe annet",
+        "et": "Midagi muud",
+        "lv": "Kas cits",
+        "lt": "Kita problema",
+        "ro": "Altceva",
+        "el": "Κάτι άλλο",
+        "hu": "Valami más",
+        "cs": "Něco jiného"
+      }
+    }
   ],
   "validation": {
     "descriptionMin": 10,
@@ -84,12 +691,81 @@
   },
   "emergency": {
     "contacts": [
-      { "id": "servicecenter", "phone": "08-570 470 00", "title": { "sv": "Värmdö kommuns servicecenter", "en": "Värmdö kommun service centre", "fi": "Värmdön kunnan palvelukeskus", "ar": "مركز خدمة بلدية فارمدو", "uk": "Сервісний центр комуни Вермдьо", "pl": "Centrum obsługi gminy Värmdö" } },
-      { "id": "sos", "phone": "08-454 25 71", "title": { "sv": "VA-jouren via SOS Alarm", "en": "Water and sewer on-call via SOS Alarm", "fi": "Vesi- ja viemäripäivystys SOS Alarmin kautta", "ar": "طوارئ المياه والصرف عبر SOS Alarm", "uk": "Чергова служба водоканалу через SOS Alarm", "pl": "Dyżur wodno-kanalizacyjny przez SOS Alarm" } }
+      {
+        "id": "servicecenter",
+        "phone": "08-570 470 00",
+        "title": {
+          "sv": "Värmdö kommuns servicecenter",
+          "en": "Värmdö kommun service centre",
+          "fi": "Värmdön kunnan palvelukeskus",
+          "ar": "مركز خدمة بلدية فارمدو",
+          "uk": "Сервісний центр комуни Вермдьо",
+          "pl": "Centrum obsługi gminy Värmdö",
+          "ru": "Сервисный центр коммуны Värmdö",
+          "de": "Servicecenter von Värmdö kommun",
+          "fr": "Centre de services de Värmdö kommun",
+          "es": "Centro de atención de Värmdö kommun",
+          "it": "Centro servizi di Värmdö kommun",
+          "pt": "Centro de atendimento de Värmdö kommun",
+          "nl": "Servicecentrum van Värmdö kommun",
+          "da": "Värmdö kommuns servicecenter",
+          "nb": "Servicesenteret i Värmdö kommun",
+          "et": "Värmdö kommun: teeninduskeskus",
+          "lv": "Värmdö kommun klientu centrs",
+          "lt": "Värmdö kommun klientų aptarnavimo centras",
+          "ro": "Centrul de servicii Värmdö kommun",
+          "el": "Κέντρο εξυπηρέτησης του Värmdö kommun",
+          "hu": "Värmdö kommun ügyfélszolgálata",
+          "cs": "Zákaznické centrum Värmdö kommun"
+        }
+      },
+      {
+        "id": "sos",
+        "phone": "08-454 25 71",
+        "title": {
+          "sv": "VA-jouren via SOS Alarm",
+          "en": "Water and sewer on-call via SOS Alarm",
+          "fi": "Vesi- ja viemäripäivystys SOS Alarmin kautta",
+          "ar": "طوارئ المياه والصرف عبر SOS Alarm",
+          "uk": "Чергова служба водоканалу через SOS Alarm",
+          "pl": "Dyżur wodno-kanalizacyjny przez SOS Alarm",
+          "ru": "Дежурная служба водоснабжения и канализации через SOS Alarm",
+          "de": "Bereitschaftsdienst Wasser und Abwasser über SOS Alarm",
+          "fr": "Astreinte eau et assainissement via SOS Alarm",
+          "es": "Guardia de agua y alcantarillado a través de SOS Alarm",
+          "it": "Reperibilità acqua e fognature tramite SOS Alarm",
+          "pt": "Piquete de água e saneamento via SOS Alarm",
+          "nl": "Storingsdienst water en riolering via SOS Alarm",
+          "da": "Vagttjeneste for vand og kloak via SOS Alarm",
+          "nb": "Vakttjeneste for vann og avløp via SOS Alarm",
+          "et": "Vee- ja kanalisatsiooni valveteenistus SOS Alarmi kaudu",
+          "lv": "Ūdensapgādes un kanalizācijas dežūrdienests ar SOS Alarm starpniecību",
+          "lt": "Vandens ir nuotekų budėjimo tarnyba per SOS Alarm",
+          "ro": "Serviciul de permanență pentru apă și canalizare prin SOS Alarm",
+          "el": "Εφημερία ύδρευσης και αποχέτευσης μέσω SOS Alarm",
+          "hu": "Víz- és csatornaügyelet az SOS Alarmon keresztül",
+          "cs": "Pohotovost pro vodu a kanalizaci přes SOS Alarm"
+        }
+      }
     ],
     "rules": [
-      { "isoWeekdays": [1, 2, 3, 4], "until": "17:00", "contactID": "servicecenter" },
-      { "isoWeekdays": [5], "until": "13:00", "contactID": "servicecenter" }
+      {
+        "isoWeekdays": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "until": "17:00",
+        "contactID": "servicecenter"
+      },
+      {
+        "isoWeekdays": [
+          5
+        ],
+        "until": "13:00",
+        "contactID": "servicecenter"
+      }
     ],
     "defaultContactID": "sos",
     "timeZone": "Europe/Stockholm",
@@ -99,7 +775,23 @@
       "fi": "Soita vain kiireellisissä vesi- ja viemärivioissa, esimerkiksi jos vettä ei tule, viemäri on tukossa tai jokin tulvii. Palvelukeskus vastaa maanantaista torstaihin ennen klo 17 ja perjantaina ennen klo 13. Muina aikoina vastaa päivystys SOS Alarmin kautta.",
       "ar": "اتصل فقط عند الأعطال العاجلة في المياه أو الصرف الصحي، مثل انقطاع المياه أو انسداد الصرف أو حدوث فيضان. يرد مركز الخدمة من الاثنين إلى الخميس قبل الساعة 17:00 ويوم الجمعة قبل الساعة 13:00. في الأوقات الأخرى ترد خدمة الطوارئ عبر SOS Alarm.",
       "uk": "Телефонуйте лише в разі термінових проблем з водою чи каналізацією: немає води, засмітилася каналізація або підтоплення. Сервісний центр відповідає з понеділка по четвер до 17:00 і в п'ятницю до 13:00. В інший час відповідає чергова служба через SOS Alarm.",
-      "pl": "Dzwoń tylko w pilnych sprawach dotyczących wody lub kanalizacji, np. gdy nie ma wody, kanalizacja jest zatkana albo coś zalewa. Centrum obsługi odbiera od poniedziałku do czwartku przed 17:00 i w piątek przed 13:00. W pozostałych godzinach odbiera dyżur przez SOS Alarm."
+      "pl": "Dzwoń tylko w pilnych sprawach dotyczących wody lub kanalizacji, np. gdy nie ma wody, kanalizacja jest zatkana albo coś zalewa. Centrum obsługi odbiera od poniedziałku do czwartku przed 17:00 i w piątek przed 13:00. W pozostałych godzinach odbiera dyżur przez SOS Alarm.",
+      "ru": "Звоните только при срочных проблемах с водоснабжением или канализацией, например если нет воды, засорилась канализация или произошло затопление. Сервисный центр отвечает с понедельника по четверг до 17:00 и в пятницу до 13:00. В остальное время отвечает дежурная служба через SOS Alarm.",
+      "de": "Rufen Sie nur bei dringenden Problemen mit Wasser oder Abwasser an, etwa wenn kein Wasser kommt, der Abfluss verstopft ist oder etwas überflutet ist. Das Servicecenter ist Montag bis Donnerstag bis 17:00 Uhr und Freitag bis 13:00 Uhr erreichbar. Zu anderen Zeiten antwortet der Bereitschaftsdienst über SOS Alarm.",
+      "fr": "N'appelez que pour un problème urgent d'eau ou d'assainissement, par exemple une coupure d'eau, un égout bouché ou une inondation. Le centre de services répond du lundi au jeudi avant 17 h et le vendredi avant 13 h. En dehors de ces horaires, le service d'astreinte répond via SOS Alarm.",
+      "es": "Llama solo por problemas urgentes de agua o alcantarillado, como falta de agua, un desagüe atascado o una inundación. El centro de atención responde de lunes a jueves antes de las 17:00 y los viernes antes de las 13:00. El resto del tiempo responde el servicio de guardia a través de SOS Alarm.",
+      "it": "Chiama solo per problemi urgenti di acqua o fognature, ad esempio se manca l'acqua, la fognatura è bloccata o c'è un allagamento. Il centro servizi risponde dal lunedì al giovedì prima delle 17:00 e il venerdì prima delle 13:00. Negli altri orari risponde il servizio di reperibilità tramite SOS Alarm.",
+      "pt": "Ligue apenas para problemas urgentes de água ou saneamento, como falta de água, esgoto entupido ou inundação. O centro de atendimento atende de segunda a quinta-feira antes das 17:00 e à sexta-feira antes das 13:00. Fora deste horário, atende o piquete via SOS Alarm.",
+      "nl": "Bel alleen bij dringende problemen met water of riolering, zoals geen water, een verstopt riool of een overstroming. Het servicecentrum is bereikbaar maandag t/m donderdag tot 17:00 en vrijdag tot 13:00. Op andere tijden neemt de storingsdienst op via SOS Alarm.",
+      "da": "Ring kun ved akutte problemer med vand eller kloak, for eksempel hvis der ikke er vand, kloakken er stoppet, eller der er oversvømmelse. Servicecentret svarer mandag–torsdag før kl. 17.00 og fredag før kl. 13.00. Uden for disse tider svarer vagttjenesten via SOS Alarm.",
+      "nb": "Ring bare ved akutte problemer med vann eller avløp, for eksempel hvis du ikke har vann, avløpet er tett eller det er oversvømmelse. Servicesenteret svarer mandag–torsdag før kl. 17.00 og fredag før kl. 13.00. Ellers svarer vakttjenesten via SOS Alarm.",
+      "et": "Helistage ainult kiireloomuliste vee- või kanalisatsiooniprobleemide korral, näiteks kui vett pole, kanalisatsioon on ummistunud või on üleujutus. Teeninduskeskus vastab esmaspäevast neljapäevani enne kella 17.00 ja reedel enne kella 13.00. Muul ajal vastab valveteenistus SOS Alarmi kaudu.",
+      "lv": "Zvaniet tikai steidzamu ūdensapgādes vai kanalizācijas problēmu gadījumā, piemēram, ja nav ūdens, ir aizsprostota kanalizācija vai notiek applūšana. Klientu centrs atbild no pirmdienas līdz ceturtdienai līdz 17:00 un piektdien līdz 13:00. Citā laikā atbild dežūrdienests ar SOS Alarm starpniecību.",
+      "lt": "Skambinkite tik dėl skubių vandens ar nuotekų problemų, pavyzdžiui, jei nėra vandens, užsikimšo kanalizacija ar kilo potvynis. Aptarnavimo centras atsiliepia pirmadienį–ketvirtadienį iki 17:00 ir penktadienį iki 13:00. Kitu laiku atsiliepia budėjimo tarnyba per SOS Alarm.",
+      "ro": "Sunați doar pentru probleme urgente de apă sau canalizare, de exemplu lipsa apei, o canalizare înfundată sau o inundație. Centrul de servicii răspunde de luni până joi înainte de ora 17:00 și vineri înainte de ora 13:00. În rest, răspunde serviciul de permanență prin SOS Alarm.",
+      "el": "Καλέστε μόνο για επείγοντα προβλήματα ύδρευσης ή αποχέτευσης, όπως διακοπή νερού, βουλωμένη αποχέτευση ή πλημμύρα. Το κέντρο εξυπηρέτησης απαντά Δευτέρα έως Πέμπτη πριν τις 17:00 και Παρασκευή πριν τις 13:00. Τις υπόλοιπες ώρες απαντά η υπηρεσία εφημερίας μέσω SOS Alarm.",
+      "hu": "Csak sürgős víz- vagy csatornahiba esetén hívja, például ha nincs víz, eldugult a csatorna vagy áradás van. Az ügyfélszolgálat hétfőtől csütörtökig 17:00 előtt, pénteken 13:00 előtt fogadja a hívásokat. Más időpontokban az ügyelet válaszol az SOS Alarmon keresztül.",
+      "cs": "Volejte jen při naléhavých problémech s vodou nebo kanalizací, například když neteče voda, je ucpaná kanalizace nebo došlo k zaplavení. Zákaznické centrum odpovídá v pondělí až čtvrtek do 17:00 a v pátek do 13:00. V ostatní době odpovídá pohotovostní služba přes SOS Alarm."
     }
   },
   "fallbackEmail": "varmdo.kommun@varmdo.se",
@@ -109,6 +801,22 @@
     "fi": "Fixa on itsenäinen avoimen lähdekoodin sovellus, eikä se ole osa Värmdön kuntaa. Sovellus lähettää ilmoituksesi suoraan kunnan vikailmoitusten sähköiseen palveluun, ja kunta käsittelee sen tavalliseen tapaan. Soita 112, jos henki tai omaisuus on vaarassa.",
     "ar": "Fixa تطبيق مستقل ومفتوح المصدر، وليس جزءاً من بلدية فارمدو. يرسل التطبيق بلاغك مباشرة إلى الخدمة الإلكترونية للبلدية الخاصة بالإبلاغ عن الأعطال، وتتعامل البلدية معه بالطريقة المعتادة. اتصل بالرقم 112 إذا كانت الأرواح أو الممتلكات في خطر.",
     "uk": "Fixa — незалежний застосунок із відкритим кодом, який не належить комуні Вермдьо. Він надсилає ваше повідомлення безпосередньо до електронного сервісу комуни для повідомлень про несправності, і комуна розглядає його у звичайному порядку. Якщо є загроза життю чи майну, телефонуйте 112.",
-    "pl": "Fixa to niezależna aplikacja open source, która nie należy do gminy Värmdö. Wysyła Twoje zgłoszenie bezpośrednio do e-usługi gminy do zgłaszania usterek, a gmina zajmuje się nim w zwykły sposób. Jeśli zagrożone jest życie lub mienie, dzwoń pod 112."
+    "pl": "Fixa to niezależna aplikacja open source, która nie należy do gminy Värmdö. Wysyła Twoje zgłoszenie bezpośrednio do e-usługi gminy do zgłaszania usterek, a gmina zajmuje się nim w zwykły sposób. Jeśli zagrożone jest życie lub mienie, dzwoń pod 112.",
+    "ru": "Fixa является независимым приложением с открытым исходным кодом и не относится к коммуне Värmdö. Оно отправляет вашу заявку напрямую в электронную услугу коммуны для заявок о неисправностях, и коммуна рассматривает её в обычном порядке. Если под угрозой жизнь или имущество, звоните 112.",
+    "de": "Fixa ist eine unabhängige Open-Source-App und gehört nicht zu Värmdö kommun. Die App sendet Ihre Meldung direkt an den E-Service der Gemeinde für Störungsmeldungen, und die Gemeinde bearbeitet sie wie gewohnt. Rufen Sie 112 an, wenn Leben oder Eigentum in Gefahr sind.",
+    "fr": "Fixa est une app indépendante et open source, qui ne fait pas partie de Värmdö kommun. Elle envoie votre signalement directement au service en ligne de signalement de la commune, qui le traite de la manière habituelle. Appelez le 112 si des vies ou des biens sont en danger.",
+    "es": "Fixa es una app independiente de código abierto y no forma parte de Värmdö kommun. Envía tu aviso directamente al servicio electrónico de avisos de incidencias del municipio, que lo gestiona de la forma habitual. Llama al 112 si hay peligro para personas o bienes.",
+    "it": "Fixa è un'app indipendente e open source e non fa parte di Värmdö kommun. Invia la tua segnalazione direttamente al servizio online del comune per la segnalazione dei guasti, e il comune la gestisce come di consueto. Chiama il 112 se ci sono pericoli per persone o cose.",
+    "pt": "A Fixa é uma app independente de código aberto e não faz parte de Värmdö kommun. Envia a sua participação diretamente para o serviço online de participação de avarias do município, que a trata da forma habitual. Ligue 112 se houver perigo para pessoas ou bens.",
+    "nl": "Fixa is een onafhankelijke opensource-app en hoort niet bij Värmdö kommun. De app stuurt je melding rechtstreeks naar de e-dienst voor storingsmeldingen van de gemeente, en de gemeente behandelt die op de gewone manier. Bel 112 als levens of eigendommen in gevaar zijn.",
+    "da": "Fixa er en uafhængig app med åben kildekode og er ikke en del af Värmdö kommun. Den sender din anmeldelse direkte til kommunens e-tjeneste for fejlmeldinger, og kommunen behandler den på sædvanlig vis. Ring 112, hvis liv eller ejendom er i fare.",
+    "nb": "Fixa er en uavhengig app med åpen kildekode og er ikke en del av Värmdö kommun. Appen sender meldingen din direkte til kommunens e-tjeneste for feilmelding, og kommunen behandler den på vanlig måte. Ring 112 hvis liv eller eiendom er i fare.",
+    "et": "Fixa on sõltumatu avatud lähtekoodiga rakendus ega kuulu omavalitsusele Värmdö kommun. See saadab teie teate otse omavalitsuse rikketeadete e-teenusesse ja omavalitsus menetleb seda tavapärasel viisil. Kui elu või vara on ohus, helistage 112.",
+    "lv": "Fixa ir neatkarīga atvērtā koda lietotne, un tā nav saistīta ar Värmdö kommun. Tā nosūta jūsu ziņojumu tieši pašvaldības e-pakalpojumam bojājumu pieteikšanai, un pašvaldība to izskata ierastajā kārtībā. Zvaniet 112, ja apdraudēta dzīvība vai īpašums.",
+    "lt": "Fixa yra nepriklausoma atvirojo kodo programėlė ir nėra Värmdö kommun dalis. Ji siunčia jūsų pranešimą tiesiai į savivaldybės gedimų pranešimo e. paslaugą, o savivaldybė jį nagrinėja įprasta tvarka. Skambinkite 112, jei gresia pavojus gyvybei ar turtui.",
+    "ro": "Fixa este o aplicație independentă, open-source, și nu face parte din Värmdö kommun. Trimite sesizarea dumneavoastră direct la serviciul online de sesizări al comunei, iar comuna o tratează în mod obișnuit. Sunați la 112 dacă viața sau bunurile cuiva sunt în pericol.",
+    "el": "Το Fixa είναι μια ανεξάρτητη εφαρμογή ανοιχτού κώδικα και δεν ανήκει στο Värmdö kommun. Στέλνει την αναφορά σας απευθείας στην ηλεκτρονική υπηρεσία αναφοράς βλαβών του δήμου, και ο δήμος τη διαχειρίζεται με τον συνήθη τρόπο. Καλέστε το 112 αν κινδυνεύουν ζωές ή περιουσίες.",
+    "hu": "A Fixa független, nyílt forráskódú alkalmazás, és nem része a Värmdö kommunnak. A bejelentését közvetlenül az önkormányzat hibabejelentő e-szolgáltatásába küldi, az önkormányzat pedig a szokásos módon intézi. Ha élet vagy vagyon van veszélyben, hívja a 112-t.",
+    "cs": "Fixa je nezávislá aplikace s otevřeným zdrojovým kódem a není součástí Värmdö kommun. Odešle vaše hlášení přímo do e-služby obce pro hlášení závad a obec ho vyřídí obvyklým způsobem. Pokud je ohrožen život nebo majetek, volejte 112."
   }
 }

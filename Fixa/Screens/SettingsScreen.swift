@@ -41,6 +41,7 @@ struct SettingsScreen: View {
                     ) {
                         model.path.append(.language)
                     }
+                    .accessibilityIdentifier("settings.language")
                 }
 
                 section(String(localized: "Display", bundle: L10n.bundle, locale: L10n.locale)) {
@@ -148,8 +149,9 @@ struct SettingsScreen: View {
             ) {
                 isDeleteAllPresented = true
             }
+            .accessibilityIdentifier("settings.deleteAll")
             // A report on its way keeps its data until it is sent.
-            .disabled(model.submission.isSending)
+            .disabled(model.isBusySending)
             .confirmationDialog(
                 Text("Delete all your data from this phone?"),
                 isPresented: $isDeleteAllPresented,

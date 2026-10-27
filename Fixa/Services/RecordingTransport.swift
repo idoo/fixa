@@ -21,7 +21,8 @@ nonisolated struct RecordingTransport: HTTPTransport {
         let index = counter.next()
         let page = response.url.flatMap { AbouPageParser.pageID(from: $0) } ?? response.url?.lastPathComponent ?? "response"
         let name = String(format: "%02d-%@.html", index, page.replacingOccurrences(of: "/", with: "_"))
-        try? data.write(to: directory.appending(path: name))
+        // Response pages can echo the reporter's name and e-mail.
+        try? data.write(to: directory.appending(path: name), options: .completeFileProtection)
         return (data, response)
     }
 }

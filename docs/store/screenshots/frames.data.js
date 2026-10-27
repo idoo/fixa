@@ -92,7 +92,7 @@ window.FRAMES = [
     proof: "Language screen: English, Svenska, Suomi, العربية, Українська, Polski; switches immediately.",
     evidence: ["Fixa/Screens/SettingsLanguageScreen.swift:32 'buttons and texts change now'", "captures/*/language.png"],
     background: { from: "#F7F5F0", to: "#EFE6D8", glow: "#E6D6BF" },
-    headline: { "sv": "Fixa på sex språk", "en-US": "Fixa in six languages" },
+    headline: { "sv": "Fixa på 22 språk", "en-US": "Fixa in 22 languages" },
     subline: { "sv": "Byt språk direkt i appen.", "en-US": "Switch language right in the app." },
     pops: [],
   },

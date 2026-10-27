@@ -153,7 +153,7 @@ final class AdapterSpecTests: XCTestCase {
         XCTAssertEqual(spec.tiles.map(\.id), ["streetlight", "pothole", "winter", "sign", "graffiti", "park", "water", "other"])
         XCTAssertEqual(spec.categories.map(\.value), ["Belysning", "Gator och cykelvägar", "Klotter och skadegörelse", "Parker och grönytor", "Vatten och avlopp", "Övrigt"])
         XCTAssertEqual(spec.fallbackEmail, "varmdo.kommun@varmdo.se")
-        let languages: Set<String> = ["sv", "en", "fi", "ar", "uk", "pl"]
+        let languages: Set<String> = ["en", "sv", "cs", "da", "de", "et", "es", "fr", "it", "lv", "lt", "hu", "nl", "nb", "pl", "pt", "ro", "fi", "el", "ru", "uk", "ar"]
         var texts = [spec.disclaimer] + spec.categories.map(\.title) + spec.tiles.map(\.title)
         if let emergency = spec.emergency { texts += [emergency.note] + emergency.contacts.map(\.title) }
         for text in texts {

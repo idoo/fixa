@@ -1,5 +1,8 @@
 # Daily check that the municipality's e-service still matches the adapter.
-# Dry run stops at the summary page; no case is created.
+# Every run is a dry run that stops at the summary page; no case is ever created.
+# Coverage: every adapter category (no point, no reply wanted: the skip-contact path), then one run
+# with a photo upload, a map point and a reply wanted (the contact page). Runs are sequential with a
+# pause between them to stay polite to the municipality's server.
 # Exit 2 (form changed): status.json -> degraded + canary issue. Other failure: issue only.
 # Success after degraded: status.json -> ok + close the issue.
 name: Canary
@@ -29,12 +32,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Dry run against the live form
+      - name: Dry runs against the live form
         id: run
         run: |
           set +e
-          (cd FixaKit && swift run fixa-cli dry-run) > canary.log 2>&1
-          echo "code=$?" >> "$GITHUB_OUTPUT"
+          if ! (cd FixaKit && swift build --product fixa-cli) > canary.log 2>&1; then
+            echo "code=1" >> "$GITHUB_OUTPUT"
+            cat canary.log
+            exit 0
+          fi
+          cli="swift run --skip-build fixa-cli dry-run --delay 5"
+          (cd FixaKit && $cli --all-categories --no-point --feedback no) >> canary.log 2>&1
+          first=$?
+          sleep 5
+          (cd FixaKit && $cli --photo Tests/FixaKitTests/Fixtures/canary-photo.jpg --feedback yes) >> canary.log 2>&1
+          second=$?
+          # Form drift (2) wins over other failures (1).
+          code=$(( first > second ? first : second ))
+          echo "code=$code" >> "$GITHUB_OUTPUT"
           cat canary.log
 
       - name: Update status and issue

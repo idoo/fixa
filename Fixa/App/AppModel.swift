@@ -1,6 +1,7 @@
 import CoreLocation
 import FixaKit
 import Foundation
+import Network
 import Observation
 import UIKit
 
@@ -29,6 +30,19 @@ final class AppModel {
     let options: LaunchOptions
     let history: HistoryStore
     let submission = SubmissionService()
+    /// Reports the user sent that the e-service hasn't confirmed: waiting, may-have-been-sent, not sent.
+    let outbox: OutboxStore
+    /// True from the moment Send is accepted until its outcome is handled. The model-level guard
+    /// against a double Send, independent of how the button looks.
+    private(set) var isSendingDraft = false
+    /// Outbox reports being sent right now; each id is sent by at most one call at a time.
+    private(set) var sendingIDs: Set<UUID> = []
+    /// Last thing `NWPathMonitor` said; true until it has spoken.
+    private(set) var isOnline = true
+    @ObservationIgnored private var pathMonitor: NWPathMonitor?
+    @ObservationIgnored private var lastPathOnline: Bool?
+    @ObservationIgnored private var retryTask: Task<Void, Never>?
+    @ObservationIgnored private var activeObserver: (any NSObjectProtocol)?
 
     var path: [Route] = []
     /// What the report sends. `contact` always mirrors the profile while a reply is wanted and is
@@ -114,6 +128,7 @@ final class AppModel {
     init(options: LaunchOptions = .current) {
         self.options = options
         history = HistoryStore(inMemory: options.demo)
+        outbox = OutboxStore(inMemory: options.demo || options.liveTest)
         profileStorage = Self.loadContact()
         var savedDisplay = DisplaySettings.load()
         if let size = options.textSize {
@@ -143,6 +158,9 @@ final class AppModel {
         }
         if let screen = options.screen {
             open(screen)
+        }
+        if persists {
+            startOutbox()
         }
     }
 
@@ -186,16 +204,69 @@ final class AppModel {
         return true
     }
 
+    /// Sends the current draft. One at a time: a second call while one is in flight returns at once,
+    /// whatever the button looks like. A failure that is safe to retry keeps the report as
+    /// "waiting to send"; an `.uncertain` one is recorded as "may have been sent" and never retried.
     func send() async {
-        guard let spec else { return }
+        guard let spec, !isSendingDraft else { return }
+        isSendingDraft = true
+        defer { isSendingDraft = false }
+        if options.demo {
+            // "-FixaDemo: no network". Nothing leaves the phone; history is in memory only.
+            sent = DemoData.receipt
+            let item = historyItem(id: UUID(), date: .now, caseNumber: DemoData.receipt.caseNumber, status: .sent)
+            history.add(item)
+            sent?.historyID = item.id
+            path.append(.receipt)
+            return
+        }
         let dryRun = options.dryRun
-        guard let result = await submission.submit(draft, spec: spec, dryRun: dryRun, recordResponses: options.liveTest) else { return }
+        guard let result = await submission.submit(draft, spec: spec, dryRun: dryRun, recordResponses: options.liveTest) else {
+            if let error = submission.error, persists, !dryRun {
+                keepUnconfirmed(after: error)
+            }
+            return
+        }
         sent = result
         if !result.isDryRun {
-            history.add(historyItem(for: result))
+            let item = historyItem(id: UUID(), date: result.date, caseNumber: result.caseNumber, status: .sent)
+            history.add(item)
+            sent?.historyID = item.id
             clearSavedDraft()
         }
         path.append(.receipt)
+    }
+
+    /// The send failed in a way that may still end well: the report moves from the draft into the
+    /// outbox (with its photo and reply details) and Sent reports, and the receipt explains what next.
+    private func keepUnconfirmed(after error: SubmissionError) {
+        let status: HistoryItem.Status
+        if error.isRetrySafe {
+            status = .waiting
+        } else if case .uncertain = error {
+            status = .maybeSent
+        } else {
+            // Form changed, broken adapter, rejected by the e-service: Review shows it and offers e-mail.
+            return
+        }
+        let now = Date.now
+        let id = UUID()
+        let pending = PendingReport(
+            id: id,
+            draft: draft,
+            createdAt: now,
+            attempts: 1,
+            nextAttemptAt: now.addingTimeInterval(Self.retryDelay(afterAttempts: 1)),
+            held: status != .waiting
+        )
+        // Keep the draft if the report can't be stored: Review's error and "Try again" stay.
+        guard outbox.put(pending) else { return }
+        history.add(historyItem(id: id, date: now, caseNumber: nil, status: status))
+        sent = SentReport(caseNumber: nil, date: now, isDryRun: false, outcome: status == .waiting ? .waiting : .maybeSent, historyID: id)
+        clearSavedDraft()
+        submission.reset()
+        path.append(.receipt)
+        scheduleRetry()
     }
 
     /// Back to Home with a fresh draft; the profile stays unless "Remember my details" is off.
@@ -237,16 +308,35 @@ final class AppModel {
     // MARK: Deleting data
 
     /// Removes the sent-reports list from this phone (the file itself, not an empty list).
+    /// Reports still waiting, possibly sent or not sent stay listed: they are not done yet.
     func clearHistory() {
-        history.deleteAll()
+        let unconfirmed = history.items.filter { $0.status != .sent }
+        if unconfirmed.isEmpty {
+            history.deleteAll()
+        } else {
+            history.delete(Set(history.items.filter { $0.status == .sent }.map(\.id)))
+        }
     }
 
-    /// Contact details, the unsent report with its photos and the sent-reports list leave this
-    /// phone. Language and display settings stay. Not while a report is being sent.
+    /// Removes reports from Sent reports. One that hasn't been confirmed leaves the outbox too, so
+    /// it is no longer sent on its own. Not while that report is being sent.
+    func removeReports(_ ids: Set<UUID>) {
+        let removable = ids.subtracting(sendingIDs)
+        outbox.remove(removable)
+        history.delete(removable)
+    }
+
+    /// Any send in flight, the user's own or from the outbox.
+    var isBusySending: Bool { isSendingDraft || !sendingIDs.isEmpty || submission.isSending }
+
+    /// Contact details, the unsent report with its photos, reports waiting to be sent and the
+    /// sent-reports list leave this phone. Language and display settings stay. Not while a report
+    /// is being sent.
     func deleteAllData() {
-        guard !submission.isSending else { return }
+        guard !isBusySending else { return }
         profileSaveTask?.cancel()
         draftSaveTask?.cancel()
+        retryTask?.cancel()
         profileStorage = Contact()
         photos = []
         photoFiles = []
@@ -256,6 +346,7 @@ final class AppModel {
         }
         draftStorage = freshDraft()
         showIssues = false
+        outbox.deleteAll()
         history.deleteAll()
         sent = nil
         submission.reset()
@@ -425,18 +516,185 @@ final class AppModel {
 
     // MARK: History
 
-    private func historyItem(for result: SentReport) -> HistoryItem {
+    private func historyItem(id: UUID, date: Date, caseNumber: String?, status: HistoryItem.Status) -> HistoryItem {
         HistoryItem(
-            id: UUID(),
-            date: result.date,
+            id: id,
+            date: date,
             tileID: draft.tileID,
             description: draft.description,
             locationText: draft.locationText,
             latitude: draft.coordinate?.latitude,
             longitude: draft.coordinate?.longitude,
-            caseNumber: result.caseNumber,
-            thumbnail: draft.photoJPEG.flatMap { PhotoCollage.thumbnail(from: $0) }
+            caseNumber: caseNumber,
+            thumbnail: draft.photoJPEG.flatMap { PhotoCollage.thumbnail(from: $0) },
+            status: status
         )
+    }
+
+    // MARK: Outbox
+
+    /// Sends tried in all before Fixa stops and asks the user, the user's own first Send included.
+    static let maxAutomaticAttempts = 5
+
+    /// Wait before the next automatic try after `attempts` tries; a connectivity change may try sooner.
+    static func retryDelay(afterAttempts attempts: Int) -> TimeInterval {
+        switch attempts {
+        case ...1: 60
+        case 2: 5 * 60
+        case 3: 15 * 60
+        default: 60 * 60
+        }
+    }
+
+    /// For Home: reports Fixa still sends on its own, or that stopped and need the user.
+    /// Reports that may have been sent are left to the receipt and Sent reports.
+    struct OutboxNotice: Equatable {
+        var title: String
+        var message: String
+    }
+
+    var outboxNotice: OutboxNotice? {
+        if history.items.contains(where: { $0.status == .notSent }) {
+            return OutboxNotice(
+                title: String(localized: "Not sent yet", bundle: L10n.bundle, locale: L10n.locale),
+                message: String(localized: "Fixa couldn't send a report. Open Sent reports to try again.", bundle: L10n.bundle, locale: L10n.locale)
+            )
+        }
+        guard history.items.contains(where: { $0.status == .waiting }) else { return nil }
+        return OutboxNotice(
+            title: String(localized: "Waiting to send", bundle: L10n.bundle, locale: L10n.locale),
+            message: isOnline
+                ? String(localized: "Your report is saved on this phone. Fixa tries again in a little while.", bundle: L10n.bundle, locale: L10n.locale)
+                : String(localized: "Your report is saved on this phone. Fixa sends it when you're back online.", bundle: L10n.bundle, locale: L10n.locale)
+        )
+    }
+
+    /// The report as plain text for e-mail, as Review's "Copy report text" gives it; nil once it is gone.
+    func reportText(for id: UUID) -> String? {
+        guard let spec, let draft = outbox.item(id: id)?.draft else { return nil }
+        var text = MailFallback.body(draft, spec: spec)
+        if let email = spec.fallbackEmail {
+            text = String(localized: "To: \(email)", bundle: L10n.bundle, locale: L10n.locale) + "\n"
+                + String(localized: "Subject: \(MailFallback.subject(draft, spec: spec))", bundle: L10n.bundle, locale: L10n.locale) + "\n\n" + text
+        }
+        return text
+    }
+
+    /// Whether a waiting or unconfirmed report asked for a reply by e-mail (and so gets a confirmation).
+    func wantsReply(_ id: UUID) -> Bool {
+        outbox.item(id: id)?.draft.wantsFeedback ?? false
+    }
+
+    /// The user's explicit "Try again" on a report Fixa stopped sending, or a confirmed
+    /// "Send again anyway" on one that may have arrived. Restarts the automatic tries.
+    func sendNow(_ id: UUID) async {
+        guard var item = outbox.item(id: id), !sendingIDs.contains(id) else { return }
+        if options.demo {
+            // No network in demo: pretend it went through.
+            outbox.remove([id])
+            markSent(id, caseNumber: DemoData.receipt.caseNumber, date: .now)
+            return
+        }
+        item.held = false
+        item.attempts = 0
+        outbox.put(item)
+        await attempt(id, automatic: false)
+        scheduleRetry()
+    }
+
+    private func startOutbox() {
+        let monitor = NWPathMonitor()
+        monitor.pathUpdateHandler = { @Sendable [weak self] path in
+            let online = path.status == .satisfied
+            Task { @MainActor [weak self] in self?.connectivityChanged(online: online) }
+        }
+        monitor.start(queue: DispatchQueue(label: "se.fixa.outbox.path"))
+        pathMonitor = monitor
+        activeObserver = NotificationCenter.default.addObserver(
+            forName: UIApplication.didBecomeActiveNotification, object: nil, queue: .main
+        ) { @Sendable [weak self] _ in
+            Task { @MainActor [weak self] in await self?.flushOutbox(ignoringBackoff: false) }
+        }
+        scheduleRetry()
+    }
+
+    /// The first path update after launch counts as a change, so launch tries once too.
+    private func connectivityChanged(online: Bool) {
+        isOnline = online
+        let changed = lastPathOnline != online
+        lastPathOnline = online
+        guard changed, online else { return }
+        Task { await flushOutbox(ignoringBackoff: true) }
+    }
+
+    /// One try for each waiting report: all of them on a connectivity change, otherwise those
+    /// whose back-off has passed. Never touches held reports (may have been sent, not sent).
+    private func flushOutbox(ignoringBackoff: Bool) async {
+        guard persists, lastPathOnline == true else { return }
+        let now = Date.now
+        let due = outbox.items.filter { !$0.held && (ignoringBackoff || $0.nextAttemptAt <= now) }.map(\.id)
+        for id in due {
+            guard lastPathOnline == true else { break }
+            await attempt(id, automatic: true)
+        }
+        scheduleRetry()
+    }
+
+    private func attempt(_ id: UUID, automatic: Bool) async {
+        guard persists, let spec, var item = outbox.item(id: id), !sendingIDs.contains(id) else { return }
+        if automatic, item.held || item.attempts >= Self.maxAutomaticAttempts { return }
+        sendingIDs.insert(id)
+        defer { sendingIDs.remove(id) }
+        let service = SubmissionService()
+        let result = await service.submit(item.draft, spec: spec, dryRun: false)
+        if let result {
+            outbox.remove([id])
+            markSent(id, caseNumber: result.caseNumber, date: result.date)
+            return
+        }
+        // Cancelled: nothing is known, so nothing changes.
+        guard let error = service.error else { return }
+        item.attempts += 1
+        let status: HistoryItem.Status
+        if error.isRetrySafe, item.attempts < Self.maxAutomaticAttempts {
+            item.nextAttemptAt = .now.addingTimeInterval(Self.retryDelay(afterAttempts: item.attempts))
+            status = .waiting
+        } else if case .uncertain = error {
+            item.held = true
+            status = .maybeSent
+        } else {
+            // Tries ran out, or retrying can't help (form changed, rejected): the user decides.
+            item.held = true
+            status = .notSent
+        }
+        outbox.put(item)
+        history.update(id: id) { $0.status = status }
+        if sent?.historyID == id {
+            sent?.outcome = status == .maybeSent ? .maybeSent : .waiting
+        }
+    }
+
+    private func markSent(_ id: UUID, caseNumber: String?, date: Date) {
+        history.update(id: id) {
+            $0.status = .sent
+            $0.caseNumber = caseNumber
+            $0.date = date
+        }
+        if sent?.historyID == id {
+            sent = SentReport(caseNumber: caseNumber, date: date, isDryRun: false, outcome: .sent, historyID: id)
+        }
+    }
+
+    /// Wakes for the earliest back-off. The flush runs in its own task so rescheduling never
+    /// cancels a send already under way.
+    private func scheduleRetry() {
+        retryTask?.cancel()
+        guard persists, let next = outbox.items.filter({ !$0.held }).map(\.nextAttemptAt).min() else { return }
+        retryTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(max(1, next.timeIntervalSinceNow)))
+            guard !Task.isCancelled else { return }
+            Task { @MainActor [weak self] in await self?.flushOutbox(ignoringBackoff: false) }
+        }
     }
 
     // MARK: Launch hooks
@@ -451,7 +709,25 @@ final class AppModel {
         }
         recomposePhoto()
         history.replaceAll(options.emptyHistory ? [] : DemoData.historyItems())
-        sent = DemoData.receipt
+        switch options.sendState {
+        case .offline?:
+            seedDemoUnconfirmed(.waiting)
+        case .uncertain?:
+            seedDemoUnconfirmed(.maybeSent)
+        case nil:
+            sent = DemoData.receipt
+        }
+    }
+
+    /// `-FixaStatus offline|uncertain` with `-FixaDemo 1`: the demo report as waiting to send or
+    /// maybe sent, on the receipt, in Sent reports and (waiting) on Home. In memory only.
+    private func seedDemoUnconfirmed(_ status: HistoryItem.Status) {
+        let id = UUID()
+        let now = Date.now.addingTimeInterval(-4 * 60)
+        outbox.put(PendingReport(id: id, draft: draft, createdAt: now, attempts: 1, nextAttemptAt: now, held: status != .waiting))
+        history.add(historyItem(id: id, date: now, caseNumber: nil, status: status))
+        sent = SentReport(caseNumber: nil, date: now, isDryRun: false, outcome: status == .waiting ? .waiting : .maybeSent, historyID: id)
+        isOnline = status != .waiting
     }
 
     /// A clearly marked TEST report with no personal data, for the single real end-to-end check.

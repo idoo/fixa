@@ -4,7 +4,8 @@ import UIKit
 
 /// The unsent report, kept across app kills. Text fields go to UserDefaults; each original
 /// photo is one JPEG in Caches/fixa-draft (purgeable: if iOS clears it, the text still restores).
-/// The contact is never stored here: it lives in the profile.
+/// Photos are re-encoded by `UIImage.jpegData`, which drops EXIF/GPS, and stored with complete file
+/// protection in a folder excluded from backup. The contact is never stored here: it lives in the profile.
 @MainActor
 enum DraftStore {
     private struct Saved: Codable {
@@ -45,12 +46,23 @@ enum DraftStore {
         guard let data = image.jpegData(compressionQuality: 0.85) else { return nil }
         let name = "\(UUID().uuidString).jpg"
         do {
-            try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-            try data.write(to: folder.appending(path: name), options: .atomic)
+            try prepareFolder()
+            try data.write(to: folder.appending(path: name), options: [.atomic, .completeFileProtection])
             return name
         } catch {
             return nil
         }
+    }
+
+    private static func prepareFolder() throws {
+        var url = folder
+        try FileManager.default.createDirectory(
+            at: url, withIntermediateDirectories: true,
+            attributes: [.protectionKey: FileProtectionType.complete]
+        )
+        var values = URLResourceValues()
+        values.isExcludedFromBackup = true
+        try url.setResourceValues(values)
     }
 
     static func deletePhoto(_ name: String) {
