@@ -3,7 +3,7 @@
 # Uses its own simulator "Fixa Shots 17 Pro Max"; never touches other devices.
 # Needs the Debug simulator build (does not build anything):
 #   build/DD/Build/Products/Debug-iphonesimulator/Fixa.app
-# Usage: docs/store/screenshots/capture.sh [screen ...]
+# Usage: docs/store/screenshots/capture.sh [screen ...]   (SETTLE=<seconds> to wait longer)
 set -euo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
@@ -13,7 +13,7 @@ bundle="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app/Info.plis
 name="Fixa Shots 17 Pro Max"
 settle="${SETTLE:-4}"
 screens=("$@")
-[ ${#screens[@]} -gt 0 ] || screens=(home report location review receipt history profile about)
+[ ${#screens[@]} -gt 0 ] || screens=(home location receipt privacy settings language)
 
 udid="$(xcrun simctl list devices -j | /usr/bin/python3 -c '
 import json, sys
@@ -33,13 +33,13 @@ xcrun simctl status_bar "$udid" override --time 9:41 \
   --cellularMode active --cellularBars 4 --batteryState charged --batteryLevel 100
 xcrun simctl install "$udid" "$app"
 
-shoot() { # locale-dir lang locale screen
+shoot() { # locale-dir FixaLanguage AppleLocale screen
   local dir="$here/captures/$1" raw
   mkdir -p "$dir"
   raw="$(mktemp -t fixa-shot).png"
   xcrun simctl terminate "$udid" "$bundle" >/dev/null 2>&1 || true
   xcrun simctl launch "$udid" "$bundle" -FixaDemo 1 -FixaScreen "$4" \
-    -AppleLanguages "($2)" -AppleLocale "$3" >/dev/null
+    -FixaLanguage "$2" -AppleLocale "$3" >/dev/null
   sleep "$settle"
   xcrun simctl io "$udid" screenshot --type=png "$raw" >/dev/null 2>&1
   magick "$raw" -alpha off "PNG24:$dir/$4.png"
