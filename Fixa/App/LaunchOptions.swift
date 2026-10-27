@@ -14,9 +14,6 @@ import Foundation
 ///   -FixaDemo 1     seeds a demo draft, profile, history and receipt; no network, nothing saved
 ///   -FixaEmptyHistory 1  with -FixaDemo: leaves the demo history empty (History empty state)
 ///   -FixaDryRun 1   Review's Send stops at the Summary page (nothing is submitted)
-///   -FixaLiveTest 1 DEBUG builds only (always off in Release): seeds a marked TEST report
-///                   (test@test.se, no personal data) on Review and records every server
-///                   response to Caches/fixa-responses. Sending is REAL.
 struct LaunchOptions: Sendable {
     enum Screen: String, CaseIterable, Sendable {
         case home, report, location, review, receipt, history, about, settings, textsize, language, contact, privacy, onboarding
@@ -37,7 +34,8 @@ struct LaunchOptions: Sendable {
     var demo: Bool
     var emptyHistory: Bool
     var dryRun: Bool
-    var liveTest: Bool
+    /// `-FixaTile <id>`: the demo report's tile, for screenshots of tile-specific screens.
+    var tile: String?
 
     static let current = LaunchOptions(arguments: ProcessInfo.processInfo.arguments)
 
@@ -66,10 +64,6 @@ struct LaunchOptions: Sendable {
         demo = isOn("-FixaDemo")
         emptyHistory = isOn("-FixaEmptyHistory")
         dryRun = isOn("-FixaDryRun")
-        #if DEBUG
-        liveTest = isOn("-FixaLiveTest")
-        #else
-        liveTest = false
-        #endif
+        tile = value("-FixaTile")
     }
 }

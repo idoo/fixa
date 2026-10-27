@@ -1,6 +1,7 @@
 import UIKit
 
 /// Combines up to three photos into one JPEG for the e-service, which accepts a single file.
+/// Each photo is fitted whole into its cell (letterboxed on paper), so nothing in it is cropped away.
 /// Re-rendering drops all EXIF/GPS metadata from the originals.
 enum PhotoCollage {
     static let maxBytes = 2_000_000
@@ -72,12 +73,23 @@ enum PhotoCollage {
             UIColor.white.setFill()
             context.fill(CGRect(origin: .zero, size: size))
             for (photo, rect) in zip(photos, rects) {
-                context.cgContext.saveGState()
-                context.cgContext.clip(to: rect)
-                draw(photo, aspectFillIn: rect)
-                context.cgContext.restoreGState()
+                paper.setFill()
+                context.fill(rect)
+                draw(photo, aspectFitIn: rect)
             }
         }
+    }
+
+    /// Warm off-white behind a fitted photo (the app's light paper colour).
+    private static let paper = UIColor(red: 0xF7 / 255, green: 0xF5 / 255, blue: 0xF0 / 255, alpha: 1)
+
+    private static func draw(_ image: UIImage, aspectFitIn rect: CGRect) {
+        let s = image.size
+        guard s.width > 0, s.height > 0 else { return }
+        let scale = min(rect.width / s.width, rect.height / s.height)
+        let w = s.width * scale
+        let h = s.height * scale
+        image.draw(in: CGRect(x: rect.midX - w / 2, y: rect.midY - h / 2, width: w, height: h))
     }
 
     private static func draw(_ image: UIImage, aspectFillIn rect: CGRect) {

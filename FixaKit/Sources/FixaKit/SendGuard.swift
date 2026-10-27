@@ -5,15 +5,16 @@ import Foundation
 public enum SendGuard {
     public enum Decision: Equatable, Sendable {
         case ok
-        /// The same problem at the same place was sent at `previous` (the latest such send).
-        case duplicate(previous: Date)
+        /// The same problem at the same place was sent at `previous` (the latest such send), with the
+        /// municipality's case number if one was read.
+        case duplicate(previous: Date, caseNumber: String?)
         /// Too many sends; the next one is allowed at `retryAfter`.
         case tooMany(retryAfter: Date)
     }
 
     /// Two reports of the same tile this close are the same problem.
     public static let duplicateRadius: Double = 150
-    public static let duplicateWindow: TimeInterval = 48 * 60 * 60
+    public static let duplicateWindow: TimeInterval = 14 * 24 * 60 * 60
     /// At most `count` sends in any rolling `window`.
     public static let limits: [(count: Int, window: TimeInterval)] = [(5, 60 * 60), (15, 24 * 60 * 60)]
 
@@ -23,8 +24,8 @@ public enum SendGuard {
                 && record.tileID == draft.tileID
                 && samePlace(draft.coordinate, draft.locationText, record.coordinate, record.locationText)
         }
-        if let previous = duplicates.map(\.date).max() {
-            return .duplicate(previous: previous)
+        if let latest = duplicates.max(by: { $0.date < $1.date }) {
+            return .duplicate(previous: latest.date, caseNumber: latest.caseNumber)
         }
 
         var retryAfter: Date?

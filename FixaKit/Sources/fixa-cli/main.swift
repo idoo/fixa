@@ -2,18 +2,18 @@ import CryptoKit
 import Foundation
 import FixaKit
 
-/// Keeps the last response so `submit` can save the final HTML.
-final class RecordingTransport: HTTPTransport, @unchecked Sendable {
+/// Prints every request the dry run makes and keeps the last page, for `--save-html`.
+final class LoggingTransport: HTTPTransport, @unchecked Sendable {
     private let base = URLSessionTransport.ephemeral()
     private let lock = NSLock()
-    private var last: (Data, URL?)?
+    private var last: Data?
 
-    var lastBody: Data? { lock.withLock { last?.0 } }
+    var lastBody: Data? { lock.withLock { last } }
 
     func send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
         let (data, response) = try await base.send(request)
         print("  \(request.httpMethod ?? "GET") \(request.url?.absoluteString ?? "") -> \(response.statusCode) \(response.url?.absoluteString ?? "")")
-        lock.withLock { last = (data, response.url) }
+        lock.withLock { last = data }
         return (data, response)
     }
 }
@@ -30,13 +30,14 @@ func value(after flag: String, in args: [String]) -> String? {
 
 let usage = """
 usage:
-  fixa-cli dry-run [--category ID ... | --all-categories] [--photo path.jpg] [--no-point] [--feedback yes|no] [--delay SECONDS]
-      Fills every page with a TEST report and stops at the summary page. No case is created.
+  fixa-cli dry-run [--category ID ... | --all-categories] [--no-point] [--feedback yes|no] [--delay SECONDS] [--save-html out.html]
+      Walks the LIVE e-service on the municipality's server up to the summary page with a sample
+      report, without a photo, and stops there. No case is created, but the server sees the requests
+      and keeps an unfinished session. Run it by hand only, after a user hit a changed form, to find
+      what changed. Never in CI, never on a schedule.
       --category may repeat; --all-categories runs once per adapter category, one after another,
       waiting --delay seconds (default 5) between runs. Without either, the street-light tile is used.
-      Exit 2 if any run found the form changed, 1 if any run failed otherwise.
-  fixa-cli submit --live --i-understand-this-creates-a-real-case [--photo path.jpg] [--save-html out.html]
-      Creates a REAL case with the municipality.
+      --save-html writes the last page reached. Exit 2 if any run found the form changed, 1 if any run failed otherwise.
   fixa-cli keygen [--key path]
       Creates the Ed25519 adapter signing key (default ~/.config/fixa/adapter-signing.key, mode 600)
       and prints its public key for AdapterSignature.publicKeyBase64. Never overwrites a key.
@@ -90,7 +91,7 @@ if args.first == "sign" {
     exit(0)
 }
 
-guard let command = args.first, ["dry-run", "submit"].contains(command) else { fail(usage) }
+guard args.first == "dry-run" else { fail(usage) }
 
 guard let spec = AdapterCatalog.bundled().first(where: { $0.id == "se.varmdo.ksb" }) else {
     fail("Bundled adapter se.varmdo.ksb not found")
@@ -100,48 +101,36 @@ func values(after flag: String, in args: [String]) -> [String] {
     args.indices.filter { args[$0] == flag && $0 + 1 < args.count }.map { args[$0 + 1] }
 }
 
+if args.contains("--photo") { fail("dry-run never uploads a photo\n\n" + usage) }
+
 var draft = ReportDraft(
     adapterID: spec.id,
     tileID: "streetlight",
-    description: "TEST — ignorera, testinlämning från app-utveckling. Gatlampan lyser inte.",
+    description: "Kontroll av formuläret. Skickas inte in.",
     coordinate: Coordinate(latitude: 59.3262, longitude: 18.3856),
     locationText: "Gustavsbergs centrum",
     wantsFeedback: true,
-    contact: Contact(email: "test@test.se")
+    contact: Contact(email: "namn@example.se")
 )
 
-let dryRun = command == "dry-run"
-if !dryRun {
-    guard args.contains("--live"), args.contains("--i-understand-this-creates-a-real-case") else {
-        fail("submit needs --live --i-understand-this-creates-a-real-case\n\n" + usage)
-    }
-}
-if let path = value(after: "--photo", in: args) {
-    guard let photo = FileManager.default.contents(atPath: path) else { fail("Cannot read \(path)") }
-    draft.photoJPEG = photo
-}
-if dryRun {
-    if args.contains("--no-point") { draft.coordinate = nil }
-    switch value(after: "--feedback", in: args) {
-    case nil: break
-    case "yes": draft.wantsFeedback = true
-    case "no": draft.wantsFeedback = false
-    default: fail("--feedback takes yes or no\n\n" + usage)
-    }
+if args.contains("--no-point") { draft.coordinate = nil }
+switch value(after: "--feedback", in: args) {
+case nil: break
+case "yes": draft.wantsFeedback = true
+case "no": draft.wantsFeedback = false
+default: fail("--feedback takes yes or no\n\n" + usage)
 }
 
 /// Category ids to run, in order; nil means the draft's tile.
 var categories: [String?] = [nil]
-if dryRun {
-    let requested = args.contains("--all-categories") ? spec.categories.map(\.id) : values(after: "--category", in: args)
-    for id in requested where spec.categories.first(where: { $0.id == id }) == nil {
-        fail("Unknown category \(id). Known: \(spec.categories.map(\.id).joined(separator: ", "))")
-    }
-    if !requested.isEmpty { categories = requested }
+let requested = args.contains("--all-categories") ? spec.categories.map(\.id) : values(after: "--category", in: args)
+for id in requested where spec.categories.first(where: { $0.id == id }) == nil {
+    fail("Unknown category \(id). Known: \(spec.categories.map(\.id).joined(separator: ", "))")
 }
+if !requested.isEmpty { categories = requested }
 let delay = Double(value(after: "--delay", in: args) ?? "5") ?? 5
 
-print(dryRun ? "Dry run against \(spec.channel.baseURL) (stops at summary)" : "LIVE submission to \(spec.channel.baseURL)")
+print("Dry run against the LIVE e-service \(spec.channel.baseURL) (stops at the summary page, no photo)")
 
 var worstExit: Int32 = 0
 for (number, categoryID) in categories.enumerated() {
@@ -152,42 +141,34 @@ for (number, categoryID) in categories.enumerated() {
         run.categoryID = categoryID
     }
     let name = categoryID ?? "tile \(draft.tileID ?? "-")"
-    print("== \(name): photo \(run.photoJPEG != nil ? "yes" : "no"), point \(run.coordinate != nil ? "yes" : "no"), feedback \(run.wantsFeedback ? "yes" : "no")")
+    print("== \(name): point \(run.coordinate != nil ? "yes" : "no"), feedback \(run.wantsFeedback ? "yes" : "no")")
 
     let issues = ReportValidator.validate(run, spec: spec)
     if !issues.isEmpty { fail("Draft invalid: \(issues)") }
 
     // A fresh transport (cookie jar) per run, like separate phones.
-    let transport = RecordingTransport()
+    let transport = LoggingTransport()
     let submitter = AbouSubmitter(spec: spec, transport: transport)
-    do {
-        let receipt = try await submitter.submit(run, dryRun: dryRun) { stage in
-            print("stage: \(stage)")
-        }
-        if let path = value(after: "--save-html", in: args), let body = transport.lastBody {
-            try body.write(to: URL(fileURLWithPath: path))
-            print("Saved final HTML to \(path)")
-        }
-        if let receipt {
-            print("Receipt:")
-            print("  case number: \(receipt.caseNumber ?? "(none found)")")
-            print("  final URL:   \(receipt.finalURL.absoluteString)")
-            print("  title:       \(receipt.title)")
-            print("  message:     \(receipt.message.prefix(500))")
-        } else {
-            print("\(name): reached the summary page. Nothing was submitted.")
-        }
-    } catch {
+    defer {
         if let path = value(after: "--save-html", in: args), let body = transport.lastBody {
             try? body.write(to: URL(fileURLWithPath: path))
+            print("Saved the last page to \(path)")
         }
+    }
+    do {
+        // A dry run stops at the summary page; the final send and its hook are never reached.
+        _ = try await submitter.submit(run, dryRun: true, beforeFinalSend: {}) { stage in
+            print("stage: \(stage)")
+        }
+        print("\(name): reached the summary page. Nothing was submitted.")
+    } catch {
         switch error {
         case SubmissionError.formChanged(let drift):
             FileHandle.standardError.write(Data("FORM CHANGED (\(name)): \(drift.report) Update adapter \(spec.id) (key, labels or synonyms), then add a fixture test.\n".utf8))
             worstExit = 2
-        case SubmissionError.uncertain(let detail):
-            FileHandle.standardError.write(Data("UNCERTAIN (\(name)): the final confirmation was sent but no receipt was read. Do NOT resend; check with the municipality. \(detail)\n".utf8))
-            if worstExit == 0 { worstExit = 1 }
+        case SubmissionError.blocked(let status):
+            FileHandle.standardError.write(Data("BLOCKED (\(name)): the e-service answered \(status). Stopping; do not run again.\n".utf8))
+            exit(1)
         default:
             FileHandle.standardError.write(Data("Failed (\(name)): \(error)\n".utf8))
             if worstExit == 0 { worstExit = 1 }

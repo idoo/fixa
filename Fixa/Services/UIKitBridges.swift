@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 import MessageUI
 
-/// `MFMailComposeViewController` for the e-mail fallback. Check `canSendMail` before presenting.
+/// `MFMailComposeViewController` for "Tell the developer". Check `canSendMail` before presenting.
 struct MailComposer: UIViewControllerRepresentable {
     struct Attachment {
         var data: Data
@@ -45,17 +45,6 @@ struct MailComposer: UIViewControllerRepresentable {
             onFinish(result)
         }
     }
-}
-
-/// Share sheet used when Mail isn't set up.
-struct ShareSheet: UIViewControllerRepresentable {
-    var items: [Any]
-
-    func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: items, applicationActivities: nil)
-    }
-
-    func updateUIViewController(_ controller: UIActivityViewController, context: Context) {}
 }
 
 /// Camera capture via `UIImagePickerController`. Only offered when a camera exists.

@@ -2,7 +2,9 @@
 
 ## Reporting a vulnerability
 
-Please report security problems privately through GitHub: open [github.com/idoo/fixa/security/advisories/new](https://github.com/idoo/fixa/security/advisories/new) ("Report a vulnerability"). Don't open a public issue for them. You'll get an answer within a week. Please don't test against the municipality's live e-service: every report sent there becomes a real case. The fixtures in `FixaKit/Tests/FixaKitTests/Fixtures` and `fixa-cli dry-run` (stops at the summary page, nothing is sent) are enough to reproduce most things.
+Please report security problems privately through GitHub: open [github.com/idoo/fixa/security/advisories/new](https://github.com/idoo/fixa/security/advisories/new) ("Report a vulnerability"). Don't open a public issue for them. You'll get an answer within a week. Please don't send anything to the municipality's live e-service, including `fixa-cli dry-run`: every request reaches the municipality's server and a full send becomes a real case. The saved pages in `FixaKit/Tests/FixaKitTests/Fixtures` and the offline tests (`cd FixaKit && swift test`) are enough to reproduce most things.
+
+Värmdö kommun can ask us to stop at any time (support@jvcr.se): we then set `adapters/status.json` to `down` and installed apps stop sending.
 
 ## What the app sends where
 
@@ -14,14 +16,14 @@ There is no Fixa server. The app talks to three places:
 | `https://raw.githubusercontent.com/idoo/fixa/main/adapters/` | Nothing about you; a plain download of the adapter JSON, `status.json` and their `.sig` signatures | Only after a send failed because the municipality's form changed, at most every 15 minutes |
 | Apple Maps | Map tiles, address search, the pin's address | While you place the pin |
 
-If you choose the e-mail fallback, your own Mail app sends the report to the municipality's address in the bundled adapter.
+When Fixa can't send, it copies the report text and opens the municipality's own web form (`webFormURL` in the bundled adapter, on the e-service's host) in Safari; the resident sends it there themselves.
 
 ## Adapter updates
 
 The downloaded adapter describes the municipality's form, so it is treated as untrusted. The app accepts it only when:
 
 - its Ed25519 signature (`<name>.sig`, over the exact bytes) verifies against the public key built into the app (`AdapterSignature`). The private key is kept offline on the maintainer's Mac, never in the repository or on GitHub, so taking over the GitHub account or the download path is not enough to change an adapter;
-- its id matches an adapter bundled in the app, and its channel kind, host, service, fallback e-mail and emergency phone numbers match that bundled adapter;
+- its id matches an adapter bundled in the app, and its channel kind, host, service, web form address and emergency phone numbers match that bundled adapter; tile links must be https pages on the municipality's own domain;
 - `baseURL` is a plain `https://host` with no user, port, path or query, and every path starts with a single `/`, with no scheme, `//`, `:` or backslash;
 - it is at most 256 KB and within the page, field and list limits in `AdapterSpecValidator`.
 

@@ -149,11 +149,16 @@ struct PendingReport: Codable, Identifiable, Sendable {
     var createdAt: Date
     /// Sends tried so far, the user's own first Send included.
     var attempts: Int
-    /// Earliest time for the next automatic try (a connectivity change may try sooner).
+    /// Earliest time for the next automatic try, back-off and jitter included.
     var nextAttemptAt: Date
     /// No automatic sending: the final step may have gone through (`.uncertain`), the error won't
     /// pass by retrying, or the tries ran out. Only an explicit tap sends it again.
     var held: Bool
+    /// Set on disk right before the final step goes out, cleared once its outcome is recorded.
+    /// Still set at launch: the app died mid-send, so the report may have been sent.
+    var finalSendAt: Date? = nil
+    /// The e-service's own `Retry-After`: not even a manual "Try again" goes before it.
+    var serverRetryAfter: Date? = nil
 }
 
 /// One JSON file per pending report in Application Support/Fixa/Outbox, so reports survive the

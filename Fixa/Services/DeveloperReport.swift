@@ -34,6 +34,8 @@ struct DeveloperReport: Equatable, Sendable {
         case .transport: errorKind = "transport"
         case .invalidSpec: errorKind = "invalidSpec"
         case .uncertain: errorKind = "uncertain"
+        case .blocked(let status): errorKind = "blocked \(status)"
+        case .loginRequired: errorKind = "loginRequired"
         }
     }
 

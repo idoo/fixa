@@ -20,6 +20,8 @@ struct SentReport: Equatable, Sendable {
     var outcome: Outcome = .sent
     /// The Sent reports entry for this report, when there is one.
     var historyID: UUID? = nil
+    /// What the e-service's receipt page said, trimmed; nil when it said nothing.
+    var kommunMessage: String? = nil
 }
 
 /// Wraps `AbouSubmitter` and publishes progress for the Review screen.
@@ -51,29 +53,35 @@ final class SubmissionService {
     /// Returns nil when sending failed; `phase` then holds the error.
     /// Each call gets its own ephemeral URLSession: Abou's cookies live in that session's private
     /// jar only (never `HTTPCookieStorage.shared`) and go away with it. A background task keeps the
-    /// send running when the user leaves the app mid-way.
-    func submit(_ draft: ReportDraft, spec: AdapterSpec, dryRun: Bool, recordResponses: Bool = false) async -> SentReport? {
+    /// send running when the user leaves the app mid-way. `beforeFinalSend` runs right before the
+    /// final step goes out and must have persisted that fact when it returns.
+    func submit(
+        _ draft: ReportDraft,
+        spec: AdapterSpec,
+        dryRun: Bool,
+        beforeFinalSend: @escaping @Sendable () async -> Void = {}
+    ) async -> SentReport? {
         guard !isSending else { return nil }
         phase = .sending(.starting)
         let background = BackgroundSend()
         defer { background.end() }
         let session = URLSessionTransport.ephemeral()
         defer { session.session.finishTasksAndInvalidate() }
-        let submitter = recordResponses
-            ? AbouSubmitter(spec: spec, transport: RecordingTransport())
-            : AbouSubmitter(spec: spec, transport: session)
+        let submitter = AbouSubmitter(spec: spec, transport: session)
         do {
-            let receipt = try await submitter.submit(draft, dryRun: dryRun) { stage in
+            let receipt = try await submitter.submit(draft, dryRun: dryRun, beforeFinalSend: beforeFinalSend) { stage in
                 Task { @MainActor [weak self] in
                     guard let self, self.isSending else { return }
                     self.phase = .sending(stage)
                 }
             }
             phase = .idle
+            let message = receipt?.message.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
             return SentReport(
                 caseNumber: receipt?.caseNumber,
                 date: receipt?.submittedAt ?? .now,
-                isDryRun: dryRun
+                isDryRun: dryRun,
+                kommunMessage: message.isEmpty ? nil : message
             )
         } catch let error as SubmissionError {
             phase = .failed(error)
@@ -162,14 +170,10 @@ extension SubmissionError {
             String(localized: "Fixa's settings for this municipality are broken. Please update the app.", bundle: L10n.bundle, locale: L10n.locale)
         case .uncertain:
             String(localized: "The connection dropped just as the report went out, so Fixa didn't see a confirmation.", bundle: L10n.bundle, locale: L10n.locale)
+        case .blocked:
+            String(localized: "Värmdö kommun's e-service isn't taking reports from Fixa right now. Use the kommun's website.", bundle: L10n.bundle, locale: L10n.locale)
+        case .loginRequired:
+            String(localized: "Värmdö kommun's e-service now asks you to log in. Use the kommun's website.", bundle: L10n.bundle, locale: L10n.locale)
         }
-    }
-}
-
-extension AdapterSpec {
-    /// The municipality's own e-service form: the intro page of the channel.
-    var eServiceURL: URL? {
-        guard let base = URL(string: channel.baseURL) else { return nil }
-        return URL(string: channel.introPath, relativeTo: base)?.absoluteURL
     }
 }

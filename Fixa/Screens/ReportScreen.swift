@@ -8,6 +8,7 @@ struct ReportScreen: View {
     @Environment(AppModel.self) private var model
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.fxHaptics) private var haptics
+    @Environment(\.openURL) private var openURL
     @Environment(\.fxReduceMotion) private var reduceMotion
     /// VoiceOver focus goes to the first section with an issue when Review fails.
     @AccessibilityFocusState private var a11yFocus: Section?
@@ -25,13 +26,8 @@ struct ReportScreen: View {
     @State private var replyInline = true
     /// Bumped by quick-phrase chips: drives the selection haptic.
     @State private var phraseTaps = 0
-    /// Place text the resident typed. A later pin (picked, found or from a photo) must not
-    /// overwrite it with an address, so it is put back after every pin change.
-    @State private var typedPlace: String?
-    /// The pin "my location" filled in on its own; a photo's place may replace it with one tap.
-    @State private var autoPin: Coordinate?
-    /// The pin when the map sheet last closed: a pin the resident chose there is never "auto".
-    @State private var pickedPin: Coordinate?
+    /// Bumped when an acute water chip is tapped: scrolls up to the call card.
+    @State private var acuteTaps = 0
     /// Where a picked photo was taken (inside the municipality), read from the original file
     /// before it is re-encoded without metadata.
     @State private var photoPlace: Coordinate?
@@ -57,6 +53,10 @@ struct ReportScreen: View {
         ScrollViewReader { proxy in
             ScrollView {
                 VStack(alignment: .leading, spacing: Fx.Space.xl) {
+                    if let emergency = waterEmergency {
+                        waterCallCard(emergency)
+                            .id(Self.callCardID)
+                    }
                     categorySection
                         .id(Section.problem)
                     locationSection
@@ -84,6 +84,12 @@ struct ReportScreen: View {
                 }
                 .padding(Fx.Space.l)
             }
+            .onChange(of: acuteTaps) { _, _ in
+                withAnimation(reduceMotion ? nil : Fx.Motion.select) {
+                    proxy.scrollTo(Self.callCardID, anchor: .top)
+                }
+                AccessibilityNotification.Announcement(acuteHint).post()
+            }
             .fxBottomBar {
                 FxPrimaryButton(title: String(localized: "Review", bundle: L10n.bundle, locale: L10n.locale), systemImage: "arrow.forward") {
                     review(scrollingWith: proxy)
@@ -100,33 +106,12 @@ struct ReportScreen: View {
         .sensoryFeedback(.selection, trigger: phraseTaps) { _, _ in haptics }
         .onAppear {
             replyInline = !model.profileIsReady
-            // A restored place text without a pin was typed by the resident.
-            if model.draft.coordinate == nil, !model.draft.locationText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                typedPlace = model.draft.locationText
-            }
         }
         // A translation belongs to one text: Review makes a new one for the changed description.
         .onChange(of: model.draft.description) { _, _ in
             if model.draft.translation != nil { model.draft.translation = nil }
         }
         .task { await model.prefillLocationIfAllowed() }
-        .onChange(of: model.isLocationPickerPresented) { _, presented in
-            guard !presented else { return }
-            pickedPin = model.draft.coordinate
-            // Confirming the same pin again rewrites the address without a pin change.
-            if let typedPlace, model.draft.locationText != typedPlace {
-                model.draft.locationText = typedPlace
-            }
-        }
-        .onChange(of: model.isFindingLocation) { wasFinding, finding in
-            guard wasFinding, !finding, let pin = model.draft.coordinate, pin != pickedPin else { return }
-            autoPin = pin
-        }
-        .onChange(of: model.draft.coordinate) { _, _ in
-            if let typedPlace, model.draft.locationText != typedPlace {
-                model.draft.locationText = typedPlace
-            }
-        }
         .onChange(of: model.photos.isEmpty) { _, isEmpty in
             if isEmpty { photoPlace = nil }
         }
@@ -147,7 +132,17 @@ struct ReportScreen: View {
         guard !model.goToReview() else { return }
         failedReviews += 1
         let issues = model.issues.sorted { Section($0.field) < Section($1.field) }
-        guard let firstIssue = issues.first else { return }
+        guard let firstIssue = issues.first else {
+            // Nothing to fix in the fields: the pin is in another kommun.
+            if let other = model.outsideMunicipalityName {
+                withAnimation(reduceMotion ? nil : Fx.Motion.select) {
+                    proxy.scrollTo(Section.place, anchor: .top)
+                }
+                a11yFocus = .place
+                AccessibilityNotification.Announcement(outsideMessage(other)).post()
+            }
+            return
+        }
         let first = Section(firstIssue.field)
         withAnimation(reduceMotion ? nil : Fx.Motion.select) {
             proxy.scrollTo(first, anchor: .top)
@@ -159,6 +154,63 @@ struct ReportScreen: View {
         AccessibilityNotification.Announcement(
             String(localized: "Fix \(issues.count) things before review. \(firstIssue.message)", bundle: L10n.bundle, locale: L10n.locale)
         ).post()
+    }
+
+    // MARK: Acute water
+
+    private static let callCardID = "report.callCard"
+
+    /// The emergency lines, only for the water tile: the kommun takes acute water and sewer faults by phone.
+    private var waterEmergency: AdapterSpec.Emergency? {
+        guard spec.tile(id: model.draft.tileID)?.categoryID == "water" else { return nil }
+        return spec.emergency
+    }
+
+    /// An acute chip ("Water leaking in the street", "Drain is blocked") is in the description.
+    private var acutePicked: Bool {
+        QuickPhrases.phrases(forTile: model.draft.tileID).contains { phrase in
+            phrase.acute && model.draft.description.localizedCaseInsensitiveContains(phrase.swedish)
+        }
+    }
+
+    private var acuteHint: String {
+        String(localized: "This sounds urgent. Call instead of sending a report.", bundle: L10n.bundle, locale: L10n.locale)
+    }
+
+    /// Time-aware call card at the top of the water report; outlined once an acute chip is picked.
+    private func waterCallCard(_ emergency: AdapterSpec.Emergency) -> some View {
+        let highlighted = acutePicked
+        return TimelineView(.everyMinute) { context in
+            let contact = EmergencyRouter.contact(for: context.date, emergency: emergency)
+            let digits = contact.phone.filter(\.isNumber)
+            // Number first and unbreakable (NBSP, non-breaking hyphen): if the line wraps, only the name moves.
+            let number = contact.phone.replacingOccurrences(of: " ", with: "\u{00A0}").replacingOccurrences(of: "-", with: "\u{2011}")
+            VStack(alignment: .leading, spacing: Fx.Space.s) {
+                FxCallRow(
+                    title: String(localized: "No water, sewage backing up or flooding? Call now", bundle: L10n.bundle, locale: L10n.locale),
+                    detail: "\(number.ltrIsolated) · \(contact.title.resolve(L10n.locale))",
+                    accessibilityValue: "\(contact.phone), \(contact.title.resolve(L10n.locale))"
+                ) {
+                    if let url = URL(string: "tel:\(digits)") {
+                        openURL(url)
+                    }
+                }
+                .overlay {
+                    if highlighted {
+                        RoundedRectangle(cornerRadius: Fx.Radius.m, style: .continuous)
+                            .strokeBorder(Fx.Color.error, lineWidth: Fx.Border.emphasis)
+                            .allowsHitTesting(false)
+                    }
+                }
+                if highlighted {
+                    Label(acuteHint, systemImage: "phone.arrow.up.right")
+                        .font(Fx.Font.callout.weight(.semibold))
+                        .foregroundStyle(Fx.Color.ink)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .accessibilityIdentifier("report.callCard")
     }
 
     /// Title, Spacer and "Change" side by side; stacked at accessibility text sizes.
@@ -218,6 +270,10 @@ struct ReportScreen: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityIdentifier("report.responsibility")
             }
+            ForEach(tile?.links ?? [], id: \.self) { link in
+                FxIconRow(systemImage: "safari", text: link.title.resolve(L10n.locale), link: link.url)
+                    .accessibilityHint(Text("Opens in Safari"))
+            }
             if let issue {
                 issueText(issue)
             }
@@ -271,6 +327,10 @@ struct ReportScreen: View {
                 }
             }
             .scrollClipDisabled()
+            Text("Avoid faces and number plates.")
+                .font(Fx.Font.footnote)
+                .foregroundStyle(Fx.Color.ink2)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 
@@ -350,8 +410,12 @@ struct ReportScreen: View {
             if let issue {
                 issueText(issue)
             }
+            if let other = model.outsideMunicipalityName {
+                FxBanner(kind: .warning, title: outsideMessage(other))
+                    .accessibilityIdentifier("report.outside")
+            }
             if let photoPlace, photoPlace != model.draft.coordinate,
-               model.draft.coordinate == nil || model.draft.coordinate == autoPin {
+               model.draft.coordinate == nil || model.pinIsAutomatic {
                 Button {
                     usePhotoPlace(photoPlace)
                 } label: {
@@ -383,7 +447,8 @@ struct ReportScreen: View {
             get: { model.draft.locationText },
             set: { newValue in
                 model.draft.locationText = newValue
-                typedPlace = newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : newValue
+                // A typed place is never overwritten by a later pin's address (AppModel, picker, photo).
+                model.placeTextIsTyped = !newValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             }
         )
         let focused = keyboardFocus == .place
@@ -420,13 +485,12 @@ struct ReportScreen: View {
 
     /// One tap: the pin goes where the photo was taken; the address fills in unless the resident typed one.
     private func usePhotoPlace(_ place: Coordinate) {
-        autoPin = nil
         model.draft.coordinate = place
-        if typedPlace == nil { model.draft.locationText = "" }
+        if !model.placeTextIsTyped { model.draft.locationText = "" }
         Task {
             let address = await ReverseGeocoder.address(for: place.clLocation)
             guard model.draft.coordinate == place else { return }
-            if typedPlace == nil { model.draft.locationText = address ?? "" }
+            if !model.placeTextIsTyped { model.draft.locationText = address ?? "" }
             let announcement = address.map { String(localized: "Pin placed: \($0)", bundle: L10n.bundle, locale: L10n.locale) }
                 ?? String(localized: "Pin placed on the map", bundle: L10n.bundle, locale: L10n.locale)
             AccessibilityNotification.Announcement(announcement).post()
@@ -440,7 +504,15 @@ struct ReportScreen: View {
                 ? String(localized: "Finding you…", bundle: L10n.bundle, locale: L10n.locale)
                 : String(localized: "Choose the place on a map", bundle: L10n.bundle, locale: L10n.locale)
         }
+        if model.pinIsAutomatic {
+            return String(localized: "Your current location. Move the pin to the problem.", bundle: L10n.bundle, locale: L10n.locale)
+        }
         return String(localized: "Pin placed on the map", bundle: L10n.bundle, locale: L10n.locale)
+    }
+
+    /// The pin is in another kommun: the report belongs there, so Review stays closed.
+    private func outsideMessage(_ kommun: String) -> String {
+        String(localized: "This place is in \(kommun). Report it to that kommun.", bundle: L10n.bundle, locale: L10n.locale)
     }
 
     // MARK: Quick phrases
@@ -452,6 +524,8 @@ struct ReportScreen: View {
             ForEach(phrases, id: \.self) { phrase in
                 let added = model.draft.description.localizedCaseInsensitiveContains(phrase.swedish)
                 Button {
+                    // Acute water chips point at the call card first; the phrase is still added.
+                    if phrase.acute { acuteTaps += 1 }
                     guard !added else { return }
                     model.draft.description = QuickPhrases.append(phrase.swedish, to: model.draft.description)
                     phraseTaps += 1
@@ -584,10 +658,12 @@ struct ReportScreen: View {
 /// Short phrases per tile that a tap adds to the description. App-side on purpose: the adapter
 /// stays a description of the e-service, and these are only typing help.
 enum QuickPhrases {
-    /// `label` is in the app's language; `swedish` is what goes into the description.
+    /// `label` is in the app's language; `swedish` is what goes into the description. `acute`: a fault
+    /// the kommun takes by phone, so the Report screen points at its call card.
     struct Phrase: Hashable {
         let label: String
         let swedish: String
+        var acute = false
     }
 
     static func phrases(forTile tileID: String?) -> [Phrase] {
@@ -603,9 +679,9 @@ enum QuickPhrases {
         case "graffiti":
             [phrase("Offensive text"), phrase("Broken glass"), phrase("On a school or playground")]
         case "park":
-            [phrase("Broken play equipment"), phrase("Fallen tree or branch"), phrase("Overflowing bins")]
+            [phrase("Broken play equipment"), phrase("Fallen tree or branch"), phrase("Litter bin full")]
         case "water":
-            [phrase("Water leaking in the street"), phrase("Drain is blocked"), phrase("Bad smell")]
+            [phrase("Water leaking in the street", acute: true), phrase("Drain is blocked", acute: true), phrase("Bad smell")]
         default:
             [phrase("Dangerous"), phrase("Been like this for a while"), phrase("Getting worse")]
         }
@@ -616,10 +692,10 @@ enum QuickPhrases {
         .path(forResource: "sv", ofType: "lproj")
         .flatMap(Bundle.init(path:))
 
-    private static func phrase(_ resource: LocalizedStringResource) -> Phrase {
+    private static func phrase(_ resource: LocalizedStringResource, acute: Bool = false) -> Phrase {
         let label = L10n.bundle.localizedString(forKey: resource.key, value: resource.key, table: nil)
         let swedish = swedishBundle?.localizedString(forKey: resource.key, value: label, table: nil) ?? label
-        return Phrase(label: label, swedish: swedish)
+        return Phrase(label: label, swedish: swedish, acute: acute)
     }
 
     /// Adds `phrase` as its own sentence: "Out since Monday" + "Flickering" → "Out since Monday. Flickering".

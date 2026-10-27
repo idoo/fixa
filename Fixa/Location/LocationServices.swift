@@ -50,6 +50,8 @@ enum LocationProvider {
     struct Fix: Sendable {
         let coordinate: Coordinate
         let isApproximate: Bool
+        /// Radius in metres of the fix's uncertainty.
+        let horizontalAccuracy: CLLocationAccuracy
     }
 
     private static let manager = CLLocationManager()
@@ -72,10 +74,11 @@ enum LocationProvider {
     }
 
     /// Lookup that says why it failed. The clock starts once the permission prompt (if any) is answered,
-    /// then gives up with `Failure.timedOut` after `timeout`.
-    static func currentFix(timeout: Duration) async throws -> Fix {
+    /// then gives up with `Failure.timedOut` after `timeout`. A precise fix is returned once it is
+    /// within `accuracy` metres.
+    static func currentFix(timeout: Duration, accuracy: CLLocationAccuracy = 200) async throws -> Fix {
         try await withThrowingTaskGroup(of: Fix.self) { group in
-            group.addTask { try await liveFix() }
+            group.addTask { try await liveFix(accuracy: accuracy) }
             group.addTask {
                 while await isAskingPermission() {
                     try await Task.sleep(for: .milliseconds(500))
@@ -93,7 +96,7 @@ enum LocationProvider {
         manager.authorizationStatus == .notDetermined
     }
 
-    private static func liveFix() async throws -> Fix {
+    private static func liveFix(accuracy: CLLocationAccuracy) async throws -> Fix {
         let session = CLServiceSession(authorization: .whenInUse)
         defer { session.invalidate() }
         for try await update in CLLocationUpdate.liveUpdates() {
@@ -102,32 +105,72 @@ enum LocationProvider {
             if update.authorizationDenied { throw Failure.denied }
             guard let location = update.location, location.horizontalAccuracy >= 0 else { continue }
             if update.accuracyLimited || manager.accuracyAuthorization == .reducedAccuracy {
-                return Fix(coordinate: Coordinate(location.coordinate), isApproximate: true)
+                return Fix(coordinate: Coordinate(location.coordinate), isApproximate: true, horizontalAccuracy: location.horizontalAccuracy)
             }
-            if location.horizontalAccuracy < 200 {
-                return Fix(coordinate: Coordinate(location.coordinate), isApproximate: false)
+            if location.horizontalAccuracy <= accuracy {
+                return Fix(coordinate: Coordinate(location.coordinate), isApproximate: false, horizontalAccuracy: location.horizontalAccuracy)
             }
         }
         throw Failure.unavailable
     }
 }
 
-/// Address text for a coordinate, via MapKit reverse geocoding.
+/// Address text and kommun for a coordinate, via MapKit reverse geocoding.
 @MainActor
 enum ReverseGeocoder {
     /// Farther than this from the pin, the found address is only "near" it.
     static let exactRadiusMeters: CLLocationDistance = 100
 
+    struct Place: Sendable, Equatable {
+        /// Swedish address text, "nära …" when the nearest result is over `exactRadiusMeters` away.
+        var address: String?
+        /// The kommun as Apple names it, e.g. "Värmdö", "Nacka" (`subAdministrativeArea`).
+        var kommun: String?
+        /// The town, e.g. "Gustavsberg", "Saltsjö-Boo"; not a kommun.
+        var locality: String?
+    }
+
+    /// One lookup per coordinate: the pin check and the address share it.
+    private static var lookups: [String: Task<Place?, Never>] = [:]
+
     /// The address of the nearest result in Swedish (the text goes to the municipality as written).
     /// A result over `exactRadiusMeters` away is prefixed "nära " so it never claims the exact spot.
     static func address(for coordinate: CLLocationCoordinate2D) async -> String? {
+        await place(for: coordinate)?.address
+    }
+
+    /// Address, kommun and town of the nearest result; nil when the lookup failed.
+    static func place(for coordinate: CLLocationCoordinate2D) async -> Place? {
+        let key = "\(coordinate.latitude),\(coordinate.longitude)"
+        if let running = lookups[key] {
+            return await running.value
+        }
+        if lookups.count > 16 {
+            lookups.removeAll()
+        }
+        let task = Task { await lookup(coordinate) }
+        lookups[key] = task
+        let place = await task.value
+        if place == nil {
+            lookups[key] = nil
+        }
+        return place
+    }
+
+    private static func lookup(_ coordinate: CLLocationCoordinate2D) async -> Place? {
         let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
         guard let request = MKReverseGeocodingRequest(location: location) else { return nil }
         request.preferredLocale = Locale(identifier: "sv_SE")
         guard let items = try? await request.mapItems,
-              let item = items.min(by: { $0.location.distance(from: location) < $1.location.distance(from: location) }),
-              let text = item.address?.shortAddress ?? item.address?.fullAddress ?? item.name else { return nil }
-        return item.location.distance(from: location) > exactRadiusMeters ? "nära \(text)" : text
+              let item = items.min(by: { $0.location.distance(from: location) < $1.location.distance(from: location) }) else { return nil }
+        var address = item.address?.shortAddress ?? item.address?.fullAddress ?? item.name
+        if let text = address, item.location.distance(from: location) > exactRadiusMeters {
+            address = "nära \(text)"
+        }
+        // MKAddress has no kommun field; the placemark still carries it (checked against Apple's
+        // answers for Gustavsberg → "Värmdö", Saltsjö-Boo → "Nacka", Vaxholm → "Vaxholm").
+        let placemark = item.placemark
+        return Place(address: address, kommun: placemark.subAdministrativeArea, locality: placemark.locality)
     }
 }
 

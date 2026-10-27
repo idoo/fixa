@@ -13,8 +13,9 @@ public struct AbouSubmitter: Sendable {
         self.pageDelay = pageDelay
     }
 
-    /// Requests look like Safari on an iPhone filling in the form on the website, so the municipality
-    /// sees the same report it would get from its own web page. (Safari 26 freezes the OS token at 18_6.)
+    /// Requests carry the headers Safari on an iPhone sends when a resident fills in the form on the
+    /// website, so the municipality receives the same fields its own web page sends. (Safari 26 freezes
+    /// the OS token at 18_6.)
     static let userAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1"
     static let acceptHTML = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
     static let acceptLanguage = "sv-SE,sv;q=0.9"
@@ -28,10 +29,12 @@ public struct AbouSubmitter: Sendable {
     ///
     /// A locked or expired session before the final confirmation starts over once from `introPath`
     /// with fresh cookies. Once the final confirmation has been sent nothing is retried or restarted:
-    /// any failure to read the receipt is `.uncertain`.
+    /// any failure to read the receipt is `.uncertain`. `beforeFinalSend` is awaited immediately before
+    /// the final (Slutför) request goes out, so the caller can persist "may have been sent" first.
     public func submit(
         _ draft: ReportDraft,
         dryRun: Bool = false,
+        beforeFinalSend: @Sendable () async -> Void,
         progress: @Sendable (SubmissionStage) -> Void = { _ in }
     ) async throws -> SubmissionReceipt? {
         let channel = spec.channel
@@ -42,10 +45,10 @@ public struct AbouSubmitter: Sendable {
 
         progress(.starting)
         do {
-            return try await walk(draft, base: base, dryRun: dryRun, restart: false, progress: progress)
+            return try await walk(draft, base: base, dryRun: dryRun, restart: false, beforeFinalSend: beforeFinalSend, progress: progress)
         } catch is SessionLost {
             do {
-                return try await walk(draft, base: base, dryRun: dryRun, restart: true, progress: progress)
+                return try await walk(draft, base: base, dryRun: dryRun, restart: true, beforeFinalSend: beforeFinalSend, progress: progress)
             } catch let lost as SessionLost {
                 throw lost.error
             }
@@ -63,12 +66,13 @@ public struct AbouSubmitter: Sendable {
         base: URL,
         dryRun: Bool,
         restart: Bool,
+        beforeFinalSend: @Sendable () async -> Void,
         progress: @Sendable (SubmissionStage) -> Void
     ) async throws -> SubmissionReceipt? {
         let channel = spec.channel
         (transport as? URLSessionTransport)?.clearCookies()
-        _ = try await get(try url(channel.introPath, base: base), pausing: restart)
-        var page = try await get(try url(channel.startPath, base: base))
+        let intro = try await get(try url(channel.introPath, base: base), pausing: restart)
+        var page = try await get(try url(channel.startPath, base: base), referer: intro.url)
         try checkSession(page)
 
         // The platform may skip pages (Värmdö skips contact details when no reply is wanted),
@@ -84,34 +88,38 @@ public struct AbouSubmitter: Sendable {
                     return nil
                 }
                 progress(.confirming)
-                let receipt = try await confirm(page)
+                let receipt = try await confirm(page, beforeFinalSend: beforeFinalSend)
                 progress(.done)
                 return receipt
             }
 
+            // Check the page against the adapter before anything is uploaded: a changed form never
+            // leaves an orphan photo on the server.
+            let pageValues = try values(for: pageSpec, draft: draft, html: page.html)
             if let upload = channel.upload, upload.pageID == pageSpec.id, let photo = draft.photoJPEG {
                 progress(.uploadingPhoto)
-                try await uploadPhoto(photo, upload: upload, base: base)
+                try await uploadPhoto(photo, upload: upload, base: base, referer: page.url)
             }
 
             progress(stage(pageSpec.stage))
-            page = try await post(page, values: try values(for: pageSpec, draft: draft, html: page.html))
+            page = try await post(page, values: pageValues)
             index += 1
         }
         throw SubmissionError.invalidSpec("No summary page")
     }
 
     /// Sends Slutför on the summary page and reads the receipt.
-    private func confirm(_ summary: Page) async throws -> SubmissionReceipt {
+    private func confirm(_ summary: Page, beforeFinalSend: @Sendable () async -> Void) async throws -> SubmissionReceipt {
         let request = try postRequest(summary, values: [])
         try await pause()
+        await beforeFinalSend()
         // ---- FINAL SEND: from the next line on the case may exist. ----
         // This request is sent exactly once. No retry and no session restart past this point; anything
         // but a receipt or the server's own validation messages is `.uncertain`, including 429/5xx,
         // timeouts, redirects off the host, maintenance and login pages.
         var page: Page
         do {
-            page = try await self.page(request, pausing: false)
+            page = try await self.page(request, pausing: false, interstitials: false)
             page = try await finishProcessing(page, finalURL: request.url)
         } catch let error as SubmissionError {
             throw SubmissionError.uncertain("No answer after the final confirmation was sent: \(error)")
@@ -123,10 +131,13 @@ public struct AbouSubmitter: Sendable {
         }
         let errors = AbouPageParser.validationErrors(page.html)
         if !errors.isEmpty { throw SubmissionError.serverValidation(errors) }
-        guard let receipt = AbouPageParser.parseReceipt(html: page.html, url: page.url, now: Date()) else {
-            throw SubmissionError.uncertain("After the final confirmation the e-service showed a page without a receipt (\(page.url.absoluteString)).")
+        // A receipt with a case number wins over maintenance or sign-in wording elsewhere on the page
+        // (a driftinformation banner). Without a case number, such wording means it is not a receipt.
+        if let receipt = AbouPageParser.parseReceipt(html: page.html, url: page.url, now: Date()),
+           receipt.caseNumber != nil || !(Self.isOutagePage(page.html) || Self.isLoginPage(page)) {
+            return receipt
         }
-        return receipt
+        throw SubmissionError.uncertain("After the final confirmation the e-service showed a page without a receipt (\(page.url.absoluteString)).")
     }
 
     // MARK: - Pages
@@ -267,7 +278,7 @@ public struct AbouSubmitter: Sendable {
 
     // MARK: - Upload
 
-    private func uploadPhoto(_ photo: Data, upload: AdapterSpec.UploadSpec, base: URL) async throws {
+    private func uploadPhoto(_ photo: Data, upload: AdapterSpec.UploadSpec, base: URL, referer: URL) async throws {
         let boundary = "----WebKitFormBoundary" + String((0..<16).map { _ in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".randomElement()! })
         var body = Data()
         body.append(Data("--\(boundary)\r\n".utf8))
@@ -277,6 +288,7 @@ public struct AbouSubmitter: Sendable {
         body.append(Data("\r\n--\(boundary)--\r\n".utf8))
 
         var request = makeRequest(try url(upload.path, base: base), method: "POST", timeout: SubmissionTimeouts.upload)
+        setOriginAndReferer(&request, referer: referer)
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         request.setValue("XMLHttpRequest", forHTTPHeaderField: "X-Requested-With")
         request.setValue("application/json", forHTTPHeaderField: "Accept")
@@ -287,6 +299,7 @@ public struct AbouSubmitter: Sendable {
         }
 
         var verify = makeRequest(try url(upload.actionPath, base: base), method: "POST")
+        setOriginAndReferer(&verify, referer: referer)
         verify.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
         verify.setValue("XMLHttpRequest", forHTTPHeaderField: "X-Requested-With")
         verify.setValue("application/json", forHTTPHeaderField: "Accept")
@@ -324,9 +337,19 @@ public struct AbouSubmitter: Sendable {
         return request
     }
 
-    private func get(_ url: URL, pausing: Bool = true) async throws -> Page {
+    /// Safari sends `Origin` (scheme and host of the page) and `Referer` (the page's URL) with every POST
+    /// from the form, and with the form's upload requests.
+    private func setOriginAndReferer(_ request: inout URLRequest, referer: URL) {
+        if let scheme = referer.scheme, let host = referer.host {
+            request.setValue("\(scheme)://\(host)", forHTTPHeaderField: "Origin")
+        }
+        request.setValue(referer.absoluteString, forHTTPHeaderField: "Referer")
+    }
+
+    private func get(_ url: URL, pausing: Bool = true, referer: URL? = nil) async throws -> Page {
         var request = makeRequest(url, method: "GET")
         request.setValue(Self.acceptHTML, forHTTPHeaderField: "Accept")
+        if let referer { request.setValue(referer.absoluteString, forHTTPHeaderField: "Referer") }
         return try await page(request, pausing: pausing)
     }
 
@@ -342,7 +365,7 @@ public struct AbouSubmitter: Sendable {
             if request.url == finalURL {
                 throw SubmissionError.uncertain("The page after the final confirmation posts back to it (\(page.url.absoluteString)); not sending it twice.")
             }
-            page = try await self.page(request)
+            page = try await self.page(request, interstitials: false)
             remaining -= 1
         }
         return page
@@ -369,34 +392,42 @@ public struct AbouSubmitter: Sendable {
         for (name, value) in values { fields[name] = value }
 
         var request = makeRequest(target, method: "POST")
+        setOriginAndReferer(&request, referer: page.url)
         request.setValue("application/x-www-form-urlencoded; charset=utf-8", forHTTPHeaderField: "Content-Type")
         request.setValue(Self.acceptHTML, forHTTPHeaderField: "Accept")
         request.httpBody = Data(Self.formEncode(fields.sorted { $0.key < $1.key }).utf8)
         return request
     }
 
-    /// Sends `request` and reads the HTML page. A maintenance or login page is never a form page or
-    /// a receipt: before the final send it is `.unavailable` / `.formChanged`, after it `confirm`
-    /// turns it into `.uncertain`.
-    private func page(_ request: URLRequest, pausing: Bool = true) async throws -> Page {
+    /// Sends `request` and reads the HTML page. With `interstitials` (every request before the final
+    /// send) a maintenance page is `.unavailable` and a sign-in page `.loginRequired`, unless the page
+    /// is one of the adapter's own form pages, which maintenance wording in a banner never stops.
+    /// After the final send `confirm` reads the raw page itself.
+    private func page(_ request: URLRequest, pausing: Bool = true, interstitials: Bool = true) async throws -> Page {
         let (data, response) = try await send(request, pausing: pausing)
         let page = Page(html: String(decoding: data, as: UTF8.self), url: response.url ?? request.url!)
+        guard interstitials, !isExpectedFormPage(page) else { return page }
         if Self.isOutagePage(page.html) {
             throw SubmissionError.unavailable(status: nil, retryAfter: nil)
         }
         if Self.isLoginPage(page) {
-            throw SubmissionError.formChanged(FormDrift(
-                pageID: nil,
-                missing: [],
-                detail: "The e-service asked to log in (\(page.url.absoluteString))."
-            ))
+            throw SubmissionError.loginRequired
         }
         return page
     }
 
+    /// A page whose form posts back to one of the adapter's pages.
+    private func isExpectedFormPage(_ page: Page) -> Bool {
+        guard let action = AbouPageParser.formAction(page.html),
+              let actionURL = URL(string: action, relativeTo: page.url),
+              let id = AbouPageParser.pageID(from: actionURL) else { return false }
+        return spec.channel.pages.contains { $0.id == id }
+    }
+
     /// Waits `pageDelay`, then sends. Requests go only to the adapter's own host, over HTTPS; a redirect
     /// that leaves it (refused by `RedirectGuard`, or followed by some other transport) is an error.
-    /// 429 and 5xx are `.unavailable` with the server's `Retry-After`.
+    /// 429 and 5xx are `.unavailable` with the server's `Retry-After`; 401/403 are `.blocked`; 404/410
+    /// mean the e-service moved or was renamed, so `.formChanged`.
     private func send(_ request: URLRequest, pausing: Bool = true) async throws -> (Data, HTTPURLResponse) {
         guard isAllowed(request.url) else {
             throw SubmissionError.formChanged(FormDrift(
@@ -424,6 +455,14 @@ public struct AbouSubmitter: Sendable {
             throw SubmissionError.transport("The e-service redirected to \(location); Fixa only follows redirects within \(allowedHost ?? "its host").")
         case 429, 500..<600:
             throw SubmissionError.unavailable(status: status, retryAfter: Self.retryAfter(response.value(forHTTPHeaderField: "Retry-After")))
+        case 401, 403:
+            throw SubmissionError.blocked(status: status)
+        case 404, 410:
+            throw SubmissionError.formChanged(FormDrift(
+                pageID: request.url.flatMap(AbouPageParser.pageID(from:)),
+                missing: [],
+                detail: "The e-service answered \(status) for \(request.url?.path ?? "-"): service not found."
+            ))
         default:
             throw SubmissionError.http(status)
         }
@@ -466,8 +505,15 @@ public struct AbouSubmitter: Sendable {
         return min(max(seconds, 0), 24 * 60 * 60)
     }
 
-    /// "Service Unavailable", maintenance and outage pages, which some servers send with HTTP 200.
+    /// "Service Unavailable", maintenance and outage pages, which some servers send with HTTP 200: the
+    /// wording in the page's title or a headline, or anywhere on a page that has no form of the
+    /// e-service. A driftinformation banner on a normal form page is not an outage.
     static func isOutagePage(_ html: String) -> Bool {
+        let headlines = (AbouPageParser.matches(#"<(title|h1)\b[^>]*>(.*?)</\1>"#, in: html, options: [.caseInsensitive, .dotMatchesLineSeparators])
+            .map { AbouPageParser.visibleText($0[2]) }).joined(separator: " ").lowercased()
+        if outageMarkers.contains(where: headlines.contains) { return true }
+        let hasServiceForm = !AbouPageParser.matches(#"<form\b[^>]*\bid\s*=\s*["']MainForm["']"#, in: html, options: [.caseInsensitive]).isEmpty
+        guard !hasServiceForm else { return false }
         let text = AbouPageParser.decodeEntities(html).lowercased()
         return outageMarkers.contains { text.contains($0) }
     }
@@ -478,13 +524,20 @@ public struct AbouSubmitter: Sendable {
         "tillfälligt otillgänglig", "tillfälligt stängd",
     ]
 
-    /// A sign-in page: a password field, or a login URL. (Every Abou page links to `/web/login.aspx`;
-    /// only being *on* it counts.)
+    /// A sign-in or identification page: a login URL, a password field, or a title or headline asking
+    /// for BankID / e-legitimation. (Every Abou page links to `/web/login.aspx`; only being *on* it counts.)
     static func isLoginPage(_ page: Page) -> Bool {
         let path = page.url.path.lowercased()
-        if ["login", "logon", "signin", "/auth"].contains(where: path.contains) { return true }
-        return page.html.range(of: #"type\s*=\s*["']?password"#, options: [.regularExpression, .caseInsensitive]) != nil
+        if ["login", "logon", "signin", "/auth", "bankid", "identif"].contains(where: path.contains) { return true }
+        if page.html.range(of: #"type\s*=\s*["']?password"#, options: [.regularExpression, .caseInsensitive]) != nil { return true }
+        let headlines = AbouPageParser.matches(#"<(title|h1)\b[^>]*>(.*?)</\1>"#, in: page.html, options: [.caseInsensitive, .dotMatchesLineSeparators])
+            .map { AbouPageParser.visibleText($0[2]) }.joined(separator: " ").lowercased()
+        return loginMarkers.contains(where: headlines.contains)
     }
+
+    static let loginMarkers = [
+        "bankid", "e-legitimation", "logga in", "legitimera dig", "identifiera dig", "freja", "sign in", "log in",
+    ]
 
     static func formEncode(_ pairs: [(key: String, value: String)]) -> String {
         var allowed = CharacterSet.alphanumerics.intersection(CharacterSet(charactersIn: Unicode.Scalar(0)...Unicode.Scalar(127)))

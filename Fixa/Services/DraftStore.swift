@@ -11,6 +11,17 @@ enum DraftStore {
     private struct Saved: Codable {
         var draft: ReportDraft
         var photoFiles: [String]
+        /// Absent in drafts saved before build 9.
+        var pinIsAutomatic: Bool?
+        var placeTextIsTyped: Bool?
+    }
+
+    struct Restored {
+        var draft: ReportDraft
+        var photos: [UIImage]
+        var photoFiles: [String]
+        var pinIsAutomatic: Bool
+        var placeTextIsTyped: Bool
     }
 
     private static let key = "fixa.draft"
@@ -19,16 +30,23 @@ enum DraftStore {
         URL.cachesDirectory.appending(path: "fixa-draft", directoryHint: .isDirectory)
     }
 
-    static func save(_ draft: ReportDraft, photoFiles: [String]) {
+    static func save(_ draft: ReportDraft, photoFiles: [String], pinIsAutomatic: Bool, placeTextIsTyped: Bool) {
         var stored = draft
         stored.photoJPEG = nil
         stored.contact = Contact()
-        guard let data = try? JSONEncoder().encode(Saved(draft: stored, photoFiles: photoFiles)) else { return }
+        let saved = Saved(draft: stored, photoFiles: photoFiles, pinIsAutomatic: pinIsAutomatic, placeTextIsTyped: placeTextIsTyped)
+        guard let data = try? JSONEncoder().encode(saved) else { return }
         UserDefaults.standard.set(data, forKey: key)
     }
 
+    /// The saved draft without its photos (cheap; for comparing).
+    static func loadDraft() -> ReportDraft? {
+        guard let data = UserDefaults.standard.data(forKey: key) else { return nil }
+        return try? JSONDecoder().decode(Saved.self, from: data).draft
+    }
+
     /// The saved draft with the photos that are still on disk, in their original order.
-    static func load() -> (draft: ReportDraft, photos: [UIImage], photoFiles: [String])? {
+    static func load() -> Restored? {
         guard let data = UserDefaults.standard.data(forKey: key),
               let saved = try? JSONDecoder().decode(Saved.self, from: data) else { return nil }
         var photos: [UIImage] = []
@@ -38,7 +56,11 @@ enum DraftStore {
             photos.append(image)
             files.append(name)
         }
-        return (saved.draft, photos, files)
+        // Before build 9 a restored place text without a pin was taken as typed.
+        let typed = saved.placeTextIsTyped
+            ?? (saved.draft.coordinate == nil && !saved.draft.locationText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+        return Restored(draft: saved.draft, photos: photos, photoFiles: files,
+                        pinIsAutomatic: saved.pinIsAutomatic ?? false, placeTextIsTyped: typed)
     }
 
     /// Writes one original photo; returns its file name, or nil if it could not be stored.
