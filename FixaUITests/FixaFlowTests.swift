@@ -190,6 +190,33 @@ final class FixaFlowTests: XCTestCase {
         XCTAssertFalse(app.descendants(matching: .any).matching(identifier: "history.row").firstMatch.waitForExistence(timeout: 3), "History not empty after Delete all my data")
         shot("e-history-empty")
     }
+
+    /// Build 5 crashed (NSInternalInconsistencyException in `_UITraitOverrides`) the moment
+    /// Higher contrast was on, and then at every launch. Turn it on and back off, then check
+    /// the app is still alive and other screens still open.
+    @MainActor
+    func testF_HigherContrastDoesNotCrash() {
+        let app = launch(["-FixaLanguage", "en"])
+        element(app, "home.settings").tap()
+        let toggle = app.switches.matching(NSPredicate(format: "label BEGINSWITH %@", "Higher contrast")).firstMatch
+        XCTAssertTrue(toggle.waitForExistence(timeout: 10), "No Higher contrast switch")
+        reveal(app, toggle)
+        toggle.switches.firstMatch.exists ? toggle.switches.firstMatch.tap() : toggle.tap()
+        RunLoop.current.run(until: Date().addingTimeInterval(1.5))
+        XCTAssertEqual(app.state, .runningForeground, "App died after turning Higher contrast on")
+        XCTAssertEqual(toggle.value as? String, "1", "Higher contrast did not turn on")
+        shot("f-contrast-on")
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        element(app, "home.history").tap()
+        XCTAssertEqual(app.state, .runningForeground, "App died navigating with Higher contrast on")
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        element(app, "home.settings").tap()
+        reveal(app, toggle)
+        toggle.switches.firstMatch.exists ? toggle.switches.firstMatch.tap() : toggle.tap()
+        RunLoop.current.run(until: Date().addingTimeInterval(1.5))
+        XCTAssertEqual(app.state, .runningForeground, "App died after turning Higher contrast off")
+        XCTAssertEqual(toggle.value as? String, "0", "Higher contrast did not turn off")
+    }
 }
 
 private extension XCUIElement {

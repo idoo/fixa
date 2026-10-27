@@ -149,8 +149,13 @@ private struct WindowTraitBridge: UIViewRepresentable {
             if window.overrideUserInterfaceStyle != style {
                 window.overrideUserInterfaceStyle = style
             }
+            // Reading an unset trait override (`traitOverrides.accessibilityContrast`
+            // before anything set it) raises an NSInternalInconsistencyException on
+            // device: build 5 crashed at launch whenever Higher contrast was on.
+            // Ask `contains` first; only then compare the stored value.
             if higherContrast {
-                if window.traitOverrides.accessibilityContrast != .high {
+                let overrides = window.traitOverrides
+                if !overrides.contains(UITraitAccessibilityContrast.self) || overrides.accessibilityContrast != .high {
                     window.traitOverrides.accessibilityContrast = .high
                 }
             } else if window.traitOverrides.contains(UITraitAccessibilityContrast.self) {
