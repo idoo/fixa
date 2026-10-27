@@ -5,15 +5,17 @@ struct HomeScreen: View {
     let spec: AdapterSpec
     @Environment(AppModel.self) private var model
     @Environment(\.openURL) private var openURL
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
-    private let columns = [
-        GridItem(.flexible(), spacing: Fx.Space.m),
-        GridItem(.flexible(), spacing: Fx.Space.m),
-    ]
+    /// Two columns; one at accessibility sizes so titles keep whole words.
+    private var columns: [GridItem] {
+        let count = dynamicTypeSize.isAccessibilitySize ? 1 : 2
+        return Array(repeating: GridItem(.flexible(), spacing: Fx.Space.m), count: count)
+    }
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: Fx.Space.xl) {
+            VStack(alignment: .leading, spacing: Fx.Space.l) {
                 VStack(alignment: .leading, spacing: Fx.Space.xs) {
                     Text(verbatim: "Fixa")
                         .font(Fx.Font.largeTitle)
@@ -24,31 +26,29 @@ struct HomeScreen: View {
                         .foregroundStyle(Fx.Color.inkSoft)
                 }
 
-                if let emergency = spec.emergency {
-                    urgentBanner(emergency)
-                }
-
-                VStack(alignment: .leading, spacing: Fx.Space.m) {
-                    FxSectionHeader(String(localized: "What's wrong?"))
-                    LazyVGrid(columns: columns, spacing: Fx.Space.m) {
-                        ForEach(spec.tiles, id: \.id) { tile in
-                            FxTile(
-                                title: tile.title.resolve(),
-                                systemImage: tile.symbol,
-                                isSelected: model.draft.tileID == tile.id && !model.path.isEmpty
-                            ) {
-                                model.startReport(tile: tile)
-                            }
+                LazyVGrid(columns: columns, spacing: Fx.Space.m) {
+                    ForEach(spec.tiles, id: \.id) { tile in
+                        FxTile(
+                            title: tile.title.resolve(),
+                            systemImage: tile.symbol,
+                            isSelected: model.draft.tileID == tile.id && !model.path.isEmpty
+                        ) {
+                            model.startReport(tile: tile)
                         }
                     }
                 }
 
-                Text("Sends to \(spec.municipality.name)'s e-service. Fixa is an independent app.")
+                if let emergency = spec.emergency {
+                    urgentRow(emergency)
+                }
+
+                Text("Independent app, not part of \(spec.municipality.name).")
                     .font(Fx.Font.footnote)
                     .foregroundStyle(Fx.Color.inkSoft)
             }
             .padding(.horizontal, Fx.Space.l)
-            .padding(.vertical, Fx.Space.l)
+            .padding(.top, Fx.Space.xs)
+            .padding(.bottom, Fx.Space.l)
         }
         .fxScreenBackground()
         .navigationBarTitleDisplayMode(.inline)
@@ -79,19 +79,18 @@ struct HomeScreen: View {
         return name
     }
 
-    private func urgentBanner(_ emergency: AdapterSpec.Emergency) -> some View {
+    /// Time-aware urgent line under the tiles; the number appears once, in the detail line.
+    private func urgentRow(_ emergency: AdapterSpec.Emergency) -> some View {
         let contact = EmergencyRouter.contact(for: .now, emergency: emergency)
         let digits = contact.phone.filter(\.isNumber)
-        return FxBanner(
-            kind: .warning,
-            title: String(localized: "Urgent? No water or sewer blocked"),
-            message: String(localized: "Call \(contact.title.resolve()), \(contact.phone). Don't wait for a reply here."),
-            actionTitle: String(localized: "Call \(contact.phone)"),
-            action: {
-                if let url = URL(string: "tel:\(digits)") {
-                    openURL(url)
-                }
+        return FxCallRow(
+            title: String(localized: "No water or a blocked sewer?"),
+            // Number first and unbreakable (NBSP, non-breaking hyphen): if the line wraps, only the name moves.
+            detail: "\(contact.phone.replacingOccurrences(of: " ", with: "\u{00A0}").replacingOccurrences(of: "-", with: "\u{2011}")) · \(contact.title.resolve())"
+        ) {
+            if let url = URL(string: "tel:\(digits)") {
+                openURL(url)
             }
-        )
+        }
     }
 }

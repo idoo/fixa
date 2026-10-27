@@ -19,8 +19,10 @@ private struct FxCatalog: View {
             VStack(alignment: .leading, spacing: Fx.Space.xl) {
                 FxSectionHeader("Fixa", subtitle: "Report a problem in Värmdö")
                 FxProgressSteps(current: 2, total: 3)
-                FxBanner(kind: .warning, title: "Urgent? No water or sewer blocked",
-                         message: "Call 08-570 470 00", actionTitle: "Call", action: {})
+                FxCallRow(title: "No water or a blocked sewer?",
+                          detail: "VA-jouren via SOS Alarm · 08-454 25 71", action: {})
+                FxBanner(kind: .warning, title: "Outside Värmdö kommun",
+                         message: "Move the pin if that's wrong.")
                 LazyVGrid(columns: [GridItem(.flexible(), spacing: Fx.Space.m),
                                     GridItem(.flexible(), spacing: Fx.Space.m)],
                           spacing: Fx.Space.m) {
@@ -35,6 +37,12 @@ private struct FxCatalog: View {
                                  issue: "Write at least 10 characters", minHeight: 120)
                     FxToggleRow(title: "I want a reply", subtitle: "The municipality e-mails you", isOn: $wantsReply)
                     FxTextField(title: "E-mail", text: $email, prompt: "name@example.com", kind: .email)
+                }
+                FxCard {
+                    FxIconRow(systemImage: "chevron.left.forwardslash.chevron.right",
+                              text: "Open source (EUPL-1.2) on GitHub",
+                              link: URL(string: "https://github.com/idoo/fixa"))
+                    FxIconRow(systemImage: "iphone", text: "No account, no server.")
                 }
                 FxBanner(kind: .info, title: "Sends to Värmdö kommun's e-service")
                 FxBanner(kind: .error, title: "Could not send", message: "The server did not answer.",

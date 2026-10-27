@@ -10,30 +10,54 @@ struct HistoryScreen: View {
     var body: some View {
         Group {
             if model.history.items.isEmpty {
-                ContentUnavailableView(
-                    "No reports yet",
-                    systemImage: "tray",
-                    description: Text("Reports you send are kept here, on this phone only.")
-                )
+                emptyState
             } else {
                 List {
-                    ForEach(model.history.items) { item in
-                        NavigationLink(value: Route.historyDetail(item.id)) {
-                            HistoryRow(item: item, spec: spec)
+                    Section {
+                        ForEach(model.history.items) { item in
+                            NavigationLink(value: Route.historyDetail(item.id)) {
+                                HistoryRow(item: item, spec: spec)
+                            }
+                            .listRowBackground(Fx.Color.card)
                         }
-                        .listRowBackground(Fx.Color.card)
+                        .onDelete { offsets in
+                            let ids = Set(offsets.map { model.history.items[$0].id })
+                            model.history.delete(ids)
+                        }
                     }
-                    .onDelete { offsets in
-                        let ids = Set(offsets.map { model.history.items[$0].id })
-                        model.history.delete(ids)
-                    }
+                    .listSectionMargins(.top, 0)
                 }
                 .scrollContentBackground(.hidden)
+                // No dead gap under the nav bar: one 8 pt step, not the default grouped header space.
+                .listSectionSpacing(.compact)
+                .contentMargins(.top, Fx.Space.s, for: .scrollContent)
             }
         }
         .fxScreenBackground()
         .navigationTitle(Text("Sent reports"))
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: Fx.Space.l) {
+            Image(systemName: "tray")
+                .font(.system(.title, weight: .regular))
+                .foregroundStyle(Fx.Color.sea)
+                .frame(width: 72, height: 72)
+                .background(Fx.Color.sea.opacity(0.10), in: .circle)
+                .accessibilityHidden(true)
+            Text("No reports yet")
+                .font(Fx.Font.title)
+                .foregroundStyle(Fx.Color.ink)
+                .multilineTextAlignment(.center)
+                .accessibilityAddTraits(.isHeader)
+            FxPrimaryButton(title: String(localized: "Report a problem"), systemImage: "plus") {
+                model.path = []
+            }
+            .padding(.top, Fx.Space.s)
+        }
+        .padding(Fx.Space.xl)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
@@ -102,8 +126,15 @@ struct HistoryDetailScreen: View {
                             subtitle: item.date.formatted(.dateTime.day().month(.wide).year().hour().minute())
                         )
                         FxCard {
-                            field(String(localized: "Case number"), value: item.caseNumber ?? String(localized: "Not given by the e-service"))
-                            field(String(localized: "Place"), value: item.locationText.isEmpty ? "–" : item.locationText)
+                            if let caseNumber = item.caseNumber {
+                                VStack(alignment: .leading, spacing: Fx.Space.s) {
+                                    field(String(localized: "Case number"), value: caseNumber)
+                                    FxCopyButton(title: String(localized: "Copy case number"), value: caseNumber)
+                                }
+                            } else {
+                                field(String(localized: "Case number"), value: String(localized: "Not given by the e-service"))
+                            }
+                            field(String(localized: "Place"), value: placeText(for: item))
                             if let lat = item.latitude, let lng = item.longitude {
                                 let center = CLLocationCoordinate2D(latitude: lat, longitude: lng)
                                 Map(initialPosition: .region(MKCoordinateRegion(
@@ -111,11 +142,11 @@ struct HistoryDetailScreen: View {
                                     latitudinalMeters: 400,
                                     longitudinalMeters: 400
                                 )), interactionModes: []) {
-                                    Marker(item.locationText, coordinate: center)
+                                    Marker(placeText(for: item), coordinate: center)
                                         .tint(Fx.Color.accent)
                                 }
                                 .frame(height: 140)
-                                .clipShape(RoundedRectangle(cornerRadius: Fx.Radius.s))
+                                .clipShape(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous))
                                 .allowsHitTesting(false)
                                 .accessibilityHidden(true)
                             }
@@ -125,7 +156,9 @@ struct HistoryDetailScreen: View {
                             }
                         }
                     }
-                    .padding(Fx.Space.l)
+                    .padding(.horizontal, Fx.Space.l)
+                    .padding(.top, Fx.Space.s)
+                    .padding(.bottom, Fx.Space.l)
                 }
             } else {
                 ContentUnavailableView("Report not found", systemImage: "questionmark.folder")
@@ -133,6 +166,13 @@ struct HistoryDetailScreen: View {
         }
         .fxScreenBackground()
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    /// Address or place text only; never coordinates.
+    private func placeText(for item: HistoryItem) -> String {
+        let text = item.locationText.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !text.isEmpty { return text }
+        return item.latitude != nil ? String(localized: "Pin on the map") : "–"
     }
 
     private func field(_ title: String, value: String) -> some View {

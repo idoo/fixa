@@ -1,86 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "A few things are missing" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A few things are missing"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Några saker saknas"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Muutama tieto puuttuu"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "بعض المعلومات ناقصة"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Бракує кількох даних"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Brakuje kilku informacji"
-          }
-        }
-      }
-    },
-    "A small app for reporting things that need fixing." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A small app for reporting things that need fixing."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "En liten app för att anmäla saker som behöver lagas."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pieni sovellus korjattavien asioiden ilmoittamiseen."
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تطبيق صغير للإبلاغ عن الأشياء التي تحتاج إلى إصلاح."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Невеликий застосунок, щоб повідомляти про те, що треба полагодити."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mała aplikacja do zgłaszania rzeczy, które trzeba naprawić."
-          }
-        }
-      }
-    },
     "A swing at the playground is broken." : {
       "localizations" : {
         "en" : {
@@ -361,82 +281,42 @@
         }
       }
     },
-    "Call %@" : {
+    "Call 112 if life or property is in danger." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Call %@"
+            "value" : "Call 112 if life or property is in danger."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ring %@"
+            "value" : "Ring 112 om liv eller egendom är i fara."
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Soita %@"
+            "value" : "Soita 112, jos henki tai omaisuus on vaarassa."
           }
         },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "اتصل بالرقم %@"
+            "value" : "اتصل بـ 112 إذا كانت الأرواح أو الممتلكات في خطر."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Подзвонити %@"
+            "value" : "Телефонуйте 112, якщо під загрозою життя чи майно."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zadzwoń: %@"
-          }
-        }
-      }
-    },
-    "Call %@, %@. Don't wait for a reply here." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Call %@, %@. Don't wait for a reply here."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ring %@, %@. Vänta inte på svar här."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Soita: %@, %@. Älä odota vastausta täällä."
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "اتصل بـ %@ على %@. لا تنتظر الرد هنا."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Телефонуйте: %@, %@. Не чекайте відповіді тут."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zadzwoń: %@, %@. Nie czekaj tu na odpowiedź."
+            "value" : "Dzwoń pod 112, gdy zagrożone jest życie lub mienie."
           }
         }
       }
@@ -521,46 +401,6 @@
         }
       }
     },
-    "Case number %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Case number %@"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ärendenummer %@"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Asianumero %@"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "رقم البلاغ %@"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Номер звернення %@"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Numer sprawy %@"
-          }
-        }
-      }
-    },
     "Category" : {
       "localizations" : {
         "en" : {
@@ -637,86 +477,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zmień"
-          }
-        }
-      }
-    },
-    "Check before sending" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Check before sending"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kontrollera innan du skickar"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tarkista ennen lähettämistä"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "راجِع قبل الإرسال"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Перевірте перед надсиланням"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sprawdź przed wysłaniem"
-          }
-        }
-      }
-    },
-    "Check the marked fields above." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Check the marked fields above."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kontrollera de markerade fälten ovan."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tarkista yllä merkityt kentät."
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "راجِع الحقول المحددة أعلاه."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Перевірте позначені поля вище."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sprawdź zaznaczone pola powyżej."
           }
         }
       }
@@ -1001,6 +761,46 @@
         }
       }
     },
+    "Contact me about this" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact me about this"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kontakta mig om detta"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ottakaa minuun yhteyttä"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تواصلوا معي بخصوص هذا"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Зв’яжіться зі мною щодо цього"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skontaktujcie się ze mną w tej sprawie"
+          }
+        }
+      }
+    },
     "Copied" : {
       "localizations" : {
         "en" : {
@@ -1037,6 +837,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Skopiowano"
+          }
+        }
+      }
+    },
+    "Copy case number" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy case number"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopiera ärendenummer"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopioi asianumero"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "نسخ رقم البلاغ"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Копіювати номер звернення"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopiuj numer sprawy"
           }
         }
       }
@@ -1401,6 +1241,46 @@
         }
       }
     },
+    "Edit" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ändra"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muokkaa"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تعديل"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Змінити"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edytuj"
+          }
+        }
+      }
+    },
     "Finding the address…" : {
       "localizations" : {
         "en" : {
@@ -1561,46 +1441,6 @@
         }
       }
     },
-    "Fixa has no server and no account. Your report goes straight from this phone to %@'s e-service. Photos are re-saved without location data. Sent reports and your contact details are kept only on this phone." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa has no server and no account. Your report goes straight from this phone to %@'s e-service. Photos are re-saved without location data. Sent reports and your contact details are kept only on this phone."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa har ingen server och inget konto. Din anmälan går direkt från telefonen till %@s e-tjänst. Bilderna sparas om utan platsdata. Skickade anmälningar och dina kontaktuppgifter finns bara på den här telefonen."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixalla ei ole palvelinta eikä tiliä. Ilmoituksesi menee tästä puhelimesta suoraan verkkopalveluun (%@). Kuvat tallennetaan uudelleen ilman sijaintitietoja. Lähetetyt ilmoitukset ja yhteystietosi säilyvät vain tässä puhelimessa."
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "لا يحتوي Fixa على خادم ولا حساب. يذهب بلاغك مباشرة من هذا الهاتف إلى الخدمة الإلكترونية لـ %@. تُحفظ الصور من جديد بدون بيانات الموقع. البلاغات المرسلة وبيانات تواصلك تبقى على هذا الهاتف فقط."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "У Fixa немає сервера й облікового запису. Ваше звернення йде просто з цього телефона до е-сервісу «%@». Фото зберігаються заново без даних про місце. Надіслані звернення та ваші контакти зберігаються лише на цьому телефоні."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aplikacja Fixa nie ma serwera ani kont. Zgłoszenie trafia prosto z tego telefonu do e-usługi: %@. Zdjęcia są zapisywane ponownie bez danych o lokalizacji. Wysłane zgłoszenia i twoje dane kontaktowe są tylko na tym telefonie."
-          }
-        }
-      }
-    },
     "Fixa reached the last step and stopped. Nothing was submitted." : {
       "localizations" : {
         "en" : {
@@ -1677,46 +1517,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fixa zatrzymuje się przed ostatnim krokiem. Nic nie jest wysyłane."
-          }
-        }
-      }
-    },
-    "Fixa's code is open source under the EUPL-1.2 licence." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa's code is open source under the EUPL-1.2 licence."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixas kod är öppen källkod under licensen EUPL-1.2."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixan koodi on avointa lähdekoodia EUPL-1.2-lisenssillä."
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "شيفرة Fixa مفتوحة المصدر بموجب رخصة EUPL-1.2."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Код Fixa відкритий за ліцензією EUPL-1.2."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kod Fixa jest otwarty na licencji EUPL-1.2."
           }
         }
       }
@@ -1841,42 +1641,42 @@
         }
       }
     },
-    "I want a reply" : {
+    "Independent app, not part of %@." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "I want a reply"
+            "value" : "Independent app, not part of %@."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Jag vill ha svar"
+            "value" : "Fristående app, ingen del av %@."
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Haluan vastauksen"
+            "value" : "Itsenäinen sovellus, ei osa: %@."
           }
         },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "أريد ردًا"
+            "value" : "تطبيق مستقل، ليس جزءًا من %@."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Я хочу отримати відповідь"
+            "value" : "Незалежний застосунок, не частина «%@»."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Chcę dostać odpowiedź"
+            "value" : "Niezależna aplikacja, nie należy do: %@."
           }
         }
       }
@@ -2121,6 +1921,46 @@
         }
       }
     },
+    "No account, no server. Your data stays on this phone, and photos lose their location." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No account, no server. Your data stays on this phone, and photos lose their location."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inget konto, ingen server. Dina uppgifter stannar i telefonen och bilderna saknar plats."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ei tiliä, ei palvelinta. Tietosi pysyvät puhelimessa, ja kuvista poistetaan sijainti."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا حساب ولا خادم. تبقى بياناتك على هذا الهاتف، وتُزال المواقع من الصور."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Без акаунта й сервера. Дані лишаються на телефоні, а з фото прибирається місце."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bez konta i serwera. Dane zostają w telefonie, a zdjęcia tracą lokalizację."
+          }
+        }
+      }
+    },
     "No photo" : {
       "localizations" : {
         "en" : {
@@ -2241,6 +2081,46 @@
         }
       }
     },
+    "No water or a blocked sewer?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No water or a blocked sewer?"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inget vatten eller stopp i avloppet?"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vesi poikki tai viemäri tukossa?"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "انقطاع المياه أو انسداد الصرف؟"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Немає води чи забита каналізація?"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brak wody lub zatkana kanalizacja?"
+          }
+        }
+      }
+    },
     "Not given by the e-service" : {
       "localizations" : {
         "en" : {
@@ -2321,42 +2201,42 @@
         }
       }
     },
-    "Open source" : {
+    "Open source (EUPL-1.2) on GitHub" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open source"
+            "value" : "Open source (EUPL-1.2) on GitHub"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Öppen källkod"
+            "value" : "Öppen källkod (EUPL-1.2) på GitHub"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Avoin lähdekoodi"
+            "value" : "Avoin lähdekoodi (EUPL-1.2) GitHubissa"
           }
         },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "مفتوح المصدر"
+            "value" : "مفتوح المصدر (EUPL-1.2) على GitHub"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Відкритий код"
+            "value" : "Відкритий код (EUPL-1.2) на GitHub"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Otwarte źródło"
+            "value" : "Otwarty kod (EUPL-1.2) na GitHubie"
           }
         }
       }
@@ -2437,6 +2317,126 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Otwiera mapę"
+          }
+        }
+      }
+    },
+    "Opens the report to change it" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens the report to change it"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öppnar anmälan så att du kan ändra den"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avaa ilmoituksen muokattavaksi"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يفتح البلاغ لتعديله"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Відкриває звернення, щоб його змінити"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwiera zgłoszenie do edycji"
+          }
+        }
+      }
+    },
+    "Optional" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optional"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valfritt"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valinnainen"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اختياري"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Необов’язково"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opcjonalnie"
+          }
+        }
+      }
+    },
+    "Optional, up to 3" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optional, up to 3"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valfritt, upp till 3"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valinnainen, enintään 3"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "اختياري، حتى 3"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Необов’язково, до 3"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opcjonalnie, do 3"
           }
         }
       }
@@ -2637,6 +2637,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zdjęcia"
+          }
+        }
+      }
+    },
+    "Pin on the map" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pin on the map"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nål på kartan"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nasta kartalla"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "دبوس على الخريطة"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Мітка на мапі"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pinezka na mapie"
           }
         }
       }
@@ -3001,6 +3041,46 @@
         }
       }
     },
+    "Report a problem" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Report a problem"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmäl ett problem"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ilmoita ongelmasta"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أبلغ عن مشكلة"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повідомити про проблему"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zgłoś problem"
+          }
+        }
+      }
+    },
     "Report a problem in %@" : {
       "localizations" : {
         "en" : {
@@ -3077,46 +3157,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nie znaleziono zgłoszenia"
-          }
-        }
-      }
-    },
-    "Reports you send are kept here, on this phone only." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reports you send are kept here, on this phone only."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anmälningar du skickar sparas här, bara på den här telefonen."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lähettämäsi ilmoitukset säilyvät täällä, vain tässä puhelimessa."
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تُحفظ البلاغات التي ترسلها هنا، على هذا الهاتف فقط."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Надіслані звернення зберігаються тут, лише на цьому телефоні."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wysłane zgłoszenia są tutaj, tylko na tym telefonie."
           }
         }
       }
@@ -3361,46 +3401,6 @@
         }
       }
     },
-    "Sends to %@'s e-service. Fixa is an independent app." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sends to %@'s e-service. Fixa is an independent app."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Skickas till %@s e-tjänst. Fixa är en fristående app."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lähetetään verkkopalveluun (%@). Fixa on itsenäinen sovellus."
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يُرسَل إلى الخدمة الإلكترونية لـ %@. Fixa تطبيق مستقل."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Надсилається до е-сервісу «%@». Fixa — незалежний застосунок."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Trafia do e-usługi: %@. Fixa to niezależna aplikacja."
-          }
-        }
-      }
-    },
     "Sent" : {
       "localizations" : {
         "en" : {
@@ -3561,42 +3561,42 @@
         }
       }
     },
-    "Source code on GitHub" : {
+    "Starts a phone call" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Source code on GitHub"
+            "value" : "Starts a phone call"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Källkod på GitHub"
+            "value" : "Ringer upp"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Lähdekoodi GitHubissa"
+            "value" : "Aloittaa puhelun"
           }
         },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "الشيفرة المصدرية على GitHub"
+            "value" : "يبدأ مكالمة هاتفية"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Код на GitHub"
+            "value" : "Починає дзвінок"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Kod źródłowy na GitHubie"
+            "value" : "Rozpoczyna połączenie"
           }
         }
       }
@@ -4041,86 +4041,6 @@
         }
       }
     },
-    "The municipality can contact you about this." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The municipality can contact you about this."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kommunen kan kontakta dig om det här."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kunta voi ottaa sinuun yhteyttä tästä asiasta."
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يمكن للبلدية التواصل معك بشأن هذا."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Муніципалітет може зв’язатися з вами щодо цього."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gmina może się z tobą skontaktować w tej sprawie."
-          }
-        }
-      }
-    },
-    "The municipality reviews the report and sends it to the right team. If you asked for a reply, they will contact you by e-mail." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The municipality reviews the report and sends it to the right team. If you asked for a reply, they will contact you by e-mail."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kommunen går igenom anmälan och skickar den vidare till rätt avdelning. Om du har bett om svar hör de av sig via e-post."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kunta käy ilmoituksen läpi ja lähettää sen oikealle tiimille. Jos pyysit vastausta, sinuun otetaan yhteyttä sähköpostilla."
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تراجع البلدية البلاغ وترسله إلى الفريق المختص. إذا طلبت ردًا، فسيتواصلون معك عبر البريد الإلكتروني."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Муніципалітет розгляне звернення й передасть його потрібній команді. Якщо ви просили відповідь, з вами зв’яжуться е-поштою."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gmina sprawdzi zgłoszenie i przekaże je właściwemu zespołowi. Jeśli prosisz o odpowiedź, skontaktują się z tobą e-mailem."
-          }
-        }
-      }
-    },
     "The photo couldn't be uploaded." : {
       "localizations" : {
         "en" : {
@@ -4281,6 +4201,86 @@
         }
       }
     },
+    "They pass it to the right team and reply by e-mail." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "They pass it to the right team and reply by e-mail."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De skickar den till rätt avdelning och svarar via e-post."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kunta välittää sen oikealle tiimille ja vastaa sähköpostilla."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سيحوّلونه إلى الفريق المختص ويردّون عبر البريد الإلكتروني."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Його передадуть потрібній службі й дадуть відповідь електронною поштою."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przekażą je właściwemu zespołowi i odpowiedzą e-mailem."
+          }
+        }
+      }
+    },
+    "They pass it to the right team." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "They pass it to the right team."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De skickar den till rätt avdelning."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kunta välittää sen oikealle tiimille."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "سيحوّلونه إلى الفريق المختص."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Його передадуть потрібній службі."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przekażą je właściwemu zespołowi."
+          }
+        }
+      }
+    },
     "This e-mail address doesn't look right." : {
       "localizations" : {
         "en" : {
@@ -4361,42 +4361,42 @@
         }
       }
     },
-    "This is what %@ will receive." : {
+    "This is what %@ receives" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This is what %@ will receive."
+            "value" : "This is what %@ receives"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Det här är vad %@ får."
+            "value" : "Det här är vad %@ får"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tämä lähtee vastaanottajalle %@."
+            "value" : "Tämä lähtee vastaanottajalle %@"
           }
         },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "هذا ما سيصل إلى %@."
+            "value" : "هذا ما يصل إلى %@"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ось що отримає «%@»."
+            "value" : "Ось що отримає «%@»"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tak zgłoszenie otrzyma %@."
+            "value" : "Tak zgłoszenie otrzyma %@"
           }
         }
       }
@@ -4601,46 +4601,6 @@
         }
       }
     },
-    "Up to 3. They are combined into one picture." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Up to 3. They are combined into one picture."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Upp till 3. De sätts ihop till en bild."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enintään 3. Ne yhdistetään yhdeksi kuvaksi."
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "حتى 3 صور. تُدمج في صورة واحدة."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "До 3. Їх буде об’єднано в одне зображення."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Maksymalnie 3. Zostaną połączone w jeden obraz."
-          }
-        }
-      }
-    },
     "Uploading the photo…" : {
       "localizations" : {
         "en" : {
@@ -4677,46 +4637,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Przesyłanie zdjęcia…"
-          }
-        }
-      }
-    },
-    "Urgent? No water or sewer blocked" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Urgent? No water or sewer blocked"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Akut? Inget vatten eller stopp i avloppet"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kiireellinen? Vesi poikki tai viemäri tukossa"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أمر عاجل؟ انقطاع المياه أو انسداد الصرف"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Терміново? Немає води або забита каналізація"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pilne? Brak wody lub zatkana kanalizacja"
           }
         }
       }
@@ -4841,46 +4761,6 @@
         }
       }
     },
-    "What happens next" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "What happens next"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vad händer nu"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mitä seuraavaksi tapahtuu"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ماذا يحدث بعد ذلك"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Що далі"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Co dalej"
-          }
-        }
-      }
-    },
     "What's wrong?" : {
       "localizations" : {
         "en" : {
@@ -4997,86 +4877,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gdzie?"
-          }
-        }
-      }
-    },
-    "You'll find this report under Sent reports." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You'll find this report under Sent reports."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Du hittar anmälan under Skickade anmälningar."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Löydät ilmoituksen kohdasta Lähetetyt ilmoitukset."
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ستجد هذا البلاغ في البلاغات المرسلة."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Це звернення буде в розділі «Надіслані звернення»."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "To zgłoszenie znajdziesz w sekcji Wysłane zgłoszenia."
-          }
-        }
-      }
-    },
-    "Your data" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your data"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dina uppgifter"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tietosi"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "بياناتك"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ваші дані"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Twoje dane"
           }
         }
       }

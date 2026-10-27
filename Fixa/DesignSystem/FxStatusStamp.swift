@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Signature element: a Falu-red rubber stamp on the receipt.
 /// Double rounded border, dashed inner rule, "MOTTAGET" + case number, rotated −6°,
@@ -76,6 +77,58 @@ struct FxStatusStamp: View {
         } else {
             String(localized: "Received", comment: "Accessibility label of the receipt stamp without case number")
         }
+    }
+}
+
+/// Compact copy control that sits under the stamp (case number) or a fallback text.
+/// Copies `value` to the pasteboard, plays a success haptic, and shows `copiedTitle` for 1.5 s.
+struct FxCopyButton: View {
+    let title: String
+    let copiedTitle: String
+    let value: String
+
+    @State private var copies = 0
+    @State private var copied = false
+
+    init(title: String, copiedTitle: String = String(localized: "Copied"), value: String) {
+        self.title = title
+        self.copiedTitle = copiedTitle
+        self.value = value
+    }
+
+    var body: some View {
+        Button {
+            UIPasteboard.general.string = value
+            copies += 1
+            copied = true
+        } label: {
+            HStack(spacing: Fx.Space.s) {
+                Image(systemName: copied ? "checkmark" : "doc.on.doc")
+                    .imageScale(.medium)
+                    .contentTransition(.symbolEffect(.replace))
+                    .accessibilityHidden(true)
+                Text(copied ? copiedTitle : title)
+                    .font(Fx.Font.callout.weight(.semibold))
+                    .multilineTextAlignment(.center)
+            }
+            .foregroundStyle(copied ? Fx.Color.moss : Fx.Color.ink)
+            .padding(.horizontal, Fx.Space.l)
+            .padding(.vertical, Fx.Space.s)
+            .frame(minHeight: Fx.minTarget)
+            .background(Fx.Color.card, in: Capsule())
+            .overlay(Capsule().strokeBorder(Fx.Color.line, lineWidth: 1))
+            .contentShape(Capsule())
+            .animation(Fx.Motion.select, value: copied)
+        }
+        .buttonStyle(FxPressStyle())
+        .sensoryFeedback(.success, trigger: copies)
+        .task(id: copies) {
+            guard copied else { return }
+            try? await Task.sleep(for: .seconds(1.5))
+            guard !Task.isCancelled else { return }
+            copied = false
+        }
+        .accessibilityLabel(Text(copied ? copiedTitle : title))
     }
 }
 

@@ -173,7 +173,9 @@ struct FxCard<Content: View>: View {
     }
 }
 
-/// Large square-ish category tile for a 2-column grid. Selection haptic.
+/// Compact category tile for a 2-column grid: icon above a title of up to two lines, both on one
+/// leading edge. The title reserves two lines so sibling tiles share one height; at accessibility
+/// sizes it grows instead of truncating. Selection haptic.
 struct FxTile: View {
     let title: String
     let systemImage: String
@@ -181,6 +183,8 @@ struct FxTile: View {
     let action: () -> Void
 
     @State private var taps = 0
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @ScaledMetric(relativeTo: .title3) private var iconSide: CGFloat = 36
 
     init(title: String, systemImage: String, isSelected: Bool = false, action: @escaping () -> Void) {
         self.title = title
@@ -194,37 +198,44 @@ struct FxTile: View {
             taps += 1
             action()
         } label: {
-            VStack(alignment: .leading, spacing: Fx.Space.m) {
+            VStack(alignment: .leading, spacing: Fx.Space.s) {
                 Image(systemName: systemImage)
-                    .font(.system(.title2, weight: .regular))
+                    .font(.system(.title3, weight: .regular))
                     .foregroundStyle(isSelected ? Fx.Color.onAccent : Fx.Color.accent)
-                    .frame(width: 44, height: 44)
+                    .frame(width: iconSide, height: iconSide)
                     .background(
                         isSelected ? Fx.Color.accent : Fx.Color.accent.opacity(0.10),
                         in: .circle
                     )
                     .accessibilityHidden(true)
-                Spacer(minLength: 0)
-                Text(title)
-                    .font(Fx.Font.headline)
-                    .foregroundStyle(Fx.Color.ink)
-                    .multilineTextAlignment(.leading)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                titleText
             }
-            .padding(Fx.Space.l)
-            .frame(maxWidth: .infinity, minHeight: 128, alignment: .topLeading)
-            .background(Fx.Color.card, in: .rect(cornerRadius: Fx.Radius.l, style: .continuous))
+            .padding(Fx.Space.m)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .background(Fx.Color.card, in: .rect(cornerRadius: Fx.Radius.m, style: .continuous))
             .overlay {
-                RoundedRectangle(cornerRadius: Fx.Radius.l, style: .continuous)
+                RoundedRectangle(cornerRadius: Fx.Radius.m, style: .continuous)
                     .strokeBorder(isSelected ? Fx.Color.accent : Fx.Color.line, lineWidth: isSelected ? 2 : 1)
             }
-            .contentShape(.rect(cornerRadius: Fx.Radius.l, style: .continuous))
+            .contentShape(.rect(cornerRadius: Fx.Radius.m, style: .continuous))
             .animation(Fx.Motion.select, value: isSelected)
         }
         .buttonStyle(FxPressStyle())
         .sensoryFeedback(.selection, trigger: taps)
         .accessibilityLabel(Text(title))
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    @ViewBuilder private var titleText: some View {
+        let text = Text(title)
+            .font(Fx.Font.headline)
+            .foregroundStyle(Fx.Color.ink)
+            .multilineTextAlignment(.leading)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        if dynamicTypeSize.isAccessibilitySize {
+            text.fixedSize(horizontal: false, vertical: true)
+        } else {
+            text.lineLimit(2, reservesSpace: true)
+        }
     }
 }

@@ -136,6 +136,119 @@ struct FxBanner: View {
     }
 }
 
+/// Compact single-row phone shortcut (e.g. an emergency line): phone glyph, short title,
+/// one secondary line (name and number) and a trailing call circle. The whole row is the
+/// tap target; light impact haptic on tap. Put the number in `detail` only, so it shows once.
+struct FxCallRow: View {
+    let title: String
+    let detail: String
+    let action: () -> Void
+
+    @State private var taps = 0
+    @ScaledMetric(relativeTo: .subheadline) private var callSide: CGFloat = 36
+
+    init(title: String, detail: String, action: @escaping () -> Void) {
+        self.title = title
+        self.detail = detail
+        self.action = action
+    }
+
+    var body: some View {
+        Button {
+            taps += 1
+            action()
+        } label: {
+            HStack(spacing: Fx.Space.m) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Fx.Color.ink)
+                    Text(detail)
+                        .font(Fx.Font.footnote)
+                        .foregroundStyle(Fx.Color.inkSoft)
+                }
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
+                Image(systemName: "phone.arrow.up.right.fill")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Fx.Color.onAccent)
+                    .frame(width: callSide, height: callSide)
+                    .background(Fx.Color.warn, in: .circle)
+                    .accessibilityHidden(true)
+            }
+            .padding(.horizontal, Fx.Space.m)
+            .padding(.vertical, Fx.Space.s)
+            .frame(minHeight: Fx.minTarget + Fx.Space.s)
+            .background(Fx.Color.warn.opacity(0.10), in: .rect(cornerRadius: Fx.Radius.m, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: Fx.Radius.m, style: .continuous)
+                    .strokeBorder(Fx.Color.warn.opacity(0.35), lineWidth: 1)
+            }
+            .contentShape(.rect(cornerRadius: Fx.Radius.m, style: .continuous))
+        }
+        .buttonStyle(FxPressStyle())
+        .sensoryFeedback(.impact(weight: .light), trigger: taps)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(title))
+        .accessibilityValue(Text(detail))
+        .accessibilityHint(Text(String(localized: "Starts a phone call", comment: "Accessibility hint for a call row")))
+        .accessibilityAddTraits(.isButton)
+    }
+}
+
+/// Short leading-icon line for lists inside an `FxCard` (e.g. About's facts).
+/// Pass `link` to make the whole row open a URL (sea text, trailing arrow).
+struct FxIconRow: View {
+    let systemImage: String
+    let text: String
+    var link: URL? = nil
+    /// Fixed icon column so every row's text starts on one leading edge, whatever the glyph width.
+    @ScaledMetric(relativeTo: .body) private var iconColumn: CGFloat = 28
+
+    init(systemImage: String, text: String, link: URL? = nil) {
+        self.systemImage = systemImage
+        self.text = text
+        self.link = link
+    }
+
+    var body: some View {
+        if let link {
+            Link(destination: link) {
+                content
+                    .contentShape(.rect)
+            }
+            .buttonStyle(FxPressStyle())
+        } else {
+            content
+                .accessibilityElement(children: .combine)
+        }
+    }
+
+    private var content: some View {
+        HStack(alignment: .firstTextBaseline, spacing: Fx.Space.m) {
+            Image(systemName: systemImage)
+                .font(Fx.Font.body)
+                .foregroundStyle(Fx.Color.sea)
+                .frame(width: iconColumn)
+                .accessibilityHidden(true)
+            Text(text)
+                .font(link == nil ? Fx.Font.body : Fx.Font.body.weight(.semibold))
+                .foregroundStyle(link == nil ? Fx.Color.ink : Fx.Color.sea)
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
+            if link != nil {
+                Image(systemName: "arrow.up.forward")
+                    .font(Fx.Font.footnote.weight(.semibold))
+                    .foregroundStyle(Fx.Color.sea)
+                    .accessibilityHidden(true)
+            }
+        }
+        .frame(minHeight: Fx.minTarget)
+    }
+}
+
 /// Segmented step indicator. `current` is 1-based.
 struct FxProgressSteps: View {
     let current: Int

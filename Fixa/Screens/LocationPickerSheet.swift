@@ -131,7 +131,9 @@ struct LocationPickerSheet: View {
                 ) {
                     useMyLocation()
                 }
-                .padding(Fx.Space.l)
+                // Sit above the Maps logo / legal row so they never collide (narrow screens, RTL).
+                .padding(.horizontal, Fx.Space.l)
+                .padding(.bottom, Fx.Space.xxl)
             }
         }
     }

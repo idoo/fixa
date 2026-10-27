@@ -3,6 +3,7 @@ import Foundation
 /// Launch hooks for screenshots and testing. Harmless in Release.
 ///   -FixaScreen home|report|location|review|receipt|history|about
 ///   -FixaDemo 1     seeds a demo draft, history and receipt; no network
+///   -FixaEmptyHistory 1  with -FixaDemo: leaves the demo history empty (History empty state)
 ///   -FixaDryRun 1   Review's Send stops at the Summary page (nothing is submitted)
 ///   -FixaLiveTest 1 DEBUG builds only (always off in Release): seeds a marked TEST report
 ///                   (test@test.se, no personal data) on Review and records every server
@@ -14,6 +15,7 @@ struct LaunchOptions: Sendable {
 
     var screen: Screen?
     var demo: Bool
+    var emptyHistory: Bool
     var dryRun: Bool
     var liveTest: Bool
 
@@ -30,6 +32,7 @@ struct LaunchOptions: Sendable {
         }
         screen = value("-FixaScreen").flatMap { Screen(rawValue: $0.lowercased()) }
         demo = isOn("-FixaDemo")
+        emptyHistory = isOn("-FixaEmptyHistory")
         dryRun = isOn("-FixaDryRun")
         #if DEBUG
         liveTest = isOn("-FixaLiveTest")
