@@ -126,19 +126,36 @@ struct HomeScreen: View {
     }
 
     /// Time-aware urgent line under the tiles; the number appears once, in the detail line.
+    /// "Other questions?" under it opens the kommun's own page in the browser.
     private func urgentRow(_ emergency: AdapterSpec.Emergency) -> some View {
         let contact = EmergencyRouter.contact(for: .now, emergency: emergency)
         let digits = contact.phone.filter(\.isNumber)
         // Number first and unbreakable (NBSP, non-breaking hyphen): if the line wraps, only the name moves.
         let number = contact.phone.replacingOccurrences(of: " ", with: "\u{00A0}").replacingOccurrences(of: "-", with: "\u{2011}")
-        return FxCallRow(
-            title: String(localized: "No water or a blocked sewer?", bundle: L10n.bundle, locale: L10n.locale),
-            detail: "\(number.ltrIsolated) · \(contact.title.resolve(L10n.locale))",
-            accessibilityValue: "\(contact.phone), \(contact.title.resolve(L10n.locale))"
-        ) {
-            if let url = URL(string: "tel:\(digits)") {
-                openURL(url)
+        return VStack(alignment: .leading, spacing: Fx.Space.s) {
+            FxCallRow(
+                title: String(localized: "No water or a blocked sewer?", bundle: L10n.bundle, locale: L10n.locale),
+                detail: "\(number.ltrIsolated) · \(contact.title.resolve(L10n.locale))",
+                accessibilityValue: "\(contact.phone), \(contact.title.resolve(L10n.locale))"
+            ) {
+                if let url = URL(string: "tel:\(digits)") {
+                    openURL(url)
+                }
+            }
+            if let info = emergency.infoURL {
+                OtherQuestionsLink(url: info)
             }
         }
+    }
+}
+
+/// "Other questions?" under an emergency call card: the kommun's own page, opened in the browser.
+struct OtherQuestionsLink: View {
+    let url: URL
+
+    var body: some View {
+        FxIconRow(systemImage: "safari", text: String(localized: "Other questions? Open the kommun's website", bundle: L10n.bundle, locale: L10n.locale), link: url)
+            .accessibilityHint(Text("Opens in Safari"))
+            .accessibilityIdentifier("emergency.otherQuestions")
     }
 }

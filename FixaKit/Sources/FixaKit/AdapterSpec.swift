@@ -162,6 +162,9 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
         /// Public-holiday calendar on which no rule applies (so `defaultContactID` answers). `"SE"`:
         /// Swedish public holidays plus julafton, nyårsafton and midsommarafton.
         public let holidays: String?
+        /// The municipality's own page for everything that isn't an emergency ("Other questions?"),
+        /// opened in the browser. An https page on the municipality's domain.
+        public let infoURL: URL?
     }
 
     public struct EmergencyContact: Codable, Sendable, Identifiable, Hashable {

@@ -190,7 +190,8 @@
         "defaultContactID": { "type": "string" },
         "timeZone": { "type": "string" },
         "note": { "$ref": "#/$defs/localizedText" },
-        "holidays": { "type": "string", "enum": ["SE"], "description": "Public-holiday calendar on which no rule applies, so defaultContactID answers. SE: Swedish public holidays plus julafton, nyårsafton and midsommarafton." }
+        "holidays": { "type": "string", "enum": ["SE"], "description": "Public-holiday calendar on which no rule applies, so defaultContactID answers. SE: Swedish public holidays plus julafton, nyårsafton and midsommarafton." },
+        "infoURL": { "type": "string", "pattern": "^https://", "description": "The municipality's own page for non-urgent questions, shown as 'Other questions?' under the emergency call card and opened in the browser. An https page on the municipality's domain." }
       }
     },
     "webFormURL": { "type": "string", "pattern": "^https://", "description": "The municipality's own web form for this e-service, on the channel's host. Fixa opens it when it cannot send. A downloaded adapter must keep the bundled value." },

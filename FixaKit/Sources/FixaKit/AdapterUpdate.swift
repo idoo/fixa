@@ -181,15 +181,19 @@ public enum AdapterSpecValidator {
             problems.append("webFormURL must be an https page on the channel host")
         }
         let domain = channelHost.map { $0.split(separator: ".").suffix(2).joined(separator: ".") }
+        func onDomain(_ url: URL) -> Bool {
+            let c = URLComponents(url: url, resolvingAgainstBaseURL: false)
+            guard let domain, c?.scheme?.lowercased() == "https", c?.user == nil, c?.port == nil,
+                  let host = c?.host?.lowercased() else { return false }
+            return host == domain || host.hasSuffix("." + domain)
+        }
         for tile in spec.tiles {
-            for link in tile.links ?? [] {
-                let c = URLComponents(url: link.url, resolvingAgainstBaseURL: false)
-                guard let domain, c?.scheme?.lowercased() == "https", c?.user == nil, c?.port == nil,
-                      let host = c?.host?.lowercased(), host == domain || host.hasSuffix("." + domain) else {
-                    problems.append("tile \(tile.id) link must be an https page on the municipality's domain")
-                    continue
-                }
+            for link in tile.links ?? [] where !onDomain(link.url) {
+                problems.append("tile \(tile.id) link must be an https page on the municipality's domain")
             }
+        }
+        if let info = spec.emergency?.infoURL, !onDomain(info) {
+            problems.append("emergency infoURL must be an https page on the municipality's domain")
         }
         return problems
     }

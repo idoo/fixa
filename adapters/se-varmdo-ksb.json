@@ -1052,7 +1052,8 @@
       "hu": "Csak sürgős víz- vagy csatornahiba esetén hívja, például ha nincs víz, eldugult a csatorna vagy áradás van. Az ügyfélszolgálat munkanapokon 8:00 és 17:00 között (pénteken 8:00 és 13:00 között) fogadja a hívásokat. Más időpontokban és ünnepnapokon a víz- és csatornaügyelet válaszol az SOS Alarmon keresztül.",
       "cs": "Volejte jen při naléhavých problémech s vodou nebo kanalizací, například když neteče voda, je ucpaná kanalizace nebo došlo k zaplavení. Zákaznické centrum odpovídá v pracovní dny 8:00–17:00 (v pátek 8:00–13:00). V ostatní době a ve svátky odpovídá pohotovostní služba pro vodu a kanalizaci přes SOS Alarm."
     },
-    "holidays": "SE"
+    "holidays": "SE",
+    "infoURL": "https://www.varmdo.se/byggabomiljo/vattenochavlopp/kommunaltvattenochavlopp.4.1a82111d16e6c321a3693781.html"
   },
   "webFormURL": "https://service.varmdo.se/KSB",
   "disclaimer": {
