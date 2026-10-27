@@ -31,6 +31,13 @@ func validDraft() -> ReportDraft {
     )
 }
 
+extension AbouSubmitter {
+    /// For tests that don't care about the final-send hook.
+    func submit(_ draft: ReportDraft, dryRun: Bool = false, progress: @Sendable (SubmissionStage) -> Void = { _ in }) async throws -> SubmissionReceipt? {
+        try await submit(draft, dryRun: dryRun, beforeFinalSend: {}, progress: progress)
+    }
+}
+
 func formFields(_ body: Data?) -> [String: String] {
     var result: [String: String] = [:]
     for pair in String(decoding: body ?? Data(), as: UTF8.self).split(separator: "&") {
@@ -152,9 +159,11 @@ final class AdapterSpecTests: XCTestCase {
         XCTAssertEqual(spec.specVersion, 1)
         XCTAssertEqual(spec.tiles.map(\.id), ["streetlight", "pothole", "winter", "sign", "graffiti", "park", "water", "other"])
         XCTAssertEqual(spec.categories.map(\.value), ["Belysning", "Gator och cykelvägar", "Klotter och skadegörelse", "Parker och grönytor", "Vatten och avlopp", "Övrigt"])
-        XCTAssertEqual(spec.fallbackEmail, "varmdo.kommun@varmdo.se")
+        XCTAssertEqual(spec.webFormURL, URL(string: "https://service.varmdo.se/KSB"))
+        XCTAssertEqual(spec.municipality.geocoderNames, ["Värmdö", "Värmdö kommun"])
         let languages: Set<String> = ["en", "sv", "cs", "da", "de", "et", "es", "fr", "it", "lv", "lt", "hu", "nl", "nb", "pl", "pt", "ro", "fi", "el", "ru", "uk", "ar"]
         var texts = [spec.disclaimer] + spec.categories.map(\.title) + spec.tiles.map(\.title)
+        texts += spec.tiles.compactMap(\.responsibility) + spec.tiles.flatMap { $0.links ?? [] }.map(\.title)
         if let emergency = spec.emergency { texts += [emergency.note] + emergency.contacts.map(\.title) }
         for text in texts {
             XCTAssertEqual(Set(text.values.keys), languages)
@@ -309,6 +318,34 @@ final class ReportValidatorTests: XCTestCase {
         XCTAssertEqual(ReportValidator.validate(d, spec: try varmdoSpec()), [.init(field: .email, code: .invalidFormat)])
     }
 
+    func testEmailFormat() {
+        for good in ["anna@example.se", "a.b+c@sub.example.com", "x@y.museum"] {
+            XCTAssertTrue(ReportValidator.isEmail(good), good)
+        }
+        for bad in ["anna", "@example.se", "anna@example", "anna@example.s", "anna@@example.se", "an na@example.se",
+                    "anna@example.se ", "anna@.se", "anna@example..se", "anna@example.12", "a@b@c.se"] {
+            XCTAssertFalse(ReportValidator.isEmail(bad), bad)
+        }
+    }
+
+    func testDescriptionMinWithoutSummary() throws {
+        let spec = try varmdoSpec()
+        XCTAssertEqual(spec.validation.descriptionMin, 10)
+        XCTAssertNil(spec.tile(id: "other")?.swedishSummary)
+        var d = validDraft()
+        d.tileID = "other"
+        // No summary: the resident's own text alone must reach descriptionMin.
+        d.description = "Farligt"
+        XCTAssertEqual(ReportValidator.validate(d, spec: spec), [.init(field: .description, code: .tooShort)])
+        d.description = "Trasig bänk"
+        XCTAssertEqual(ReportValidator.validate(d, spec: spec), [])
+        // With a summary, summary plus a short chip reaches it.
+        d.tileID = "streetlight"
+        d.description = "Släckt"
+        XCTAssertEqual(ReportValidator.validate(d, spec: spec), [])
+        XCTAssertEqual(ReportValidator.composedLength(of: d, spec: spec), "Gatubelysning ur funktion\n\nSläckt".count)
+    }
+
     func testPhoneFormat() throws {
         var d = validDraft()
         d.contact.phone = "ring mig"
@@ -350,6 +387,59 @@ final class EmergencyRouterTests: XCTestCase {
         XCTAssertEqual(EmergencyRouter.contact(for: date("2026-10-26 09:00"), emergency: emergency).phone, "08-570 470 00")
         XCTAssertEqual(EmergencyRouter.contact(for: date("2026-10-31 10:00"), emergency: emergency).phone, "08-454 25 71")
     }
+
+    func testNightsAndEarlyMorningsGoToSOS() throws {
+        let emergency = try XCTUnwrap(try varmdoSpec().emergency)
+        // 2026-10-27 is a Tuesday, 2026-10-30 a Friday.
+        XCTAssertEqual(EmergencyRouter.contact(for: date("2026-10-27 03:00"), emergency: emergency).id, "sos")
+        XCTAssertEqual(EmergencyRouter.contact(for: date("2026-10-27 07:59"), emergency: emergency).id, "sos")
+        XCTAssertEqual(EmergencyRouter.contact(for: date("2026-10-27 08:00"), emergency: emergency).id, "servicecenter")
+        XCTAssertEqual(EmergencyRouter.contact(for: date("2026-10-30 13:30"), emergency: emergency).id, "sos")
+        XCTAssertEqual(EmergencyRouter.contact(for: date("2026-10-30 00:00"), emergency: emergency).id, "sos")
+        XCTAssertFalse(EmergencyRouter.isOpen(contactID: "servicecenter", at: date("2026-10-27 03:00"), emergency: emergency))
+        XCTAssertTrue(EmergencyRouter.isOpen(contactID: "servicecenter", at: date("2026-10-27 10:00"), emergency: emergency))
+        XCTAssertFalse(EmergencyRouter.isOpen(contactID: "sos", at: date("2026-10-27 10:00"), emergency: emergency), "sos is the default, not a rule")
+    }
+
+    func testSwedishHolidaysGoToSOS() throws {
+        let emergency = try XCTUnwrap(try varmdoSpec().emergency)
+        XCTAssertEqual(emergency.holidays, "SE")
+        for day in [
+            "2026-12-24 10:00", // julafton, Thursday
+            "2026-06-19 10:00", // midsommarafton, Friday
+            "2026-04-03 10:00", // långfredagen
+            "2026-04-06 10:00", // annandag påsk
+            "2026-05-14 10:00", // Kristi himmelsfärdsdag
+            "2026-05-01 10:00", // första maj
+            "2026-01-06 10:00", // trettondedag jul
+            "2026-12-31 10:00", // nyårsafton
+            "2027-01-01 10:00", // nyårsdagen
+            "2027-06-25 10:00", // midsommarafton 2027
+            "2028-06-06 10:00", // nationaldagen on a Tuesday
+        ] {
+            XCTAssertEqual(EmergencyRouter.contact(for: date(day), emergency: emergency).id, "sos", day)
+            XCTAssertFalse(EmergencyRouter.isOpen(contactID: "servicecenter", at: date(day), emergency: emergency), day)
+        }
+        // An ordinary working day around them.
+        XCTAssertEqual(EmergencyRouter.contact(for: date("2026-12-23 10:00"), emergency: emergency).id, "servicecenter")
+        XCTAssertEqual(EmergencyRouter.contact(for: date("2026-06-18 10:00"), emergency: emergency).id, "servicecenter")
+    }
+
+    func testHolidayCalendar() {
+        XCTAssertEqual(PublicHolidays.easterSunday(year: 2024).month, 3)
+        XCTAssertEqual(PublicHolidays.easterSunday(year: 2024).day, 31)
+        XCTAssertEqual(PublicHolidays.easterSunday(year: 2025).day, 20)
+        XCTAssertEqual(PublicHolidays.easterSunday(year: 2026).day, 5)
+        XCTAssertEqual(PublicHolidays.easterSunday(year: 2027).day, 28)
+        // Midsommarafton and alla helgons dag move with the weekday.
+        XCTAssertTrue(PublicHolidays.isHoliday(year: 2025, month: 6, day: 20, calendar: "SE"))
+        XCTAssertTrue(PublicHolidays.isHoliday(year: 2025, month: 6, day: 21, calendar: "SE"))
+        XCTAssertFalse(PublicHolidays.isHoliday(year: 2025, month: 6, day: 19, calendar: "SE"))
+        XCTAssertTrue(PublicHolidays.isHoliday(year: 2025, month: 11, day: 1, calendar: "SE"))
+        XCTAssertTrue(PublicHolidays.isHoliday(year: 2027, month: 11, day: 6, calendar: "SE"))
+        XCTAssertTrue(PublicHolidays.isHoliday(year: 2027, month: 5, day: 6, calendar: "SE"), "Kristi himmelsfärd 2027")
+        XCTAssertFalse(PublicHolidays.isHoliday(year: 2026, month: 12, day: 24, calendar: "XX"))
+    }
 }
 
 // MARK: - Composer & mail
@@ -363,6 +453,9 @@ final class ComposerTests: XCTestCase {
             "Gatubelysning ur funktion\n\nLampan vid busshållplatsen är släckt sedan i måndags."
         )
         XCTAssertEqual(ReportComposer.placeText(for: d), "Gustavsbergs centrum (59.3262, 18.3856)")
+        var precise = d
+        precise.coordinate = Coordinate(latitude: 59.32621234567891, longitude: 18.38561999999)
+        XCTAssertEqual(ReportComposer.placeText(for: precise), "Gustavsbergs centrum (59.32621, 18.38562)")
         var noCoordinate = d
         noCoordinate.coordinate = nil
         XCTAssertEqual(ReportComposer.placeText(for: noCoordinate), "Gustavsbergs centrum")
@@ -386,13 +479,14 @@ final class ComposerTests: XCTestCase {
             Översatt från ukrainska:
             Lampan lyser inte
 
-            Upptäckt: 2026-10-27 09:15
+            Anmälan skriven: 2026-10-27 09:15
             """
         )
-        // Within the hour: no Upptäckt line.
-        XCTAssertFalse(ReportComposer.description(for: d, spec: spec, now: created.addingTimeInterval(3600)).contains("Upptäckt"))
+        // Within the hour: no Anmälan skriven line.
+        XCTAssertFalse(ReportComposer.description(for: d, spec: spec, now: created.addingTimeInterval(3600)).contains("Anmälan skriven"))
         d.createdAt = nil
-        XCTAssertFalse(ReportComposer.description(for: d, spec: spec, now: created.addingTimeInterval(9 * 3600)).contains("Upptäckt"))
+        XCTAssertFalse(ReportComposer.description(for: d, spec: spec, now: created.addingTimeInterval(9 * 3600)).contains("Anmälan skriven"))
+        XCTAssertFalse(ReportComposer.description(for: d, spec: spec).contains("Upptäckt"))
         XCTAssertEqual(ReportComposer.swedishLanguageName("ar"), "arabiska")
     }
 
@@ -420,31 +514,66 @@ final class ComposerTests: XCTestCase {
         XCTAssertEqual(try JSONDecoder().decode(ReportDraft.self, from: JSONEncoder().encode(new)), new)
     }
 
-    func testMailFallback() throws {
+    func testPreviousReportLine() throws {
+        let spec = try varmdoSpec()
+        var d = validDraft()
+        // 2026-10-20 10:00 UTC.
+        let earlier = Date(timeIntervalSince1970: 1_792_490_400)
+        d.previousReport = PreviousReport(caseNumber: "123", date: earlier)
+        XCTAssertEqual(
+            ReportComposer.description(for: d, spec: spec),
+            "Gatubelysning ur funktion\n\nLampan vid busshållplatsen är släckt sedan i måndags.\n\nJag anmälde detta tidigare den 2026-10-20 (ärende 123)."
+        )
+        d.previousReport = PreviousReport(caseNumber: nil, date: earlier)
+        XCTAssertTrue(ReportComposer.description(for: d, spec: spec).hasSuffix("\n\nJag anmälde detta tidigare den 2026-10-20."))
+        // Never cut, even when the text is.
+        d.description = String(repeating: "x", count: 5000)
+        let long = ReportComposer.description(for: d, spec: spec)
+        XCTAssertLessThanOrEqual(long.count, spec.validation.descriptionMax)
+        XCTAssertTrue(long.hasSuffix("Jag anmälde detta tidigare den 2026-10-20."))
+        // Old drafts without the field still decode.
+        XCTAssertNil(try JSONDecoder().decode(ReportDraft.self, from: Data(#"{"adapterID":"x","description":"","locationText":"","wantsFeedback":false,"contact":{"firstName":"","lastName":"","phone":"","email":""}}"#.utf8)).previousReport)
+    }
+
+    func testTranslatedPlace() throws {
+        let spec = try varmdoSpec()
+        var d = validDraft()
+        d.locationText = "біля школи"
+        d.translation = MachineTranslation(sourceLanguage: "uk", text: "", locationText: "vid skolan")
+        let text = ReportComposer.description(for: d, spec: spec)
+        XCTAssertFalse(text.contains("Översatt från"), "an empty description translation adds no block")
+        XCTAssertTrue(text.hasSuffix("\n\nPlats (översatt från ukrainska): vid skolan"), text)
+        XCTAssertEqual(ReportComposer.placeText(for: d), "біля школи (59.3262, 18.3856)")
+    }
+
+    func testWebFallback() throws {
         let spec = try varmdoSpec()
         let d = validDraft()
-        XCTAssertEqual(MailFallback.subject(d, spec: spec), "Felanmälan: Belysning, Gustavsbergs centrum")
-        let body = MailFallback.body(d, spec: spec)
+        let text = WebFallback.text(d, spec: spec)
         for expected in [
             "Område: Belysning",
-            "Plats: Gustavsbergs centrum",
-            "59.3262,18.3856",
-            "https://maps.apple.com/?ll=59.3262,18.3856",
+            "Plats: Gustavsbergs centrum (59.3262, 18.3856)",
             "Gatubelysning ur funktion",
             "Lampan vid busshållplatsen",
+            "Jag vill ha återkoppling.",
             "Namn: Anna Svensson",
             "Telefon: 070-123 45 67",
             "E-post: anna@example.se",
-            "Jag skickar felanmälan med e-post eftersom e-tjänsten inte gick att nå.",
         ] {
-            XCTAssertTrue(body.contains(expected), expected)
+            XCTAssertTrue(text.contains(expected), expected)
         }
-        XCTAssertFalse(body.localizedCaseInsensitiveContains("fixa"), "nothing in the e-mail names the app")
-        XCTAssertFalse(body.localizedCaseInsensitiveContains("appen"))
+        for unwanted in ["fixa", "appen", "e-tjänsten inte", "e-post eftersom", "To:", "Hej"] {
+            XCTAssertFalse(text.localizedCaseInsensitiveContains(unwanted), unwanted)
+        }
+        var noReply = d
+        noReply.wantsFeedback = false
+        let plain = WebFallback.text(noReply, spec: spec)
+        XCTAssertFalse(plain.contains("anna@example.se"), "contact only when a reply is wanted")
+        XCTAssertFalse(plain.contains("Anna"))
         var old = d
         let created = Date(timeIntervalSince1970: 1_793_088_900)
         old.createdAt = created
-        XCTAssertTrue(MailFallback.body(old, spec: spec, now: created.addingTimeInterval(7200)).contains("Upptäckt: 2026-10-27 09:15"))
+        XCTAssertTrue(WebFallback.text(old, spec: spec, now: created.addingTimeInterval(7200)).contains("Anmälan skriven: 2026-10-27 09:15"))
     }
 }
 

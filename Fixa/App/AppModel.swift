@@ -5,6 +5,7 @@ import Foundation
 import Network
 import Observation
 import UIKit
+import UniformTypeIdentifiers
 
 enum Route: Hashable {
     case report
@@ -54,14 +55,34 @@ final class AppModel {
     @ObservationIgnored private var flushTask: Task<Void, Never>?
     /// A trigger arrived during the running flush: one more pass when it ends.
     @ObservationIgnored private var flushAgain = false
-    @ObservationIgnored private var flushAgainIgnoringBackoff = false
+    /// The random wait after the network comes back, so phones don't all send at the same second.
+    @ObservationIgnored private var reconnectTask: Task<Void, Never>?
     /// iOS is ending the background task: let the send in flight finish, start no new one.
     @ObservationIgnored var stopsOutboxAfterCurrentSend = false
+    /// The repeat the user confirmed with "Send anyway"; written into the report as an earlier one.
+    @ObservationIgnored private var duplicateOf: PreviousReport?
 
     enum SendGuardAlert: Equatable {
-        case duplicate(previous: Date)
+        case duplicate(previous: Date, caseNumber: String?)
         case tooMany(retryAfter: Date)
     }
+
+    /// Why Fixa sends nothing on its own right now: the e-service refused Fixa (401/403), asked
+    /// for a login, or the status file says it is down. Saved (UserDefaults `fixa.sendsPaused`);
+    /// cleared by a send the user started that goes through, or by the status file saying ok.
+    enum SendsPause: String, Codable, Sendable {
+        case blocked, loginRequired, serviceDown
+    }
+
+    private(set) var sendsPaused: SendsPause?
+    /// The other kommun the pin is in (reverse geocoding, else the adapter's box); nil when the
+    /// pin is inside, unknown or missing. Review is not allowed while it is set.
+    private(set) var outsideMunicipalityName: String?
+    @ObservationIgnored private var municipalityTask: Task<Void, Never>?
+    /// The pin came from the automatic prefill and the user hasn't moved or confirmed it.
+    var pinIsAutomatic = false
+    /// The place text was typed by the resident, not filled in from the pin's address.
+    var placeTextIsTyped = false
 
     var path: [Route] = []
     /// What the report sends. `contact` always mirrors the profile while a reply is wanted and is
@@ -71,7 +92,16 @@ final class AppModel {
         set {
             var next = newValue
             next.contact = next.wantsFeedback ? profileStorage : Contact()
+            // A translated place belongs to the text it was made from.
+            if next.locationText != draftStorage.locationText, next.translation?.locationText != nil {
+                next.translation?.locationText = nil
+            }
+            let pinMoved = next.coordinate != draftStorage.coordinate
             draftStorage = next
+            if pinMoved {
+                pinIsAutomatic = false
+                checkMunicipality()
+            }
             scheduleDraftSave()
         }
     }
@@ -143,11 +173,12 @@ final class AppModel {
     private static let contactKey = "fixa.contact"
     private static let rememberKey = "fixa.rememberDetails"
     private static let onboardedKey = "fixa.onboarded"
+    private static let sendsPausedKey = "fixa.sendsPaused"
 
     init(options: LaunchOptions = .current) {
         self.options = options
         history = HistoryStore(inMemory: options.demo)
-        outbox = OutboxStore(inMemory: options.demo || options.liveTest)
+        outbox = OutboxStore(inMemory: options.demo)
         profileStorage = Self.loadContact()
         var savedDisplay = DisplaySettings.load()
         if let size = options.textSize {
@@ -157,21 +188,26 @@ final class AppModel {
         rememberDetails = UserDefaults.standard.object(forKey: Self.rememberKey) as? Bool ?? true
         let savedLanguage = UserDefaults.standard.string(forKey: AppLanguage.storageKey).flatMap(AppLanguage.init(rawValue:))
         language = savedLanguage
-        L10n.apply(savedLanguage, savesSystemSetting: !options.demo && !options.liveTest)
-        // Demo, test and screenshot launches skip it unless they ask for `-FixaScreen onboarding`.
+        L10n.apply(savedLanguage, savesSystemSetting: !options.demo)
+        // Demo and screenshot launches skip it unless they ask for `-FixaScreen onboarding`.
         if options.screen == .onboarding {
             isOnboardingPresented = true
-        } else if options.demo || options.liveTest || options.screen != nil {
+        } else if options.demo || options.screen != nil {
             isOnboardingPresented = false
         } else {
             isOnboardingPresented = !UserDefaults.standard.bool(forKey: Self.onboardedKey)
         }
         draftStorage = ReportDraft(adapterID: adapters.spec?.id ?? Self.adapterID)
         draftStorage = freshDraft()
+        if persists {
+            sendsPaused = UserDefaults.standard.string(forKey: Self.sendsPausedKey).flatMap(SendsPause.init(rawValue:))
+            loadGuardRecords()
+            // Before the draft comes back: a draft whose send was cut off must not reopen.
+            settleInterruptedSends()
+            syncSendsPauseWithStatus()
+        }
         if options.demo {
             seedDemo()
-        } else if options.liveTest {
-            seedLiveTest()
         } else if options.screen == nil {
             restoreDraft()
         }
@@ -179,13 +215,12 @@ final class AppModel {
             open(screen)
         }
         if persists {
-            loadGuardRecords()
             startOutbox()
         }
     }
 
-    /// Drafts and the profile are written only for real use, never for demo or live-test launches.
-    private var persists: Bool { !options.demo && !options.liveTest }
+    /// Drafts and the profile are written only for real use, never for demo launches.
+    private var persists: Bool { !options.demo }
 
     // MARK: Flow
 
@@ -227,7 +262,7 @@ final class AppModel {
     @discardableResult
     func goToReview() -> Bool {
         showIssues = true
-        guard issues.isEmpty else { return false }
+        guard issues.isEmpty, outsideMunicipalityName == nil else { return false }
         saveProfileNow()
         submission.reset()
         path.append(.review)
@@ -246,18 +281,22 @@ final class AppModel {
     /// "Send anyway" on the repeat warning. The hourly/daily cap still applies.
     func sendAnyway() async {
         sendGuardAlert = nil
+        if let duplicateOf {
+            draft.previousReport = duplicateOf
+        }
+        duplicateOf = nil
         await send(confirmedDuplicate: true)
     }
 
     private func send(confirmedDuplicate: Bool) async {
         // Demo seeds a receipt up front; everywhere else a set `sent` means this draft already went.
-        guard let spec, !isSendingDraft, options.demo || sent == nil else { return }
+        guard let spec, !isSendingDraft, options.demo || sent == nil, outsideMunicipalityName == nil else { return }
         isSendingDraft = true
         defer { isSendingDraft = false }
         if options.demo {
             // "-FixaDemo: no network". Nothing leaves the phone; history is in memory only.
             sent = DemoData.receipt
-            let item = historyItem(id: UUID(), date: .now, caseNumber: DemoData.receipt.caseNumber, status: .sent)
+            let item = historyItem(id: UUID(), from: draft, date: .now, caseNumber: DemoData.receipt.caseNumber, status: .sent)
             history.add(item)
             sent?.historyID = item.id
             path.append(.receipt)
@@ -268,32 +307,44 @@ final class AppModel {
             switch sendGuardDecision(for: draft, checksDuplicate: !confirmedDuplicate) {
             case .ok:
                 break
-            case .duplicate(let previous):
-                sendGuardAlert = .duplicate(previous: previous)
+            case .duplicate(let previous, let caseNumber):
+                duplicateOf = PreviousReport(caseNumber: caseNumber, date: previous)
+                sendGuardAlert = .duplicate(previous: previous, caseNumber: caseNumber)
                 return
             case .tooMany(let retryAfter):
                 sendGuardAlert = .tooMany(retryAfter: retryAfter)
                 return
             }
         }
-        var result = await submission.submit(draft, spec: spec, dryRun: dryRun, recordResponses: options.liveTest)
+        // The outbox id this report gets if its final step goes out (see `markFinalSend`).
+        let id = UUID()
+        let report = draft
+        let mark: @Sendable () async -> Void
+        if dryRun {
+            mark = {}
+        } else {
+            mark = { @MainActor [weak self] in await self?.markFinalSend(id, draft: report) }
+        }
+        var result = await submission.submit(report, spec: spec, dryRun: dryRun, beforeFinalSend: mark)
         // The form changed: drift stops before the final step, so nothing reached the municipality.
         // Try once more with a newer signed adapter if there is one; otherwise Review shows the drift.
         if result == nil, case .formChanged? = submission.error,
-           await adapters.refreshAfterFormChange(), let fresh = self.spec {
+           await refreshAdapterAfterFormChange(), let fresh = self.spec {
             submission.reset()
-            result = await submission.submit(draft, spec: fresh, dryRun: dryRun, recordResponses: options.liveTest)
+            result = await submission.submit(report, spec: fresh, dryRun: dryRun, beforeFinalSend: mark)
         }
         guard let result else {
-            if let error = submission.error, persists, !dryRun {
-                keepUnconfirmed(after: error)
+            if persists, !dryRun, let error = submission.error ?? interruptedAfterFinalSend(id) {
+                keepUnconfirmed(report, id: id, after: error)
             }
             return
         }
         sent = result
         if !result.isDryRun {
-            recordSend(draft, date: result.date)
-            let item = historyItem(id: UUID(), date: result.date, caseNumber: result.caseNumber, status: .sent)
+            setSendsPaused(nil)
+            recordSend(report, date: result.date, caseNumber: result.caseNumber)
+            outbox.remove([id])
+            let item = historyItem(id: id, from: report, date: result.date, caseNumber: result.caseNumber, status: .sent)
             history.add(item)
             sent?.historyID = item.id
             clearSavedDraft()
@@ -301,35 +352,44 @@ final class AppModel {
         path.append(.receipt)
     }
 
+    /// The send ended with no error (cancelled) after its final step was marked: it may have gone.
+    private func interruptedAfterFinalSend(_ id: UUID) -> SubmissionError? {
+        outbox.item(id: id)?.finalSendAt != nil ? .uncertain("ended after the final step without an answer") : nil
+    }
+
     /// The send failed in a way that may still end well: the report moves from the draft into the
     /// outbox (with its photo and reply details) and Sent reports, and the receipt explains what next.
-    private func keepUnconfirmed(after error: SubmissionError) {
+    /// `id` is the outbox entry the final-step mark may already have written.
+    private func keepUnconfirmed(_ report: ReportDraft, id: UUID, after error: SubmissionError) {
+        pauseIfRefused(error)
         let status: HistoryItem.Status
         if error.isRetrySafe {
             status = .waiting
         } else if case .uncertain = error {
             status = .maybeSent
         } else {
-            // Form changed, broken adapter, rejected by the e-service: Review shows it and offers e-mail.
+            // Form changed, broken adapter, refused or rejected by the e-service: nothing was
+            // filed. Review shows it and offers the kommun's website.
+            outbox.remove([id])
             return
         }
         let now = Date.now
         if status == .maybeSent {
             // It may have reached the municipality: counts for the repeat warning and the cap.
-            recordSend(draft, date: now)
+            recordSend(report, date: now, caseNumber: nil)
         }
-        let id = UUID()
         let pending = PendingReport(
             id: id,
-            draft: draft,
+            draft: report,
             createdAt: now,
             attempts: 1,
             nextAttemptAt: Self.nextAttemptDate(afterAttempts: 1, error: error, now: now),
-            held: status != .waiting
+            held: status != .waiting,
+            serverRetryAfter: Self.serverRetryAfter(error, now: now)
         )
         // Keep the draft if the report can't be stored: Review's error and "Try again" stay.
         guard outbox.put(pending) else { return }
-        history.add(historyItem(id: id, date: now, caseNumber: nil, status: status))
+        history.add(historyItem(id: id, from: report, date: now, caseNumber: nil, status: status))
         sent = SentReport(caseNumber: nil, date: now, isDryRun: false, outcome: status == .waiting ? .waiting : .maybeSent, historyID: id)
         clearSavedDraft()
         submission.reset()
@@ -346,6 +406,8 @@ final class AppModel {
             profileStorage = Contact()
         }
         draft = freshDraft()
+        placeTextIsTyped = false
+        duplicateOf = nil
         showIssues = false
         submission.reset()
         path = []
@@ -398,13 +460,15 @@ final class AppModel {
     var isBusySending: Bool { isSendingDraft || !sendingIDs.isEmpty || submission.isSending }
 
     /// Contact details, the unsent report with its photos, reports waiting to be sent and the
-    /// sent-reports list leave this phone. Language and display settings stay. Not while a report
-    /// is being sent.
+    /// sent-reports list leave this phone. Language and display settings stay, and so do the
+    /// `SendGuard` records (dates, tiles, places, case numbers): the repeat warning and the cap
+    /// must not be lifted by deleting data. Not while a report is being sent.
     func deleteAllData() {
         guard !isBusySending else { return }
         profileSaveTask?.cancel()
         draftSaveTask?.cancel()
         retryTask?.cancel()
+        reconnectTask?.cancel()
         profileStorage = Contact()
         photos = []
         photoFiles = []
@@ -412,12 +476,15 @@ final class AppModel {
             UserDefaults.standard.removeObject(forKey: Self.contactKey)
             DraftStore.clear()
             BackgroundOutbox.schedule(earliest: nil)
-            UserDefaults.standard.removeObject(forKey: Self.sentRecordsKey)
         }
         draftStorage = freshDraft()
+        municipalityTask?.cancel()
+        outsideMunicipalityName = nil
+        pinIsAutomatic = false
+        placeTextIsTyped = false
+        duplicateOf = nil
         showIssues = false
         outbox.deleteAll()
-        guardRecords = []
         history.deleteAll()
         sent = nil
         submission.reset()
@@ -425,21 +492,70 @@ final class AppModel {
 
     // MARK: Location
 
-    /// On a new report, fills in the current place and address when location is already allowed.
-    /// Never asks for permission: that prompt stays on the explicit "Use my location".
+    /// A prefilled pin is only as good as this; anything vaguer waits for the user's own pin.
+    static let prefillAccuracyMeters: CLLocationAccuracy = 50
+
+    /// On a new report, fills in the current place and address when precise location is already
+    /// allowed and the fix is within `prefillAccuracyMeters`. Never asks for permission: that
+    /// prompt stays on the explicit "Use my location". Never places a pin in another kommun and
+    /// never replaces a place the resident typed.
     func prefillLocationIfAllowed() async {
         guard persists, let spec, draft.coordinate == nil, !isFindingLocation else { return }
-        let status = CLLocationManager().authorizationStatus
-        guard status == .authorizedWhenInUse || status == .authorizedAlways else { return }
+        let manager = CLLocationManager()
+        guard manager.authorizationStatus == .authorizedWhenInUse || manager.authorizationStatus == .authorizedAlways,
+              manager.accuracyAuthorization == .fullAccuracy else { return }
         isFindingLocation = true
         defer { isFindingLocation = false }
-        guard let coordinate = await LocationProvider.currentCoordinate(timeout: .seconds(10)),
-              spec.municipality.region.contains(coordinate) else { return }
-        let address = await ReverseGeocoder.address(for: coordinate.clLocation)
+        guard let fix = try? await LocationProvider.currentFix(timeout: .seconds(10), accuracy: Self.prefillAccuracyMeters),
+              !fix.isApproximate, fix.horizontalAccuracy <= Self.prefillAccuracyMeters,
+              spec.municipality.region.contains(fix.coordinate) else { return }
+        let place = await ReverseGeocoder.place(for: fix.coordinate.clLocation)
+        guard Self.otherMunicipality(place, spec: spec, coordinate: fix.coordinate) == nil else { return }
         // The user may have placed a pin meanwhile; theirs wins.
         guard draft.coordinate == nil, !isLocationPickerPresented else { return }
-        draft.coordinate = coordinate
-        draft.locationText = address ?? ""
+        draft.coordinate = fix.coordinate
+        pinIsAutomatic = true
+        if !placeTextIsTyped {
+            draft.locationText = place?.address ?? ""
+        }
+    }
+
+    /// Sets `outsideMunicipalityName` for the current pin: the adapter's box answers at once, the
+    /// reverse-geocoded kommun when it arrives.
+    private func checkMunicipality() {
+        municipalityTask?.cancel()
+        guard let spec, let coordinate = draftStorage.coordinate else {
+            outsideMunicipalityName = nil
+            return
+        }
+        outsideMunicipalityName = Self.otherMunicipality(nil, spec: spec, coordinate: coordinate)
+        municipalityTask = Task { [weak self] in
+            let place = await ReverseGeocoder.place(for: coordinate.clLocation)
+            guard !Task.isCancelled, let self, self.draftStorage.coordinate == coordinate else { return }
+            self.outsideMunicipalityName = Self.otherMunicipality(place, spec: spec, coordinate: coordinate)
+        }
+    }
+
+    /// The other kommun `coordinate` lies in, or nil when it is inside or that is unknown.
+    /// For Swedish places Apple returns the kommun as `subAdministrativeArea` ("Värmdö", "Nacka",
+    /// "Vaxholm") and the town as `locality` ("Gustavsberg", "Saltsjö-Boo"), so a locality only
+    /// ever confirms "inside". Without either, the adapter's box decides.
+    static func otherMunicipality(_ place: ReverseGeocoder.Place?, spec: AdapterSpec, coordinate: Coordinate) -> String? {
+        let names = Set(spec.municipality.geocoderNames.map(normalizedPlaceName))
+        if let kommun = place?.kommun?.trimmingCharacters(in: .whitespacesAndNewlines), !kommun.isEmpty {
+            return names.contains(normalizedPlaceName(kommun)) ? nil : kommun
+        }
+        if let locality = place?.locality, names.contains(normalizedPlaceName(locality)) {
+            return nil
+        }
+        return spec.municipality.region.contains(coordinate)
+            ? nil
+            : String(localized: "another municipality", bundle: L10n.bundle, locale: L10n.locale)
+    }
+
+    private static func normalizedPlaceName(_ name: String) -> String {
+        name.trimmingCharacters(in: .whitespacesAndNewlines)
+            .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: Locale(identifier: "sv_SE"))
     }
 
     // MARK: Photos
@@ -491,7 +607,7 @@ final class AppModel {
         draftSaveTask?.cancel()
         guard sent == nil else { return }
         if draftHasContent {
-            DraftStore.save(draftStorage, photoFiles: photoFiles)
+            DraftStore.save(draftStorage, photoFiles: photoFiles, pinIsAutomatic: pinIsAutomatic, placeTextIsTyped: placeTextIsTyped)
         } else {
             DraftStore.clear()
         }
@@ -521,6 +637,9 @@ final class AppModel {
             photos = []
             return
         }
+        pinIsAutomatic = saved.pinIsAutomatic
+        placeTextIsTyped = saved.placeTextIsTyped
+        checkMunicipality()
         path = [.report]
     }
 
@@ -587,17 +706,17 @@ final class AppModel {
 
     // MARK: History
 
-    private func historyItem(id: UUID, date: Date, caseNumber: String?, status: HistoryItem.Status) -> HistoryItem {
+    private func historyItem(id: UUID, from report: ReportDraft, date: Date, caseNumber: String?, status: HistoryItem.Status) -> HistoryItem {
         HistoryItem(
             id: id,
             date: date,
-            tileID: draft.tileID,
-            description: draft.description,
-            locationText: draft.locationText,
-            latitude: draft.coordinate?.latitude,
-            longitude: draft.coordinate?.longitude,
+            tileID: report.tileID,
+            description: report.description,
+            locationText: report.locationText,
+            latitude: report.coordinate?.latitude,
+            longitude: report.coordinate?.longitude,
             caseNumber: caseNumber,
-            thumbnail: draft.photoJPEG.flatMap { PhotoCollage.thumbnail(from: $0) },
+            thumbnail: report.photoJPEG.flatMap { PhotoCollage.thumbnail(from: $0) },
             status: status
         )
     }
@@ -607,7 +726,8 @@ final class AppModel {
     /// Sends tried in all before Fixa stops and asks the user, the user's own first Send included.
     static let maxAutomaticAttempts = 5
 
-    /// Wait before the next automatic try after `attempts` tries; a connectivity change may try sooner.
+    /// Wait before the next automatic try after `attempts` tries (before jitter). Every automatic
+    /// trigger honours it; only the user's own "Try again" may go sooner.
     static func retryDelay(afterAttempts attempts: Int) -> TimeInterval {
         switch attempts {
         case ...1: 60
@@ -617,17 +737,27 @@ final class AppModel {
         }
     }
 
-    /// The back-off, or the e-service's own `Retry-After` when it asks for longer (capped at a day).
+    /// The back-off with ±20% random jitter, or the e-service's own `Retry-After` when it asks for
+    /// longer (capped at a day).
     static func nextAttemptDate(afterAttempts attempts: Int, error: SubmissionError, now: Date) -> Date {
+        let jittered = retryDelay(afterAttempts: attempts) * Double.random(in: 0.8...1.2)
         let asked = min(error.retryAfter ?? 0, 24 * 60 * 60)
-        return now.addingTimeInterval(max(retryDelay(afterAttempts: attempts), asked))
+        return now.addingTimeInterval(max(jittered, asked))
     }
+
+    /// When the e-service's `Retry-After` ends, if it sent one (capped at a day).
+    static func serverRetryAfter(_ error: SubmissionError, now: Date) -> Date? {
+        error.retryAfter.map { now.addingTimeInterval(min($0, 24 * 60 * 60)) }
+    }
+
+    /// Longest random wait after the network comes back before the outbox is tried.
+    static let reconnectSpread: TimeInterval = 60
 
     // MARK: Send guard
 
-    /// Reports that reached, or may have reached, the municipality in the last 48 hours, for
-    /// `SendGuard`. Kept apart from Sent reports (UserDefaults `fixa.sentRecords`) so clearing that
-    /// list doesn't lift the guard; "Delete all data" removes them too.
+    /// Reports that reached, or may have reached, the municipality within the longest `SendGuard`
+    /// window. Kept apart from Sent reports (UserDefaults `fixa.sentRecords`) so neither clearing
+    /// that list nor "Delete all data" lifts the guard.
     var sentRecords: [SentRecord] {
         let cutoff = Date.now.addingTimeInterval(-Self.sentRecordLifetime)
         return guardRecords.filter { $0.date > cutoff }
@@ -638,8 +768,10 @@ final class AppModel {
     private static let sentRecordLifetime = max(SendGuard.duplicateWindow, SendGuard.limits.map { $0.window }.max() ?? 0)
 
     /// A send whose final step went out: a receipt, or no answer (may have been sent).
-    private func recordSend(_ draft: ReportDraft, date: Date) {
-        guardRecords = sentRecords + [SentRecord(draft, date: date)]
+    private func recordSend(_ draft: ReportDraft, date: Date, caseNumber: String?) {
+        var record = SentRecord(draft, date: date)
+        record.caseNumber = caseNumber
+        guardRecords = sentRecords + [record]
         saveGuardRecords()
     }
 
@@ -664,7 +796,9 @@ final class AppModel {
                 if let latitude = item.latitude, let longitude = item.longitude {
                     coordinate = Coordinate(latitude: latitude, longitude: longitude)
                 }
-                return SentRecord(date: item.date, tileID: item.tileID, coordinate: coordinate, locationText: item.locationText)
+                var record = SentRecord(date: item.date, tileID: item.tileID, coordinate: coordinate, locationText: item.locationText)
+                record.caseNumber = item.caseNumber
+                return record
             }
         guardRecords = sentRecords
         saveGuardRecords()
@@ -696,23 +830,40 @@ final class AppModel {
             )
         }
         guard history.items.contains(where: { $0.status == .waiting }) else { return nil }
-        return OutboxNotice(
-            title: String(localized: "Waiting to send", bundle: L10n.bundle, locale: L10n.locale),
-            message: isOnline
-                ? String(localized: "Your report is saved on this phone. Fixa tries again in a little while, also in the background.", bundle: L10n.bundle, locale: L10n.locale)
-                : String(localized: "Your report is saved on this phone. Fixa sends it when you're back online, also in the background.", bundle: L10n.bundle, locale: L10n.locale)
-        )
+        let message: String
+        if sendsPaused != nil {
+            message = String(localized: "Your report is saved on this phone. Fixa isn't sending on its own right now. Open Sent reports to use the kommun's website instead.", bundle: L10n.bundle, locale: L10n.locale)
+        } else if isOnline {
+            message = String(localized: "Your report is saved on this phone. Fixa tries again in a little while, also in the background.", bundle: L10n.bundle, locale: L10n.locale)
+        } else {
+            message = String(localized: "Your report is saved on this phone. Fixa sends it when you're back online, also in the background.", bundle: L10n.bundle, locale: L10n.locale)
+        }
+        return OutboxNotice(title: String(localized: "Waiting to send", bundle: L10n.bundle, locale: L10n.locale), message: message)
     }
 
-    /// The report as plain text for e-mail, as Review's "Copy report text" gives it; nil once it is gone.
-    func reportText(for id: UUID) -> String? {
-        guard let spec, let draft = outbox.item(id: id)?.draft else { return nil }
-        var text = MailFallback.body(draft, spec: spec)
-        if let email = spec.fallbackEmail {
-            text = String(localized: "To: \(email)", bundle: L10n.bundle, locale: L10n.locale) + "\n"
-                + String(localized: "Subject: \(MailFallback.subject(draft, spec: spec))", bundle: L10n.bundle, locale: L10n.locale) + "\n\n" + text
-        }
-        return text
+    // MARK: Kommun's website
+
+    /// The report as plain Swedish text to paste into the kommun's own web form.
+    func webFallbackText(for draft: ReportDraft) -> String {
+        guard let spec else { return "" }
+        return WebFallback.text(draft, spec: spec)
+    }
+
+    /// `webFallbackText(for:)` for a report in the outbox; nil once it is gone.
+    func webFallbackText(id: UUID) -> String? {
+        guard let draft = outbox.item(id: id)?.draft else { return nil }
+        return webFallbackText(for: draft)
+    }
+
+    /// Copies `text` (this phone only, for an hour) and opens the kommun's own web form in Safari,
+    /// where the user pastes it and attaches the photo themselves.
+    func openWebForm(_ text: String) {
+        UIPasteboard.general.setItems(
+            [[UTType.utf8PlainText.identifier: text]],
+            options: [.localOnly: true, .expirationDate: Date.now.addingTimeInterval(60 * 60)]
+        )
+        guard let spec else { return }
+        UIApplication.shared.open(spec.webFormURL)
     }
 
     /// Whether a waiting or unconfirmed report asked for a reply by e-mail (and so gets a confirmation).
@@ -720,17 +871,25 @@ final class AppModel {
         outbox.item(id: id)?.draft.wantsFeedback ?? false
     }
 
+    /// The e-service asked Fixa to wait until then; not even "Try again" sends this report sooner.
+    func retryBlockedUntil(_ id: UUID) -> Date? {
+        guard let until = outbox.item(id: id)?.serverRetryAfter, until > .now else { return nil }
+        return until
+    }
+
     /// The user's explicit "Try again" on a report Fixa stopped sending, or a confirmed
-    /// "Send again anyway" on one that may have arrived. Restarts the automatic tries.
-    /// Already confirmed, so no repeat warning, but the hourly/daily cap still applies.
+    /// "Send again anyway" on one that may have arrived. Skips Fixa's own back-off, never the
+    /// e-service's `Retry-After` (`retryBlockedUntil`). Already confirmed, so no repeat warning,
+    /// but the hourly/daily cap still applies.
     func sendNow(_ id: UUID) async {
-        guard var item = outbox.item(id: id), !sendingIDs.contains(id) else { return }
+        guard var item = outbox.item(id: id), !sendingIDs.contains(id), item.finalSendAt == nil else { return }
         if options.demo {
             // No network in demo: pretend it went through.
             outbox.remove([id])
             markSent(id, caseNumber: DemoData.receipt.caseNumber, date: .now)
             return
         }
+        guard retryBlockedUntil(id) == nil else { return }
         if case .tooMany(let retryAfter) = sendGuardDecision(for: item.draft, checksDuplicate: false) {
             sendGuardAlert = .tooMany(retryAfter: retryAfter)
             return
@@ -755,40 +914,48 @@ final class AppModel {
         ) { @Sendable [weak self] _ in
             Task { @MainActor [weak self] in
                 self?.stopsOutboxAfterCurrentSend = false
-                await self?.flushOutbox(ignoringBackoff: false)
+                await self?.flushOutbox()
             }
         }
         scheduleRetry()
     }
 
-    /// The first path update after launch counts as a change, so launch tries once too.
+    /// The first path update after launch tries the reports whose back-off has passed. A
+    /// connection coming back waits a random 0–60 s first, then does the same.
     private func connectivityChanged(online: Bool) {
         isOnline = online
-        let changed = lastPathOnline != online
+        let previous = lastPathOnline
         lastPathOnline = online
-        guard changed, online else { return }
-        Task { await flushOutbox(ignoringBackoff: true) }
+        guard previous != online else { return }
+        reconnectTask?.cancel()
+        guard online else { return }
+        guard previous == false else {
+            Task { await flushOutbox() }
+            return
+        }
+        let wait = Double.random(in: 0...Self.reconnectSpread)
+        reconnectTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(wait))
+            guard !Task.isCancelled else { return }
+            await self?.flushOutbox()
+        }
     }
 
     /// Single flight: if a flush is already running, this asks it for one more pass and waits for
     /// it, so foreground, connectivity, timer and background task firing together run one loop.
     /// Returns when the outbox has had its try.
-    private func flushOutbox(ignoringBackoff: Bool) async {
+    private func flushOutbox() async {
         guard persists else { return }
         if let running = flushTask {
             flushAgain = true
-            flushAgainIgnoringBackoff = flushAgainIgnoringBackoff || ignoringBackoff
             await running.value
             return
         }
         // Main-actor task: set before it can start, cleared by itself before it ends.
         let task = Task { [self] in
-            var ignoring = ignoringBackoff
             repeat {
                 flushAgain = false
-                flushAgainIgnoringBackoff = false
-                await flushPass(ignoringBackoff: ignoring)
-                ignoring = flushAgainIgnoringBackoff
+                await flushPass()
             } while flushAgain && !stopsOutboxAfterCurrentSend
             flushTask = nil
             scheduleRetry()
@@ -797,15 +964,23 @@ final class AppModel {
         await task.value
     }
 
-    /// One try for each waiting report: all of them on a connectivity change, otherwise those
-    /// whose back-off has passed. Never touches held reports (may have been sent, not sent).
-    private func flushPass(ignoringBackoff: Bool) async {
+    /// Reports Fixa may try on its own now: not held, not mid-send, tries left, back-off and
+    /// `Retry-After` passed. None while sends are paused.
+    private func isDue(_ item: PendingReport, at now: Date) -> Bool {
+        sendsPaused == nil && !item.held && item.finalSendAt == nil
+            && item.attempts < Self.maxAutomaticAttempts && item.nextAttemptAt <= now
+            && (item.serverRetryAfter ?? .distantPast) <= now
+    }
+
+    /// One try for each report whose back-off has passed. Never touches held reports (may have
+    /// been sent, not sent).
+    private func flushPass() async {
         guard lastPathOnline == true else { return }
         let now = Date.now
-        let due = outbox.items.filter { !$0.held && (ignoringBackoff || $0.nextAttemptAt <= now) }.map(\.id)
+        let due = outbox.items.filter { isDue($0, at: now) }.map(\.id)
         for id in due {
             guard lastPathOnline == true, !stopsOutboxAfterCurrentSend else { break }
-            await attempt(id, automatic: true, ignoringBackoff: ignoringBackoff)
+            await attempt(id, automatic: true)
         }
     }
 
@@ -819,16 +994,16 @@ final class AppModel {
             try? await Task.sleep(for: .milliseconds(100))
             waited += 1
         }
-        await flushOutbox(ignoringBackoff: false)
+        await flushOutbox()
     }
 
     /// Sends one outbox report and waits for the e-service's final answer. Single flight per id:
     /// the check and the insert into `sendingIDs` run on the main actor with no await between.
-    private func attempt(_ id: UUID, automatic: Bool, ignoringBackoff: Bool = true) async {
-        guard persists, let spec, var item = outbox.item(id: id), !sendingIDs.contains(id) else { return }
-        if automatic, item.held || item.attempts >= Self.maxAutomaticAttempts { return }
+    private func attempt(_ id: UUID, automatic: Bool) async {
+        guard persists, let spec, var item = outbox.item(id: id), !sendingIDs.contains(id), item.finalSendAt == nil else { return }
         // Re-read: another trigger may have tried it since this pass picked it.
-        if automatic, !ignoringBackoff, item.nextAttemptAt > .now { return }
+        if automatic, !isDue(item, at: .now) { return }
+        if let until = item.serverRetryAfter, until > .now { return }
         // Rate limit counts retries too; waiting for it is not a failed try.
         if case .tooMany(let retryAfter) = sendGuardDecision(for: item.draft, checksDuplicate: false) {
             item.nextAttemptAt = max(item.nextAttemptAt, retryAfter)
@@ -838,33 +1013,43 @@ final class AppModel {
         sendingIDs.insert(id)
         defer { sendingIDs.remove(id) }
         let service = SubmissionService()
-        var result = await service.submit(item.draft, spec: spec, dryRun: false)
+        let report = item.draft
+        let mark: @Sendable () async -> Void = { [weak self] in await self?.markFinalSend(id, draft: report) }
+        var result = await service.submit(report, spec: spec, dryRun: false, beforeFinalSend: mark)
         // Form drift stops before the final step: once more with a newer signed adapter, if any.
         if result == nil, case .formChanged? = service.error,
-           await adapters.refreshAfterFormChange(), let fresh = self.spec {
+           await refreshAdapterAfterFormChange(), let fresh = self.spec {
             service.reset()
-            result = await service.submit(item.draft, spec: fresh, dryRun: false)
+            result = await service.submit(report, spec: fresh, dryRun: false, beforeFinalSend: mark)
         }
         if let result {
-            recordSend(item.draft, date: result.date)
+            if !automatic {
+                setSendsPaused(nil)
+            }
+            recordSend(report, date: result.date, caseNumber: result.caseNumber)
             outbox.remove([id])
             markSent(id, caseNumber: result.caseNumber, date: result.date)
             return
         }
-        // Cancelled: nothing is known, so nothing changes.
-        guard let error = service.error else { return }
+        // Cancelled before the final step: nothing is known, so nothing changes.
+        guard let error = service.error ?? interruptedAfterFinalSend(id) else { return }
+        pauseIfRefused(error)
+        let now = Date.now
+        // `item` predates the final-step mark, so writing it back clears the mark.
+        item.finalSendAt = nil
         item.attempts += 1
+        item.serverRetryAfter = Self.serverRetryAfter(error, now: now)
         let status: HistoryItem.Status
         if error.isRetrySafe, item.attempts < Self.maxAutomaticAttempts {
-            item.nextAttemptAt = Self.nextAttemptDate(afterAttempts: item.attempts, error: error, now: .now)
+            item.nextAttemptAt = Self.nextAttemptDate(afterAttempts: item.attempts, error: error, now: now)
             status = .waiting
         } else if case .uncertain = error {
             // Never sent again on its own; counts as a send for the guard.
-            recordSend(item.draft, date: .now)
+            recordSend(report, date: now, caseNumber: nil)
             item.held = true
             status = .maybeSent
         } else {
-            // Tries ran out, or retrying can't help (form changed, rejected): the user decides.
+            // Tries ran out, or retrying can't help (form changed, refused, rejected): the user decides.
             item.held = true
             status = .notSent
         }
@@ -886,26 +1071,114 @@ final class AppModel {
         }
     }
 
+    // MARK: Final-step mark
+
+    /// Runs right before a report's final step goes out (the user's Send and outbox sends alike):
+    /// writes to disk, before returning, that it is going out. If the app dies before the outcome
+    /// is recorded, the next launch finds the mark (`settleInterruptedSends`).
+    private func markFinalSend(_ id: UUID, draft: ReportDraft) {
+        guard persists else { return }
+        var item = outbox.item(id: id)
+            ?? PendingReport(id: id, draft: draft, createdAt: .now, attempts: 0, nextAttemptAt: .now, held: false)
+        item.finalSendAt = .now
+        outbox.put(item)
+    }
+
+    /// At launch: every report whose final step went out with no outcome recorded may have been
+    /// sent. It is held (never sent again on its own), counts for `SendGuard`, shows in Sent
+    /// reports as "may have been sent", and its saved draft does not reopen.
+    private func settleInterruptedSends() {
+        for var item in outbox.items {
+            guard let markedAt = item.finalSendAt else { continue }
+            item.finalSendAt = nil
+            item.held = true
+            item.attempts = max(item.attempts, 1)
+            recordSend(item.draft, date: markedAt, caseNumber: nil)
+            outbox.put(item)
+            if history.item(id: item.id) == nil {
+                history.add(historyItem(id: item.id, from: item.draft, date: markedAt, caseNumber: nil, status: .maybeSent))
+            } else {
+                history.update(id: item.id) { $0.status = .maybeSent }
+            }
+            if let saved = DraftStore.loadDraft(), saved.createdAt == item.draft.createdAt, saved.description == item.draft.description {
+                DraftStore.clear()
+            }
+        }
+    }
+
+    // MARK: Paused sends
+
+    private func setSendsPaused(_ pause: SendsPause?) {
+        guard pause != sendsPaused else { return }
+        sendsPaused = pause
+        if persists {
+            if let pause {
+                UserDefaults.standard.set(pause.rawValue, forKey: Self.sendsPausedKey)
+            } else {
+                UserDefaults.standard.removeObject(forKey: Self.sendsPausedKey)
+            }
+        }
+        scheduleRetry()
+    }
+
+    /// The e-service refused Fixa or asked for a login: nothing more goes out on its own.
+    private func pauseIfRefused(_ error: SubmissionError) {
+        switch error {
+        case .blocked: setSendsPaused(.blocked)
+        case .loginRequired: setSendsPaused(.loginRequired)
+        default: break
+        }
+    }
+
+    /// The status file says down: pause. Back to ok: lifts a pause it caused, and any pause when
+    /// it was down before (the e-service is back for everyone).
+    private func syncSendsPauseWithStatus(previous: AdapterStatus.State? = nil) {
+        guard persists else { return }
+        let state = adapters.status.state
+        if state == .down {
+            if sendsPaused == nil { setSendsPaused(.serviceDown) }
+        } else if sendsPaused == .serviceDown || previous == .down {
+            setSendsPaused(nil)
+        }
+    }
+
+    /// `AdapterStore.refreshAfterFormChange` plus the status it may bring along.
+    private func refreshAdapterAfterFormChange() async -> Bool {
+        let previous = adapters.status.state
+        let changed = await adapters.refreshAfterFormChange()
+        syncSendsPauseWithStatus(previous: previous)
+        return changed
+    }
+
+    /// The earliest moment an outbox report is due on its own; nil while paused or none waits.
+    private var nextAutomaticAttempt: Date? {
+        guard sendsPaused == nil else { return nil }
+        return outbox.items
+            .filter { !$0.held && $0.finalSendAt == nil && $0.attempts < Self.maxAutomaticAttempts }
+            .map { max($0.nextAttemptAt, $0.serverRetryAfter ?? .distantPast) }
+            .min()
+    }
+
     /// Wakes for the earliest back-off while the app runs, and asks iOS for a background task at
     /// the same time for when it doesn't. The flush runs in its own task so rescheduling never
     /// cancels a send already under way. Called whenever a report is queued or a back-off is set.
     private func scheduleRetry() {
         retryTask?.cancel()
         guard persists else { return }
-        let next = outbox.items.filter { !$0.held }.map(\.nextAttemptAt).min()
+        let next = nextAutomaticAttempt
         BackgroundOutbox.schedule(earliest: next)
         guard let next else { return }
         retryTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(max(1, next.timeIntervalSinceNow)))
             guard !Task.isCancelled else { return }
-            Task { @MainActor [weak self] in await self?.flushOutbox(ignoringBackoff: false) }
+            Task { @MainActor [weak self] in await self?.flushOutbox() }
         }
     }
 
     /// When the app leaves the screen: makes sure iOS knows about waiting reports.
     func scheduleBackgroundSend() {
         guard persists else { return }
-        BackgroundOutbox.schedule(earliest: outbox.items.filter { !$0.held }.map(\.nextAttemptAt).min())
+        BackgroundOutbox.schedule(earliest: nextAutomaticAttempt)
     }
 
     // MARK: Launch hooks
@@ -913,6 +1186,7 @@ final class AppModel {
     private func seedDemo() {
         profileStorage = DemoData.profile
         var demo = DemoData.draft(adapterID: spec?.id ?? Self.adapterID)
+        if let tile = options.tile, spec?.tile(id: tile) != nil { demo.tileID = tile }
         demo.categoryID = spec?.tile(id: demo.tileID)?.categoryID
         draft = demo
         if let image = DemoData.photo {
@@ -936,25 +1210,9 @@ final class AppModel {
         let id = UUID()
         let now = Date.now.addingTimeInterval(-4 * 60)
         outbox.put(PendingReport(id: id, draft: draft, createdAt: now, attempts: 1, nextAttemptAt: now, held: status != .waiting))
-        history.add(historyItem(id: id, date: now, caseNumber: nil, status: status))
+        history.add(historyItem(id: id, from: draft, date: now, caseNumber: nil, status: status))
         sent = SentReport(caseNumber: nil, date: now, isDryRun: false, outcome: status == .waiting ? .waiting : .maybeSent, historyID: id)
         isOnline = status != .waiting
-    }
-
-    /// A clearly marked TEST report with no personal data, for the single real end-to-end check.
-    private func seedLiveTest() {
-        var test = ReportDraft(adapterID: spec?.id ?? Self.adapterID)
-        test.categoryID = "lighting"
-        test.description = "TEST — ignorera, testinlämning från app-utveckling. Detta är inget riktigt fel; appen Fixa (öppen källkod) testar att e-tjänsten tar emot anmälningar."
-        test.coordinate = Coordinate(latitude: 59.3262, longitude: 18.3856)
-        test.locationText = "TEST, Gustavsbergs centrum"
-        test.wantsFeedback = true
-        profileStorage = Contact(firstName: "", lastName: "", phone: "", email: "test@test.se")
-        draft = test
-        if let image = DemoData.photo {
-            photos = [image]
-        }
-        recomposePhoto()
     }
 
     private func open(_ screen: LaunchOptions.Screen) {

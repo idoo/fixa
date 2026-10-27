@@ -10,9 +10,23 @@ struct HistoryScreen: View {
     var body: some View {
         Group {
             if model.history.items.isEmpty {
-                emptyState
+                VStack(spacing: 0) {
+                    if model.sendsPaused != nil {
+                        pausedBanner
+                            .padding(.horizontal, Fx.Space.l)
+                            .padding(.top, Fx.Space.s)
+                    }
+                    emptyState
+                }
             } else {
                 List {
+                    if model.sendsPaused != nil {
+                        Section {
+                            pausedBanner
+                                .listRowInsets(EdgeInsets())
+                                .listRowBackground(Color.clear)
+                        }
+                    }
                     Section {
                         ForEach(model.history.items) { item in
                             NavigationLink(value: Route.historyDetail(item.id)) {
@@ -41,6 +55,25 @@ struct HistoryScreen: View {
             if !model.history.items.isEmpty {
                 ToolbarItem(placement: .topBarTrailing) {
                     EditButton()
+                }
+            }
+        }
+    }
+
+    /// Fixa has stopped sending (blocked, sign-in required, or paused by status). Points to the
+    /// kommun's website with the newest report that is still waiting, when there is one.
+    @ViewBuilder
+    private var pausedBanner: some View {
+        if let pause = model.sendsPaused {
+            let pending = model.history.items.first { $0.status == .waiting || $0.status == .notSent }
+            VStack(alignment: .leading, spacing: Fx.Space.m) {
+                FxBanner(
+                    kind: .warning,
+                    title: String(localized: "Fixa can't send right now", bundle: L10n.bundle, locale: L10n.locale),
+                    message: pause.message
+                )
+                if let pending {
+                    WebFormFallback(text: model.webFallbackText(id: pending.id), spec: spec, tileID: pending.tileID)
                 }
             }
         }
@@ -278,29 +311,39 @@ struct HistoryDetailScreen: View {
     /// Where an unconfirmed report stands and what the user can do about it.
     private func statusCard(_ item: HistoryItem) -> some View {
         let isSending = model.sendingIDs.contains(item.id)
-        let text = model.reportText(for: item.id)
+        let text = model.webFallbackText(id: item.id)
         return VStack(alignment: .leading, spacing: Fx.Space.m) {
             switch item.status {
             case .sent:
                 EmptyView()
             case .waiting:
-                FxBanner(
-                    kind: .info,
-                    title: String(localized: "Waiting to send", bundle: L10n.bundle, locale: L10n.locale),
-                    message: model.isOnline
-                        ? String(localized: "Your report is saved on this phone. Fixa tries again in a little while, also in the background.", bundle: L10n.bundle, locale: L10n.locale)
-                        : String(localized: "Your report is saved on this phone. Fixa sends it when you're back online, also in the background.", bundle: L10n.bundle, locale: L10n.locale)
-                )
+                if let pause = model.sendsPaused {
+                    FxBanner(
+                        kind: .warning,
+                        title: String(localized: "Fixa can't send right now", bundle: L10n.bundle, locale: L10n.locale),
+                        message: pause.message
+                    )
+                    WebFormFallback(text: text, spec: spec, tileID: item.tileID)
+                } else {
+                    FxBanner(
+                        kind: .info,
+                        title: String(localized: "Waiting to send", bundle: L10n.bundle, locale: L10n.locale),
+                        message: model.isOnline
+                            ? String(localized: "Your report is saved on this phone. Fixa tries again in a little while, also in the background.", bundle: L10n.bundle, locale: L10n.locale)
+                            : String(localized: "Your report is saved on this phone. Fixa sends it when you're back online, also in the background.", bundle: L10n.bundle, locale: L10n.locale)
+                    )
+                }
             case .maybeSent:
                 FxBanner(
                     kind: .warning,
                     title: String(localized: "May have been sent", bundle: L10n.bundle, locale: L10n.locale),
                     message: model.wantsReply(item.id)
-                        ? String(localized: "Fixa didn't see a confirmation, but it may well have arrived. Check your e-mail for a confirmation before you send it again.", bundle: L10n.bundle, locale: L10n.locale)
-                        : String(localized: "Fixa didn't see a confirmation, but it may well have arrived. Sending it again may create a second case.", bundle: L10n.bundle, locale: L10n.locale)
+                        ? String(localized: "Fixa didn't see a confirmation, but it may well have arrived.", bundle: L10n.bundle, locale: L10n.locale) + " " + String(localized: "You asked for a reply, so the kommun answers by e-mail. If you're unsure whether it arrived, ask the servicecenter.", bundle: L10n.bundle, locale: L10n.locale)
+                        : String(localized: "Fixa didn't see a confirmation, but it may well have arrived.", bundle: L10n.bundle, locale: L10n.locale) + " " + String(localized: "If you're unsure whether it arrived, ask the servicecenter.", bundle: L10n.bundle, locale: L10n.locale)
                 )
-                if let text {
-                    FxCopyButton(title: String(localized: "Copy report text", bundle: L10n.bundle, locale: L10n.locale), value: text)
+                ServiceCentreHelp(spec: spec)
+                // Only while the report is still on this phone's outbox (it has text to send).
+                if text != nil {
                     FxSecondaryButton(title: String(localized: "Send again anyway", bundle: L10n.bundle, locale: L10n.locale), systemImage: "exclamationmark.arrow.circlepath") {
                         isSendAgainConfirmPresented = true
                     }
@@ -310,9 +353,10 @@ struct HistoryDetailScreen: View {
                 FxBanner(
                     kind: .warning,
                     title: String(localized: "Not sent yet", bundle: L10n.bundle, locale: L10n.locale),
-                    message: String(localized: "Fixa tried a few times and couldn't get it through. Try again now, or copy the text and e-mail it.", bundle: L10n.bundle, locale: L10n.locale)
+                    message: String(localized: "Fixa tried a few times and couldn't get it through. Try again now, or use the kommun's website.", bundle: L10n.bundle, locale: L10n.locale)
                 )
                 if text != nil {
+                    let blockedUntil = model.retryBlockedUntil(item.id)
                     FxPrimaryButton(
                         title: String(localized: "Try again now", bundle: L10n.bundle, locale: L10n.locale),
                         systemImage: "arrow.clockwise",
@@ -320,11 +364,15 @@ struct HistoryDetailScreen: View {
                     ) {
                         Task { await model.sendNow(item.id) }
                     }
-                    .disabled(isSending)
+                    .disabled(isSending || blockedUntil != nil)
+                    if let blockedUntil {
+                        Text("The e-service asked Fixa to wait. You can try again after \(blockedUntil.formatted(date: .omitted, time: .shortened)).")
+                            .font(Fx.Font.footnote)
+                            .foregroundStyle(Fx.Color.ink2)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
-                if let text {
-                    FxCopyButton(title: String(localized: "Copy report text", bundle: L10n.bundle, locale: L10n.locale), value: text)
-                }
+                WebFormFallback(text: text, spec: spec, tileID: item.tileID)
             }
         }
     }

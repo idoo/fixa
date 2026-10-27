@@ -16,20 +16,22 @@ struct HomeScreen: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Fx.Space.l) {
                 // Words come from the app by state, never from the downloaded status file.
-                switch model.adapterStatus.state {
-                case .ok:
-                    EmptyView()
-                case .degraded:
+                if model.sendsPaused != nil || model.adapterStatus.state == .down {
+                    FxBanner(
+                        kind: .warning,
+                        title: String(localized: "Fixa can't send to \(spec.municipality.name) right now", bundle: L10n.bundle, locale: L10n.locale),
+                        message: String(localized: "Your report is saved. You can use the kommun's website.", bundle: L10n.bundle, locale: L10n.locale),
+                        actionTitle: String(localized: "Open the kommun's website", bundle: L10n.bundle, locale: L10n.locale),
+                        action: openWebsite
+                    )
+                    .accessibilityIdentifier("home.pausedBanner")
+                } else if model.adapterStatus.state == .degraded {
                     FxBanner(
                         kind: .warning,
                         title: String(localized: "The municipality's e-service has changed", bundle: L10n.bundle, locale: L10n.locale),
-                        message: String(localized: "Fixa is an independent app. We are updating it. Your report is saved, and you can still send it by email.", bundle: L10n.bundle, locale: L10n.locale)
-                    )
-                case .down:
-                    FxBanner(
-                        kind: .warning,
-                        title: String(localized: "The municipality's e-service is down", bundle: L10n.bundle, locale: L10n.locale),
-                        message: String(localized: "Your report is saved. You can send it by email now, or try again later.", bundle: L10n.bundle, locale: L10n.locale)
+                        message: String(localized: "Fixa is an independent app and is being updated. Your report is saved. You can use the kommun's website.", bundle: L10n.bundle, locale: L10n.locale),
+                        actionTitle: String(localized: "Open the kommun's website", bundle: L10n.bundle, locale: L10n.locale),
+                        action: openWebsite
                     )
                 }
                 if let notice = model.outboxNotice {
@@ -102,6 +104,15 @@ struct HomeScreen: View {
                 .accessibilityLabel(Text("Sent reports"))
                 .accessibilityIdentifier("home.history")
             }
+        }
+    }
+
+    /// The kommun's own web form: with the unsent draft's text copied when there is one.
+    private func openWebsite() {
+        if model.draft.description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            openURL(spec.webFormURL)
+        } else {
+            model.openWebForm(model.webFallbackText(for: model.draft))
         }
     }
 

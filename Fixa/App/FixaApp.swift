@@ -132,16 +132,12 @@ struct RootView: View {
 
     private func sendGuardMessage(_ alert: AppModel.SendGuardAlert) -> String {
         switch alert {
-        case .duplicate(let previous):
-            let formatter = DateComponentsFormatter()
-            formatter.unitsStyle = .full
-            formatter.maximumUnitCount = 1
-            formatter.allowedUnits = [.day, .hour, .minute]
-            var calendar = Calendar.current
-            calendar.locale = L10n.locale
-            formatter.calendar = calendar
-            let ago = formatter.string(from: max(60, Date.now.timeIntervalSince(previous))) ?? ""
-            return String(localized: "You reported this here \(ago) ago. The kommun already has it. Send another report?", bundle: L10n.bundle, locale: L10n.locale)
+        case .duplicate(let previous, let caseNumber):
+            let date = previous.formatted(.dateTime.day().month(.wide).year().locale(L10n.locale))
+            if let caseNumber, !caseNumber.isEmpty {
+                return String(localized: "You reported this here on \(date) (case \(caseNumber)). Send it again?", bundle: L10n.bundle, locale: L10n.locale)
+            }
+            return String(localized: "You reported this here on \(date). Send it again?", bundle: L10n.bundle, locale: L10n.locale)
         case .tooMany(let retryAfter):
             let sameDay = Calendar.current.isDate(retryAfter, inSameDayAs: .now)
             let time = retryAfter.formatted(

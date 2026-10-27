@@ -59,13 +59,19 @@ public enum SubmissionError: Error, Sendable, Equatable {
     /// The final confirmation was sent but no receipt was read (timeout, dropped connection, unknown page).
     /// The case may or may not exist; never retry automatically, it could file a duplicate.
     case uncertain(String)
+    /// The e-service refused the request (401/403) before the final confirmation. The municipality may
+    /// not accept reports this way; stop sending and point the resident to its website.
+    case blocked(status: Int)
+    /// Before the final confirmation the e-service asked the resident to sign in (login, BankID or other
+    /// identification). Fixa never signs in; the resident uses the website.
+    case loginRequired
 
     /// True only when nothing reached the municipality as a case: a network or HTTP failure before the
     /// final confirmation was sent. Everything else needs a person (or a new adapter) first.
     public var isRetrySafe: Bool {
         switch self {
         case .transport, .http, .unavailable: true
-        case .sessionLocked, .serverValidation, .formChanged, .uploadFailed, .invalidSpec, .uncertain: false
+        case .sessionLocked, .serverValidation, .formChanged, .uploadFailed, .invalidSpec, .uncertain, .blocked, .loginRequired: false
         }
     }
 

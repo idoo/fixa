@@ -3,7 +3,7 @@
   "$id": "https://github.com/idoo/fixa/schema/adapter.schema.json",
   "title": "Fixa municipality adapter",
   "type": "object",
-  "required": ["specVersion", "id", "municipality", "channel", "categories", "tiles", "validation", "disclaimer"],
+  "required": ["specVersion", "id", "municipality", "channel", "categories", "tiles", "validation", "webFormURL", "disclaimer"],
   "additionalProperties": false,
   "properties": {
     "specVersion": { "type": "integer", "minimum": 1, "description": "Adapter format version. Apps skip a remote adapter whose version is newer than they support." },
@@ -11,10 +11,11 @@
     "id": { "type": "string", "description": "Reverse-DNS id, e.g. se.varmdo.ksb" },
     "municipality": {
       "type": "object",
-      "required": ["name", "countryCode", "region"],
+      "required": ["name", "countryCode", "region", "geocoderNames"],
       "properties": {
         "name": { "type": "string" },
         "countryCode": { "type": "string", "description": "ISO 3166-1 alpha-2" },
+        "geocoderNames": { "type": "array", "minItems": 1, "items": { "type": "string" }, "description": "Names a reverse geocoder gives for the municipality, e.g. [\"Värmdö\", \"Värmdö kommun\"]; a pin in the bounding box but in another municipality is outside." },
         "region": {
           "type": "object",
           "required": ["center", "bbox"],
@@ -122,14 +123,27 @@
       "maxItems": 100,
       "items": {
         "type": "object",
-        "required": ["id", "symbol", "categoryID", "title", "swedishSummary"],
+        "required": ["id", "symbol", "categoryID", "title"],
         "properties": {
           "id": { "type": "string" },
           "symbol": { "type": "string", "description": "SF Symbol name" },
           "categoryID": { "type": "string" },
           "title": { "$ref": "#/$defs/localizedText" },
-          "swedishSummary": { "type": "string" },
-          "responsibility": { "$ref": "#/$defs/localizedText", "description": "Short note under the tile on who looks after this problem (e.g. municipal streets vs state or private roads). Omit when the municipality always handles it." }
+          "swedishSummary": { "type": "string", "description": "First line of the description sent to the municipality. Omit when the category says it all; then the resident's own text must reach validation.descriptionMin by itself." },
+          "responsibility": { "$ref": "#/$defs/localizedText", "description": "Short note under the tile on who looks after this problem (e.g. municipal streets vs state or private roads). Omit when the municipality always handles it." },
+          "links": {
+            "type": "array",
+            "maxItems": 50,
+            "description": "The municipality's other e-services for things that don't belong here, opened in Safari. https only, on the municipality's own domain.",
+            "items": {
+              "type": "object",
+              "required": ["title", "url"],
+              "properties": {
+                "title": { "$ref": "#/$defs/localizedText" },
+                "url": { "type": "string", "pattern": "^https://" }
+              }
+            }
+          }
         }
       }
     },
@@ -164,8 +178,10 @@
           "items": {
             "type": "object",
             "required": ["isoWeekdays", "until", "contactID"],
+            "description": "Applies on the weekdays from 'from' (default 00:00) until before 'until', local time.",
             "properties": {
               "isoWeekdays": { "type": "array", "items": { "type": "integer", "enum": [1, 2, 3, 4, 5, 6, 7] } },
+              "from": { "type": "string", "pattern": "^[0-2][0-9]:[0-5][0-9]$" },
               "until": { "type": "string", "pattern": "^[0-2][0-9]:[0-5][0-9]$" },
               "contactID": { "type": "string" }
             }
@@ -173,10 +189,11 @@
         },
         "defaultContactID": { "type": "string" },
         "timeZone": { "type": "string" },
-        "note": { "$ref": "#/$defs/localizedText" }
+        "note": { "$ref": "#/$defs/localizedText" },
+        "holidays": { "type": "string", "enum": ["SE"], "description": "Public-holiday calendar on which no rule applies, so defaultContactID answers. SE: Swedish public holidays plus julafton, nyårsafton and midsommarafton." }
       }
     },
-    "fallbackEmail": { "type": "string" },
+    "webFormURL": { "type": "string", "pattern": "^https://", "description": "The municipality's own web form for this e-service, on the channel's host. Fixa opens it when it cannot send. A downloaded adapter must keep the bundled value." },
     "disclaimer": { "$ref": "#/$defs/localizedText" }
   },
   "$defs": {

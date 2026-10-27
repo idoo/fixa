@@ -30,6 +30,8 @@ struct LocationPickerSheet: View {
     @State private var geocodeTask: Task<Void, Never>?
     @State private var didAutoLocate = false
     @State private var foundCount = 0
+    /// The other kommun the pin is in, from reverse geocoding; nil while inside or unknown.
+    @State private var otherKommun: String?
     @FocusState private var searchFocused: Bool
 
     /// Opening view when nothing is known yet: Gustavsberg centrum at about 3 km.
@@ -276,11 +278,18 @@ struct LocationPickerSheet: View {
     private var footer: some View {
         VStack(alignment: .leading, spacing: Fx.Space.m) {
             if isOutside {
-                FxBanner(
-                    kind: .warning,
-                    title: String(localized: "The pin is outside \(spec.municipality.name)", bundle: L10n.bundle, locale: L10n.locale),
-                    message: String(localized: "Fixa only sends reports to \(spec.municipality.name). Search for the address of the problem, or move the map.", bundle: L10n.bundle, locale: L10n.locale)
-                )
+                if let otherKommun {
+                    FxBanner(
+                        kind: .warning,
+                        title: String(localized: "This place is in \(otherKommun). Report it to that kommun.", bundle: L10n.bundle, locale: L10n.locale)
+                    )
+                } else {
+                    FxBanner(
+                        kind: .warning,
+                        title: String(localized: "The pin is outside \(spec.municipality.name)", bundle: L10n.bundle, locale: L10n.locale),
+                        message: String(localized: "Fixa only sends reports to \(spec.municipality.name). Search for the address of the problem, or move the map.", bundle: L10n.bundle, locale: L10n.locale)
+                    )
+                }
             }
             Text("Move the map so the pin is on the problem.")
                 .font(Fx.Font.footnote)
@@ -309,9 +318,10 @@ struct LocationPickerSheet: View {
         .background(Fx.Color.paper)
     }
 
+    /// Outside the adapter's box at once; another kommun once reverse geocoding names one.
     private var isOutside: Bool {
         guard let pin else { return false }
-        return !spec.municipality.region.contains(Coordinate(pin))
+        return otherKommun != nil || !spec.municipality.region.contains(Coordinate(pin))
     }
 
     private var confirmTitle: String {
@@ -334,6 +344,7 @@ struct LocationPickerSheet: View {
     private func loadFromDraft() {
         guard pin == nil, let coordinate = model.draft.coordinate else { return }
         pin = coordinate.clLocation
+        otherKommun = model.outsideMunicipalityName
         address = model.draft.locationText
         moveCamera(to: coordinate.clLocation, meters: 600)
     }
@@ -414,25 +425,30 @@ struct LocationPickerSheet: View {
             locate = .idle
         }
         pin = coordinate
+        otherKommun = nil
         if move { moveCamera(to: coordinate, distance: cameraDistance) }
         geocodeTask?.cancel()
         if let knownAddress {
             address = knownAddress
-            announcePlacement()
-            return
+        } else {
+            address = ""
         }
-        address = ""
         geocodeTask = Task {
-            let text = await ReverseGeocoder.address(for: coordinate)
+            let place = await ReverseGeocoder.place(for: coordinate)
             guard !Task.isCancelled else { return }
-            address = text ?? String(format: "%.5f, %.5f", coordinate.latitude, coordinate.longitude)
+            otherKommun = AppModel.otherMunicipality(place, spec: spec, coordinate: Coordinate(coordinate))
+            if knownAddress == nil {
+                address = place?.address ?? String(format: "%.5f, %.5f", coordinate.latitude, coordinate.longitude)
+            }
             announcePlacement()
         }
     }
 
     private func announcePlacement() {
         var text = String(localized: "Pin placed: \(address)", bundle: L10n.bundle, locale: L10n.locale)
-        if isOutside {
+        if let otherKommun {
+            text += " " + String(localized: "This place is in \(otherKommun). Report it to that kommun.", bundle: L10n.bundle, locale: L10n.locale)
+        } else if isOutside {
             text += " " + String(localized: "The pin is outside \(spec.municipality.name)", bundle: L10n.bundle, locale: L10n.locale)
         }
         AccessibilityNotification.Announcement(text).post()
@@ -490,7 +506,12 @@ struct LocationPickerSheet: View {
     private func confirm() {
         guard let pin, !isOutside else { return }
         model.draft.coordinate = Coordinate(pin)
-        model.draft.locationText = address
+        // Chosen here, so no longer the automatic "your current location" pin, even if unchanged.
+        model.pinIsAutomatic = false
+        // The address comes from the geocoder; a place the resident typed stays as written.
+        if !model.placeTextIsTyped {
+            model.draft.locationText = address
+        }
         dismiss()
     }
 

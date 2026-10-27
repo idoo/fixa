@@ -51,7 +51,7 @@ private struct FxCatalog: View {
                     .frame(maxWidth: .infinity)
                 FxPrimaryButton(title: "Send to Värmdö kommun", systemImage: "paperplane", action: {})
                 FxPrimaryButton(title: "Sending…", isLoading: true, action: {})
-                FxSecondaryButton(title: "Send by e-mail instead", systemImage: "envelope", action: {})
+                FxSecondaryButton(title: "Open the kommun's website", systemImage: "safari", action: {})
             }
             .padding(Fx.Space.l)
         }

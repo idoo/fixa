@@ -25,7 +25,7 @@ final class SendGuardTests: XCTestCase {
 
     func testDuplicateWithinRadius() {
         let previous = sent(3, at: north(149))
-        XCTAssertEqual(SendGuard.check(draft(at: pin), history: [previous], now: now), .duplicate(previous: previous.date))
+        XCTAssertEqual(SendGuard.check(draft(at: pin), history: [previous], now: now), .duplicate(previous: previous.date, caseNumber: nil))
         XCTAssertEqual(SendGuard.check(draft(at: pin), history: [sent(3, at: north(151))], now: now), .ok)
     }
 
@@ -33,20 +33,32 @@ final class SendGuardTests: XCTestCase {
         XCTAssertEqual(SendGuard.check(draft(tile: "pothole", at: pin), history: [sent(1, at: pin)], now: now), .ok)
     }
 
-    func testDuplicateWindowIs48Hours() {
-        let previous = sent(47.9, at: pin)
-        XCTAssertEqual(SendGuard.check(draft(at: pin), history: [previous], now: now), .duplicate(previous: previous.date))
-        XCTAssertEqual(SendGuard.check(draft(at: pin), history: [sent(48.1, at: pin)], now: now), .ok)
+    func testDuplicateWindowIs14Days() {
+        let previous = sent(14 * 24 - 0.1, at: pin)
+        XCTAssertEqual(SendGuard.check(draft(at: pin), history: [previous], now: now), .duplicate(previous: previous.date, caseNumber: nil))
+        XCTAssertEqual(SendGuard.check(draft(at: pin), history: [sent(14 * 24 + 0.1, at: pin)], now: now), .ok)
+        // A week-old report of a lamp still out is the same problem.
+        let week = sent(7 * 24, at: pin)
+        XCTAssertEqual(SendGuard.check(draft(at: pin), history: [week], now: now), .duplicate(previous: week.date, caseNumber: nil))
+    }
+
+    func testDuplicateCarriesCaseNumberOfLatestMatch() {
+        var older = sent(5 * 24, at: pin), newer = sent(2, at: north(50))
+        older.caseNumber = "261020-KSB-AB12"
+        newer.caseNumber = "261027-KSB-CD34"
+        XCTAssertEqual(SendGuard.check(draft(at: pin), history: [newer, older], now: now), .duplicate(previous: newer.date, caseNumber: "261027-KSB-CD34"))
+        newer.caseNumber = nil
+        XCTAssertEqual(SendGuard.check(draft(at: pin), history: [older, newer], now: now), .duplicate(previous: newer.date, caseNumber: nil))
     }
 
     func testDuplicateReportsTheLatestMatch() {
         let older = sent(30, at: pin), newer = sent(2, at: north(50))
-        XCTAssertEqual(SendGuard.check(draft(at: pin), history: [newer, older], now: now), .duplicate(previous: newer.date))
+        XCTAssertEqual(SendGuard.check(draft(at: pin), history: [newer, older], now: now), .duplicate(previous: newer.date, caseNumber: nil))
     }
 
     func testPlaceTextComparedWhenEitherHasNoPin() {
         let previous = sent(5, place: "Storvägen 3, Brunn")
-        XCTAssertEqual(SendGuard.check(draft(at: pin, place: "  storvagen 3 brunn "), history: [previous], now: now), .duplicate(previous: previous.date))
+        XCTAssertEqual(SendGuard.check(draft(at: pin, place: "  storvagen 3 brunn "), history: [previous], now: now), .duplicate(previous: previous.date, caseNumber: nil))
         XCTAssertEqual(SendGuard.check(draft(place: "Storvägen 5, Brunn"), history: [previous], now: now), .ok)
         // Both pinned far apart: the same street name doesn't make it a duplicate.
         XCTAssertEqual(SendGuard.check(draft(at: pin, place: "Storvägen 3, Brunn"), history: [sent(5, at: north(500), place: "Storvägen 3, Brunn")], now: now), .ok)
@@ -83,7 +95,7 @@ final class SendGuardTests: XCTestCase {
         var history = (0..<5).map { sent(Double($0) * 0.1 + 0.05, tile: "graffiti", place: "Plats \($0)") }
         let same = sent(0.01, at: pin)
         history.append(same)
-        XCTAssertEqual(SendGuard.check(draft(at: pin), history: history, now: now), .duplicate(previous: same.date))
+        XCTAssertEqual(SendGuard.check(draft(at: pin), history: history, now: now), .duplicate(previous: same.date, caseNumber: nil))
     }
 
     func testDistance() {
@@ -91,8 +103,12 @@ final class SendGuardTests: XCTestCase {
         XCTAssertEqual(SendGuard.distance(pin, pin), 0)
     }
 
-    func testSentRecordFromDraft() {
+    func testSentRecordFromDraft() throws {
         let d = draft(at: pin)
         XCTAssertEqual(SentRecord(d, date: now), SentRecord(date: now, tileID: "streetlight", coordinate: pin, locationText: "Gustavsbergs centrum"))
+        XCTAssertEqual(SentRecord(d, date: now, caseNumber: "K-1").caseNumber, "K-1")
+        // Records saved before caseNumber existed still decode.
+        let old = #"{"date":0,"tileID":"streetlight","locationText":"Brunn"}"#
+        XCTAssertNil(try JSONDecoder().decode(SentRecord.self, from: Data(old.utf8)).caseNumber)
     }
 }

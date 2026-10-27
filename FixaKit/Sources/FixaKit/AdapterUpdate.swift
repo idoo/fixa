@@ -45,6 +45,21 @@ extension AdapterSpec {
             for id in [emergency.defaultContactID] + emergency.rules.map(\.contactID) where !contacts.contains(id) {
                 problems.append("unknown emergency contact \(id)")
             }
+            for rule in emergency.rules {
+                let from = EmergencyRouter.minutesOfDay(rule.from ?? "00:00")
+                let until = EmergencyRouter.minutesOfDay(rule.until)
+                if from == nil || until == nil || from! >= until! { problems.append("bad emergency hours \(rule.from ?? "00:00")–\(rule.until)") }
+                if rule.isoWeekdays.isEmpty || rule.isoWeekdays.contains(where: { !(1...7).contains($0) }) {
+                    problems.append("bad emergency weekdays")
+                }
+            }
+            if let holidays = emergency.holidays, !PublicHolidays.supported.contains(holidays) {
+                problems.append("unknown holiday calendar \(holidays)")
+            }
+        }
+        problems += AdapterSpecValidator.linkProblems(self)
+        if municipality.geocoderNames.isEmpty || municipality.geocoderNames.contains(where: { $0.trimmingCharacters(in: .whitespaces).isEmpty }) {
+            problems.append("municipality needs geocoder names")
         }
         return problems
     }
@@ -139,7 +154,7 @@ public enum AdapterSpecValidator {
     }
 
     /// Everything a downloaded adapter may not change: where reports go (channel kind, host, service),
-    /// the fallback e-mail address and the emergency phone numbers. Empty means the remote may be used.
+    /// the municipality's web form and the emergency phone numbers. Empty means the remote may be used.
     public static func pinningProblems(remote: AdapterSpec, bundled: AdapterSpec) -> [String] {
         var problems: [String] = []
         if remote.id != bundled.id { problems.append("unknown adapter id \(remote.id)") }
@@ -149,11 +164,33 @@ public enum AdapterSpecValidator {
             problems.append("channel host changed")
         }
         if remote.channel.service != bundled.channel.service { problems.append("service changed") }
-        if remote.fallbackEmail?.lowercased() != bundled.fallbackEmail?.lowercased() {
-            problems.append("fallback e-mail changed")
-        }
+        if remote.webFormURL != bundled.webFormURL { problems.append("web form changed") }
         let phones = { (spec: AdapterSpec) in (spec.emergency?.contacts.map(\.phone) ?? []).sorted() }
         if phones(remote) != phones(bundled) { problems.append("emergency phone numbers changed") }
+        return problems
+    }
+
+    /// The web form must be an https page on the channel's own host; tile links must be https pages on
+    /// the municipality's own domain (the channel host's last two labels, e.g. `varmdo.se`).
+    static func linkProblems(_ spec: AdapterSpec) -> [String] {
+        var problems: [String] = []
+        let channelHost = URLComponents(string: spec.channel.baseURL)?.host?.lowercased()
+        let form = URLComponents(url: spec.webFormURL, resolvingAgainstBaseURL: false)
+        if form?.scheme?.lowercased() != "https" || form?.host?.lowercased() != channelHost || channelHost == nil
+            || form?.user != nil || form?.port != nil {
+            problems.append("webFormURL must be an https page on the channel host")
+        }
+        let domain = channelHost.map { $0.split(separator: ".").suffix(2).joined(separator: ".") }
+        for tile in spec.tiles {
+            for link in tile.links ?? [] {
+                let c = URLComponents(url: link.url, resolvingAgainstBaseURL: false)
+                guard let domain, c?.scheme?.lowercased() == "https", c?.user == nil, c?.port == nil,
+                      let host = c?.host?.lowercased(), host == domain || host.hasSuffix("." + domain) else {
+                    problems.append("tile \(tile.id) link must be an https page on the municipality's domain")
+                    continue
+                }
+            }
+        }
         return problems
     }
 
@@ -229,6 +266,8 @@ public enum AdapterSpecValidator {
             lists += synonyms.values.map(\.count)
         }
         lists += spec.categories.map { $0.synonyms?.count ?? 0 }
+        lists += spec.tiles.map { $0.links?.count ?? 0 }
+        lists.append(spec.municipality.geocoderNames.count)
         if lists.contains(where: { $0 > maxListItems }) { problems.append("a list has more than \(maxListItems) items") }
         return problems
     }

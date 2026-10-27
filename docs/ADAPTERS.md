@@ -15,13 +15,13 @@ Today the only channel kind is `abou`, the Abou e-service platform (ASP.NET WebF
 | `specVersion` | Adapter format version, `1` today. An app ignores a remote adapter with a newer version than it supports. |
 | `minAppBuild` | Optional. Lowest app build (`CFBundleVersion`) that can run this adapter. Older builds keep their bundled copy. |
 | `id` | Reverse-DNS id, e.g. `se.varmdo.ksb`. Stored in every draft. |
-| `municipality` | `name`, `countryCode`, and `region` with `center` and `bbox` (WGS84). The map opens on the region and the validator warns when the pin is outside the bbox. |
+| `municipality` | `name`, `countryCode`, `region` with `center` and `bbox` (WGS84), and `geocoderNames`: the names Apple's reverse geocoder gives for the municipality (`["Värmdö", "Värmdö kommun"]`), so a pin inside the bbox but in a neighbouring municipality counts as outside. The map opens on the region and the validator warns when the pin is outside the bbox. |
 | `channel` | How to reach the e-service; see below. |
 | `categories` | `id` (your stable slug), `value` (the exact `<option value>` of the form's category dropdown), optional `synonyms` (see Resilience) and a localized `title`. |
-| `tiles` | The home grid: `id`, `symbol` (SF Symbol), `categoryID`, localized `title`, and `swedishSummary`, which becomes the first line of the description sent to the municipality. Optional localized `responsibility`: a short note on who looks after this kind of problem, for tiles where the municipality is not always the right place (Värmdö's road tiles: municipal streets vs Trafikverket's state roads and private road associations). |
-| `validation` | `descriptionMin`, `descriptionMax`, `emailRequiredWhenFeedback`, `requireLocation` (a pin or a place text). |
-| `emergency` | Optional. Phone `contacts`, `rules` (`isoWeekdays` 1 = Monday, `until` "HH:mm" local, `contactID`), `defaultContactID` when no rule matches, `timeZone`, and a localized `note`. |
-| `fallbackEmail` | Optional. Where the "send by e-mail instead" fallback goes. |
+| `tiles` | The home grid: `id`, `symbol` (SF Symbol), `categoryID`, localized `title`, and optional `swedishSummary`, which becomes the first line of the description sent to the municipality. Leave the summary out when the category says it all (Värmdö's "Något annat"); the resident's own text must then reach `descriptionMin` by itself. Optional localized `responsibility`: a short note on who looks after this kind of problem (Värmdö's road tiles: municipal streets vs Trafikverket's state roads and private road associations; the water tile: leaks on your own property are the owner's job). Optional `links`: `{title, url}` to the municipality's other e-services (https, on the municipality's own domain), e.g. recycling stations and missed bin collection on "Något annat". |
+| `validation` | `descriptionMin` (characters of tile summary plus the resident's text), `descriptionMax`, `emailRequiredWhenFeedback`, `requireLocation` (a pin or a place text). |
+| `emergency` | Optional. Phone `contacts`, `rules` (`isoWeekdays` 1 = Monday, optional `from` "HH:mm" (default 00:00) and `until` "HH:mm" local, a rule applies when `from <= now < until`; `contactID`), `defaultContactID` when no rule matches, `timeZone`, optional `holidays` (`"SE"`: on Swedish public holidays plus julafton, nyårsafton and midsommarafton no rule applies), and a localized `note`. |
+| `webFormURL` | The municipality's own web form for this e-service (https, on the channel's host). When Fixa can't send, it copies the report text and opens this page. A downloaded adapter must keep the bundled value. |
 | `disclaimer` | Localized. Shown before sending. The app always shows the disclaimer of the adapter it shipped with, never a downloaded one. |
 
 Localized texts are plain objects keyed by language code: `{"sv": "…", "en": "…", "ru": "…", …}`, one key per app language (`en sv cs da de et es fr it lv lt hu nl nb pl pt ro fi el ru uk ar`). `sv` and `en` are required; a missing language falls back to English, then Swedish.
@@ -50,23 +50,24 @@ Municipalities edit their e-services. The submitter tolerates small changes and 
 - **Fields**: exact `key` + `control` first, then the same `key` with the same kind of input, then a control of the same `type` (`select`, `radio`, `text`, `textarea`, `hidden`, `checkbox`) or `control` class under a question whose label matches one of `labels` (`{"sv": ["Beskriv felet här"], "en": […]}`). Labels compare case- and diacritic-insensitively and ignore `*`, a trailing `:` and extra spaces.
 - **Options** (dropdowns, radios): exact value, then the visible text or value after the same normalisation, then `categories[].synonyms` or the field's `optionSynonyms` (`{"Ja": ["Ja tack"]}`, keyed by `yesValue`/`noValue`).
 - **Pages**: by `PageId`, or, if the id was renamed, by finding all of a page's fields on it. Pages without fields (the summary) are matched by id only.
-- **Drift**: anything else throws `SubmissionError.formChanged(FormDrift)` with `pageID`, `missing` (labels of fields or options Fixa can't fill, and of new required questions, the ones with a visible `*`) and a one-sentence `detail`. Network and server answers stay `transport`, `http`, `sessionLocked` and `serverValidation`.
+- **Drift**: anything else throws `SubmissionError.formChanged(FormDrift)` with `pageID`, `missing` (labels of fields or options Fixa can't fill, and of new required questions, the ones with a visible `*`) and a one-sentence `detail`. A page is checked before the photo is uploaded, so drift never leaves an orphan upload. 404 and 410 (the service moved or was renamed) are drift too. Network and server answers stay `transport`, `http`, `sessionLocked` and `serverValidation`.
+- **Blocked or sign-in**: before the final send, 401 and 403 become `blocked(status)`, and a sign-in, BankID or identification page becomes `loginRequired`. Neither is retried; the app stops sending and points to the municipality's web form.
 - **Session lost**: before the final send, a page with `sessionLockedMarker`, the platform's `GenericError` page, or a bounce back to `introPath` (the session expired) makes the submitter start over once from `introPath` with fresh cookies. A second loss surfaces as `sessionLocked` (lock) or `transport` (expiry).
-- **Final send**: posting the summary page is the one request that creates the case. It is sent exactly once. If it, or the ThankYou re-posts after it, time out, fail, redirect, or end on a page that shows neither a case number nor received-wording ("Tack", "tagit emot", "kvittens"), the submitter throws `SubmissionError.uncertain`. Nothing after that point is retried or restarted. `SubmissionError.isRetrySafe` is true only for `transport`, `http` and `unavailable`, which can only happen before the final send; the app must never resend an `uncertain` report automatically.
-- **Server down**: before the final send, 429 and any 5xx become `unavailable(status, retryAfter)` (`Retry-After` read as seconds or a date, capped at 24 h), and so does a maintenance page served with 200. A login page served with 200 is `formChanged`. Neither is ever read as a receipt.
+- **Final send**: posting the summary page is the one request that creates the case. It is sent exactly once; the caller's `beforeFinalSend` hook is awaited right before it, so the app can record "may have been sent" first. If it, or the ThankYou re-posts after it, time out, fail, redirect, or end on a page that shows neither a case number nor received-wording ("Tack", "tagit emot", "kvittens"), the submitter throws `SubmissionError.uncertain`. A receipt with a case number counts even if the page also carries maintenance wording. Nothing after that point is retried or restarted. `SubmissionError.isRetrySafe` is true only for `transport`, `http` and `unavailable`, which can only happen before the final send; the app must never resend an `uncertain` report automatically.
+- **Server down**: before the final send, 429 and any 5xx become `unavailable(status, retryAfter)` (`Retry-After` read as seconds or a date, capped at 24 h), and so does a maintenance page served with 200 (maintenance wording in its title or headline, or a page without the e-service's form). A maintenance banner on one of the adapter's own form pages does not stop a send. Neither is ever read as a receipt.
 - **Host**: requests go only to the adapter's host over https. Redirects off that host are not followed, and a form posting elsewhere is `formChanged`.
-- **Pace**: 400 ms between page requests, like a person moving through the form.
-- **Looks like the website**: Safari's User-Agent and headers, a WebKit-style multipart boundary and a camera-style photo name (`IMG_1234.jpg`). Nothing sent to the municipality names Fixa.
+- **Pace**: 400 ms between page requests.
+- **Same fields as the website**: requests carry Safari's User-Agent and the `Origin` and `Referer` headers a browser sends with the form, a WebKit-style multipart boundary and a camera-style photo name (`IMG_1234.jpg`), so the municipality receives the same report its own web page would send.
 - **Timeouts**: `SubmissionTimeouts.page` (30 s) for every page request, `SubmissionTimeouts.upload` (120 s) for the photo upload.
 
-`fixa-cli dry-run` exits 2 on drift (1 on any other failure), so you can tell "the form changed" from "the site was down". Run it by hand only, when a user reports a failed send or before changing an adapter: there is no scheduled job, so the municipality's e-service is never exercised automatically. When it reports drift, capture the new page, add the new texts to `labels`/`synonyms` or update `key`, and add a fixture test.
+`fixa-cli dry-run` exits 2 on drift (1 on any other failure), so you can tell "the form changed" from "the site was down". It walks the live e-service, so run it by hand only, after a user hit a changed form: there is no scheduled job, so the municipality's e-service is never exercised automatically. When it reports drift, capture the new page, add the new texts to `labels`/`synonyms` or update `key`, and add a fixture test.
 
 ## When a municipality changes its form
 
 The app downloads `adapters/<id>.json` and `adapters/status.json` from `main` on GitHub (raw.githubusercontent.com), each with its signature `<name>.sig`, only after a send has failed with `formChanged`, and at most every 15 minutes (`AdapterStore.refreshAfterFormChange`). Never on launch or on a timer. If a newer adapter is accepted, the app retries that send once (drift stops before the final step, so this can't create a second case). A downloaded adapter replaces the bundled one only if its signature verifies, it decodes, passes the same consistency checks as the bundled copy (`AdapterSpec.problems`), has the same `id`, a `specVersion` the app supports, and a `minAppBuild` no higher than the installed build. A status file is used only if its signature verifies. Otherwise the app keeps what it has. A fix that only needs JSON therefore needs no App Store release.
 
-1. **Notice.** A send that hits a changed form stops before the final step with a drift report, and the app offers e-mail instead. There is no automatic check against the live e-service: Fixa never sends test traffic to the municipality.
-2. **Status.** Set the adapter's `state` in `adapters/status.json` to `degraded` by hand and sign the file (below). Apps read it the next time a send hits the changed form and show their own banner on Home. The file carries only `state` and optional `updated` (`schema/status.schema.json`); there is no message field, the app words each state itself. Reports stay saved and can still go by e-mail.
+1. **Notice.** A send that hits a changed form stops before the final step with a drift report, and the app offers the municipality's own web form instead. There is no automatic check against the live e-service: Fixa never sends test traffic to the municipality.
+2. **Status.** Set the adapter's `state` in `adapters/status.json` to `degraded` by hand and sign the file (below). Apps read it the next time a send hits the changed form and show their own banner on Home. The file carries only `state` and optional `updated` (`schema/status.schema.json`); there is no message field, the app words each state itself. Reports stay saved and can still go in through the municipality's website.
 3. **Fix.** Run `swift run fixa-cli dry-run --save-html page.html` once locally, then update `key`, `labels` or `synonyms` in `adapters/<id>.json`, copy it into `FixaKit/Sources/FixaKit/Resources/adapters/`, sign it, and add a fixture test.
 4. **Push** to `main` and set the status back to `ok` (signed again). A phone picks up the new adapter the next time its send hits the changed form, and retries that send.
 
@@ -105,23 +106,22 @@ swift test
 
 ## Dry run against the live site
 
-`fixa-cli dry-run` fills every page with a report marked `TEST — ignorera` and stops at the summary page. No case is created; the session expires on its own.
+`fixa-cli dry-run` walks the **live** e-service on the municipality's server up to the summary page with a sample report, without a photo, and stops there. No case is created, but the municipality's server sees every request and keeps an unfinished session until it expires. Run it only by hand, after a user hit a changed form, to see what changed. Never in CI, never on a schedule. It stops at once if the e-service answers 401/403.
 
 ```sh
 cd FixaKit
 swift run fixa-cli dry-run                                   # street-light tile, point, reply wanted
-swift run fixa-cli dry-run --category lighting --category roads --no-point --feedback no
-swift run fixa-cli dry-run --all-categories --delay 5        # every category, one after another
-swift run fixa-cli dry-run --photo foto.jpg                  # also uploads the photo (to the unsent case)
+swift run fixa-cli dry-run --category lighting --no-point --feedback no
+swift run fixa-cli dry-run --save-html page.html             # keep the last page reached
 ```
 
-`fixa-cli submit --live --i-understand-this-creates-a-real-case [--photo foto.jpg] [--save-html receipt.html]` creates a **real** case. Only use it when you have agreed with the municipality to send a test case, then capture the receipt page as a new fixture.
+There is no live test submission: neither the CLI nor the app can send a test case.
 
 ## Capturing real pages
 
 Fixtures should be real pages, saved byte for byte. Two ways to get them:
 
-- **`fixa-cli dry-run`** (above) walks every page up to the summary without creating a case. Use it to check field keys and to capture form pages.
-- **App launch hook `-FixaLiveTest 1`** (DEBUG builds only). It seeds a report marked TEST and records every response to the app's `Caches/fixa-responses` folder. Sending is **real**: it creates a case with the municipality. Use it sparingly, only to capture pages that a dry run cannot reach (the ThankYou and receipt pages).
+- **`fixa-cli dry-run --save-html`** (above) walks the pages up to the summary without creating a case. Use it to check field keys and to capture form pages.
+- **Safari**, when you send a real report of your own through the website: save the ThankYou and receipt pages from there.
 
 Copy the captured pages into `FixaKit/Tests/FixaKitTests/Fixtures/` with a numbered name (e.g. `08-thankyou-processing.html`, `09-thankyou-receipt.html`) and add a parser or submitter test that replays them.

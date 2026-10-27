@@ -103,6 +103,50 @@ final class SubmissionRobustnessTests: XCTestCase {
         XCTAssertEqual(posts, 1)
     }
 
+    func testReceiptWithCaseNumberWinsOverMaintenanceBanner() async throws {
+        let banner = #"<div class="driftinfo"><p>Planerat underhåll söndag 2 nov 20–22. Tjänsten är tillfälligt otillgänglig då.</p></div>"#
+        let receiptPage = try fixture("09-thankyou-receipt").replacingOccurrences(of: "<main", with: banner + "<main")
+        XCTAssertTrue(receiptPage.contains("Planerat underhåll"))
+        let fake = ScriptedAbou([.init(method: "POST", urlContains: "PageId=SummaryPage", occurrence: 0,
+                                       fault: .html(receiptPage, at: "\(common)ThankYou.aspx?eServiceName=KSB&PageId=ThankYou"))])
+        let receipt = try await submit(fake)
+        XCTAssertEqual(receipt?.caseNumber, "261026-KSB-KS43")
+        let posts = await finalPosts(fake)
+        XCTAssertEqual(posts, 1)
+
+        // Even a maintenance headline does not undo a receipt that has a case number.
+        let headline = "<html><head><title>Planerat underhåll</title></head><body><main><p>Ärendenummer: KSB-777</p></main></body></html>"
+        let second = ScriptedAbou([.init(method: "POST", urlContains: "PageId=SummaryPage", occurrence: 0,
+                                         fault: .html(headline, at: "\(common)Receipt.aspx?eServiceName=KSB"))])
+        let other = try await submit(second)
+        XCTAssertEqual(other?.caseNumber, "KSB-777")
+    }
+
+    func testMaintenanceBannerOnExpectedPageDoesNotStopTheSend() async throws {
+        let banner = "<p>Planerat underhåll söndag 2 nov 20–22. Service unavailable during maintenance.</p>"
+        for (name, marker, at) in [
+            ("04-contact", "PageId=FaultReport", contactURL),
+            ("05-summary", "PageId=PersonalEmailInformation", summaryURL),
+        ] {
+            let html = try fixture(name).replacingOccurrences(of: "<main", with: banner + "<main")
+            XCTAssertNotEqual(html, try fixture(name), name)
+            let fake = ScriptedAbou([.init(method: "POST", urlContains: marker, occurrence: 1, fault: .html(html, at: at))])
+            let receipt = try await submit(fake)
+            XCTAssertEqual(receipt?.caseNumber, "KSB-123456", name)
+        }
+        // On the intro page too.
+        let intro = try fixture("01-intro").replacingOccurrences(of: "<main", with: banner + "<main")
+        let fake = ScriptedAbou([.init(method: "GET", urlContains: "/KSB", occurrence: 1, fault: .html(intro, at: "\(base)/KSB"))])
+        let receipt = try await submit(fake)
+        XCTAssertEqual(receipt?.caseNumber, "KSB-123456")
+    }
+
+    func testOutageDetection() {
+        XCTAssertTrue(AbouSubmitter.isOutagePage("<html><title>Service Unavailable</title><body><form id=\"MainForm\" action=\"x\"></form></body></html>"))
+        XCTAssertTrue(AbouSubmitter.isOutagePage("<html><body><p>Planerat underhåll pågår.</p></body></html>"))
+        XCTAssertFalse(AbouSubmitter.isOutagePage("<html><title>Felanmälan</title><body><form id=\"MainForm\" action=\"x\"><p>Planerat underhåll i helgen</p></form></body></html>"))
+    }
+
     func testLoginPageAfterFinalSendIsUncertain() async throws {
         let html = "<html><title>Logga in</title><body><p>Tack för att du använder e-tjänsterna.</p><form action=\"/web/login.aspx\"><input type=\"password\" name=\"pw\"></form></body></html>"
         let fake = ScriptedAbou([.init(method: "POST", urlContains: "PageId=SummaryPage", occurrence: 0,
@@ -113,12 +157,12 @@ final class SubmissionRobustnessTests: XCTestCase {
         XCTAssertEqual(posts, 1)
     }
 
-    func testLoginPageBeforeFinalSendIsNotRetried() async throws {
+    func testLoginPageBeforeFinalSendIsLoginRequired() async throws {
         let html = "<html><body><form method=\"post\" action=\"./login.aspx\"><input type=\"hidden\" name=\"__VIEWSTATE\" value=\"x\" /><input type=\"password\" name=\"pw\"></form></body></html>"
         let fake = ScriptedAbou([.init(method: "POST", urlContains: "PageId=FaultReport", occurrence: 1,
                                        fault: .html(html, at: "\(base)/web/login.aspx?RedirectPage=x"))])
         let error = try await expectError(fake)
-        guard case .formChanged = error else { return XCTFail("expected .formChanged, got \(error)") }
+        XCTAssertEqual(error, .loginRequired, "a sign-in requirement is not a changed form")
         XCTAssertFalse(error.isRetrySafe)
         let posts = await finalPosts(fake)
         XCTAssertEqual(posts, 0)
@@ -260,7 +304,7 @@ final class SubmissionRobustnessTests: XCTestCase {
         }
         let report = requests.first { $0.httpMethod == "POST" && $0.url!.absoluteString.contains("PageId=FaultReport") }!
         let posted = String(decoding: report.httpBody!, as: UTF8.self).replacingOccurrences(of: "+", with: " ").removingPercentEncoding!
-        XCTAssertTrue(posted.contains("Översatt från ukrainska:\nLampan lyser inte\n\nUpptäckt: "), posted)
+        XCTAssertTrue(posted.contains("Översatt från ukrainska:\nLampan lyser inte\n\nAnmälan skriven: "), posted)
     }
 
     // MARK: - Politeness

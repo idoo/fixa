@@ -6,7 +6,6 @@ struct ReceiptScreen: View {
     @Environment(AppModel.self) private var model
     @Environment(\.locale) private var locale
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @Environment(\.openURL) private var openURL
 
     var body: some View {
         let sent = model.sent ?? SentReport(caseNumber: nil, date: .now, isDryRun: false)
@@ -66,8 +65,7 @@ struct ReceiptScreen: View {
     }
 
     /// The final step went out but no confirmation came back. Never retried on its own, and no
-    /// resend from here: the advice is to wait and check. Sending again lives in the report's
-    /// Sent reports detail, behind a warning.
+    /// resend from here: sending again lives in the report's Sent reports detail, behind a warning.
     private func maybeSentContent(_ sent: SentReport) -> some View {
         VStack(spacing: Fx.Space.xl) {
             FxBadge(systemImage: "questionmark.circle", fill: Fx.Color.Pastel.sky, side: 64)
@@ -83,39 +81,16 @@ struct ReceiptScreen: View {
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
                 Text(sent.historyID.map { model.wantsReply($0) } == true
-                    ? String(localized: "Wait a day and check your e-mail for a confirmation from \(spec.municipality.name).", bundle: L10n.bundle, locale: L10n.locale)
-                    : String(localized: "Wait a day and see if the problem gets fixed. If you're unsure, call \(spec.municipality.name) and ask.", bundle: L10n.bundle, locale: L10n.locale))
+                    ? String(localized: "You asked for a reply, so the kommun answers by e-mail. If you're unsure whether it arrived, ask the servicecenter.", bundle: L10n.bundle, locale: L10n.locale)
+                    : String(localized: "If you're unsure whether it arrived, ask the servicecenter.", bundle: L10n.bundle, locale: L10n.locale))
                     .font(Fx.Font.callout)
                     .foregroundStyle(Fx.Color.ink2)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
             }
             VStack(spacing: Fx.Space.l) {
-                if let call = serviceCentreRow {
-                    call
-                }
-                if let id = sent.historyID, let text = model.reportText(for: id) {
-                    FxCopyButton(title: String(localized: "Copy report text", bundle: L10n.bundle, locale: L10n.locale), value: text)
-                }
+                ServiceCentreHelp(spec: spec, alignment: .center)
                 sentReportsButton
-            }
-        }
-    }
-
-    /// The municipality's service centre, from the adapter's contacts: the person to ask whether
-    /// the report arrived. Nil when the adapter lists none.
-    private var serviceCentreRow: FxCallRow? {
-        guard let contact = spec.emergency?.contacts.first(where: { $0.id == "servicecenter" }) else { return nil }
-        let digits = contact.phone.filter(\.isNumber)
-        // Number first and unbreakable (NBSP, non-breaking hyphen): if the line wraps, only the name moves.
-        let number = contact.phone.replacingOccurrences(of: " ", with: "\u{00A0}").replacingOccurrences(of: "-", with: "\u{2011}")
-        return FxCallRow(
-            title: String(localized: "Ask if it arrived", bundle: L10n.bundle, locale: L10n.locale),
-            detail: "\(number.ltrIsolated) · \(contact.title.resolve(L10n.locale))",
-            accessibilityValue: "\(contact.phone), \(contact.title.resolve(L10n.locale))"
-        ) {
-            if let url = URL(string: "tel:\(digits)") {
-                openURL(url)
             }
         }
     }
@@ -169,11 +144,7 @@ struct ReceiptScreen: View {
 
             if !sent.isDryRun {
                 VStack(spacing: Fx.Space.l) {
-                    Text(nextStep)
-                        .font(Fx.Font.body)
-                        .foregroundStyle(Fx.Color.ink2)
-                        .multilineTextAlignment(.center)
-                        .fixedSize(horizontal: false, vertical: true)
+                    kommunReceipt(sent.kommunMessage)
                     if model.draft.wantsFeedback, locale.language.languageCode != .swedish {
                         Text("The reply will be in Swedish. You can open it in Translate.")
                             .font(Fx.Font.callout)
@@ -186,10 +157,101 @@ struct ReceiptScreen: View {
             }
         }
     }
+}
 
-    private var nextStep: String {
-        model.draft.wantsFeedback
-            ? String(localized: "They pass it to the right team and reply by e-mail.", bundle: L10n.bundle, locale: L10n.locale)
-            : String(localized: "They pass it to the right team.", bundle: L10n.bundle, locale: L10n.locale)
+private extension ReceiptScreen {
+    /// The kommun's own words from its receipt page, quoted and attributed; never Fixa speaking for it.
+    @ViewBuilder
+    func kommunReceipt(_ message: String?) -> some View {
+        if let message {
+            VStack(alignment: .leading, spacing: Fx.Space.xs) {
+                Text("Värmdö kommun's receipt")
+                    .font(Fx.Font.footnote.weight(.semibold))
+                    .foregroundStyle(Fx.Color.ink2)
+                Text(message)
+                    .font(Fx.Font.body)
+                    .foregroundStyle(Fx.Color.ink)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .textSelection(.enabled)
+                    .environment(\.locale, Locale(identifier: "sv_SE"))
+            }
+            .padding(.leading, Fx.Space.m)
+            .overlay(alignment: .leading) {
+                Rectangle()
+                    .fill(Fx.Color.line)
+                    .frame(width: 2)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityElement(children: .combine)
+        } else {
+            Text("Värmdö kommun has your report.")
+                .font(Fx.Font.body)
+                .foregroundStyle(Fx.Color.ink2)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
+/// Who to ask whether an unconfirmed report arrived: the kommun's servicecenter. A call button
+/// only while it is open (per the adapter's hours), otherwise its opening hours. Empty when the
+/// adapter lists no servicecenter.
+struct ServiceCentreHelp: View {
+    let spec: AdapterSpec
+    var alignment: TextAlignment = .leading
+    @Environment(\.openURL) private var openURL
+
+    private static let contactID = "servicecenter"
+
+    var body: some View {
+        if let emergency = spec.emergency,
+           let contact = emergency.contacts.first(where: { $0.id == Self.contactID }) {
+            // Re-evaluated each minute so the button disappears at closing time.
+            TimelineView(.everyMinute) { context in
+                if EmergencyRouter.isOpen(contactID: Self.contactID, at: context.date, emergency: emergency) {
+                    callRow(contact)
+                } else if let hours = Self.hoursText(emergency) {
+                    Text(String(localized: "\(contact.title.resolve(L10n.locale)) is open \(hours).", bundle: L10n.bundle, locale: L10n.locale))
+                        .font(Fx.Font.callout)
+                        .foregroundStyle(Fx.Color.ink2)
+                        .multilineTextAlignment(alignment)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+    }
+
+    private func callRow(_ contact: AdapterSpec.EmergencyContact) -> FxCallRow {
+        let digits = contact.phone.filter(\.isNumber)
+        // Number first and unbreakable (NBSP, non-breaking hyphen): if the line wraps, only the name moves.
+        let number = contact.phone.replacingOccurrences(of: " ", with: "\u{00A0}").replacingOccurrences(of: "-", with: "\u{2011}")
+        return FxCallRow(
+            title: String(localized: "Ask if it arrived", bundle: L10n.bundle, locale: L10n.locale),
+            detail: "\(number.ltrIsolated) · \(contact.title.resolve(L10n.locale))",
+            accessibilityValue: "\(contact.phone), \(contact.title.resolve(L10n.locale))"
+        ) {
+            if let url = URL(string: "tel:\(digits)") {
+                openURL(url)
+            }
+        }
+    }
+
+    /// "Mon–Thu 08:00–17:00, Fri 08:00–13:00" from the adapter's rules for the servicecenter.
+    static func hoursText(_ emergency: AdapterSpec.Emergency) -> String? {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.locale = L10n.locale
+        let symbols = calendar.shortStandaloneWeekdaySymbols
+        // ISO 1 = Monday … 7 = Sunday; the symbols start at Sunday.
+        func day(_ iso: Int) -> String { symbols[iso % 7] }
+        let parts = emergency.rules.filter { $0.contactID == contactID }.compactMap { rule -> String? in
+            let days = rule.isoWeekdays.filter { (1...7).contains($0) }.sorted()
+            guard let first = days.first, let last = days.last else { return nil }
+            let isRun = days.count > 1 && last - first == days.count - 1
+            let dayText = isRun ? "\(day(first))–\(day(last))" : days.map(day).joined(separator: ", ")
+            let time = rule.from.map { "\($0)–\(rule.until)" }
+                ?? String(localized: "until \(rule.until)", bundle: L10n.bundle, locale: L10n.locale)
+            return "\(dayText) \(time)"
+        }
+        return parts.isEmpty ? nil : parts.joined(separator: ", ")
     }
 }

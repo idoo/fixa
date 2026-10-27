@@ -1,6 +1,6 @@
 {
   "specVersion": 1,
-  "minAppBuild": 3,
+  "minAppBuild": 9,
   "id": "se.varmdo.ksb",
   "municipality": {
     "name": "Värmdö kommun",
@@ -16,7 +16,11 @@
         "minLongitude": 18.25,
         "maxLongitude": 19.05
       }
-    }
+    },
+    "geocoderNames": [
+      "Värmdö",
+      "Värmdö kommun"
+    ]
   },
   "channel": {
     "kind": "abou",
@@ -746,13 +750,36 @@
         "el": "Ύδρευση ή αποχέτευση",
         "hu": "Víz vagy csatorna",
         "cs": "Voda nebo kanalizace"
+      },
+      "responsibility": {
+        "sv": "Gäller kommunalt vatten och avlopp. Läckor på den egna tomten och fel inne i huset ansvarar fastighetsägaren för. Hyr du, kontakta din hyresvärd.",
+        "en": "Applies to the municipal water and sewer network. Leaks on your own property and faults inside the house are the property owner's responsibility. If you rent, contact your landlord.",
+        "fi": "Koskee kunnan vesi- ja viemäriverkkoa. Omalla tontilla olevista vuodoista ja talon sisäisistä vioista vastaa kiinteistön omistaja. Jos asut vuokralla, ota yhteyttä vuokranantajaan.",
+        "ar": "يخص شبكة المياه والصرف الصحي التابعة للبلدية. التسربات داخل عقارك والأعطال داخل المنزل هي مسؤولية مالك العقار. إذا كنت مستأجرًا، فتواصل مع المؤجر.",
+        "uk": "Стосується комунальної мережі водопостачання та каналізації. За витоки на власній ділянці та несправності в будинку відповідає власник нерухомості. Якщо ви орендуєте житло, зверніться до орендодавця.",
+        "pl": "Dotyczy gminnej sieci wodociągowej i kanalizacyjnej. Za wycieki na własnej działce i usterki w budynku odpowiada właściciel nieruchomości. Jeśli wynajmujesz, skontaktuj się z wynajmującym.",
+        "ru": "Относится к муниципальной сети водоснабжения и канализации. За утечки на собственном участке и неисправности в доме отвечает владелец недвижимости. Если вы снимаете жильё, обратитесь к арендодателю.",
+        "de": "Gilt für das kommunale Wasser- und Abwassernetz. Für Lecks auf dem eigenen Grundstück und Schäden im Haus ist der Eigentümer zuständig. Wenn Sie zur Miete wohnen, wenden Sie sich an Ihren Vermieter.",
+        "fr": "Concerne le réseau communal d'eau et d'assainissement. Les fuites sur votre propre terrain et les pannes à l'intérieur de la maison relèvent du propriétaire. Si vous êtes locataire, contactez votre bailleur.",
+        "es": "Se refiere a la red municipal de agua y alcantarillado. Las fugas en tu propia parcela y las averías dentro de la casa son responsabilidad del propietario. Si vives de alquiler, contacta con tu arrendador.",
+        "it": "Riguarda la rete comunale di acqua e fognature. Le perdite sul proprio terreno e i guasti all'interno della casa sono responsabilità del proprietario. Se sei in affitto, contatta il locatore.",
+        "pt": "Aplica-se à rede municipal de água e saneamento. As fugas no seu próprio terreno e as avarias dentro de casa são da responsabilidade do proprietário. Se arrenda a casa, contacte o senhorio.",
+        "nl": "Geldt voor het gemeentelijke water- en rioleringsnet. Lekken op uw eigen perceel en storingen in huis zijn de verantwoordelijkheid van de eigenaar. Huurt u, neem dan contact op met uw verhuurder.",
+        "da": "Gælder det kommunale vand- og kloaknet. Utætheder på din egen grund og fejl inde i huset er ejerens ansvar. Bor du til leje, så kontakt din udlejer.",
+        "nb": "Gjelder det kommunale vann- og avløpsnettet. Lekkasjer på egen tomt og feil inne i huset er eierens ansvar. Leier du, kontakt utleieren din.",
+        "et": "Kehtib valla vee- ja kanalisatsioonivõrgu kohta. Lekete eest oma krundil ja rikete eest majas vastutab kinnistu omanik. Kui elate üürikorteris, võtke ühendust üürileandjaga.",
+        "lv": "Attiecas uz pašvaldības ūdensapgādes un kanalizācijas tīklu. Par noplūdēm savā zemesgabalā un bojājumiem mājā atbild īpašuma īpašnieks. Ja īrējat mājokli, sazinieties ar izīrētāju.",
+        "lt": "Taikoma savivaldybės vandentiekio ir nuotekų tinklui. Už nuotėkius savo sklype ir gedimus name atsako nekilnojamojo turto savininkas. Jei nuomojatės, kreipkitės į nuomotoją.",
+        "ro": "Se referă la rețeaua municipală de apă și canalizare. De scurgerile de pe propriul teren și de defecțiunile din casă răspunde proprietarul. Dacă locuiți cu chirie, contactați proprietarul locuinței.",
+        "el": "Αφορά το δημοτικό δίκτυο ύδρευσης και αποχέτευσης. Για διαρροές στο δικό σας οικόπεδο και βλάβες μέσα στο σπίτι ευθύνεται ο ιδιοκτήτης. Αν μένετε στο ενοίκιο, επικοινωνήστε με τον ιδιοκτήτη.",
+        "hu": "Az önkormányzati víz- és csatornahálózatra vonatkozik. A saját telken lévő szivárgásokért és a házon belüli hibákért az ingatlan tulajdonosa felel. Ha bérlő, forduljon a bérbeadóhoz.",
+        "cs": "Týká se obecní vodovodní a kanalizační sítě. Za úniky na vlastním pozemku a závady uvnitř domu odpovídá vlastník nemovitosti. Pokud bydlíte v nájmu, obraťte se na pronajímatele."
       }
     },
     {
       "id": "other",
       "symbol": "ellipsis.circle",
       "categoryID": "other",
-      "swedishSummary": "Övrigt",
       "title": {
         "sv": "Något annat",
         "en": "Something else",
@@ -776,7 +803,141 @@
         "el": "Κάτι άλλο",
         "hu": "Valami más",
         "cs": "Něco jiného"
-      }
+      },
+      "responsibility": {
+        "sv": "Återvinningsstationer, utebliven sophämtning, fel i kommunens hyreslokaler och synpunkter har egna e-tjänster hos kommunen.",
+        "en": "Recycling stations, missed bin collections, faults in rented municipal premises and feedback have their own e-services at the municipality.",
+        "fi": "Kierrätysasemille, tyhjentämättä jääneille jäteastioille, kunnan vuokratilojen vioille ja palautteelle on kunnalla omat sähköiset palvelunsa.",
+        "ar": "لمحطات إعادة التدوير وعدم جمع النفايات وأعطال مباني البلدية المؤجرة والملاحظات خدمات إلكترونية خاصة بها لدى البلدية.",
+        "uk": "Для пунктів сортування відходів, невивезеного сміття, несправностей в орендованих приміщеннях комуни та відгуків у комуни є окремі електронні послуги.",
+        "pl": "Stacje recyklingu, nieodebrane śmieci, usterki w wynajmowanych lokalach gminy oraz uwagi mają w gminie osobne e-usługi.",
+        "ru": "Для пунктов сортировки отходов, невывезенного мусора, неисправностей в арендуемых помещениях коммуны и отзывов у коммуны есть отдельные электронные услуги.",
+        "de": "Für Recyclingstationen, ausgefallene Müllabfuhr, Mängel in gemieteten Räumen der Gemeinde und Rückmeldungen hat die Gemeinde eigene E-Services.",
+        "fr": "Les points de recyclage, les collectes de déchets manquées, les pannes dans les locaux loués à la commune et les avis ont leurs propres services en ligne auprès de la commune.",
+        "es": "Los puntos de reciclaje, la recogida de basura no realizada, las averías en locales municipales alquilados y las opiniones tienen sus propios servicios electrónicos en el municipio.",
+        "it": "Per le stazioni di riciclo, la raccolta rifiuti mancata, i guasti nei locali comunali in affitto e le segnalazioni il comune ha servizi online dedicati.",
+        "pt": "Os ecopontos, a recolha de lixo que não foi feita, as avarias em espaços municipais arrendados e as sugestões têm serviços online próprios no município.",
+        "nl": "Voor recyclingstations, niet opgehaald afval, storingen in gehuurde gemeentelijke ruimtes en feedback heeft de gemeente eigen e-diensten.",
+        "da": "Genbrugsstationer, manglende affaldsafhentning, fejl i kommunens lejede lokaler og synspunkter har deres egne e-tjenester hos kommunen.",
+        "nb": "Returpunkter, uteblitt søppeltømming, feil i kommunens utleielokaler og tilbakemeldinger har egne e-tjenester hos kommunen.",
+        "et": "Taaskasutuspunktide, tühjendamata prügikastide, valla üüripindade rikete ja tagasiside jaoks on vallal eraldi e-teenused.",
+        "lv": "Šķirošanas punktiem, neizvestiem atkritumiem, bojājumiem pašvaldības īrētajās telpās un atsauksmēm pašvaldībai ir atsevišķi e-pakalpojumi.",
+        "lt": "Rūšiavimo aikštelėms, neišvežtoms atliekoms, savivaldybės nuomojamų patalpų gedimams ir atsiliepimams savivaldybė turi atskiras e. paslaugas.",
+        "ro": "Pentru stațiile de reciclare, gunoiul neridicat, defecțiunile din spațiile închiriate ale comunei și sugestii, comuna are servicii online separate.",
+        "el": "Για σημεία ανακύκλωσης, αποκομιδή απορριμμάτων που δεν έγινε, βλάβες σε μισθωμένους χώρους του δήμου και σχόλια, ο δήμος έχει ξεχωριστές ηλεκτρονικές υπηρεσίες.",
+        "hu": "A szelektív gyűjtőpontokra, az elmaradt szemétszállításra, az önkormányzati bérlemények hibáira és a véleményekre az önkormányzatnak külön e-szolgáltatásai vannak.",
+        "cs": "Pro sběrná místa tříděného odpadu, nevyvezený odpad, závady v pronajatých prostorách obce a připomínky má obec samostatné e-služby."
+      },
+      "links": [
+        {
+          "title": {
+            "sv": "Återvinningsstationer",
+            "en": "Recycling stations",
+            "fi": "Kierrätysasemat",
+            "ar": "محطات إعادة التدوير",
+            "uk": "Пункти сортування відходів",
+            "pl": "Stacje recyklingu",
+            "ru": "Пункты сортировки отходов",
+            "de": "Recyclingstationen",
+            "fr": "Points de recyclage",
+            "es": "Puntos de reciclaje",
+            "it": "Stazioni di riciclo",
+            "pt": "Ecopontos",
+            "nl": "Recyclingstations",
+            "da": "Genbrugsstationer",
+            "nb": "Returpunkter",
+            "et": "Taaskasutuspunktid",
+            "lv": "Šķirošanas punkti",
+            "lt": "Rūšiavimo aikštelės",
+            "ro": "Stații de reciclare",
+            "el": "Σημεία ανακύκλωσης",
+            "hu": "Szelektív gyűjtőpontok",
+            "cs": "Sběrná místa tříděného odpadu"
+          },
+          "url": "https://service.varmdo.se/FELATER"
+        },
+        {
+          "title": {
+            "sv": "Utebliven sophämtning",
+            "en": "Missed bin collection",
+            "fi": "Tyhjentämättä jäänyt jäteastia",
+            "ar": "عدم جمع النفايات",
+            "uk": "Сміття не вивезли",
+            "pl": "Nieodebrane śmieci",
+            "ru": "Мусор не вывезли",
+            "de": "Ausgefallene Müllabfuhr",
+            "fr": "Collecte des déchets manquée",
+            "es": "Recogida de basura no realizada",
+            "it": "Raccolta rifiuti mancata",
+            "pt": "Recolha de lixo não feita",
+            "nl": "Afval niet opgehaald",
+            "da": "Manglende affaldsafhentning",
+            "nb": "Uteblitt søppeltømming",
+            "et": "Prügi jäi viimata",
+            "lv": "Atkritumi nav izvesti",
+            "lt": "Neišvežtos atliekos",
+            "ro": "Gunoi neridicat",
+            "el": "Δεν έγινε αποκομιδή απορριμμάτων",
+            "hu": "Elmaradt szemétszállítás",
+            "cs": "Nevyvezený odpad"
+          },
+          "url": "https://service.varmdo.se/anmutbsop"
+        },
+        {
+          "title": {
+            "sv": "Fel i hyreslokaler",
+            "en": "Faults in rented municipal premises",
+            "fi": "Viat kunnan vuokratiloissa",
+            "ar": "أعطال في مباني البلدية المؤجرة",
+            "uk": "Несправності в орендованих приміщеннях комуни",
+            "pl": "Usterki w wynajmowanych lokalach gminy",
+            "ru": "Неисправности в арендуемых помещениях коммуны",
+            "de": "Mängel in gemieteten Räumen der Gemeinde",
+            "fr": "Pannes dans les locaux loués à la commune",
+            "es": "Averías en locales municipales alquilados",
+            "it": "Guasti nei locali comunali in affitto",
+            "pt": "Avarias em espaços municipais arrendados",
+            "nl": "Storingen in gehuurde gemeentelijke ruimtes",
+            "da": "Fejl i kommunens lejede lokaler",
+            "nb": "Feil i kommunens utleielokaler",
+            "et": "Rikked valla üüripindadel",
+            "lv": "Bojājumi pašvaldības īrētajās telpās",
+            "lt": "Gedimai savivaldybės nuomojamose patalpose",
+            "ro": "Defecțiuni în spațiile închiriate ale comunei",
+            "el": "Βλάβες σε μισθωμένους χώρους του δήμου",
+            "hu": "Hibák az önkormányzati bérleményekben",
+            "cs": "Závady v pronajatých prostorách obce"
+          },
+          "url": "https://service.varmdo.se/FKV"
+        },
+        {
+          "title": {
+            "sv": "Synpunkter, förslag eller klagomål",
+            "en": "Feedback, suggestions or complaints",
+            "fi": "Palaute, ehdotukset tai valitukset",
+            "ar": "ملاحظات أو اقتراحات أو شكاوى",
+            "uk": "Відгуки, пропозиції чи скарги",
+            "pl": "Uwagi, propozycje lub skargi",
+            "ru": "Отзывы, предложения или жалобы",
+            "de": "Rückmeldungen, Vorschläge oder Beschwerden",
+            "fr": "Avis, suggestions ou réclamations",
+            "es": "Opiniones, sugerencias o quejas",
+            "it": "Opinioni, proposte o reclami",
+            "pt": "Opiniões, sugestões ou reclamações",
+            "nl": "Feedback, ideeën of klachten",
+            "da": "Synspunkter, forslag eller klager",
+            "nb": "Tilbakemeldinger, forslag eller klager",
+            "et": "Tagasiside, ettepanekud või kaebused",
+            "lv": "Atsauksmes, ierosinājumi vai sūdzības",
+            "lt": "Atsiliepimai, pasiūlymai ar skundai",
+            "ro": "Păreri, propuneri sau reclamații",
+            "el": "Σχόλια, προτάσεις ή παράπονα",
+            "hu": "Vélemény, javaslat vagy panasz",
+            "cs": "Připomínky, návrhy nebo stížnosti"
+          },
+          "url": "https://www.varmdo.se/kommunochpolitik/insynochdialog/lamnasynpunktforslagellerklagomal.4.18c983316e0536cb18deeba.html"
+        }
+      ]
     }
   ],
   "validation": {
@@ -852,6 +1013,7 @@
           3,
           4
         ],
+        "from": "08:00",
         "until": "17:00",
         "contactID": "servicecenter"
       },
@@ -859,6 +1021,7 @@
         "isoWeekdays": [
           5
         ],
+        "from": "08:00",
         "until": "13:00",
         "contactID": "servicecenter"
       }
@@ -866,31 +1029,32 @@
     "defaultContactID": "sos",
     "timeZone": "Europe/Stockholm",
     "note": {
-      "sv": "Ring bara vid akuta fel på vatten och avlopp, till exempel om vattnet är borta, avloppet är stopp eller det översvämmar. Servicecenter svarar måndag–torsdag före 17.00 och fredag före 13.00. Övrig tid svarar VA-jouren via SOS Alarm.",
-      "en": "Call only for urgent water or sewer problems, such as no water, a blocked sewer or flooding. The service centre answers Monday–Thursday before 17:00 and Friday before 13:00. At other times the on-call service answers via SOS Alarm.",
-      "fi": "Soita vain kiireellisissä vesi- ja viemärivioissa, esimerkiksi jos vettä ei tule, viemäri on tukossa tai jokin tulvii. Palvelukeskus vastaa maanantaista torstaihin ennen klo 17 ja perjantaina ennen klo 13. Muina aikoina vastaa päivystys SOS Alarmin kautta.",
-      "ar": "اتصل فقط عند الأعطال العاجلة في المياه أو الصرف الصحي، مثل انقطاع المياه أو انسداد الصرف أو حدوث فيضان. يرد مركز الخدمة من الاثنين إلى الخميس قبل الساعة 17:00 ويوم الجمعة قبل الساعة 13:00. في الأوقات الأخرى ترد خدمة الطوارئ عبر SOS Alarm.",
-      "uk": "Телефонуйте лише в разі термінових проблем з водою чи каналізацією: немає води, засмітилася каналізація або підтоплення. Сервісний центр відповідає з понеділка по четвер до 17:00 і в п'ятницю до 13:00. В інший час відповідає чергова служба через SOS Alarm.",
-      "pl": "Dzwoń tylko w pilnych sprawach dotyczących wody lub kanalizacji, np. gdy nie ma wody, kanalizacja jest zatkana albo coś zalewa. Centrum obsługi odbiera od poniedziałku do czwartku przed 17:00 i w piątek przed 13:00. W pozostałych godzinach odbiera dyżur przez SOS Alarm.",
-      "ru": "Звоните только при срочных проблемах с водоснабжением или канализацией, например если нет воды, засорилась канализация или произошло затопление. Сервисный центр отвечает с понедельника по четверг до 17:00 и в пятницу до 13:00. В остальное время отвечает дежурная служба через SOS Alarm.",
-      "de": "Rufen Sie nur bei dringenden Problemen mit Wasser oder Abwasser an, etwa wenn kein Wasser kommt, der Abfluss verstopft ist oder etwas überflutet ist. Das Servicecenter ist Montag bis Donnerstag bis 17:00 Uhr und Freitag bis 13:00 Uhr erreichbar. Zu anderen Zeiten antwortet der Bereitschaftsdienst über SOS Alarm.",
-      "fr": "N'appelez que pour un problème urgent d'eau ou d'assainissement, par exemple une coupure d'eau, un égout bouché ou une inondation. Le centre de services répond du lundi au jeudi avant 17 h et le vendredi avant 13 h. En dehors de ces horaires, le service d'astreinte répond via SOS Alarm.",
-      "es": "Llama solo por problemas urgentes de agua o alcantarillado, como falta de agua, un desagüe atascado o una inundación. El centro de atención responde de lunes a jueves antes de las 17:00 y los viernes antes de las 13:00. El resto del tiempo responde el servicio de guardia a través de SOS Alarm.",
-      "it": "Chiama solo per problemi urgenti di acqua o fognature, ad esempio se manca l'acqua, la fognatura è bloccata o c'è un allagamento. Il centro servizi risponde dal lunedì al giovedì prima delle 17:00 e il venerdì prima delle 13:00. Negli altri orari risponde il servizio di reperibilità tramite SOS Alarm.",
-      "pt": "Ligue apenas para problemas urgentes de água ou saneamento, como falta de água, esgoto entupido ou inundação. O centro de atendimento atende de segunda a quinta-feira antes das 17:00 e à sexta-feira antes das 13:00. Fora deste horário, atende o piquete via SOS Alarm.",
-      "nl": "Bel alleen bij dringende problemen met water of riolering, zoals geen water, een verstopt riool of een overstroming. Het servicecentrum is bereikbaar maandag t/m donderdag tot 17:00 en vrijdag tot 13:00. Op andere tijden neemt de storingsdienst op via SOS Alarm.",
-      "da": "Ring kun ved akutte problemer med vand eller kloak, for eksempel hvis der ikke er vand, kloakken er stoppet, eller der er oversvømmelse. Servicecentret svarer mandag–torsdag før kl. 17.00 og fredag før kl. 13.00. Uden for disse tider svarer vagttjenesten via SOS Alarm.",
-      "nb": "Ring bare ved akutte problemer med vann eller avløp, for eksempel hvis du ikke har vann, avløpet er tett eller det er oversvømmelse. Servicesenteret svarer mandag–torsdag før kl. 17.00 og fredag før kl. 13.00. Ellers svarer vakttjenesten via SOS Alarm.",
-      "et": "Helistage ainult kiireloomuliste vee- või kanalisatsiooniprobleemide korral, näiteks kui vett pole, kanalisatsioon on ummistunud või on üleujutus. Teeninduskeskus vastab esmaspäevast neljapäevani enne kella 17.00 ja reedel enne kella 13.00. Muul ajal vastab valveteenistus SOS Alarmi kaudu.",
-      "lv": "Zvaniet tikai steidzamu ūdensapgādes vai kanalizācijas problēmu gadījumā, piemēram, ja nav ūdens, ir aizsprostota kanalizācija vai notiek applūšana. Klientu centrs atbild no pirmdienas līdz ceturtdienai līdz 17:00 un piektdien līdz 13:00. Citā laikā atbild dežūrdienests ar SOS Alarm starpniecību.",
-      "lt": "Skambinkite tik dėl skubių vandens ar nuotekų problemų, pavyzdžiui, jei nėra vandens, užsikimšo kanalizacija ar kilo potvynis. Aptarnavimo centras atsiliepia pirmadienį–ketvirtadienį iki 17:00 ir penktadienį iki 13:00. Kitu laiku atsiliepia budėjimo tarnyba per SOS Alarm.",
-      "ro": "Sunați doar pentru probleme urgente de apă sau canalizare, de exemplu lipsa apei, o canalizare înfundată sau o inundație. Centrul de servicii răspunde de luni până joi înainte de ora 17:00 și vineri înainte de ora 13:00. În rest, răspunde serviciul de permanență prin SOS Alarm.",
-      "el": "Καλέστε μόνο για επείγοντα προβλήματα ύδρευσης ή αποχέτευσης, όπως διακοπή νερού, βουλωμένη αποχέτευση ή πλημμύρα. Το κέντρο εξυπηρέτησης απαντά Δευτέρα έως Πέμπτη πριν τις 17:00 και Παρασκευή πριν τις 13:00. Τις υπόλοιπες ώρες απαντά η υπηρεσία εφημερίας μέσω SOS Alarm.",
-      "hu": "Csak sürgős víz- vagy csatornahiba esetén hívja, például ha nincs víz, eldugult a csatorna vagy áradás van. Az ügyfélszolgálat hétfőtől csütörtökig 17:00 előtt, pénteken 13:00 előtt fogadja a hívásokat. Más időpontokban az ügyelet válaszol az SOS Alarmon keresztül.",
-      "cs": "Volejte jen při naléhavých problémech s vodou nebo kanalizací, například když neteče voda, je ucpaná kanalizace nebo došlo k zaplavení. Zákaznické centrum odpovídá v pondělí až čtvrtek do 17:00 a v pátek do 13:00. V ostatní době odpovídá pohotovostní služba přes SOS Alarm."
-    }
+      "sv": "Ring bara vid akuta fel på vatten och avlopp, till exempel om vattnet är borta, avloppet är stopp eller det översvämmar. Servicecenter svarar vardagar 08.00–17.00 (fredagar 08.00–13.00). Övrig tid och på helgdagar svarar VA-jouren via SOS Alarm.",
+      "en": "Call only for urgent water or sewer problems, such as no water, a blocked sewer or flooding. The service centre answers on weekdays 08:00–17:00 (Fridays 08:00–13:00). At other times and on public holidays, the water and sewer on-call service answers via SOS Alarm.",
+      "fi": "Soita vain kiireellisissä vesi- ja viemärivioissa, esimerkiksi jos vettä ei tule, viemäri on tukossa tai jokin tulvii. Palvelukeskus vastaa arkisin klo 8–17 (perjantaisin klo 8–13). Muina aikoina ja pyhäpäivinä vesihuollon päivystys vastaa SOS Alarmin kautta.",
+      "ar": "اتصل فقط عند الأعطال العاجلة في المياه أو الصرف الصحي، مثل انقطاع المياه أو انسداد الصرف أو حدوث فيضان. يرد مركز الخدمة في أيام العمل من 08:00 إلى 17:00 (الجمعة من 08:00 إلى 13:00). في الأوقات الأخرى وأيام العطل الرسمية ترد خدمة طوارئ المياه والصرف الصحي عبر SOS Alarm.",
+      "uk": "Телефонуйте лише в разі термінових проблем з водою чи каналізацією: немає води, засмітилася каналізація або підтоплення. Сервісний центр відповідає в робочі дні з 08:00 до 17:00 (у п'ятницю з 08:00 до 13:00). В інший час і у святкові дні відповідає чергова служба водопостачання через SOS Alarm.",
+      "pl": "Dzwoń tylko w pilnych sprawach dotyczących wody lub kanalizacji, np. gdy nie ma wody, kanalizacja jest zatkana albo coś zalewa. Centrum obsługi odbiera w dni robocze w godz. 8:00–17:00 (w piątki 8:00–13:00). W pozostałych godzinach i w dni świąteczne odbiera dyżur wodno-kanalizacyjny przez SOS Alarm.",
+      "ru": "Звоните только при срочных проблемах с водоснабжением или канализацией, например если нет воды, засорилась канализация или произошло затопление. Сервисный центр отвечает в будни с 08:00 до 17:00 (в пятницу с 08:00 до 13:00). В остальное время и в праздничные дни отвечает дежурная служба водоканала через SOS Alarm.",
+      "de": "Rufen Sie nur bei dringenden Problemen mit Wasser oder Abwasser an, etwa wenn kein Wasser kommt, der Abfluss verstopft ist oder etwas überflutet ist. Das Servicecenter ist werktags von 8:00 bis 17:00 Uhr erreichbar (freitags von 8:00 bis 13:00 Uhr). Zu anderen Zeiten und an Feiertagen antwortet der Bereitschaftsdienst für Wasser und Abwasser über SOS Alarm.",
+      "fr": "N'appelez que pour un problème urgent d'eau ou d'assainissement, par exemple une coupure d'eau, un égout bouché ou une inondation. Le centre de services répond les jours ouvrables de 8 h à 17 h (le vendredi de 8 h à 13 h). En dehors de ces horaires et les jours fériés, le service d'astreinte eau et assainissement répond via SOS Alarm.",
+      "es": "Llama solo por problemas urgentes de agua o alcantarillado, como falta de agua, un desagüe atascado o una inundación. El centro de atención responde los días laborables de 8:00 a 17:00 (los viernes de 8:00 a 13:00). El resto del tiempo y los días festivos responde el servicio de guardia de agua y alcantarillado a través de SOS Alarm.",
+      "it": "Chiama solo per problemi urgenti di acqua o fognature, ad esempio se manca l'acqua, la fognatura è bloccata o c'è un allagamento. Il centro servizi risponde nei giorni feriali dalle 8:00 alle 17:00 (il venerdì dalle 8:00 alle 13:00). Negli altri orari e nei giorni festivi risponde il servizio di reperibilità per acqua e fognature tramite SOS Alarm.",
+      "pt": "Ligue apenas para problemas urgentes de água ou saneamento, como falta de água, esgoto entupido ou inundação. O centro de atendimento atende nos dias úteis das 8h00 às 17h00 (à sexta-feira das 8h00 às 13h00). Fora deste horário e nos feriados, atende o serviço de piquete de água e saneamento através do SOS Alarm.",
+      "nl": "Bel alleen bij dringende problemen met water of riolering, zoals geen water, een verstopt riool of een overstroming. Het servicecentrum is op werkdagen bereikbaar van 8.00 tot 17.00 uur (op vrijdag van 8.00 tot 13.00 uur). Op andere tijden en op feestdagen neemt de storingsdienst voor water en riolering op via SOS Alarm.",
+      "da": "Ring kun ved akutte problemer med vand eller kloak, for eksempel hvis der ikke er vand, kloakken er stoppet, eller der er oversvømmelse. Servicecentret svarer på hverdage kl. 8.00–17.00 (fredag kl. 8.00–13.00). Uden for disse tider og på helligdage svarer vagttjenesten for vand og kloak via SOS Alarm.",
+      "nb": "Ring bare ved akutte problemer med vann eller avløp, for eksempel hvis du ikke har vann, avløpet er tett eller det er oversvømmelse. Servicesenteret svarer på hverdager kl. 8.00–17.00 (fredager kl. 8.00–13.00). Ellers, og på helligdager, svarer vakttjenesten for vann og avløp via SOS Alarm.",
+      "et": "Helistage ainult kiireloomuliste vee- või kanalisatsiooniprobleemide korral, näiteks kui vett pole, kanalisatsioon on ummistunud või on üleujutus. Teeninduskeskus vastab tööpäeviti kell 8.00–17.00 (reedeti kell 8.00–13.00). Muul ajal ja riigipühadel vastab vee- ja kanalisatsiooni valveteenistus SOS Alarmi kaudu.",
+      "lv": "Zvaniet tikai steidzamu ūdensapgādes vai kanalizācijas problēmu gadījumā, piemēram, ja nav ūdens, ir aizsprostota kanalizācija vai notiek applūšana. Klientu centrs atbild darbdienās no 8.00 līdz 17.00 (piektdienās no 8.00 līdz 13.00). Citā laikā un svētku dienās atbild ūdensapgādes un kanalizācijas dežūrdienests ar SOS Alarm starpniecību.",
+      "lt": "Skambinkite tik dėl skubių vandens ar nuotekų problemų, pavyzdžiui, jei nėra vandens, užsikimšo kanalizacija ar kilo potvynis. Aptarnavimo centras atsiliepia darbo dienomis 8.00–17.00 (penktadieniais 8.00–13.00). Kitu laiku ir švenčių dienomis atsiliepia vandens ir nuotekų budėjimo tarnyba per SOS Alarm.",
+      "ro": "Sunați doar pentru probleme urgente de apă sau canalizare, de exemplu lipsa apei, o canalizare înfundată sau o inundație. Centrul de servicii răspunde în zilele lucrătoare între 08:00 și 17:00 (vinerea între 08:00 și 13:00). În rest și în zilele de sărbătoare, răspunde serviciul de permanență pentru apă și canalizare prin SOS Alarm.",
+      "el": "Καλέστε μόνο για επείγοντα προβλήματα ύδρευσης ή αποχέτευσης, όπως διακοπή νερού, βουλωμένη αποχέτευση ή πλημμύρα. Το κέντρο εξυπηρέτησης απαντά τις εργάσιμες ημέρες 08:00–17:00 (την Παρασκευή 08:00–13:00). Τις υπόλοιπες ώρες και τις αργίες απαντά η υπηρεσία εφημερίας ύδρευσης και αποχέτευσης μέσω SOS Alarm.",
+      "hu": "Csak sürgős víz- vagy csatornahiba esetén hívja, például ha nincs víz, eldugult a csatorna vagy áradás van. Az ügyfélszolgálat munkanapokon 8:00 és 17:00 között (pénteken 8:00 és 13:00 között) fogadja a hívásokat. Más időpontokban és ünnepnapokon a víz- és csatornaügyelet válaszol az SOS Alarmon keresztül.",
+      "cs": "Volejte jen při naléhavých problémech s vodou nebo kanalizací, například když neteče voda, je ucpaná kanalizace nebo došlo k zaplavení. Zákaznické centrum odpovídá v pracovní dny 8:00–17:00 (v pátek 8:00–13:00). V ostatní době a ve svátky odpovídá pohotovostní služba pro vodu a kanalizaci přes SOS Alarm."
+    },
+    "holidays": "SE"
   },
-  "fallbackEmail": "varmdo.kommun@varmdo.se",
+  "webFormURL": "https://service.varmdo.se/KSB",
   "disclaimer": {
     "sv": "Fixa är en fristående app med öppen källkod och ingen del av Värmdö kommun. Appen skickar din anmälan direkt till kommunens e-tjänst för felanmälan, och kommunen hanterar ärendet på sitt vanliga sätt. Ring 112 om liv eller egendom är i fara.",
     "en": "Fixa is an independent open-source app and is not part of Värmdö kommun. It sends your report straight to the municipality's fault-report e-service, and the municipality handles it the usual way. Call 112 if life or property is in danger.",

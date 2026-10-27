@@ -164,8 +164,53 @@ final class AdapterSecurityTests: XCTestCase {
         try assertRejected(try changedChannel("baseURL", "https://service.varmdo.se/proxy"), "base path")
         try assertRejected(try changedChannel("service", "OTHER"), "changed service")
         try assertRejected(try changedChannel("kind", "email"), "changed kind")
-        try assertRejected(try changed { $0["fallbackEmail"] = "harvest@evil.example.com" }, "changed fallback e-mail")
+        try assertRejected(try changed { $0["webFormURL"] = "https://service.varmdo.se/OTHER" }, "changed web form")
+        try assertRejected(try changed { $0["webFormURL"] = "https://evil.example.com/KSB" }, "web form off host")
         try assertRejected(try changed { $0["id"] = "se.evil.ksb" }, "unknown id")
+    }
+
+    func testWebFormAndTileLinksStayOnTheMunicipality() throws {
+        let bundled = try varmdoSpec()
+        XCTAssertEqual(AdapterSpecValidator.linkProblems(bundled), [])
+        func withOtherLink(_ url: String) throws -> Data {
+            try changed { json in
+                var tiles = try XCTUnwrap(json["tiles"] as? [[String: Any]])
+                let index = try XCTUnwrap(tiles.firstIndex { $0["id"] as? String == "other" })
+                var links = try XCTUnwrap(tiles[index]["links"] as? [[String: Any]])
+                links[0]["url"] = url
+                tiles[index]["links"] = links
+                json["tiles"] = tiles
+            }
+        }
+        for url in ["https://evil.example.com/FELATER", "http://service.varmdo.se/FELATER", "https://varmdo.se.evil.com/x",
+                    "https://user@service.varmdo.se/x", "javascript:alert(1)"] {
+            try assertRejected(try withOtherLink(url), url)
+        }
+        XCTAssertNotNil(try? check(try withOtherLink("https://www.varmdo.se/kontakt.html")))
+        // The bundled adapter itself is checked the same way.
+        XCTAssertThrowsError(try AdapterCatalog.decode(try withOtherLink("https://evil.example.com/x")))
+        XCTAssertThrowsError(try AdapterCatalog.decode(try changed { $0["webFormURL"] = "http://service.varmdo.se/KSB" }))
+    }
+
+    func testEmergencyHoursAreChecked() throws {
+        func withRule(_ edit: @escaping (inout [String: Any]) -> Void) throws -> Data {
+            try changed { json in
+                var emergency = try XCTUnwrap(json["emergency"] as? [String: Any])
+                var rules = try XCTUnwrap(emergency["rules"] as? [[String: Any]])
+                edit(&rules[0])
+                emergency["rules"] = rules
+                json["emergency"] = emergency
+            }
+        }
+        XCTAssertThrowsError(try AdapterCatalog.decode(try withRule { $0["from"] = "18:00" }), "from after until")
+        XCTAssertThrowsError(try AdapterCatalog.decode(try withRule { $0["from"] = "8" }), "unreadable from")
+        XCTAssertThrowsError(try AdapterCatalog.decode(try withRule { $0["isoWeekdays"] = [0] }), "weekday 0")
+        XCTAssertNoThrow(try AdapterCatalog.decode(try withRule { $0.removeValue(forKey: "from") }), "from is optional")
+        XCTAssertThrowsError(try AdapterCatalog.decode(try changed { json in
+            var emergency = try XCTUnwrap(json["emergency"] as? [String: Any])
+            emergency["holidays"] = "XX"
+            json["emergency"] = emergency
+        }), "unknown holiday calendar")
     }
 
     func testUnsafePathsAreRejected() throws {

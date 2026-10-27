@@ -13,13 +13,18 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
     public let tiles: [Tile]
     public let validation: ValidationRules
     public let emergency: Emergency?
-    public let fallbackEmail: String?
+    /// The municipality's own web form for this e-service, opened in Safari when Fixa cannot send
+    /// (the resident pastes `WebFallback.text` there). Same host as `channel.baseURL`.
+    public let webFormURL: URL
     public let disclaimer: LocalizedText
 
     public struct Municipality: Codable, Sendable {
         public let name: String
         public let countryCode: String
         public let region: Region
+        /// Names a reverse geocoder gives for this municipality (e.g. `["Värmdö", "Värmdö kommun"]`),
+        /// used to tell a pin inside the region's box but in a neighbouring municipality.
+        public let geocoderNames: [String]
     }
 
     public struct Region: Codable, Sendable {
@@ -126,11 +131,19 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
         public let symbol: String
         public let categoryID: String
         public let title: LocalizedText
-        /// First line of the description sent to the municipality.
-        public let swedishSummary: String
+        /// First line of the description sent to the municipality. Absent when the category says it all
+        /// ("Övrigt"); then the resident's own text comes first.
+        public let swedishSummary: String?
         /// Who looks after this kind of problem, shown under the tile (e.g. municipal streets versus state
         /// or private roads). Absent when the municipality is always the right place.
         public let responsibility: LocalizedText?
+        /// The municipality's other e-services for things that don't belong in this one (https only).
+        public let links: [TileLink]?
+    }
+
+    public struct TileLink: Codable, Sendable, Hashable {
+        public let title: LocalizedText
+        public let url: URL
     }
 
     public struct ValidationRules: Codable, Sendable {
@@ -146,6 +159,9 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
         public let defaultContactID: String
         public let timeZone: String
         public let note: LocalizedText
+        /// Public-holiday calendar on which no rule applies (so `defaultContactID` answers). `"SE"`:
+        /// Swedish public holidays plus julafton, nyårsafton and midsommarafton.
+        public let holidays: String?
     }
 
     public struct EmergencyContact: Codable, Sendable, Identifiable, Hashable {
@@ -154,9 +170,11 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
         public let phone: String
     }
 
-    /// Applies on the listed ISO weekdays (1 = Monday … 7 = Sunday) before `until` ("HH:mm", local time).
+    /// Applies on the listed ISO weekdays (1 = Monday … 7 = Sunday) from `from` (default "00:00") until
+    /// before `until` ("HH:mm", local time): `from <= now < until`.
     public struct HoursRule: Codable, Sendable, Hashable {
         public let isoWeekdays: [Int]
+        public let from: String?
         public let until: String
         public let contactID: String
     }
