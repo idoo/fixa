@@ -24,9 +24,7 @@ private struct FxCatalog: View {
                           accessibilityValue: "08-454 25 71, VA-jouren via SOS Alarm", action: {})
                 FxBanner(kind: .warning, title: "Outside Värmdö kommun",
                          message: "Move the pin if that's wrong.")
-                LazyVGrid(columns: [GridItem(.flexible(), spacing: Fx.Space.m),
-                                    GridItem(.flexible(), spacing: Fx.Space.m)],
-                          spacing: Fx.Space.m) {
+                FxTileGrid(columns: 2, spacing: Fx.Space.m) {
                     ForEach(Array(tiles.enumerated()), id: \.element.id) { index, tile in
                         FxTile(title: tile.title, systemImage: tile.symbol, index: index,
                                isSelected: tile.id == selected) { selected = tile.id }

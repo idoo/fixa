@@ -8,9 +8,8 @@ struct HomeScreen: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     /// Two columns; one at accessibility sizes so titles keep whole words.
-    private var columns: [GridItem] {
-        let count = dynamicTypeSize.isAccessibilitySize ? 1 : 2
-        return Array(repeating: GridItem(.flexible(), spacing: Fx.Space.m), count: count)
+    private var columns: Int {
+        dynamicTypeSize.isAccessibilitySize ? 1 : 2
     }
 
     var body: some View {
@@ -35,19 +34,15 @@ struct HomeScreen: View {
                     .accessibilityHint(Text("Opens Sent reports"))
                     .accessibilityIdentifier("home.outboxBanner")
                 }
-                VStack(alignment: .leading, spacing: Fx.Space.xs) {
-                    Text(verbatim: "Fixa")
-                        .font(Fx.Font.largeTitle)
-                        .foregroundStyle(Fx.Color.ink)
-                        .accessibilityAddTraits(.isHeader)
-                    Text("Report a problem in \(placeName) in a minute.")
-                        .font(Fx.Font.body)
-                        .foregroundStyle(Fx.Color.ink2)
-                    languageChip
-                        .padding(.top, Fx.Space.xs)
-                }
+                // No app name on Home: the icon already says "Fixa"; the line says what to do.
+                Text("Report a problem in \(placeName) in a minute.")
+                    .font(Fx.Font.body)
+                    .foregroundStyle(Fx.Color.ink2)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
+                    .accessibilityAddTraits(.isHeader)
 
-                LazyVGrid(columns: columns, spacing: Fx.Space.m) {
+                FxTileGrid(columns: columns, spacing: Fx.Space.m) {
                     ForEach(Array(spec.tiles.enumerated()), id: \.element.id) { index, tile in
                         FxTile(
                             title: tile.title.resolve(L10n.locale),
@@ -68,6 +63,8 @@ struct HomeScreen: View {
                 Text("Independent app, not run by the municipality.")
                     .font(Fx.Font.footnote)
                     .foregroundStyle(Fx.Color.ink2)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
                     .fixedSize(horizontal: false, vertical: true)
             }
             .padding(.horizontal, Fx.Space.l)
@@ -96,31 +93,6 @@ struct HomeScreen: View {
                 .accessibilityIdentifier("home.history")
             }
         }
-    }
-
-    /// The current language in its own script ("Svenska"), so someone who can't read the UI
-    /// still finds the switch. Opens the Language page.
-    private var languageChip: some View {
-        let language = model.effectiveLanguage
-        return Button {
-            model.path.append(.language)
-        } label: {
-            Label {
-                Text(verbatim: language.nativeName)
-                    .environment(\.locale, language.locale)
-            } icon: {
-                Image(systemName: "globe")
-            }
-            .font(Fx.Font.subheadline)
-            .foregroundStyle(Fx.Color.sea)
-            .padding(.horizontal, Fx.Space.m)
-            .frame(minHeight: Fx.minTarget)
-            .fxOutline(Capsule(), outline: Fx.Color.fieldBorder)
-            .contentShape(Capsule())
-        }
-        .buttonStyle(FxPressStyle())
-        .accessibilityLabel(Text("Language: \(language.nativeName)"))
-        .accessibilityInputLabels([Text("Language"), Text(verbatim: language.nativeName)])
     }
 
     /// "Värmdö" from "Värmdö kommun": the subtitle stays descriptive.

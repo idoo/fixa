@@ -197,9 +197,11 @@ struct FxBadge: View {
     }
 }
 
-/// Compact category tile for a 2-column grid: white card, muted pastel glyph circle above a semibold
-/// title, both on one leading edge. `index` picks the pastel so the grid is varied but stable. The title
-/// never truncates; LazyVGrid gives each row its tallest tile's height. Selected: 2 pt sea border. Selection haptic.
+/// Category tile for `FxTileGrid`: white card, muted pastel glyph circle centred at the top, a centred
+/// semibold title in the space below. `index` picks the pastel so the grid is varied but stable. The title
+/// never truncates and reserves at least two lines; the grid gives every tile the tallest tile's height, so
+/// icons share one line per row and shorter titles centre in the leftover space. Selected: 2 pt sea border.
+/// Selection haptic.
 struct FxTile: View {
     let title: String
     let systemImage: String
@@ -210,7 +212,7 @@ struct FxTile: View {
     @State private var taps = 0
     @Environment(\.fxHaptics) private var haptics
     @Environment(\.fxReduceMotion) private var reduceMotion
-    @ScaledMetric(relativeTo: .body) private var iconSide: CGFloat = 36
+    @ScaledMetric(relativeTo: .body) private var iconSide: CGFloat = 44
 
     init(title: String, systemImage: String, index: Int = 0, isSelected: Bool = false, action: @escaping () -> Void) {
         self.title = title
@@ -225,12 +227,13 @@ struct FxTile: View {
             taps += 1
             action()
         } label: {
-            VStack(alignment: .leading, spacing: Fx.Space.s) {
+            VStack(spacing: Fx.Space.s) {
                 FxBadge(systemImage: systemImage, fill: Fx.Color.pastel(at: index), side: iconSide)
                 titleText
             }
-            .padding(Fx.Space.m)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .padding(.horizontal, Fx.Space.m)
+            .padding(.vertical, Fx.Space.l)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .fxCardSurface(
                 RoundedRectangle(cornerRadius: Fx.Radius.m, style: .continuous),
                 border: isSelected ? Fx.Color.sea : Fx.Color.line,
@@ -245,12 +248,55 @@ struct FxTile: View {
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
+    /// Centred title over a hidden two-line placeholder: grows past two lines, never shrinks below them, and
+    /// centres in whatever height the grid gives the tile.
     private var titleText: some View {
-        Text(title)
-            .font(Fx.Font.headline)
-            .foregroundStyle(Fx.Color.ink)
-            .multilineTextAlignment(.leading)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .fixedSize(horizontal: false, vertical: true)
+        ZStack {
+            Text(verbatim: " \n ")
+                .hidden()
+                .accessibilityHidden(true)
+            Text(title)
+                .foregroundStyle(Fx.Color.ink)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .font(Fx.Font.headline)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+/// Grid for `FxTile`s: every cell gets the tallest cell's height across all rows, so a three-line title in
+/// one row doesn't make that row taller than the rest. Cells are placed leading to trailing; SwiftUI
+/// mirrors the placement in right-to-left languages.
+struct FxTileGrid: Layout {
+    var columns: Int
+    var spacing: CGFloat
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let width = proposal.replacingUnspecifiedDimensions().width
+        let rows = (subviews.count + columns - 1) / columns
+        guard rows > 0 else { return CGSize(width: width, height: 0) }
+        let height = cellHeight(subviews, width: cellWidth(width))
+        return CGSize(width: width, height: height * CGFloat(rows) + spacing * CGFloat(rows - 1))
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let width = cellWidth(bounds.width)
+        let height = cellHeight(subviews, width: width)
+        for (index, subview) in subviews.enumerated() {
+            let origin = CGPoint(
+                x: bounds.minX + CGFloat(index % columns) * (width + spacing),
+                y: bounds.minY + CGFloat(index / columns) * (height + spacing)
+            )
+            subview.place(at: origin, proposal: ProposedViewSize(width: width, height: height))
+        }
+    }
+
+    private func cellWidth(_ width: CGFloat) -> CGFloat {
+        max(0, (width - spacing * CGFloat(columns - 1)) / CGFloat(columns))
+    }
+
+    private func cellHeight(_ subviews: Subviews, width: CGFloat) -> CGFloat {
+        subviews.map { $0.sizeThatFits(ProposedViewSize(width: width, height: nil)).height }.max() ?? 0
     }
 }

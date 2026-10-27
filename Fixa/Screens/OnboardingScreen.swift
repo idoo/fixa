@@ -97,7 +97,7 @@ struct OnboardingScreen: View {
         return UIImage(named: "AppIcon")
     }()
 
-    /// Same chip as Home: the current language in its own script, so a newcomer can switch first.
+    /// The current language in its own script, so a newcomer can switch first. Later it lives in Settings.
     private var languageChip: some View {
         let language = model.effectiveLanguage
         return Button {
