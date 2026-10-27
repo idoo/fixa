@@ -62,7 +62,7 @@ struct ProfileScreen: View {
                         .foregroundStyle(model.profileIsEmpty ? Fx.Color.ink2 : Fx.Color.error)
                         .frame(minHeight: Fx.minTarget)
                 }
-                .buttonStyle(FxPressStyle(dims: true))
+                .buttonStyle(FxPressStyle())
                 .disabled(model.profileIsEmpty)
 
                 aboutRow

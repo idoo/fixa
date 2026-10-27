@@ -26,12 +26,12 @@ extension SwiftUI.Color {
         self.init(uiColor: UIColor(dynamicProvider: provider))
     }
 
-    /// Hex convenience: `Color(light: 0xFFF4DD, dark: 0x15202B)`.
+    /// Hex convenience: `Color(light: 0xF7F5F0, dark: 0x121A22)`.
     init(light: UInt32, dark: UInt32) {
         self.init(light: UIColor(fxHex: light), dark: UIColor(fxHex: dark))
     }
 
-    /// One colour in both appearances (art fills that stay light at night, ink on those fills).
+    /// One colour in both appearances (the brand stamp, ink on pastel fills).
     init(fxHex hex: UInt32) {
         self.init(uiColor: UIColor(fxHex: hex))
     }
@@ -41,49 +41,51 @@ extension SwiftUI.Color {
 
 /// Fixa design system namespace. Screens use only these tokens and the `Fx*` components.
 enum Fx {
-    /// "Skärgård & vägarbete": cream paper, ink, archipelago sea, traffic-cone orange, flat pastels.
-    /// WCAG (sRGB): ink on paper 14.5 (dark 12.0 on card); ink2 ≥ 5.8 light / ≥ 6.8 dark;
-    /// sea 6.7 on paper / 7.7 on dark card; onCone on cone 5.54 (white would be 2.86, fails).
+    /// Calm civic palette: warm off-white paper, white cards, hairline borders, one sea-blue action colour.
+    /// WCAG (sRGB): ink on paper 14.5 / 12+ dark; ink2 ≥ 5.8 light / ≥ 7.3 dark; sea text 6.7 on paper,
+    /// 8.3 on dark card; white on `action` 7.27 light (#1F5A8A) / 5.36 dark (#2E6FA3).
     enum Color {
-        /// Cream screen background; navy night.
-        static let paper = SwiftUI.Color(light: 0xFFF4DD, dark: 0x15202B)
-        /// Raised surfaces (cards, fields, tiles).
-        static let card = SwiftUI.Color(light: 0xFFFFFF, dark: 0x1E2B38)
+        /// Screen background.
+        static let paper = SwiftUI.Color(light: 0xF7F5F0, dark: 0x121A22)
+        /// Cards, fields, tiles.
+        static let card = SwiftUI.Color(light: 0xFFFFFF, dark: 0x1B2530)
         /// Primary text.
         static let ink = SwiftUI.Color(light: 0x1E2136, dark: 0xF3EAD6)
         /// Secondary text, icons at rest.
         static let ink2 = SwiftUI.Color(light: 0x5B5F73, dark: 0xB9B2A2)
-        /// Archipelago blue: links, info, map pin, selected, switches.
+        /// Hairline borders and rules (1 pt).
+        static let line = SwiftUI.Color(light: 0xD8D2C6, dark: 0x33414F)
+        /// Sea blue for text: links, selected, focus, map pins, switches.
         static let sea = SwiftUI.Color(light: 0x1F5A8A, dark: 0x8CC4F0)
-        /// Traffic-cone orange: THE action fill (primary button, stamp). Fill only, never text.
+        /// Primary action fill (sea), with `onAction` text.
+        static let action = SwiftUI.Color(light: 0x1F5A8A, dark: 0x2E6FA3)
+        /// Text and glyphs on `action`.
+        static let onAction = SwiftUI.Color(fxHex: 0xFFFFFF)
+        /// Brand accent, traffic-cone orange. Receipt stamp only.
         static let cone = SwiftUI.Color(fxHex: 0xFF6A2B)
-        /// Text and glyphs on `cone`: ink in both appearances (5.54:1).
+        /// Text on `cone` (5.54:1).
         static let onCone = SwiftUI.Color(fxHex: 0x1E2136)
-        /// Text and glyphs on pastel / warning fills, both appearances (≥ 10.5:1).
+        /// Glyphs on pastel fills, both appearances (≥ 10.7:1).
         static let onPastel = SwiftUI.Color(fxHex: 0x1E2136)
-        /// Secondary text on pastel fills (≥ 5.4:1 on every pastel).
-        static let onPastel2 = SwiftUI.Color(fxHex: 0x4A4E61)
-        /// Stuga red: errors and validation.
+        /// Errors and validation.
         static let error = SwiftUI.Color(light: 0xB3261E, dark: 0xFF8A80)
-        /// Moss: success.
+        /// Success.
         static let success = SwiftUI.Color(light: 0x3E7D4F, dark: 0x8FCB9C)
-        /// Sun: warning fill (text on it is `onPastel`).
+        /// Warning sun: accent bars only, never text.
         static let warning = SwiftUI.Color(fxHex: 0xF2B233)
-        /// Sticker outline: ink by day, a soft slate at night (≥ 5:1 on dark surfaces).
-        static let line = SwiftUI.Color(light: 0x1E2136, dark: 0x8E9BA8)
-        /// Hard, unblurred drop shadow under raised stickers.
-        static let shadow = SwiftUI.Color(light: 0x1E2136, dark: 0x05090E)
+        /// Very soft card shadow in light mode (black 6 %); none at night.
+        static let shadow = SwiftUI.Color(light: UIColor(fxHex: 0x000000, alpha: 0.06), dark: .clear)
 
-        /// Flat pastel fills for badges and tiles; light in both appearances, ink on top.
+        /// Muted pastels (≈ 20 % desaturated) for small icon circles; same in both appearances.
         enum Pastel {
-            static let mint = SwiftUI.Color(fxHex: 0xBFE8D2)
-            static let sky = SwiftUI.Color(fxHex: 0xC9E3F6)
-            static let sun = SwiftUI.Color(fxHex: 0xFFE08A)
-            static let peach = SwiftUI.Color(fxHex: 0xFFD0B5)
-            static let lilac = SwiftUI.Color(fxHex: 0xDCCFF5)
-            static let sand = SwiftUI.Color(fxHex: 0xEADBC0)
-            static let rose = SwiftUI.Color(fxHex: 0xF7C6CF)
-            static let foam = SwiftUI.Color(fxHex: 0xCFEFEA)
+            static let mint = SwiftUI.Color(fxHex: 0xC3E4D2)
+            static let sky = SwiftUI.Color(fxHex: 0xCDE2F2)
+            static let sun = SwiftUI.Color(fxHex: 0xF3DA96)
+            static let peach = SwiftUI.Color(fxHex: 0xF8D2BC)
+            static let lilac = SwiftUI.Color(fxHex: 0xDDD3F1)
+            static let sand = SwiftUI.Color(fxHex: 0xE6DAC4)
+            static let rose = SwiftUI.Color(fxHex: 0xF2CBD2)
+            static let foam = SwiftUI.Color(fxHex: 0xD2ECE8)
         }
 
         /// Tile order: neighbours in a 2-column grid never share a pastel.
@@ -110,39 +112,37 @@ enum Fx {
     }
 
     enum Radius {
-        static let s: CGFloat = 12
-        static let m: CGFloat = 18
-        static let l: CGFloat = 24
+        /// Fields, photos, maps.
+        static let s: CGFloat = 10
+        /// Cards, tiles, buttons.
+        static let m: CGFloat = 12
     }
 
-    /// Sticker metrics: 2 pt ink outline, hard shadow straight down (no blur).
-    enum Sticker {
-        static let line: CGFloat = 2
-        /// Raised surfaces: cards, buttons, tiles.
-        static let depth: CGFloat = 4
-        /// Small controls: chips, icon buttons, badges.
-        static let smallDepth: CGFloat = 2
+    /// Border widths: hairline at rest, emphasis for focus, selection and errors.
+    enum Border {
+        static let hairline: CGFloat = 1
+        static let emphasis: CGFloat = 2
     }
 
-    /// Dynamic-Type text styles. Titles: SF Rounded heavy/black. Body: SF Rounded.
+    /// Dynamic-Type text styles, SF Pro.
     enum Font {
-        static let largeTitle = SwiftUI.Font.system(.largeTitle, design: .rounded, weight: .black)
-        static let title = SwiftUI.Font.system(.title2, design: .rounded, weight: .heavy)
-        static let title3 = SwiftUI.Font.system(.title3, design: .rounded, weight: .heavy)
-        static let headline = SwiftUI.Font.system(.headline, design: .rounded, weight: .bold)
-        static let subheadline = SwiftUI.Font.system(.subheadline, design: .rounded, weight: .semibold)
-        static let body = SwiftUI.Font.system(.body, design: .rounded)
-        static let callout = SwiftUI.Font.system(.callout, design: .rounded)
-        static let footnote = SwiftUI.Font.system(.footnote, design: .rounded)
+        static let largeTitle = SwiftUI.Font.system(.largeTitle, weight: .bold)
+        static let title = SwiftUI.Font.system(.title2, weight: .semibold)
+        static let title3 = SwiftUI.Font.system(.title3, weight: .semibold)
+        static let headline = SwiftUI.Font.system(.headline, weight: .semibold)
+        static let subheadline = SwiftUI.Font.system(.subheadline, weight: .semibold)
+        static let body = SwiftUI.Font.system(.body)
+        static let callout = SwiftUI.Font.system(.callout)
+        static let footnote = SwiftUI.Font.system(.footnote)
         /// "MOTTAGET" on the receipt stamp.
-        static let stamp = SwiftUI.Font.system(.title, design: .rounded, weight: .black)
+        static let stamp = SwiftUI.Font.system(.title, weight: .heavy)
         /// Case number on the stamp.
-        static let stampNumber = SwiftUI.Font.system(.headline, design: .monospaced, weight: .bold)
+        static let stampNumber = SwiftUI.Font.system(.headline, design: .monospaced, weight: .semibold)
     }
 
     enum Motion {
-        static let press = Animation.spring(response: 0.25, dampingFraction: 0.6)
-        static let select = Animation.spring(response: 0.35, dampingFraction: 0.8)
+        static let press = Animation.easeOut(duration: 0.12)
+        static let select = Animation.spring(response: 0.35, dampingFraction: 0.85)
     }
 
     /// Minimum hit target (HIG).
@@ -151,77 +151,41 @@ enum Fx {
 
 // MARK: - Pressed state
 
-extension EnvironmentValues {
-    /// True while the enclosing `FxPressStyle` button is held; sticker surfaces sink into their shadow.
-    @Entry var fxPressed: Bool = false
-}
-
-/// Shared pressed state. Passes the press to `fxSticker` surfaces in the label, which sink into
-/// their hard shadow. `dims` gives labels without a sticker (rows, links) an opacity dip instead.
+/// Shared pressed state: a quick opacity dip. Nothing moves, so it is the same with Reduce Motion.
 struct FxPressStyle: ButtonStyle {
-    var dims: Bool = false
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .environment(\.fxPressed, configuration.isPressed)
-            .opacity(dims && configuration.isPressed ? 0.6 : 1)
-            .animation(reduceMotion ? nil : Fx.Motion.press, value: configuration.isPressed)
+            .opacity(configuration.isPressed ? 0.65 : 1)
+            .animation(Fx.Motion.press, value: configuration.isPressed)
     }
 }
 
-// MARK: - Sticker surfaces
-
-/// Fill, 2 pt outline and a hard offset shadow straight down. While an `FxPressStyle` button is held
-/// the face drops onto its shadow; Reduce Motion dips opacity instead of moving.
-private struct FxSticker<S: InsettableShape>: ViewModifier {
-    let shape: S
-    let fill: SwiftUI.Color
-    let outline: SwiftUI.Color
-    let depth: CGFloat
-    let pressable: Bool
-
-    @Environment(\.fxPressed) private var pressed
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    func body(content: Content) -> some View {
-        let isPressed = pressable && pressed
-        content
-            .background(fill, in: shape)
-            .overlay(shape.strokeBorder(outline, lineWidth: Fx.Sticker.line))
-            .offset(y: isPressed && !reduceMotion ? depth : 0)
-            .background {
-                if depth > 0 {
-                    shape.fill(Fx.Color.shadow).offset(y: depth)
-                }
-            }
-            .opacity(isPressed && reduceMotion ? 0.75 : 1)
-            .padding(.bottom, depth)
-            .contentShape(shape)
-    }
-}
+// MARK: - Surfaces
 
 extension View {
-    /// Raised sticker: `fill`, ink outline, hard ink shadow `depth` pt below.
-    /// `pressable: false` keeps nested decorations (badges) still while the surrounding button sinks.
-    func fxSticker<S: InsettableShape>(
+    /// Card surface: `fill`, 1 pt hairline border, and the very soft light-mode shadow.
+    func fxCardSurface<S: InsettableShape>(
         _ shape: S,
         fill: SwiftUI.Color = Fx.Color.card,
-        outline: SwiftUI.Color = Fx.Color.line,
-        depth: CGFloat = Fx.Sticker.depth,
-        pressable: Bool = true
+        border: SwiftUI.Color = Fx.Color.line,
+        borderWidth: CGFloat = Fx.Border.hairline
     ) -> some View {
-        modifier(FxSticker(shape: shape, fill: fill, outline: outline, depth: depth, pressable: pressable))
+        background {
+            shape.fill(fill)
+                .shadow(color: Fx.Color.shadow, radius: 3, y: 1)
+        }
+        .overlay(shape.strokeBorder(border, lineWidth: borderWidth))
     }
 
-    /// Flat outlined surface without a shadow (fields, photos, inset slots).
+    /// Flat bordered surface without shadow (fields, photos, maps, inset slots).
     func fxOutline<S: InsettableShape>(
         _ shape: S,
         fill: SwiftUI.Color = Fx.Color.card,
-        outline: SwiftUI.Color = Fx.Color.line
+        outline: SwiftUI.Color = Fx.Color.line,
+        width: CGFloat = Fx.Border.hairline
     ) -> some View {
         background(fill, in: shape)
-            .overlay(shape.strokeBorder(outline, lineWidth: Fx.Sticker.line))
+            .overlay(shape.strokeBorder(outline, lineWidth: width))
     }
 }
 
@@ -238,7 +202,7 @@ private struct FxScreenBackground: ViewModifier {
 }
 
 extension View {
-    /// Cream paper screen background, ink text, sea tint for system controls and links.
+    /// Paper screen background, ink text, sea tint for system controls and links.
     func fxScreenBackground() -> some View {
         modifier(FxScreenBackground())
     }

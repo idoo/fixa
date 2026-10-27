@@ -21,7 +21,7 @@ struct HomeScreen: View {
                         .font(Fx.Font.largeTitle)
                         .foregroundStyle(Fx.Color.ink)
                         .accessibilityAddTraits(.isHeader)
-                    Text("Report a problem in \(placeName) without the e-service maze.")
+                    Text("Report a problem in \(placeName) in a minute.")
                         .font(Fx.Font.body)
                         .foregroundStyle(Fx.Color.ink2)
                 }
@@ -43,7 +43,7 @@ struct HomeScreen: View {
                     urgentRow(emergency)
                 }
 
-                Text("Not the municipality's app. Made by a neighbour who wanted it simpler.")
+                Text("Independent app, not run by the municipality.")
                     .font(Fx.Font.footnote)
                     .foregroundStyle(Fx.Color.ink2)
                     .fixedSize(horizontal: false, vertical: true)

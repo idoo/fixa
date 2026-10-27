@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Cone-orange sticker call to action. One per screen. Impact haptic on tap.
-/// Ink text on cone (5.54:1). Disabled by the caller: flat card with secondary text, no shadow.
+/// Filled sea-blue call to action with white text. One per screen. Impact haptic on tap.
+/// White on fill: 7.27:1 light (#1F5A8A), 5.36:1 dark (#2E6FA3). Disabled by the caller: faded.
 struct FxPrimaryButton: View {
     let title: String
     var systemImage: String? = nil
@@ -27,28 +27,24 @@ struct FxPrimaryButton: View {
             HStack(spacing: Fx.Space.s) {
                 if isLoading {
                     ProgressView()
-                        .tint(Fx.Color.onCone)
+                        .tint(Fx.Color.onAction)
                         .accessibilityHidden(true)
                 } else if let systemImage {
                     Image(systemName: systemImage)
                         .imageScale(.medium)
-                        .fontWeight(.heavy)
                         .accessibilityHidden(true)
                 }
                 Text(title)
                     .font(Fx.Font.headline)
                     .multilineTextAlignment(.center)
             }
-            .foregroundStyle(isEnabled ? Fx.Color.onCone : Fx.Color.ink2)
-            .frame(maxWidth: .infinity, minHeight: 52)
+            .foregroundStyle(Fx.Color.onAction)
+            .frame(maxWidth: .infinity, minHeight: 50)
             .padding(.horizontal, Fx.Space.l)
             .padding(.vertical, Fx.Space.xs)
-            .fxSticker(
-                RoundedRectangle(cornerRadius: Fx.Radius.m, style: .continuous),
-                fill: isEnabled ? Fx.Color.cone : Fx.Color.card,
-                depth: isEnabled ? Fx.Sticker.depth : 0
-            )
-            .padding(.top, isEnabled ? 0 : Fx.Sticker.depth)
+            .background(Fx.Color.action, in: .rect(cornerRadius: Fx.Radius.m, style: .continuous))
+            .opacity(isEnabled ? 1 : 0.45)
+            .contentShape(.rect(cornerRadius: Fx.Radius.m, style: .continuous))
         }
         .buttonStyle(FxPressStyle())
         .disabled(isLoading)
@@ -58,7 +54,7 @@ struct FxPrimaryButton: View {
     }
 }
 
-/// Card-coloured sticker companion button.
+/// Quiet companion button: card fill, hairline border, sea text.
 struct FxSecondaryButton: View {
     let title: String
     var systemImage: String? = nil
@@ -86,7 +82,7 @@ struct FxSecondaryButton: View {
 }
 
 /// The look of `FxSecondaryButton`, for controls that bring their own action (e.g. `PhotosPicker`).
-/// Pair with `.buttonStyle(FxPressStyle())` so it sinks when pressed.
+/// Pair with `.buttonStyle(FxPressStyle())`.
 struct FxSecondaryLabel: View {
     let title: String
     var systemImage: String? = nil
@@ -96,22 +92,22 @@ struct FxSecondaryLabel: View {
             if let systemImage {
                 Image(systemName: systemImage)
                     .imageScale(.medium)
-                    .fontWeight(.bold)
                     .accessibilityHidden(true)
             }
             Text(title)
                 .font(Fx.Font.headline)
                 .multilineTextAlignment(.center)
         }
-        .foregroundStyle(Fx.Color.ink)
-        .frame(maxWidth: .infinity, minHeight: 48)
+        .foregroundStyle(Fx.Color.sea)
+        .frame(maxWidth: .infinity, minHeight: 50)
         .padding(.horizontal, Fx.Space.l)
         .padding(.vertical, Fx.Space.xs)
-        .fxSticker(RoundedRectangle(cornerRadius: Fx.Radius.m, style: .continuous))
+        .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.m, style: .continuous))
+        .contentShape(.rect(cornerRadius: Fx.Radius.m, style: .continuous))
     }
 }
 
-/// Round sticker icon-only control, e.g. floating over a map. `label` is read by VoiceOver.
+/// Round icon-only control, e.g. floating over a map. `label` is read by VoiceOver.
 struct FxIconButton: View {
     let systemImage: String
     let label: String
@@ -136,16 +132,16 @@ struct FxIconButton: View {
             ZStack {
                 if isLoading {
                     ProgressView()
-                        .tint(Fx.Color.ink)
+                        .tint(Fx.Color.sea)
                 } else {
                     Image(systemName: systemImage)
                         .font(Fx.Font.headline)
-                        .fontWeight(.heavy)
-                        .foregroundStyle(Fx.Color.ink)
+                        .foregroundStyle(Fx.Color.sea)
                 }
             }
             .frame(width: 48, height: 48)
-            .fxSticker(Circle(), depth: Fx.Sticker.depth - 1)
+            .fxCardSurface(Circle())
+            .contentShape(Circle())
         }
         .buttonStyle(FxPressStyle())
         .sensoryFeedback(.impact(weight: .light), trigger: taps)
@@ -153,7 +149,7 @@ struct FxIconButton: View {
     }
 }
 
-/// Raised sticker surface for grouping content. Inside an `FxPressStyle` button it sinks when pressed.
+/// White surface for grouping content: radius 12, hairline border, very soft light-mode shadow.
 struct FxCard<Content: View>: View {
     @ViewBuilder let content: Content
 
@@ -167,12 +163,11 @@ struct FxCard<Content: View>: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(Fx.Space.l)
-        .fxSticker(RoundedRectangle(cornerRadius: Fx.Radius.l, style: .continuous))
+        .fxCardSurface(RoundedRectangle(cornerRadius: Fx.Radius.m, style: .continuous))
     }
 }
 
-/// Pastel circle badge with an ink glyph, outline and a small hard shadow. Decorative.
-/// Stays still while a surrounding sticker button sinks.
+/// Small muted pastel circle with an ink glyph. Decorative.
 struct FxBadge: View {
     let systemImage: String
     var fill: Color
@@ -186,18 +181,19 @@ struct FxBadge: View {
 
     var body: some View {
         Image(systemName: systemImage)
-            .font(Fx.Font.title3)
+            .font(Fx.Font.body)
+            .imageScale(side >= 56 ? .large : .medium)
             .foregroundStyle(Fx.Color.onPastel)
             .frame(width: side, height: side)
-            .fxSticker(Circle(), fill: fill, depth: Fx.Sticker.smallDepth, pressable: false)
+            .background(fill, in: Circle())
             .accessibilityHidden(true)
     }
 }
 
-/// Compact category tile for a 2-column grid: pastel badge above a title of up to two lines, both on one
-/// leading edge. `index` picks the badge pastel so the grid is varied but stable. The title reserves two
-/// lines so sibling tiles share one height; at accessibility sizes it grows instead of truncating.
-/// Selected: the whole tile takes its pastel. Selection haptic.
+/// Compact category tile for a 2-column grid: white card, muted pastel glyph circle above a semibold
+/// title of up to two lines, both on one leading edge. `index` picks the pastel so the grid is varied
+/// but stable. The title reserves two lines so sibling tiles share one height; at accessibility sizes it
+/// grows instead of truncating. Selected: 2 pt sea border. Selection haptic.
 struct FxTile: View {
     let title: String
     let systemImage: String
@@ -207,7 +203,7 @@ struct FxTile: View {
 
     @State private var taps = 0
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @ScaledMetric(relativeTo: .title3) private var iconSide: CGFloat = 44
+    @ScaledMetric(relativeTo: .body) private var iconSide: CGFloat = 36
 
     init(title: String, systemImage: String, index: Int = 0, isSelected: Bool = false, action: @escaping () -> Void) {
         self.title = title
@@ -218,21 +214,22 @@ struct FxTile: View {
     }
 
     var body: some View {
-        let pastel = Fx.Color.pastel(at: index)
         Button {
             taps += 1
             action()
         } label: {
-            VStack(alignment: .leading, spacing: Fx.Space.m) {
-                FxBadge(systemImage: systemImage, fill: pastel, side: iconSide)
+            VStack(alignment: .leading, spacing: Fx.Space.s) {
+                FxBadge(systemImage: systemImage, fill: Fx.Color.pastel(at: index), side: iconSide)
                 titleText
             }
             .padding(Fx.Space.m)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .fxSticker(
-                RoundedRectangle(cornerRadius: Fx.Radius.l, style: .continuous),
-                fill: isSelected ? pastel : Fx.Color.card
+            .fxCardSurface(
+                RoundedRectangle(cornerRadius: Fx.Radius.m, style: .continuous),
+                border: isSelected ? Fx.Color.sea : Fx.Color.line,
+                borderWidth: isSelected ? Fx.Border.emphasis : Fx.Border.hairline
             )
+            .contentShape(.rect(cornerRadius: Fx.Radius.m, style: .continuous))
             .animation(Fx.Motion.select, value: isSelected)
         }
         .buttonStyle(FxPressStyle())
@@ -244,7 +241,7 @@ struct FxTile: View {
     @ViewBuilder private var titleText: some View {
         let text = Text(title)
             .font(Fx.Font.headline)
-            .foregroundStyle(isSelected ? Fx.Color.onPastel : Fx.Color.ink)
+            .foregroundStyle(Fx.Color.ink)
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, alignment: .leading)
         if dynamicTypeSize.isAccessibilitySize {

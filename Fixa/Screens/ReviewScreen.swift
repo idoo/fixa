@@ -189,7 +189,7 @@ struct ReviewScreen: View {
             .frame(maxWidth: .infinity, minHeight: Fx.minTarget, alignment: .leading)
             .contentShape(.rect)
         }
-        .buttonStyle(FxPressStyle(dims: true))
+        .buttonStyle(FxPressStyle())
         .disabled(model.submission.isSending)
         .accessibilityElement(children: .combine)
         .accessibilityHint(Text("Opens the report to change it"))

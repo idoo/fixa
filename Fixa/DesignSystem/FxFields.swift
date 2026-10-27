@@ -26,7 +26,7 @@ struct FxTextField: View {
         VStack(alignment: .leading, spacing: Fx.Space.xs) {
             Text(title)
                 .font(Fx.Font.subheadline)
-                .foregroundStyle(Fx.Color.ink2)
+                .foregroundStyle(Fx.Color.ink)
                 .accessibilityHidden(true)
             TextField(text: $text, prompt: Text(prompt).foregroundStyle(Fx.Color.ink2)) {
                 Text(title)
@@ -40,7 +40,7 @@ struct FxTextField: View {
             .focused($focused)
             .padding(.horizontal, Fx.Space.m)
             .frame(minHeight: Fx.minTarget + 4)
-            .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous), outline: borderColor)
+            .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous), outline: borderColor, width: borderWidth)
             .accessibilityLabel(Text(title))
             .accessibilityHint(issue.map { Text($0) } ?? Text(""))
             FxIssueText(issue: issue)
@@ -50,6 +50,10 @@ struct FxTextField: View {
     private var borderColor: Color {
         if issue != nil { return Fx.Color.error }
         return focused ? Fx.Color.sea : Fx.Color.line
+    }
+
+    private var borderWidth: CGFloat {
+        issue != nil || focused ? Fx.Border.emphasis : Fx.Border.hairline
     }
 
     private var keyboard: UIKeyboardType {
@@ -103,7 +107,7 @@ struct FxTextEditor: View {
             if showsTitle {
                 Text(title)
                     .font(Fx.Font.subheadline)
-                    .foregroundStyle(Fx.Color.ink2)
+                    .foregroundStyle(Fx.Color.ink)
                     .accessibilityHidden(true)
             }
             TextEditor(text: $text)
@@ -125,7 +129,7 @@ struct FxTextEditor: View {
                             .accessibilityHidden(true)
                     }
                 }
-                .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous), outline: borderColor)
+                .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous), outline: borderColor, width: borderWidth)
                 .accessibilityLabel(Text(title))
                 .accessibilityHint(issue.map { Text($0) } ?? Text(prompt))
             FxIssueText(issue: issue)
@@ -135,6 +139,10 @@ struct FxTextEditor: View {
     private var borderColor: Color {
         if issue != nil { return Fx.Color.error }
         return focused ? Fx.Color.sea : Fx.Color.line
+    }
+
+    private var borderWidth: CGFloat {
+        issue != nil || focused ? Fx.Border.emphasis : Fx.Border.hairline
     }
 }
 
@@ -158,8 +166,8 @@ private struct FxIssueText: View {
 }
 
 /// Equal square slot for a horizontal photo row: a picked photo with a remove control,
-/// an "add" sticker (label of a Button or PhotosPicker with `FxPressStyle`, so it sinks when pressed),
-/// or a loading placeholder that reserves the photo's space. Side scales with Dynamic Type.
+/// an "add" slot (label of a Button or PhotosPicker with `FxPressStyle`), or a loading placeholder
+/// that reserves the photo's space. Side scales with Dynamic Type.
 struct FxPhotoSlot: View {
     private enum Kind {
         case photo(UIImage, label: String, removeLabel: String, onRemove: () -> Void)
@@ -175,7 +183,7 @@ struct FxPhotoSlot: View {
         kind = .photo(image, label: label, removeLabel: removeLabel, onRemove: onRemove)
     }
 
-    /// Card sticker with a sea glyph and a short label. Passive: wrap it in a Button or PhotosPicker.
+    /// Bordered card slot with a sea glyph and a short label. Passive: wrap it in a Button or PhotosPicker.
     init(addTitle: String, systemImage: String) {
         kind = .add(title: addTitle, systemImage: systemImage)
     }
@@ -195,15 +203,15 @@ struct FxPhotoSlot: View {
                 .scaledToFill()
                 .frame(width: side, height: side)
                 .clipShape(shape)
-                .fxSticker(shape, fill: Fx.Color.card, depth: slotDepth, pressable: false)
+                .overlay { shape.strokeBorder(Fx.Color.line, lineWidth: Fx.Border.hairline) }
                 .accessibilityLabel(Text(label))
                 .overlay(alignment: .topTrailing) {
                     Button(action: onRemove) {
                         Image(systemName: "xmark")
-                            .font(Fx.Font.footnote.weight(.black))
+                            .font(Fx.Font.footnote.weight(.bold))
                             .foregroundStyle(Fx.Color.ink)
                             .frame(width: 26, height: 26)
-                            .fxSticker(Circle(), depth: Fx.Sticker.smallDepth)
+                            .fxOutline(Circle())
                             .padding(Fx.Space.xs)
                             .frame(width: Fx.minTarget, height: Fx.minTarget, alignment: .topTrailing)
                             .contentShape(Rectangle())
@@ -227,17 +235,14 @@ struct FxPhotoSlot: View {
             }
             .padding(Fx.Space.xs)
             .frame(width: side, height: side)
-            .fxSticker(shape, depth: slotDepth)
+            .fxOutline(shape)
+            .contentShape(shape)
         case .loading:
             ProgressView()
                 .frame(width: side, height: side)
                 .fxOutline(shape)
-                .padding(.bottom, slotDepth)
         }
     }
-
-    /// One shadow depth for every slot kind so a mixed row stays aligned.
-    private var slotDepth: CGFloat { Fx.Sticker.depth - 1 }
 
     private var shape: RoundedRectangle {
         RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous)

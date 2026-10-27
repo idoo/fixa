@@ -40,8 +40,8 @@ struct HistoryScreen: View {
 
     private var emptyState: some View {
         VStack(spacing: Fx.Space.l) {
-            FxBadge(systemImage: "tray", fill: Fx.Color.Pastel.sky, side: 72)
-            Text("Nothing reported yet. Everything's fine?")
+            FxBadge(systemImage: "tray", fill: Fx.Color.Pastel.sky, side: 64)
+            Text("No reports yet.")
                 .font(Fx.Font.title)
                 .foregroundStyle(Fx.Color.ink)
                 .multilineTextAlignment(.center)
@@ -102,7 +102,7 @@ private struct HistoryThumbnail: View {
         }
         .frame(width: side, height: side)
         .clipShape(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous))
-        .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous), fill: .clear)
+        .overlay(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous).strokeBorder(Fx.Color.line, lineWidth: Fx.Border.hairline))
         .accessibilityHidden(true)
     }
 }

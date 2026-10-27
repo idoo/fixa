@@ -2321,6 +2321,46 @@
         }
       }
     },
+    "Independent app, not run by the municipality." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Independent app, not run by the municipality."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fristående app, drivs inte av kommunen."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Itsenäinen sovellus, ei kunnan ylläpitämä."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تطبيق مستقل، لا تديره البلدية."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Незалежний застосунок, муніципалітет ним не керує."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niezależna aplikacja, nieprowadzona przez gminę."
+          }
+        }
+      }
+    },
     "Last name (optional)" : {
       "localizations" : {
         "en" : {
@@ -2681,6 +2721,46 @@
         }
       }
     },
+    "No reports yet." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No reports yet."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inga anmälningar än."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ei vielä ilmoituksia."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا توجد بلاغات بعد."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ще немає звернень."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brak zgłoszeń."
+          }
+        }
+      }
+    },
     "No water or a blocked sewer?" : {
       "localizations" : {
         "en" : {
@@ -2837,86 +2917,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nie wysłano"
-          }
-        }
-      }
-    },
-    "Not the municipality's app. Made by a neighbour who wanted it simpler." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Not the municipality's app. Made by a neighbour who wanted it simpler."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inte kommunens app. Gjord av en granne som ville ha det enklare."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ei kunnan sovellus. Tehnyt naapuri, joka halusi tästä helpompaa."
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ليس تطبيق البلدية. صنعه جارٌ أراد أن يكون الأمر أبسط."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Це не застосунок муніципалітету. Його зробив сусід, який хотів простіше."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "To nie jest aplikacja gminy. Zrobił ją sąsiad, który chciał, żeby było prościej."
-          }
-        }
-      }
-    },
-    "Nothing reported yet. Everything's fine?" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nothing reported yet. Everything's fine?"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inget anmält än. Är allt bra?"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ei vielä ilmoituksia. Onko kaikki kunnossa?"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "لم تُبلّغ عن شيء بعد. هل كل شيء على ما يرام؟"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ще нічого не повідомлено. Усе гаразд?"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jeszcze nic nie zgłoszono. Wszystko w porządku?"
           }
         }
       }
@@ -4121,42 +4121,42 @@
         }
       }
     },
-    "Report a problem in %@ without the e-service maze." : {
+    "Report a problem in %@ in a minute." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Report a problem in %@ without the e-service maze."
+            "value" : "Report a problem in %@ in a minute."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Anmäl fel i %@ utan att leta i e-tjänster."
+            "value" : "Anmäl ett fel i %@ på en minut."
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@: ilmoita ongelmasta ilman e-palvelujen sokkeloa."
+            "value" : "%@: ilmoita ongelmasta minuutissa."
           }
         },
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "أبلغ عن مشكلة في %@ دون متاهة الخدمات الإلكترونية."
+            "value" : "أبلغ عن مشكلة في %@ خلال دقيقة."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Повідомте про проблему в %@ без лабіринту е-сервісів."
+            "value" : "Повідомте про проблему в %@ за хвилину."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zgłoś problem w %@ bez błądzenia po e-usługach."
+            "value" : "Zgłoś problem w %@ w minutę."
           }
         }
       }

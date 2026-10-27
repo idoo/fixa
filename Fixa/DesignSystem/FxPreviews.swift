@@ -17,7 +17,7 @@ private struct FxCatalog: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Fx.Space.xl) {
-                FxSectionHeader("Fixa", subtitle: "Report a problem in Värmdö without the e-service maze.")
+                FxSectionHeader("Fixa", subtitle: "Report a problem in Värmdö in a minute.")
                 FxProgressSteps(current: 2, total: 3)
                 FxCallRow(title: "No water or a blocked sewer?",
                           detail: "VA-jouren via SOS Alarm · 08-454 25 71", action: {})
