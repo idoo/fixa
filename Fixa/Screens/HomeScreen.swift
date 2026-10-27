@@ -21,16 +21,17 @@ struct HomeScreen: View {
                         .font(Fx.Font.largeTitle)
                         .foregroundStyle(Fx.Color.ink)
                         .accessibilityAddTraits(.isHeader)
-                    Text("Report a problem in \(placeName)")
+                    Text("Report a problem in \(placeName) without the e-service maze.")
                         .font(Fx.Font.body)
-                        .foregroundStyle(Fx.Color.inkSoft)
+                        .foregroundStyle(Fx.Color.ink2)
                 }
 
                 LazyVGrid(columns: columns, spacing: Fx.Space.m) {
-                    ForEach(spec.tiles, id: \.id) { tile in
+                    ForEach(Array(spec.tiles.enumerated()), id: \.element.id) { index, tile in
                         FxTile(
                             title: tile.title.resolve(),
                             systemImage: tile.symbol,
+                            index: index,
                             isSelected: model.draft.tileID == tile.id && !model.path.isEmpty
                         ) {
                             model.startReport(tile: tile)
@@ -42,9 +43,10 @@ struct HomeScreen: View {
                     urgentRow(emergency)
                 }
 
-                Text("Independent app, not part of \(spec.municipality.name).")
+                Text("Not the municipality's app. Made by a neighbour who wanted it simpler.")
                     .font(Fx.Font.footnote)
-                    .foregroundStyle(Fx.Color.inkSoft)
+                    .foregroundStyle(Fx.Color.ink2)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .padding(.horizontal, Fx.Space.l)
             .padding(.top, Fx.Space.xs)
@@ -55,9 +57,9 @@ struct HomeScreen: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
-                    model.path.append(.about)
+                    model.path.append(.profile)
                 } label: {
-                    Label("About", systemImage: "info.circle")
+                    Label("Profile", systemImage: "person.crop.circle")
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {

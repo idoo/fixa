@@ -45,6 +45,25 @@ enum LocationProvider {
         }
         throw Failure.unavailable
     }
+
+    /// Like `currentCoordinate()` but gives up quietly after `timeout`; nil on any failure.
+    /// Requests nothing on its own when authorization is already decided.
+    static func currentCoordinate(timeout: Duration) async -> Coordinate? {
+        let lookup = Task { @MainActor () -> Coordinate? in
+            guard let found = try? await currentCoordinate() else { return nil }
+            return Coordinate(found)
+        }
+        let timer = Task { @MainActor in
+            try? await Task.sleep(for: timeout)
+            lookup.cancel()
+        }
+        defer { timer.cancel() }
+        return await withTaskCancellationHandler {
+            await lookup.value
+        } onCancel: {
+            lookup.cancel()
+        }
+    }
 }
 
 /// Address text for a coordinate, via MapKit reverse geocoding.

@@ -3,7 +3,7 @@ import XCTest
 /// Screenshot sweep, run via the `FixaUI` scheme:
 /// `xcodebuild test -scheme FixaUI -only-testing:FixaUITests/FixaUITests/testScreens`.
 final class FixaUITests: XCTestCase {
-    private let screens = ["home", "report", "location", "review", "receipt", "history", "about"]
+    private let screens = ["home", "report", "location", "review", "receipt", "history", "about", "profile"]
 
     override func setUp() {
         continueAfterFailure = true

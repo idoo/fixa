@@ -1,9 +1,9 @@
 import SwiftUI
 import UIKit
 
-/// Signature element: a Falu-red rubber stamp on the receipt.
-/// Double rounded border, dashed inner rule, "MOTTAGET" + case number, rotated −6°,
-/// faint ink speckle, and a one-shot "stamp" landing (spring + success haptic).
+/// Signature element: a traffic-cone orange rubber-stamp sticker on the receipt.
+/// Cone face with ink type (5.54:1), ink outline, dashed inner rule, worn ink speckle, hard shadow,
+/// "MOTTAGET" + case number, rotated −6°, and a one-shot "stamp" landing (spring + success haptic).
 /// Reduce Motion: appears in place without the landing.
 struct FxStatusStamp: View {
     let caseNumber: String?
@@ -38,36 +38,36 @@ struct FxStatusStamp: View {
     }
 
     private var stamp: some View {
-        VStack(spacing: Fx.Space.xs) {
+        let shape = RoundedRectangle(cornerRadius: Fx.Radius.m, style: .continuous)
+        return VStack(spacing: Fx.Space.xs) {
             Text(verbatim: "MOTTAGET")
-                .font(.system(.title, design: .default, weight: .black))
+                .font(Fx.Font.stamp)
                 .tracking(5)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
             Rectangle()
-                .frame(height: 1.5)
+                .frame(height: Fx.Sticker.line)
                 .padding(.horizontal, Fx.Space.s)
             Text(verbatim: caseNumber.map { "Nr \($0)" } ?? "Fixa")
-                .font(.system(.headline, design: .monospaced, weight: .bold))
+                .font(Fx.Font.stampNumber)
                 .monospacedDigit()
                 .tracking(1.5)
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
         }
+        .foregroundStyle(Fx.Color.onCone)
         .padding(.horizontal, Fx.Space.xl)
         .padding(.vertical, Fx.Space.l)
         .overlay {
             RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous)
-                .strokeBorder(style: StrokeStyle(lineWidth: 1.5, dash: [6, 3]))
+                .strokeBorder(Fx.Color.onCone, style: StrokeStyle(lineWidth: 1.5, dash: [6, 3]))
                 .padding(Fx.Space.xs + 2)
         }
-        .overlay {
-            RoundedRectangle(cornerRadius: Fx.Radius.s + 4, style: .continuous)
-                .strokeBorder(lineWidth: 3.5)
-        }
-        .foregroundStyle(Fx.Color.accent)
+        .background(Fx.Color.cone, in: shape)
+        .overlay(shape.strokeBorder(Fx.Color.onCone, lineWidth: Fx.Sticker.line + 1))
         .mask { FxInkTexture() }
-        .opacity(0.92)
+        .background(shape.fill(Fx.Color.shadow).offset(y: Fx.Sticker.depth + 1))
+        .padding(.bottom, Fx.Sticker.depth + 1)
         .fixedSize()
     }
 
@@ -80,7 +80,7 @@ struct FxStatusStamp: View {
     }
 }
 
-/// Compact copy control that sits under the stamp (case number) or a fallback text.
+/// Compact sticker-capsule copy control that sits under the stamp (case number) or a fallback text.
 /// Copies `value` to the pasteboard, plays a success haptic, and shows `copiedTitle` for 1.5 s.
 struct FxCopyButton: View {
     let title: String
@@ -105,19 +105,18 @@ struct FxCopyButton: View {
             HStack(spacing: Fx.Space.s) {
                 Image(systemName: copied ? "checkmark" : "doc.on.doc")
                     .imageScale(.medium)
+                    .fontWeight(.bold)
                     .contentTransition(.symbolEffect(.replace))
                     .accessibilityHidden(true)
                 Text(copied ? copiedTitle : title)
-                    .font(Fx.Font.callout.weight(.semibold))
+                    .font(Fx.Font.callout.weight(.bold))
                     .multilineTextAlignment(.center)
             }
-            .foregroundStyle(copied ? Fx.Color.moss : Fx.Color.ink)
+            .foregroundStyle(copied ? Fx.Color.success : Fx.Color.ink)
             .padding(.horizontal, Fx.Space.l)
             .padding(.vertical, Fx.Space.s)
             .frame(minHeight: Fx.minTarget)
-            .background(Fx.Color.card, in: Capsule())
-            .overlay(Capsule().strokeBorder(Fx.Color.line, lineWidth: 1))
-            .contentShape(Capsule())
+            .fxSticker(Capsule(), depth: Fx.Sticker.depth - 1)
             .animation(Fx.Motion.select, value: copied)
         }
         .buttonStyle(FxPressStyle())
@@ -133,10 +132,11 @@ struct FxCopyButton: View {
 }
 
 /// Deterministic ink speckle used as a mask: mostly opaque, with small worn-out flecks.
+/// Only alpha matters in a mask; `Fx.Color.ink` is just an opaque paint.
 private struct FxInkTexture: View {
     var body: some View {
         Canvas { context, size in
-            context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(.white))
+            context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(Fx.Color.ink))
             var seed: UInt64 = 0x9E3779B97F4A7C15
             func next() -> CGFloat {
                 seed = seed &* 6364136223846793005 &+ 1442695040888963407
@@ -151,7 +151,7 @@ private struct FxInkTexture: View {
                 let alpha = 0.25 + next() * 0.6
                 context.fill(
                     Path(ellipseIn: CGRect(x: x - r, y: y - r, width: r * 2, height: r * 2)),
-                    with: .color(.white.opacity(alpha))
+                    with: .color(Fx.Color.ink.opacity(alpha))
                 )
             }
         }

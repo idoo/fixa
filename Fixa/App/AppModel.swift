@@ -1,5 +1,6 @@
-import Foundation
+import CoreLocation
 import FixaKit
+import Foundation
 import Observation
 import UIKit
 
@@ -10,6 +11,7 @@ enum Route: Hashable {
     case history
     case historyDetail(UUID)
     case about
+    case profile
 }
 
 @Observable
@@ -21,13 +23,43 @@ final class AppModel {
     let submission = SubmissionService()
 
     var path: [Route] = []
-    var draft: ReportDraft
+    /// What the report sends. `contact` always mirrors the profile while a reply is wanted and is
+    /// empty otherwise, so turning the toggle off never sends (or deletes) the saved details.
+    var draft: ReportDraft {
+        get { draftStorage }
+        set {
+            var next = newValue
+            next.contact = next.wantsFeedback ? profileStorage : Contact()
+            draftStorage = next
+            scheduleDraftSave()
+        }
+    }
+    private var draftStorage: ReportDraft
+    /// Optional reply details, saved on this phone (UserDefaults `fixa.contact`) as they change.
+    var profile: Contact {
+        get { profileStorage }
+        set {
+            profileStorage = newValue
+            if draftStorage.wantsFeedback {
+                draftStorage.contact = newValue
+            }
+            scheduleProfileSave()
+        }
+    }
+    private var profileStorage: Contact
     /// Originals picked or taken; `draft.photoJPEG` is their collage.
     private(set) var photos: [UIImage] = []
+    /// Draft copies of `photos` in Caches, same order; empty when drafts aren't persisted.
+    @ObservationIgnored private var photoFiles: [String] = []
     var isLocationPickerPresented = false
+    /// True while a new report fills in the current location on its own.
+    private(set) var isFindingLocation = false
     /// Set once the user has tried to continue; inline issues show from then on.
     var showIssues = false
     private(set) var sent: SentReport?
+
+    @ObservationIgnored private var profileSaveTask: Task<Void, Never>?
+    @ObservationIgnored private var draftSaveTask: Task<Void, Never>?
 
     static let maxPhotos = 3
     private static let adapterID = "se.varmdo.ksb"
@@ -38,17 +70,23 @@ final class AppModel {
         let bundled = AdapterCatalog.bundled()
         spec = bundled.first { $0.id == Self.adapterID } ?? bundled.first
         history = HistoryStore(inMemory: options.demo)
-        draft = ReportDraft(adapterID: spec?.id ?? Self.adapterID)
-        draft.contact = Self.loadContact()
+        profileStorage = Self.loadContact()
+        draftStorage = ReportDraft(adapterID: spec?.id ?? Self.adapterID)
+        draftStorage = freshDraft()
         if options.demo {
             seedDemo()
         } else if options.liveTest {
             seedLiveTest()
+        } else if options.screen == nil {
+            restoreDraft()
         }
         if let screen = options.screen {
             open(screen)
         }
     }
+
+    /// Drafts and the profile are written only for real use, never for demo or live-test launches.
+    private var persists: Bool { !options.demo && !options.liveTest }
 
     // MARK: Flow
 
@@ -81,7 +119,7 @@ final class AppModel {
     func goToReview() -> Bool {
         showIssues = true
         guard issues.isEmpty else { return false }
-        saveContact()
+        saveProfileNow()
         submission.reset()
         path.append(.review)
         return true
@@ -94,20 +132,47 @@ final class AppModel {
         sent = result
         if !result.isDryRun {
             history.add(historyItem(for: result))
+            clearSavedDraft()
         }
         path.append(.receipt)
     }
 
-    /// Back to Home with a fresh draft; keeps the remembered contact.
+    /// Back to Home with a fresh draft; the profile stays.
     func finish() {
-        let contact = draft.contact
-        draft = ReportDraft(adapterID: spec?.id ?? Self.adapterID)
-        draft.contact = contact
-        photos = []
-        showIssues = false
         sent = nil
+        photos = []
+        clearSavedDraft()
+        draft = freshDraft()
+        showIssues = false
         submission.reset()
         path = []
+    }
+
+    /// A new report: replies default to on when the profile already has a usable e-mail.
+    private func freshDraft() -> ReportDraft {
+        var fresh = ReportDraft(adapterID: spec?.id ?? Self.adapterID)
+        fresh.wantsFeedback = profileHasEmail
+        fresh.contact = fresh.wantsFeedback ? profileStorage : Contact()
+        return fresh
+    }
+
+    // MARK: Location
+
+    /// On a new report, fills in the current place and address when location is already allowed.
+    /// Never asks for permission: that prompt stays on the explicit "Use my location".
+    func prefillLocationIfAllowed() async {
+        guard persists, let spec, draft.coordinate == nil, !isFindingLocation else { return }
+        let status = CLLocationManager().authorizationStatus
+        guard status == .authorizedWhenInUse || status == .authorizedAlways else { return }
+        isFindingLocation = true
+        defer { isFindingLocation = false }
+        guard let coordinate = await LocationProvider.currentCoordinate(timeout: .seconds(10)),
+              spec.municipality.region.contains(coordinate) else { return }
+        let address = await ReverseGeocoder.address(for: coordinate.clLocation)
+        // The user may have placed a pin meanwhile; theirs wins.
+        guard draft.coordinate == nil, !isLocationPickerPresented else { return }
+        draft.coordinate = coordinate
+        draft.locationText = address ?? ""
     }
 
     // MARK: Photos
@@ -115,13 +180,20 @@ final class AppModel {
     func addPhotos(_ images: [UIImage]) {
         let room = Self.maxPhotos - photos.count
         guard room > 0 else { return }
-        photos.append(contentsOf: images.prefix(room))
+        let added = Array(images.prefix(room))
+        photos.append(contentsOf: added)
+        if persists {
+            photoFiles.append(contentsOf: added.compactMap { DraftStore.writePhoto($0) })
+        }
         recomposePhoto()
     }
 
     func removePhoto(at index: Int) {
         guard photos.indices.contains(index) else { return }
         photos.remove(at: index)
+        if photoFiles.indices.contains(index) {
+            DraftStore.deletePhoto(photoFiles.remove(at: index))
+        }
         recomposePhoto()
     }
 
@@ -129,11 +201,115 @@ final class AppModel {
         draft.photoJPEG = PhotoCollage.combine(photos)
     }
 
-    // MARK: Contact
+    // MARK: Draft persistence
 
-    func saveContact() {
-        guard !options.demo, draft.wantsFeedback, let data = try? JSONEncoder().encode(draft.contact) else { return }
-        UserDefaults.standard.set(data, forKey: Self.contactKey)
+    private var draftHasContent: Bool {
+        !draftStorage.description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !photos.isEmpty
+    }
+
+    private func scheduleDraftSave() {
+        guard persists else { return }
+        draftSaveTask?.cancel()
+        draftSaveTask = Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(600))
+            guard !Task.isCancelled else { return }
+            self?.saveDraftNow()
+        }
+    }
+
+    /// Keeps an unsent draft with text or photos; an empty one is cleared. A sent one is left alone
+    /// (`send` already cleared it).
+    func saveDraftNow() {
+        guard persists else { return }
+        draftSaveTask?.cancel()
+        guard sent == nil else { return }
+        if draftHasContent {
+            DraftStore.save(draftStorage, photoFiles: photoFiles)
+        } else {
+            DraftStore.clear()
+        }
+    }
+
+    private func clearSavedDraft() {
+        draftSaveTask?.cancel()
+        photoFiles = []
+        if persists {
+            DraftStore.clear()
+        }
+    }
+
+    /// Reopens an unsent report from before the app was closed.
+    private func restoreDraft() {
+        guard let saved = DraftStore.load() else { return }
+        var restored = saved.draft
+        restored.adapterID = spec?.id ?? Self.adapterID
+        restored.contact = restored.wantsFeedback ? profileStorage : Contact()
+        draftStorage = restored
+        photos = saved.photos
+        photoFiles = saved.photoFiles
+        draftStorage.photoJPEG = PhotoCollage.combine(photos)
+        guard draftHasContent else {
+            clearSavedDraft()
+            draftStorage = freshDraft()
+            photos = []
+            return
+        }
+        path = [.report]
+    }
+
+    /// Writes everything pending at once, e.g. when the app goes to the background.
+    func persistNow() {
+        saveProfileNow()
+        saveDraftNow()
+    }
+
+    // MARK: Profile
+
+    /// Email and phone problems in `contact`, judged exactly as the report judges them.
+    func contactIssues(_ contact: Contact) -> [ValidationIssue] {
+        guard let spec else { return [] }
+        let probe = ReportDraft(adapterID: spec.id, wantsFeedback: false, contact: contact)
+        return ReportValidator.validate(probe, spec: spec).filter { $0.field == .email || $0.field == .phone }
+    }
+
+    /// The saved profile has a non-empty e-mail the report accepts.
+    var profileHasEmail: Bool {
+        !profileStorage.email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && !contactIssues(profileStorage).contains { $0.field == .email }
+    }
+
+    /// The profile can stand in for the reply fields: usable e-mail and no other problems.
+    var profileIsReady: Bool {
+        profileHasEmail && contactIssues(profileStorage).isEmpty
+    }
+
+    var profileIsEmpty: Bool { profileStorage == Contact() }
+
+    private func scheduleProfileSave() {
+        guard persists else { return }
+        profileSaveTask?.cancel()
+        profileSaveTask = Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(500))
+            guard !Task.isCancelled else { return }
+            self?.saveProfileNow()
+        }
+    }
+
+    func saveProfileNow() {
+        guard persists else { return }
+        profileSaveTask?.cancel()
+        if profileIsEmpty {
+            UserDefaults.standard.removeObject(forKey: Self.contactKey)
+        } else if let data = try? JSONEncoder().encode(profileStorage) {
+            UserDefaults.standard.set(data, forKey: Self.contactKey)
+        }
+    }
+
+    /// Removes the saved details from this phone and turns replies off for the current report.
+    func clearProfile() {
+        profile = Contact()
+        draft.wantsFeedback = false
+        saveProfileNow()
     }
 
     private static func loadContact() -> Contact {
@@ -161,6 +337,7 @@ final class AppModel {
     // MARK: Launch hooks
 
     private func seedDemo() {
+        profileStorage = DemoData.profile
         var demo = DemoData.draft(adapterID: spec?.id ?? Self.adapterID)
         demo.categoryID = spec?.tile(id: demo.tileID)?.categoryID
         draft = demo
@@ -180,7 +357,7 @@ final class AppModel {
         test.coordinate = Coordinate(latitude: 59.3262, longitude: 18.3856)
         test.locationText = "TEST, Gustavsbergs centrum"
         test.wantsFeedback = true
-        test.contact = Contact(firstName: "", lastName: "", phone: "", email: "test@test.se")
+        profileStorage = Contact(firstName: "", lastName: "", phone: "", email: "test@test.se")
         draft = test
         if let image = DemoData.photo {
             photos = [image]
@@ -208,6 +385,8 @@ final class AppModel {
             path = [.history]
         case .about:
             path = [.about]
+        case .profile:
+            path = [.profile]
         }
     }
 }

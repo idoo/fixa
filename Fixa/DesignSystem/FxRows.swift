@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Serif section title with optional supporting line.
+/// Heavy rounded section title with optional supporting line.
 struct FxSectionHeader: View {
     let title: String
     var subtitle: String? = nil
@@ -19,7 +19,7 @@ struct FxSectionHeader: View {
             if let subtitle {
                 Text(subtitle)
                     .font(Fx.Font.callout)
-                    .foregroundStyle(Fx.Color.inkSoft)
+                    .foregroundStyle(Fx.Color.ink2)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -27,7 +27,26 @@ struct FxSectionHeader: View {
     }
 }
 
-/// Labelled switch row, whole row toggles.
+/// Dashed 2 pt rule between rows inside an `FxCard`, quieter than the card's ink outline.
+struct FxDivider: View {
+    var body: some View {
+        Rule()
+            .stroke(Fx.Color.ink2.opacity(0.45), style: StrokeStyle(lineWidth: Fx.Sticker.line, lineCap: .round, dash: [6, 6]))
+            .frame(height: Fx.Sticker.line)
+            .accessibilityHidden(true)
+    }
+
+    private struct Rule: Shape {
+        nonisolated func path(in rect: CGRect) -> Path {
+            var path = Path()
+            path.move(to: CGPoint(x: rect.minX, y: rect.midY))
+            path.addLine(to: CGPoint(x: rect.maxX, y: rect.midY))
+            return path
+        }
+    }
+}
+
+/// Labelled switch row, whole row toggles. Sea switch.
 struct FxToggleRow: View {
     let title: String
     var subtitle: String? = nil
@@ -43,22 +62,23 @@ struct FxToggleRow: View {
         Toggle(isOn: $isOn) {
             VStack(alignment: .leading, spacing: Fx.Space.xs) {
                 Text(title)
-                    .font(Fx.Font.body)
+                    .font(Fx.Font.headline)
                     .foregroundStyle(Fx.Color.ink)
                 if let subtitle {
                     Text(subtitle)
                         .font(Fx.Font.footnote)
-                        .foregroundStyle(Fx.Color.inkSoft)
+                        .foregroundStyle(Fx.Color.ink2)
                 }
             }
         }
-        .tint(Fx.Color.accent)
+        .tint(Fx.Color.sea)
         .frame(minHeight: Fx.minTarget)
         .sensoryFeedback(.selection, trigger: isOn)
     }
 }
 
-/// Calm inline message: info (sea), warning, error (Falu red), success (moss).
+/// Pastel sticker message: info (sky), warning (sun), error (rose), success (mint). Ink text on the
+/// pastel in both appearances; the kind's glyph sits in a small badge.
 struct FxBanner: View {
     enum Kind: Sendable {
         case info, warning, error, success
@@ -69,6 +89,8 @@ struct FxBanner: View {
     var message: String? = nil
     var actionTitle: String? = nil
     var action: (() -> Void)? = nil
+
+    @ScaledMetric(relativeTo: .headline) private var badgeSide: CGFloat = 30
 
     init(kind: Kind, title: String, message: String? = nil, actionTitle: String? = nil, action: (() -> Void)? = nil) {
         self.kind = kind
@@ -81,64 +103,67 @@ struct FxBanner: View {
     var body: some View {
         HStack(alignment: .top, spacing: Fx.Space.m) {
             Image(systemName: symbol)
-                .font(Fx.Font.headline)
-                .foregroundStyle(tone)
-                .frame(minWidth: 24)
+                .font(Fx.Font.subheadline.weight(.black))
+                .foregroundStyle(Fx.Color.onPastel)
+                .frame(width: badgeSide, height: badgeSide)
+                .fxOutline(Circle(), fill: .clear, outline: Fx.Color.onPastel)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: Fx.Space.xs) {
                 Text(title)
                     .font(Fx.Font.headline)
-                    .foregroundStyle(Fx.Color.ink)
+                    .foregroundStyle(Fx.Color.onPastel)
                 if let message {
                     Text(message)
                         .font(Fx.Font.callout)
-                        .foregroundStyle(Fx.Color.inkSoft)
+                        .foregroundStyle(Fx.Color.onPastel2)
                 }
                 if let actionTitle, let action {
                     Button(action: action) {
                         Text(actionTitle)
-                            .font(Fx.Font.callout.weight(.semibold))
-                            .foregroundStyle(tone)
+                            .font(Fx.Font.callout.weight(.bold))
+                            .underline()
+                            .foregroundStyle(Fx.Color.onPastel)
                             .frame(minHeight: Fx.minTarget, alignment: .leading)
                             .contentShape(.rect)
                     }
-                    .buttonStyle(FxPressStyle())
+                    .buttonStyle(FxPressStyle(dims: true))
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .fixedSize(horizontal: false, vertical: true)
         }
         .padding(Fx.Space.l)
-        .background(tone.opacity(0.10), in: .rect(cornerRadius: Fx.Radius.m, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: Fx.Radius.m, style: .continuous)
-                .strokeBorder(tone.opacity(0.35), lineWidth: 1)
-        }
+        .fxSticker(
+            RoundedRectangle(cornerRadius: Fx.Radius.l, style: .continuous),
+            fill: fill,
+            depth: Fx.Sticker.depth - 1,
+            pressable: false
+        )
         .accessibilityElement(children: .combine)
     }
 
-    private var tone: Color {
+    private var fill: Color {
         switch kind {
-        case .info: Fx.Color.sea
-        case .warning: Fx.Color.warn
-        case .error: Fx.Color.accent
-        case .success: Fx.Color.moss
+        case .info: Fx.Color.Pastel.sky
+        case .warning: Fx.Color.Pastel.sun
+        case .error: Fx.Color.Pastel.rose
+        case .success: Fx.Color.Pastel.mint
         }
     }
 
     private var symbol: String {
         switch kind {
-        case .info: "info.circle.fill"
-        case .warning: "exclamationmark.triangle.fill"
-        case .error: "xmark.octagon.fill"
-        case .success: "checkmark.circle.fill"
+        case .info: "info"
+        case .warning: "exclamationmark"
+        case .error: "xmark"
+        case .success: "checkmark"
         }
     }
 }
 
-/// Compact single-row phone shortcut (e.g. an emergency line): phone glyph, short title,
-/// one secondary line (name and number) and a trailing call circle. The whole row is the
-/// tap target; light impact haptic on tap. Put the number in `detail` only, so it shows once.
+/// Compact single-row phone shortcut (e.g. an emergency line): short title, one secondary line
+/// (number and name) and a trailing cone call badge, on a sun-pastel sticker. The whole row is the
+/// tap target and sinks when pressed; light impact haptic on tap. Put the number in `detail` only, so it shows once.
 struct FxCallRow: View {
     let title: String
     let detail: String
@@ -161,31 +186,29 @@ struct FxCallRow: View {
             HStack(spacing: Fx.Space.m) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(Fx.Color.ink)
+                        .font(Fx.Font.subheadline.weight(.bold))
+                        .foregroundStyle(Fx.Color.onPastel)
                     Text(detail)
                         .font(Fx.Font.footnote)
-                        .foregroundStyle(Fx.Color.inkSoft)
+                        .foregroundStyle(Fx.Color.onPastel2)
                 }
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
                 Image(systemName: "phone.arrow.up.right.fill")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Fx.Color.onAccent)
+                    .font(Fx.Font.subheadline.weight(.heavy))
+                    .foregroundStyle(Fx.Color.onCone)
                     .frame(width: callSide, height: callSide)
-                    .background(Fx.Color.warn, in: .circle)
+                    .fxSticker(Circle(), fill: Fx.Color.cone, depth: Fx.Sticker.smallDepth, pressable: false)
                     .accessibilityHidden(true)
             }
             .padding(.horizontal, Fx.Space.m)
             .padding(.vertical, Fx.Space.s)
             .frame(minHeight: Fx.minTarget + Fx.Space.s)
-            .background(Fx.Color.warn.opacity(0.10), in: .rect(cornerRadius: Fx.Radius.m, style: .continuous))
-            .overlay {
-                RoundedRectangle(cornerRadius: Fx.Radius.m, style: .continuous)
-                    .strokeBorder(Fx.Color.warn.opacity(0.35), lineWidth: 1)
-            }
-            .contentShape(.rect(cornerRadius: Fx.Radius.m, style: .continuous))
+            .fxSticker(
+                RoundedRectangle(cornerRadius: Fx.Radius.m, style: .continuous),
+                fill: Fx.Color.Pastel.sun
+            )
         }
         .buttonStyle(FxPressStyle())
         .sensoryFeedback(.impact(weight: .light), trigger: taps)
@@ -218,7 +241,7 @@ struct FxIconRow: View {
                 content
                     .contentShape(.rect)
             }
-            .buttonStyle(FxPressStyle())
+            .buttonStyle(FxPressStyle(dims: true))
         } else {
             content
                 .accessibilityElement(children: .combine)
@@ -228,19 +251,19 @@ struct FxIconRow: View {
     private var content: some View {
         HStack(alignment: .firstTextBaseline, spacing: Fx.Space.m) {
             Image(systemName: systemImage)
-                .font(Fx.Font.body)
+                .font(Fx.Font.body.weight(.bold))
                 .foregroundStyle(Fx.Color.sea)
                 .frame(width: iconColumn)
                 .accessibilityHidden(true)
             Text(text)
-                .font(link == nil ? Fx.Font.body : Fx.Font.body.weight(.semibold))
+                .font(link == nil ? Fx.Font.body : Fx.Font.body.weight(.bold))
                 .foregroundStyle(link == nil ? Fx.Color.ink : Fx.Color.sea)
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
             if link != nil {
                 Image(systemName: "arrow.up.forward")
-                    .font(Fx.Font.footnote.weight(.semibold))
+                    .font(Fx.Font.footnote.weight(.heavy))
                     .foregroundStyle(Fx.Color.sea)
                     .accessibilityHidden(true)
             }
@@ -249,7 +272,7 @@ struct FxIconRow: View {
     }
 }
 
-/// Segmented step indicator. `current` is 1-based.
+/// Segmented step indicator: outlined capsules, done steps filled cone. `current` is 1-based.
 struct FxProgressSteps: View {
     let current: Int
     let total: Int
@@ -266,8 +289,9 @@ struct FxProgressSteps: View {
         HStack(spacing: Fx.Space.xs) {
             ForEach(1...safeTotal, id: \.self) { step in
                 Capsule()
-                    .fill(step <= safeCurrent ? Fx.Color.accent : Fx.Color.line)
-                    .frame(height: 4)
+                    .fill(step <= safeCurrent ? Fx.Color.cone : Fx.Color.card)
+                    .overlay(Capsule().strokeBorder(Fx.Color.line, lineWidth: Fx.Sticker.line))
+                    .frame(height: 10)
             }
         }
         .animation(Fx.Motion.select, value: safeCurrent)

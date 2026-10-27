@@ -15,7 +15,7 @@ struct ReviewScreen: View {
             VStack(alignment: .leading, spacing: Fx.Space.l) {
                 Text("This is what \(spec.municipality.name) receives")
                     .font(Fx.Font.callout)
-                    .foregroundStyle(Fx.Color.inkSoft)
+                    .foregroundStyle(Fx.Color.ink2)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .fixedSize(horizontal: false, vertical: true)
                 summaryCard
@@ -67,7 +67,7 @@ struct ReviewScreen: View {
                 if let category = municipalityCategory {
                     Text(category)
                         .font(Fx.Font.callout)
-                        .foregroundStyle(Fx.Color.inkSoft)
+                        .foregroundStyle(Fx.Color.ink2)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
@@ -81,10 +81,11 @@ struct ReviewScreen: View {
                         longitudinalMeters: 400
                     )), interactionModes: []) {
                         Marker(placeText, coordinate: coordinate.clLocation)
-                            .tint(Fx.Color.accent)
+                            .tint(Fx.Color.sea)
                     }
                     .frame(height: 120)
                     .clipShape(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous))
+                    .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous), fill: .clear)
                     .allowsHitTesting(false)
                     .accessibilityHidden(true)
                     .padding(.top, Fx.Space.xs)
@@ -101,7 +102,7 @@ struct ReviewScreen: View {
                 } else {
                     Text("No photo")
                         .font(Fx.Font.body)
-                        .foregroundStyle(Fx.Color.inkSoft)
+                        .foregroundStyle(Fx.Color.ink2)
                 }
             }
             divider
@@ -151,13 +152,14 @@ struct ReviewScreen: View {
                     .scaledToFill()
             }
             .clipShape(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous))
+            .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous), fill: .clear)
             .padding(.top, Fx.Space.xs)
             .accessibilityElement()
             .accessibilityLabel(Text("Attached photo"))
     }
 
     private var divider: some View {
-        Rectangle().fill(Fx.Color.line).frame(height: 1)
+        FxDivider()
     }
 
     private func value(_ text: String) -> some View {
@@ -174,12 +176,12 @@ struct ReviewScreen: View {
             VStack(alignment: .leading, spacing: Fx.Space.xs) {
                 HStack(alignment: .firstTextBaseline, spacing: Fx.Space.s) {
                     Text(title)
-                        .font(Fx.Font.footnote.weight(.semibold))
-                        .foregroundStyle(Fx.Color.inkSoft)
+                        .font(Fx.Font.subheadline)
+                        .foregroundStyle(Fx.Color.ink2)
                     Spacer(minLength: Fx.Space.s)
                     Text("Edit")
-                        .font(Fx.Font.footnote)
-                        .foregroundStyle(Fx.Color.inkSoft)
+                        .font(Fx.Font.footnote.weight(.bold))
+                        .foregroundStyle(Fx.Color.sea)
                         .accessibilityHidden(true)
                 }
                 content()
@@ -187,7 +189,7 @@ struct ReviewScreen: View {
             .frame(maxWidth: .infinity, minHeight: Fx.minTarget, alignment: .leading)
             .contentShape(.rect)
         }
-        .buttonStyle(FxPressStyle())
+        .buttonStyle(FxPressStyle(dims: true))
         .disabled(model.submission.isSending)
         .accessibilityElement(children: .combine)
         .accessibilityHint(Text("Opens the report to change it"))
@@ -236,14 +238,14 @@ struct ReviewScreen: View {
                     FxProgressSteps(current: stage.stepIndex, total: SubmissionStage.stepCount)
                     Text(stage.label)
                         .font(Fx.Font.callout)
-                        .foregroundStyle(Fx.Color.inkSoft)
+                        .foregroundStyle(Fx.Color.ink2)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .accessibilityElement(children: .combine)
             } else if let error = submission.error {
                 HStack(alignment: .firstTextBaseline, spacing: Fx.Space.s) {
                     Image(systemName: "xmark.octagon.fill")
-                        .foregroundStyle(Fx.Color.accent)
+                        .foregroundStyle(Fx.Color.error)
                         .accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: Fx.Space.xs) {
                         Text("Not sent")
@@ -251,7 +253,7 @@ struct ReviewScreen: View {
                             .foregroundStyle(Fx.Color.ink)
                         Text(error.userMessage)
                             .font(Fx.Font.callout)
-                            .foregroundStyle(Fx.Color.inkSoft)
+                            .foregroundStyle(Fx.Color.ink2)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                 }
@@ -268,7 +270,7 @@ struct ReviewScreen: View {
             if let email = spec.fallbackEmail {
                 Text("Mail isn't set up on this phone. Share or copy the report and send it to \(email).")
                     .font(Fx.Font.footnote)
-                    .foregroundStyle(Fx.Color.inkSoft)
+                    .foregroundStyle(Fx.Color.ink2)
                     .fixedSize(horizontal: false, vertical: true)
             }
             FxCopyButton(title: String(localized: "Copy report text"), value: mailText)

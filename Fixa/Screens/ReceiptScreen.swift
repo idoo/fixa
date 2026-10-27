@@ -46,7 +46,7 @@ struct ReceiptScreen: View {
                     .accessibilityAddTraits(.isHeader)
                 Text(sent.date, format: .dateTime.day().month(.wide).year().hour().minute())
                     .font(Fx.Font.callout)
-                    .foregroundStyle(Fx.Color.inkSoft)
+                    .foregroundStyle(Fx.Color.ink2)
                     .multilineTextAlignment(.center)
                 if !sent.isDryRun, let caseNumber = sent.caseNumber {
                     FxCopyButton(title: String(localized: "Copy case number"), value: caseNumber)
@@ -58,7 +58,7 @@ struct ReceiptScreen: View {
                 VStack(spacing: Fx.Space.l) {
                     Text(nextStep)
                         .font(Fx.Font.body)
-                        .foregroundStyle(Fx.Color.inkSoft)
+                        .foregroundStyle(Fx.Color.ink2)
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
                     FxSecondaryButton(title: String(localized: "Sent reports"), systemImage: "clock.arrow.circlepath") {

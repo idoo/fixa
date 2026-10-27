@@ -1,8 +1,8 @@
 import Foundation
 
 /// Launch hooks for screenshots and testing. Harmless in Release.
-///   -FixaScreen home|report|location|review|receipt|history|about
-///   -FixaDemo 1     seeds a demo draft, history and receipt; no network
+///   -FixaScreen home|report|location|review|receipt|history|about|profile
+///   -FixaDemo 1     seeds a demo draft, profile, history and receipt; no network, nothing saved
 ///   -FixaEmptyHistory 1  with -FixaDemo: leaves the demo history empty (History empty state)
 ///   -FixaDryRun 1   Review's Send stops at the Summary page (nothing is submitted)
 ///   -FixaLiveTest 1 DEBUG builds only (always off in Release): seeds a marked TEST report
@@ -10,7 +10,7 @@ import Foundation
 ///                   response to Caches/fixa-responses. Sending is REAL.
 struct LaunchOptions: Sendable {
     enum Screen: String, CaseIterable, Sendable {
-        case home, report, location, review, receipt, history, about
+        case home, report, location, review, receipt, history, about, profile
     }
 
     var screen: Screen?
