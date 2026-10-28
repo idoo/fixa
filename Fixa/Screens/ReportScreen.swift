@@ -208,6 +208,9 @@ struct ReportScreen: View {
                         .foregroundStyle(Fx.Color.ink)
                         .fixedSize(horizontal: false, vertical: true)
                 }
+                if let info = emergency.infoURL {
+                    OtherQuestionsLink(url: info)
+                }
             }
         }
         .accessibilityIdentifier("report.callCard")

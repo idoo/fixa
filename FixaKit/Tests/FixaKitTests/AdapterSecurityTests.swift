@@ -211,6 +211,17 @@ final class AdapterSecurityTests: XCTestCase {
             emergency["holidays"] = "XX"
             json["emergency"] = emergency
         }), "unknown holiday calendar")
+        func withInfo(_ url: String) throws -> Data {
+            try changed { json in
+                var emergency = try XCTUnwrap(json["emergency"] as? [String: Any])
+                emergency["infoURL"] = url
+                json["emergency"] = emergency
+            }
+        }
+        XCTAssertNoThrow(try AdapterCatalog.decode(try withInfo("https://www.varmdo.se/kontakt.html")), "kommun page")
+        XCTAssertThrowsError(try AdapterCatalog.decode(try withInfo("https://evil.example.com/varmdo.se")), "other domain")
+        XCTAssertThrowsError(try AdapterCatalog.decode(try withInfo("http://www.varmdo.se/kontakt.html")), "plain http")
+        XCTAssertThrowsError(try AdapterCatalog.decode(try withInfo("https://notvarmdo.se/")), "lookalike domain")
     }
 
     func testUnsafePathsAreRejected() throws {
