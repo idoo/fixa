@@ -17,10 +17,12 @@ struct AboutScreen: View {
                         text: String(localized: "Open source (EUPL-1.2) on GitHub", bundle: L10n.bundle, locale: L10n.locale),
                         link: Self.repoURL
                     )
+                    FxDivider()
                     FxIconRow(
                         systemImage: "iphone",
                         text: String(localized: "No account, no server. Your data stays on this phone, and photos lose their location.", bundle: L10n.bundle, locale: L10n.locale)
                     )
+                    FxDivider()
                     FxIconRow(
                         systemImage: "building.columns",
                         text: String(localized: "Independent app, not part of \(spec.municipality.name).", bundle: L10n.bundle, locale: L10n.locale)
@@ -46,6 +48,7 @@ struct AboutScreen: View {
                     }
                     .accessibilityIdentifier("about.developer")
                     if let contact = spec.contact {
+                        FxDivider()
                         FxIconRow(
                             systemImage: "building.columns",
                             text: String(localized: "Questions about your report? Ask the kommun on its website.", bundle: L10n.bundle, locale: L10n.locale)
@@ -56,10 +59,12 @@ struct AboutScreen: View {
                     }
                 }
 
-                FxIconRow(
-                    systemImage: "phone",
-                    text: String(localized: "Call 112 if life or property is in danger.", bundle: L10n.bundle, locale: L10n.locale)
-                )
+                FxCard {
+                    FxIconRow(
+                        systemImage: "phone",
+                        text: String(localized: "Call 112 if life or property is in danger.", bundle: L10n.bundle, locale: L10n.locale)
+                    )
+                }
 
                 Text("Version \(Self.version)")
                     .font(Fx.Font.footnote)

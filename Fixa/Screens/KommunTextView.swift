@@ -111,7 +111,7 @@ struct KommunTextView: View {
         let content = VStack(alignment: .leading, spacing: Fx.Space.xs) {
             if let title {
                 Text(title)
-                    .font(Fx.Font.footnote.weight(.semibold))
+                    .font(Fx.Font.section)
                     .foregroundStyle(Fx.Color.ink2)
             }
             if isSwedishUI {
@@ -181,7 +181,7 @@ struct KommunTextView: View {
         if showsOriginal {
             VStack(alignment: .leading, spacing: Fx.Space.xs) {
                 Text("In Swedish, as the kommun wrote it")
-                    .font(Fx.Font.footnote.weight(.semibold))
+                    .font(Fx.Font.section)
                     .foregroundStyle(Fx.Color.ink2)
                 swedishText(font: Fx.Font.callout)
             }

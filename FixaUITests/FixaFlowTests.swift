@@ -52,6 +52,14 @@ final class FixaFlowTests: XCTestCase {
     private func replaceDescription(_ app: XCUIApplication, with text: String) {
         let editor = element(app, "report.description")
         reveal(app, editor)
+        // The pinned Review bar overlaps the bottom of the scroll view: a field that is "hittable"
+        // but partly under it gets the tap on the bar instead. Scroll until it sits fully above.
+        let bar = element(app, "report.review")
+        var tries = 0
+        while editor.frame.maxY > bar.frame.minY - 8 && tries < 4 {
+            app.swipeUp()
+            tries += 1
+        }
         editor.tap()
         let current = (editor.value as? String) ?? ""
         if !current.isEmpty {

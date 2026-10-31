@@ -43,57 +43,81 @@ window.FRAMES = [
     background: { from: "#F7F5F0", to: "#E1ECE3", glow: "#CFE3D3" },
     headline: { "sv": "Sätt nålen på kartan", "en-US": "Drop a pin on the map" },
     subline: { "sv": "Eller tryck på Använd min nuvarande plats.", "en-US": "Or just tap Use my current location." },
-    // Button outline measured on the capture: x 48..1272, y 616..788 (both locales).
+    // Inside of the button's 6 px outline, measured on the build 12 captures (both locales):
+    // outline x 37..42 / 1278..1283, y 600..605 / 762..767; inner corner radius about 50 px.
     pops: [{
       src: "location",
-      crop: { "sv": { x: 48, y: 616, w: 1224, h: 172 }, "en-US": { x: 48, y: 616, w: 1224, h: 172 } },
-      scale: 0.94, radius: 30, rotate: 0,
+      crop: { "sv": { x: 43, y: 606, w: 1235, h: 156 }, "en-US": { x: 43, y: 606, w: 1235, h: 156 } },
+      scale: 0.93, radius: 46, rotate: 0,
     }],
   },
   {
     id: "03", screen: "receipt", purpose: "differentiator",
     desire: "Know it arrived, with something to refer to later.",
     objection: "Reports vanish into a black hole.",
-    proof: "Receipt: orange 'MOTTAGET' stamp with the case number, 'Sent to Värmdö kommun', Copy case number.",
-    evidence: ["Fixa/Screens/ReceiptScreen.swift", "Fixa/DesignSystem/FxStatusStamp.swift", "Fixa/Screens/HistoryScreen.swift case number kept in history"],
+    proof: "Receipt: orange 'MOTTAGET'/'RECEIVED' stamp with the case number, 'Sent to Värmdö kommun', Copy case number, and the kommun's own receipt text (outside a Swedish UI translated, with 'Show original').",
+    evidence: [
+      "Fixa/Screens/ReceiptScreen.swift:111 FxStatusStamp, :136 Copy case number, :165-183 kommunReceipt",
+      "Fixa/Screens/KommunTextView.swift:79-82 translated with 'Show original'; Swedish UI shows the Swedish",
+      "Fixa/Services/HistoryStore.swift:83-87 case number and receipt text kept in Sent reports",
+      "captures/*/receipt.png",
+    ],
     background: { from: "#F7F5F0", to: "#F4E3D5", glow: "#F2D3BE" },
     headline: { "sv": "Ärendenummer direkt", "en-US": "Your case number, right away" },
-    subline: { "sv": "Det sparas i appen, så du kan följa upp.", "en-US": "It stays in the app so you can follow up." },
-    // Stamp measured by colour bbox (orange 705x322 at 308,781 sv / 308,730 en) plus outline padding.
+    subline: { "sv": "Kommunens eget kvitto sparas i appen.", "en-US": "The kommun's own receipt stays in the app." },
+    // Stamp bbox incl. outline and shadow (non-background pixels, y 150..650): sv 303..1017 x 250..583,
+    // en-US 323..996 x 252..581; one crop centred on both with 16 px margin. Scale 1.0 keeps the pop
+    // between the status bar (ends ~769 canvas) and the 'Sent to' title (~1178 canvas).
     pops: [{
       src: "receipt",
-      crop: { "sv": { x: 280, y: 766, w: 760, h: 352 }, "en-US": { x: 280, y: 715, w: 760, h: 352 } },
-      scale: 1.15, radius: 44, rotate: 0,
+      crop: { "sv": { x: 287, y: 234, w: 746, h: 366 }, "en-US": { x: 287, y: 234, w: 746, h: 366 } },
+      scale: 1.0, radius: 40, rotate: 0,
     }],
   },
   {
     id: "04", screen: "privacy", purpose: "objection: account and privacy",
     desire: "Report without signing up or handing over my details.",
     objection: "Another app that wants an account and my data.",
-    proof: "'What Fixa stores': 'Everything stays on your phone: your details, drafts and the reports you've sent. No account, no server, no tracking.'",
-    evidence: ["Fixa/Screens/PrivacyScreen (FixaScreen privacy)", "Fixa/Screens/SettingsScreen.swift:154-168 Delete all data"],
+    proof: "'What Fixa stores', four lines with icons; first: 'Your details, drafts and sent reports stay on this phone. No account, no tracking.'; last: 'Delete everything in Settings.'",
+    evidence: ["Fixa/Screens/PrivacyScreen.swift (FixaScreen privacy)", "captures/*/privacy.png"],
     background: { from: "#F7F5F0", to: "#E4E7F0", glow: "#D3D9EA" },
     headline: { "sv": "Inget konto behövs", "en-US": "No account needed" },
     subline: {
       "sv": "Dina uppgifter stannar i telefonen. Radera dem när du vill.",
       "en-US": "Your details stay on your phone. Delete them anytime.",
     },
-    // First paragraph of the card ("Everything stays on your phone … No account …"), measured: text 450–650.
+    // First line of the card, measured: card inside x 51..1268 from y 384 to the first separator
+    // (sv 649, en-US 588).
     pops: [{
       src: "privacy",
-      crop: { "sv": { x: 48, y: 430, w: 1224, h: 240 }, "en-US": { x: 48, y: 430, w: 1224, h: 240 } },
-      scale: 0.94, radius: 40, rotate: 0,
+      crop: { "sv": { x: 51, y: 384, w: 1218, h: 265 }, "en-US": { x: 51, y: 384, w: 1218, h: 204 } },
+      scale: 0.93, radius: 40, rotate: 0,
     }],
   },
   {
-    id: "05", screen: "language", purpose: "objection: will it work for me",
+    // Swedish UI shows the kommun's Swedish as is, so the sv frame uses a Finnish-UI receipt;
+    // en-US uses the English one (capture.sh writes both as receipt-translated.png).
+    id: "05", screen: "receipt-translated", purpose: "differentiator: language",
     desire: "Use it in the language I read best.",
     objection: "My Swedish is not good enough for a municipal form.",
-    proof: "Language screen: English, Svenska, Suomi, العربية, Українська, Polski; switches immediately.",
-    evidence: ["Fixa/Screens/SettingsLanguageScreen.swift:32 'buttons and texts change now'", "captures/*/language.png"],
+    proof: "Receipt in Finnish (sv) / English (en-US): the kommun's Swedish receipt shown translated, 'Translated from Swedish', 'Show original'; 'What you wrote' with 'Filed in Swedish'.",
+    evidence: [
+      "Fixa/Screens/KommunTextView.swift:79-82,165-180 translated receipt with 'Show original'",
+      "Fixa/Screens/ReviewScreen.swift:219 'Translating your text into Swedish…'",
+      "Fixa/Screens/ReceiptScreen.swift:146-148 the kommun's e-mail reply stays Swedish (so: receipt, not reply)",
+      "captures/*/receipt-translated.png",
+    ],
     background: { from: "#F7F5F0", to: "#EFE6D8", glow: "#E6D6BF" },
-    headline: { "sv": "Fixa på 22 språk", "en-US": "Fixa in 22 languages" },
-    subline: { "sv": "Byt språk direkt i appen.", "en-US": "Switch language right in the app." },
-    pops: [],
+    headline: { "sv": "Skriv på ditt språk", "en-US": "Write in your own language" },
+    subline: {
+      "sv": "Fixa översätter till svenska. Kommunens kvitto visas på ditt språk.",
+      "en-US": "Fixa translates it into Swedish. The kommun's receipt shows in yours.",
+    },
+    // The kommun-receipt card, measured inside: x 51..1268, y 1098..2085 (both captures).
+    pops: [{
+      src: "receipt-translated",
+      crop: { "sv": { x: 51, y: 1098, w: 1218, h: 988 }, "en-US": { x: 51, y: 1098, w: 1218, h: 988 } },
+      scale: 0.93, radius: 40, rotate: 0,
+    }],
   },
 ];

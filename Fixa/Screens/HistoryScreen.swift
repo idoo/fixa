@@ -80,17 +80,10 @@ struct HistoryScreen: View {
     }
 
     private var emptyState: some View {
-        VStack(spacing: Fx.Space.l) {
-            FxBadge(systemImage: "tray", fill: Fx.Color.Pastel.sky, side: 64)
-            Text("No reports yet.")
-                .font(Fx.Font.title)
-                .foregroundStyle(Fx.Color.ink)
-                .multilineTextAlignment(.center)
-                .accessibilityAddTraits(.isHeader)
+        FxEmptyState(title: String(localized: "No reports yet.", bundle: L10n.bundle, locale: L10n.locale)) {
             FxPrimaryButton(title: String(localized: "Report a problem", bundle: L10n.bundle, locale: L10n.locale), systemImage: "plus") {
                 model.path = []
             }
-            .padding(.top, Fx.Space.s)
         }
         .padding(Fx.Space.xl)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -103,15 +96,14 @@ private struct HistoryRow: View {
     var isSending = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.locale) private var locale
-    @ScaledMetric(relativeTo: .headline) private var thumbnailSide: CGFloat = 56
 
     var body: some View {
-        // Thumbnail above the text at accessibility sizes, so the text keeps the full width.
+        // Glyph above the text at accessibility sizes, so the text keeps the full width.
         let layout = dynamicTypeSize.isAccessibilitySize
             ? AnyLayout(VStackLayout(alignment: .leading, spacing: Fx.Space.s))
-            : AnyLayout(HStackLayout(spacing: Fx.Space.m))
+            : AnyLayout(HStackLayout(alignment: .top, spacing: Fx.Space.m))
         layout {
-            HistoryThumbnail(item: item, spec: spec, side: min(thumbnailSide, 80))
+            HistoryCategoryGlyph(spec: spec, tileID: item.tileID)
             VStack(alignment: .leading, spacing: Fx.Space.xs) {
                 Text(spec.tile(id: item.tileID)?.title.resolve(L10n.locale) ?? String(localized: "Report", bundle: L10n.bundle, locale: L10n.locale))
                     .font(Fx.Font.headline)
@@ -119,22 +111,43 @@ private struct HistoryRow: View {
                 Text(item.locationText.isEmpty ? item.description : item.locationText)
                     .font(Fx.Font.callout)
                     .foregroundStyle(Fx.Color.ink2)
-                    .lineLimit(3)
-                Text(item.date.formatted(.dateTime.day().month().year().locale(locale)))
-                    .font(Fx.Font.footnote)
-                    .foregroundStyle(Fx.Color.ink2)
-                if item.status != .sent || isSending {
+                    .lineLimit(2)
+                HStack(spacing: Fx.Space.s) {
+                    Text(item.date.formatted(.dateTime.day().month().year().locale(locale)))
+                        .font(Fx.Font.footnote)
+                        .foregroundStyle(Fx.Color.ink2)
                     HistoryStatusLabel(status: item.status, isSending: isSending)
                 }
+                .padding(.top, Fx.Space.xs)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .padding(.vertical, Fx.Space.xs)
+        .padding(.vertical, Fx.Space.s)
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("history.row")
     }
 }
 
-/// How far a report got, for anything not confirmed by the e-service. Icon plus words, never colour alone.
+/// The report's category: its SF Symbol on the category tint, rounded square. Decorative.
+private struct HistoryCategoryGlyph: View {
+    let spec: AdapterSpec
+    let tileID: String?
+    var side: CGFloat = 44
+    @ScaledMetric(relativeTo: .headline) private var scale: CGFloat = 1
+
+    var body: some View {
+        let tile = spec.tile(id: tileID)
+        let edge = min(side * scale, side * 1.6)
+        Image(systemName: tile?.symbol ?? "doc.text")
+            .font(Fx.Font.headline)
+            .foregroundStyle(Fx.Color.categoryGlyph(tile?.categoryID))
+            .frame(width: edge, height: edge)
+            .background(Fx.Color.categoryTint(tile?.categoryID), in: RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous))
+            .accessibilityHidden(true)
+    }
+}
+
+/// How far a report got. A small pill: icon plus words, never colour alone.
 private struct HistoryStatusLabel: View {
     let status: HistoryItem.Status
     var isSending = false
@@ -146,7 +159,21 @@ private struct HistoryStatusLabel: View {
             Image(systemName: symbol)
         }
         .font(Fx.Font.footnote.weight(.semibold))
-        .foregroundStyle(Fx.Color.ink)
+        .foregroundStyle(tone)
+        .padding(.horizontal, Fx.Space.s)
+        .padding(.vertical, 2)
+        .background(tone.opacity(0.12), in: Capsule())
+        .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var tone: Color {
+        if isSending { return Fx.Color.sea }
+        switch status {
+        case .sent: return Fx.Color.success
+        case .waiting: return Fx.Color.sea
+        case .maybeSent: return Fx.Color.ink
+        case .notSent: return Fx.Color.error
+        }
     }
 
     private var title: String {
@@ -188,9 +215,9 @@ private struct HistoryThumbnail: View {
             } else {
                 Image(systemName: spec.tile(id: item.tileID)?.symbol ?? "doc.text")
                     .font(Fx.Font.title)
-                    .foregroundStyle(Fx.Color.onPastel)
+                    .foregroundStyle(Fx.Color.categoryGlyph(spec.tile(id: item.tileID)?.categoryID))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Fx.Color.Pastel.sky)
+                    .background(Fx.Color.categoryTint(spec.tile(id: item.tileID)?.categoryID))
             }
         }
         .frame(width: side, height: side)
@@ -216,23 +243,30 @@ struct HistoryDetailScreen: View {
         Group {
             if let item {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: Fx.Space.xl) {
-                        FxSectionHeader(
-                            title(for: item),
-                            subtitle: item.date.formatted(.dateTime.day().month(.wide).year().hour().minute().locale(locale))
-                        )
+                    VStack(alignment: .leading, spacing: Fx.Space.l) {
+                        HStack(alignment: .top, spacing: Fx.Space.m) {
+                            HistoryCategoryGlyph(spec: spec, tileID: item.tileID)
+                            FxSectionHeader(
+                                title(for: item),
+                                subtitle: item.date.formatted(.dateTime.day().month(.wide).year().hour().minute().locale(locale))
+                            )
+                        }
                         if item.status != .sent {
                             statusCard(item)
                         }
-                        FxCard {
-                            if let caseNumber = item.caseNumber {
+                        if let caseNumber = item.caseNumber {
+                            FxCard {
                                 VStack(alignment: .leading, spacing: Fx.Space.s) {
                                     field(String(localized: "Case number", bundle: L10n.bundle, locale: L10n.locale), value: caseNumber)
                                     FxCopyButton(title: String(localized: "Copy case number", bundle: L10n.bundle, locale: L10n.locale), value: caseNumber)
                                 }
-                            } else if item.status == .sent {
+                            }
+                        } else if item.status == .sent {
+                            FxCard {
                                 field(String(localized: "Case number", bundle: L10n.bundle, locale: L10n.locale), value: String(localized: "Not given by the e-service", bundle: L10n.bundle, locale: L10n.locale))
                             }
+                        }
+                        FxCard {
                             field(String(localized: "Place", bundle: L10n.bundle, locale: L10n.locale), value: placeText(for: item))
                             if let lat = item.latitude, let lng = item.longitude {
                                 let center = CLLocationCoordinate2D(latitude: lat, longitude: lng)
@@ -250,6 +284,8 @@ struct HistoryDetailScreen: View {
                                 .allowsHitTesting(false)
                                 .accessibilityHidden(true)
                             }
+                        }
+                        FxCard {
                             field(String(localized: "Description", bundle: L10n.bundle, locale: L10n.locale), value: item.description)
                             if let filed = item.filedText {
                                 FiledInSwedish(text: filed, isFiled: item.status == .sent || item.status == .maybeSent)

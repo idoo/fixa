@@ -46,18 +46,20 @@ struct HomeScreen: View {
                 }
                 // No app name on Home: the icon already says "Fixa"; the line says what to do.
                 Text("Report a problem in \(placeName) in a minute.")
-                    .font(Fx.Font.body)
+                    .font(Fx.Font.callout)
                     .foregroundStyle(Fx.Color.ink2)
                     .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, Fx.Space.s)
                     .accessibilityAddTraits(.isHeader)
 
                 FxTileGrid(columns: columns, spacing: Fx.Space.m) {
-                    ForEach(Array(spec.tiles.enumerated()), id: \.element.id) { index, tile in
+                    ForEach(spec.tiles) { tile in
                         FxTile(
                             title: tile.title.resolve(L10n.locale),
                             systemImage: tile.symbol,
-                            index: index,
+                            categoryID: tile.categoryID,
                             isSelected: model.draft.tileID == tile.id && !model.path.isEmpty
                         ) {
                             model.startReport(tile: tile)
@@ -66,16 +68,19 @@ struct HomeScreen: View {
                     }
                 }
 
-                if let emergency = spec.emergency {
-                    urgentRow(emergency)
-                }
+                VStack(spacing: Fx.Space.m) {
+                    if let emergency = spec.emergency {
+                        urgentRow(emergency)
+                    }
 
-                Text("Independent app, not run by the municipality.")
-                    .font(Fx.Font.footnote)
-                    .foregroundStyle(Fx.Color.ink2)
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: .infinity)
-                    .fixedSize(horizontal: false, vertical: true)
+                    Text("Independent app, not run by the municipality.")
+                        .font(Fx.Font.footnote)
+                        .foregroundStyle(Fx.Color.ink2)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.top, Fx.Space.s)
             }
             .padding(.horizontal, Fx.Space.l)
             .padding(.top, Fx.Space.xs)
@@ -133,7 +138,7 @@ struct HomeScreen: View {
         let digits = contact.phone.filter(\.isNumber)
         // Number first and unbreakable (NBSP, non-breaking hyphen): if the line wraps, only the name moves.
         let number = contact.phone.replacingOccurrences(of: " ", with: "\u{00A0}").replacingOccurrences(of: "-", with: "\u{2011}")
-        return VStack(alignment: .leading, spacing: Fx.Space.s) {
+        return VStack(alignment: .leading, spacing: Fx.Space.xs) {
             FxCallRow(
                 title: String(localized: "No water or a blocked sewer?", bundle: L10n.bundle, locale: L10n.locale),
                 detail: "\(number.ltrIsolated) · \(contact.title.resolve(L10n.locale))",
@@ -144,7 +149,8 @@ struct HomeScreen: View {
                 }
             }
             if let page = spec.contact?.pageURL ?? emergency.infoURL {
-                OtherQuestionsLink(url: page, text: String(localized: "Other questions? Ask the kommun on its website", bundle: L10n.bundle, locale: L10n.locale))
+                OtherQuestionsLink(url: page, text: String(localized: "Other questions? Ask the kommun", bundle: L10n.bundle, locale: L10n.locale))
+                    .padding(.horizontal, Fx.Space.xs)
             }
         }
     }

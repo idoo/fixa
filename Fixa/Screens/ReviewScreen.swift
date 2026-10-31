@@ -63,7 +63,7 @@ struct ReviewScreen: View {
                     if let disclaimer = AdapterCatalog.shipped(id: spec.id)?.disclaimer {
                         FxBanner(kind: .info, title: String(localized: "Good to know", bundle: L10n.bundle, locale: L10n.locale), message: disclaimer.resolve(L10n.locale))
                     }
-                    Text("Reports to the kommun become public records. Avoid faces, number plates and other people's names.")
+                    Text("Reports become public records. Leave out faces, plates and names.")
                         .font(Fx.Font.footnote)
                         .foregroundStyle(Fx.Color.ink2)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -126,7 +126,7 @@ struct ReviewScreen: View {
                         Marker(placeText, coordinate: coordinate.clLocation)
                             .tint(Fx.Color.sea)
                     }
-                    .frame(height: 120)
+                    .frame(height: 160)
                     .clipShape(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous))
                     .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous), fill: .clear)
                     .allowsHitTesting(false)
@@ -145,7 +145,7 @@ struct ReviewScreen: View {
                     value(model.draft.description.trimmingCharacters(in: .whitespacesAndNewlines))
                     VStack(alignment: .leading, spacing: Fx.Space.xs) {
                         Text("As sent, in Swedish")
-                            .font(Fx.Font.footnote.weight(.semibold))
+                            .font(Fx.Font.section)
                             .foregroundStyle(Fx.Color.ink2)
                         Text(ReportComposer.description(for: model.draft, spec: spec))
                             .font(Fx.Font.callout)
@@ -212,15 +212,15 @@ struct ReviewScreen: View {
     /// description above, under "Översatt från …:", exactly as the municipality receives it.
     private var translationNote: Text {
         if let translated = model.draft.translation?.text, !translated.isEmpty {
-            return Text("The problem type is added in Swedish. Your text is sent as written, with a Swedish translation added under “Översatt från”.")
+            return Text("Sent as written, with a Swedish translation added.")
         }
         switch translationState {
         case .translating:
             return Text("Translating your text into Swedish…")
         case .unavailable:
-            return Text("The problem type is added in Swedish. Your text is sent as written; no Swedish translation could be made on this iPhone.")
+            return Text("Sent as written; this iPhone couldn't translate it.")
         case .idle:
-            return Text("The problem type is added in Swedish. Your text is sent as written.")
+            return Text("Sent as written.")
         }
     }
 
@@ -419,7 +419,7 @@ struct ReviewScreen: View {
         FxCard {
             VStack(alignment: .leading, spacing: Fx.Space.m) {
                 VStack(alignment: .leading, spacing: Fx.Space.s) {
-                    FxBadge(systemImage: "wrench.and.screwdriver", fill: Fx.Color.Pastel.sun, side: 44)
+                    FxBadge(systemImage: "wrench.and.screwdriver", fill: Fx.Color.categoryTint(nil), side: 44)
                     Text("The municipality seems to have changed its form")
                         .font(Fx.Font.headline)
                         .foregroundStyle(Fx.Color.ink)

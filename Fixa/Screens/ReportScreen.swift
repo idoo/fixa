@@ -66,7 +66,7 @@ struct ReportScreen: View {
                         FxTextEditor(
                             title: String(localized: "What's wrong?", bundle: L10n.bundle, locale: L10n.locale),
                             text: $model.draft.description,
-                            prompt: String(localized: "For example: the light by the bus stop has been out since Monday. Write in any language.", bundle: L10n.bundle, locale: L10n.locale),
+                            prompt: String(localized: "What's broken, and since when? Any language is fine.", bundle: L10n.bundle, locale: L10n.locale),
                             issue: model.issue(for: .description)?.message,
                             minHeight: 140,
                             showsTitle: false
@@ -245,7 +245,9 @@ struct ReportScreen: View {
                     rowLayout {
                         Image(systemName: tile?.symbol ?? "questionmark.circle")
                             .font(Fx.Font.headline)
-                            .foregroundStyle(Fx.Color.sea)
+                            .foregroundStyle(Fx.Color.categoryGlyph(tile?.categoryID))
+                            .frame(width: Fx.minTarget, height: Fx.minTarget)
+                            .background(Fx.Color.categoryTint(tile?.categoryID), in: RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous))
                             .accessibilityHidden(true)
                         Text(title)
                             .font(Fx.Font.headline)
@@ -380,7 +382,7 @@ struct ReportScreen: View {
                                 .tint(Fx.Color.sea)
                         }
                         .id(coordinate.key)
-                        .frame(height: 140)
+                        .frame(height: 180)
                         .clipShape(RoundedRectangle(cornerRadius: Fx.Radius.s))
                         .allowsHitTesting(false)
                         .accessibilityHidden(true)

@@ -273,142 +273,6 @@
         }
       }
     },
-    "A report goes only to the municipality, and only when you press Send. Photos lose their location first." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يذهب البلاغ إلى البلدية فقط، وفقط عندما تضغط «إرسال». وقبل ذلك تُحذف معلومات الموقع من الصور."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hlášení jde jen obci, a jen když stisknete Odeslat. Fotky předtím přijdou o údaje o poloze."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "En anmeldelse går kun til kommunen, og kun når du trykker Send. Billederne mister først deres placering."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Eine Meldung geht nur an die Gemeinde, und nur wenn du auf Senden tippst. Fotos verlieren vorher ihren Standort."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Μια αναφορά πηγαίνει μόνο στον δήμο, και μόνο όταν πατήσεις Αποστολή. Πρώτα οι φωτογραφίες χάνουν την τοποθεσία τους."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A report goes only to the municipality, and only when you press Send. Photos lose their location first."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Un aviso solo va al ayuntamiento, y solo cuando pulsas Enviar. Antes, las fotos pierden su ubicación."
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Teade läheb ainult vallale ja ainult siis, kui vajutad Saada. Fotodelt eemaldatakse enne asukoht."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ilmoitus menee vain kunnalle ja vain, kun painat Lähetä. Kuvista poistetaan ensin sijaintitieto."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Un signalement part uniquement vers la commune, et seulement quand vous appuyez sur Envoyer. Les photos perdent d'abord leur position."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A bejelentés csak az önkormányzathoz megy, és csak akkor, ha megnyomod a Küldés gombot. A fotókról előtte lekerül a helyadat."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Una segnalazione va solo al comune, e solo quando premi Invia. Prima le foto perdono la posizione."
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pranešimas keliauja tik savivaldybei ir tik paspaudus Siųsti. Prieš tai iš nuotraukų pašalinama vieta."
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ziņojums nonāk tikai pašvaldībā un tikai tad, kad nospied Sūtīt. Fotoattēliem vispirms tiek noņemta atrašanās vieta."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "En melding går bare til kommunen, og bare når du trykker Send. Bildene mister posisjonen sin først."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Een melding gaat alleen naar de gemeente, en alleen als je op Verstuur tikt. Foto's verliezen eerst hun locatie."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zgłoszenie trafia tylko do gminy i tylko wtedy, gdy naciśniesz Wyślij. Zdjęcia najpierw tracą informację o miejscu."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Uma participação vai apenas para o município, e só quando toca em Enviar. Antes disso, as fotografias perdem a localização."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O sesizare ajunge doar la primărie și doar când apeși Trimite. Înainte, fotografiile își pierd locația."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Заявка уходит только в коммуну и только когда вы нажмёте «Отправить». Перед этим с фото удаляется место съёмки."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "En anmälan går bara till kommunen, och bara när du trycker på Skicka. Bilderna tappar sin platsinfo först."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Заявка йде тільки до комуни й тільки тоді, коли ви натиснете «Надіслати». Перед цим із фото видаляється місце зйомки."
-          }
-        }
-      }
-    },
     "A swing at the playground is broken." : {
       "localizations" : {
         "ar" : {
@@ -5169,142 +5033,6 @@
         }
       }
     },
-    "Clear sent reports" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "مسح البلاغات المُرسلة"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vymazat odeslaná hlášení"
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ryd sendte anmeldelser"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gesendete Meldungen löschen"
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Εκκαθάριση απεσταλμένων αναφορών"
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clear sent reports"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Borrar avisos enviados"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kustuta saadetud teated"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tyhjennä lähetetyt ilmoitukset"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Effacer les signalements envoyés"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elküldött bejelentések törlése"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cancella segnalazioni inviate"
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Išvalyti išsiųstus pranešimus"
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Notīrīt nosūtītos ziņojumus"
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tøm sendte meldinger"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wis verstuurde meldingen"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wyczyść wysłane zgłoszenia"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Limpar participações enviadas"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ștergeți sesizările trimise"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Удалить отправленные заявки"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rensa skickade anmälningar"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Очистити надіслані звернення"
-          }
-        }
-      }
-    },
     "Clear the list of sent reports?" : {
       "localizations" : {
         "ar" : {
@@ -9521,142 +9249,6 @@
         }
       }
     },
-    "Everything stays on your phone: your details, drafts and the reports you've sent. No account, no server, no tracking." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "كل شيء يبقى على هاتفك: بياناتك ومسوداتك والبلاغات التي أرسلتها. بلا حساب، بلا خادم، بلا تتبّع."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Všechno zůstává ve vašem telefonu: vaše údaje, koncepty i odeslaná hlášení. Žádný účet, žádný server, žádné sledování."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alt bliver på din telefon: dine oplysninger, kladder og de anmeldelser, du har sendt. Ingen konto, ingen server, ingen sporing."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alles bleibt auf deinem Handy: deine Angaben, Entwürfe und gesendeten Meldungen. Kein Konto, kein Server, kein Tracking."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Όλα μένουν στο τηλέφωνό σου: τα στοιχεία σου, τα πρόχειρα και οι αναφορές που έστειλες. Χωρίς λογαριασμό, χωρίς διακομιστή, χωρίς παρακολούθηση."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Everything stays on your phone: your details, drafts and the reports you've sent. No account, no server, no tracking."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Todo se queda en tu teléfono: tus datos, borradores y los avisos que has enviado. Sin cuenta, sin servidor, sin rastreo."
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kõik jääb sinu telefoni: sinu andmed, mustandid ja saadetud teated. Kontot pole, serverit pole, jälgimist pole."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kaikki pysyy puhelimessasi: tietosi, luonnokset ja lähettämäsi ilmoitukset. Ei tiliä, ei palvelinta, ei seurantaa."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tout reste sur votre téléphone : vos coordonnées, vos brouillons et les signalements envoyés. Pas de compte, pas de serveur, pas de pistage."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Minden a telefonodon marad: az adataid, a piszkozatok és az elküldött bejelentések. Nincs fiók, nincs szerver, nincs követés."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tutto resta sul tuo telefono: i tuoi dati, le bozze e le segnalazioni inviate. Nessun account, nessun server, nessun tracciamento."
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Viskas lieka jūsų telefone: jūsų duomenys, juodraščiai ir išsiųsti pranešimai. Jokios paskyros, jokio serverio, jokio sekimo."
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Viss paliek tavā tālrunī: tavi dati, melnraksti un nosūtītie ziņojumi. Bez konta, bez servera, bez izsekošanas."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alt blir på telefonen din: opplysningene dine, utkast og meldingene du har sendt. Ingen konto, ingen server, ingen sporing."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alles blijft op je telefoon: je gegevens, concepten en de meldingen die je hebt verstuurd. Geen account, geen server, geen tracking."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wszystko zostaje w twoim telefonie: twoje dane, szkice i wysłane zgłoszenia. Bez konta, bez serwera, bez śledzenia."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tudo fica no seu telemóvel: os seus dados, rascunhos e as participações que enviou. Sem conta, sem servidor, sem rastreio."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Totul rămâne pe telefonul tău: datele tale, ciornele și sesizările trimise. Fără cont, fără server, fără urmărire."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Всё остаётся на вашем телефоне: ваши данные, черновики и отправленные заявки. Без аккаунта, без сервера, без слежки."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Allt stannar i din telefon: dina uppgifter, utkast och anmälningar du har skickat. Inget konto, ingen server, ingen spårning."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Усе залишається на вашому телефоні: ваші дані, чернетки й надіслані заявки. Без акаунта, без сервера, без стеження."
-          }
-        }
-      }
-    },
     "Fallen tree or branch" : {
       "localizations" : {
         "ar" : {
@@ -12237,142 +11829,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Наприклад: біля автобусної зупинки на Skolvägen"
-          }
-        }
-      }
-    },
-    "For example: the light by the bus stop has been out since Monday. Write in any language." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "مثلًا: المصباح عند موقف الحافلات مطفأ منذ يوم الاثنين. اكتب بأي لغة."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Například: světlo u autobusové zastávky nesvítí od pondělí. Pište v jakémkoli jazyce."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "For eksempel: lampen ved busstoppestedet har været slukket siden mandag. Skriv på det sprog, du vil."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zum Beispiel: Die Lampe an der Bushaltestelle ist seit Montag aus. Schreiben Sie in einer beliebigen Sprache."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Για παράδειγμα: η λάμπα δίπλα στη στάση του λεωφορείου είναι σβηστή από τη Δευτέρα. Γράψτε σε όποια γλώσσα θέλετε."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "For example: the light by the bus stop has been out since Monday. Write in any language."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Por ejemplo: la farola junto a la parada de autobús está apagada desde el lunes. Escribe en el idioma que quieras."
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Näiteks: bussipeatuse juures olev lamp on esmaspäevast saati kustunud. Võite kirjutada mis tahes keeles."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esimerkiksi: bussipysäkin valo on ollut pimeänä maanantaista asti. Voit kirjoittaa millä kielellä tahansa."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Par exemple : le lampadaire près de l’arrêt de bus est éteint depuis lundi. Écrivez dans la langue de votre choix."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Például: a buszmegálló melletti lámpa hétfő óta nem ég. Bármilyen nyelven írhat."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Per esempio: il lampione vicino alla fermata dell'autobus è spento da lunedì. Scrivi in qualsiasi lingua."
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pavyzdžiui: šviestuvas prie autobusų stotelės nešviečia nuo pirmadienio. Rašykite bet kuria kalba."
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Piemēram: lampa pie autobusa pieturas nedeg kopš pirmdienas. Rakstiet jebkurā valodā."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "For eksempel: lyset ved bussholdeplassen har vært slukket siden mandag. Skriv på hvilket språk du vil."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bijvoorbeeld: de lamp bij de bushalte is sinds maandag uit. Je mag in elke taal schrijven."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Na przykład: lampa przy przystanku nie świeci od poniedziałku. Pisz w dowolnym języku."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Por exemplo: o candeeiro junto à paragem de autocarro está apagado desde segunda-feira. Escreva em qualquer idioma."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "De exemplu: lampa de lângă stația de autobuz nu mai merge de luni. Puteți scrie în orice limbă."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Например: фонарь у автобусной остановки не горит с понедельника. Пишите на любом языке."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Till exempel: lampan vid busshållplatsen har varit släckt sedan i måndags. Skriv på vilket språk du vill."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Наприклад: ліхтар біля зупинки не світить з понеділка. Пишіть будь-якою мовою."
           }
         }
       }
@@ -31145,142 +30601,6 @@
         }
       }
     },
-    "The connection dropped just as the report went out, so Fixa didn't see a confirmation. It may well have reached %@." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "انقطع الاتصال لحظة إرسال البلاغ، لذلك لم يرَ Fixa أي تأكيد. ربما وصل فعلًا إلى %@."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Připojení se přerušilo právě při odesílání hlášení, takže Fixa nedostala potvrzení. Hlášení ale klidně mohlo k %@ dorazit."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Forbindelsen blev afbrudt, lige da anmeldelsen blev sendt, så Fixa fik ingen bekræftelse. Den kan sagtens være nået frem til %@."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Verbindung ist genau beim Senden der Meldung abgebrochen, daher hat Fixa keine Bestätigung erhalten. Die Meldung ist aber möglicherweise trotzdem bei %@ angekommen."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Η σύνδεση διακόπηκε τη στιγμή που στελνόταν η αναφορά, οπότε το Fixa δεν είδε επιβεβαίωση. Είναι πολύ πιθανό να έφτασε στο %@."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The connection dropped just as the report went out, so Fixa didn't see a confirmation. It may well have reached %@."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La conexión se cortó justo cuando se enviaba el aviso, así que Fixa no recibió confirmación. Es muy posible que haya llegado a %@."
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ühendus katkes just teate saatmise ajal, seega ei näinud Fixa kinnitust. Teade võis vabalt jõuda saajani %@."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Yhteys katkesi juuri kun ilmoitus lähti, joten Fixa ei nähnyt vahvistusta. Se on voinut hyvin mennä perille: %@."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La connexion a été coupée au moment de l'envoi, Fixa n'a donc pas reçu de confirmation. Il est bien possible que le signalement soit arrivé à %@."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A kapcsolat éppen a bejelentés elküldésekor szakadt meg, ezért a Fixa nem kapott visszaigazolást. Könnyen lehet, hogy megérkezett ide: %@."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La connessione si è interrotta proprio mentre la segnalazione veniva inviata, quindi Fixa non ha ricevuto una conferma. È possibile che sia arrivata a %@."
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ryšys nutrūko kaip tik siunčiant pranešimą, todėl Fixa negavo patvirtinimo. Labai gali būti, kad jis pasiekė %@."
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Savienojums pārtrūka tieši ziņojuma sūtīšanas brīdī, tāpēc Fixa nesaņēma apstiprinājumu. Ļoti iespējams, ka tas tomēr nonāca līdz %@."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tilkoblingen ble brutt akkurat da meldingen ble sendt, så Fixa fikk ingen bekreftelse. Den kan godt ha kommet fram til %@."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "De verbinding viel weg net toen de melding werd verstuurd, dus Fixa heeft geen bevestiging gezien. Hij kan best bij %@ zijn aangekomen."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Połączenie zerwało się w chwili wysyłania, więc Fixa nie zobaczył potwierdzenia. Zgłoszenie mogło jednak dotrzeć do %@."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A ligação falhou precisamente quando a participação estava a ser enviada, por isso a Fixa não recebeu confirmação. É bem possível que tenha chegado a %@."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Conexiunea s-a întrerupt exact când se trimitea sesizarea, așa că Fixa nu a primit o confirmare. Este foarte posibil să fi ajuns la %@."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Соединение прервалось в момент отправки, поэтому Fixa не получила подтверждения. Вполне возможно, что заявка дошла до %@."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anslutningen bröts precis när anmälan skickades, så Fixa såg ingen bekräftelse. Den kan mycket väl ha kommit fram till %@."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "З’єднання обірвалося саме під час надсилання, тому Fixa не побачив підтвердження. Цілком можливо, що звернення дійшло до %@."
-          }
-        }
-      }
-    },
     "The e-service didn't accept the report." : {
       "localizations" : {
         "ar" : {
@@ -31413,142 +30733,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Е-сервіс не прийняв звернення."
-          }
-        }
-      }
-    },
-    "The e-service didn't answer. Your report is saved on this phone, and Fixa tries again in a little while." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "لم تستجب الخدمة الإلكترونية. بلاغك محفوظ على هذا الهاتف، وسيحاول Fixa مرة أخرى بعد قليل."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "E-služba neodpověděla. Vaše hlášení je uložené v tomto telefonu a Fixa to za chvíli zkusí znovu."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "E-tjenesten svarede ikke. Din anmeldelse er gemt på denne telefon, og Fixa prøver igen om lidt."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der E-Service hat nicht geantwortet. Ihre Meldung ist auf diesem Telefon gespeichert, und Fixa versucht es gleich noch einmal."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Η ηλεκτρονική υπηρεσία δεν απάντησε. Η αναφορά σας είναι αποθηκευμένη σε αυτό το τηλέφωνο και το Fixa θα δοκιμάσει ξανά σε λίγο."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The e-service didn't answer. Your report is saved on this phone, and Fixa tries again in a little while."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El servicio electrónico no respondió. Tu aviso está guardado en este teléfono y Fixa lo volverá a intentar dentro de un rato."
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "E-teenus ei vastanud. Teie teade on selles telefonis salvestatud ja Fixa proovib veidi aja pärast uuesti."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Verkkopalvelu ei vastannut. Ilmoituksesi on tallessa tässä puhelimessa, ja Fixa yrittää hetken päästä uudelleen."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le service en ligne n'a pas répondu. Votre signalement est enregistré sur ce téléphone, et Fixa réessaiera dans un moment."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Az e-szolgáltatás nem válaszolt. A bejelentése el van mentve ezen a telefonon, és a Fixa kis idő múlva újra megpróbálja."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il servizio online non ha risposto. La segnalazione è salvata su questo telefono e Fixa riproverà tra poco."
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "E. paslauga neatsakė. Jūsų pranešimas išsaugotas šiame telefone, o Fixa netrukus bandys dar kartą."
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "E-pakalpojums neatbildēja. Jūsu ziņojums ir saglabāts šajā tālrunī, un Fixa pēc brīža mēģinās vēlreiz."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "E-tjenesten svarte ikke. Meldingen din er lagret på denne telefonen, og Fixa prøver igjen om litt."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "De e-dienst gaf geen antwoord. Je melding is bewaard op deze telefoon en Fixa probeert het zo meteen opnieuw."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "E-usługa nie odpowiedziała. Twoje zgłoszenie jest zapisane na tym telefonie, a Fixa spróbuje ponownie za chwilę."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O serviço online não respondeu. A sua participação está guardada neste telemóvel e a Fixa volta a tentar daqui a pouco."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Serviciul online nu a răspuns. Sesizarea dumneavoastră este salvată pe acest telefon, iar Fixa încearcă din nou peste puțin timp."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Электронная услуга не ответила. Ваша заявка сохранена на этом телефоне, и Fixa попробует отправить её ещё раз чуть позже."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "E-tjänsten svarade inte. Din anmälan är sparad på telefonen, och Fixa försöker igen om en stund."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Е-сервіс не відповів. Ваше звернення збережено на цьому телефоні, і Fixa спробує ще раз трохи згодом."
           }
         }
       }
@@ -32637,414 +31821,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Шпилька поза межами: %@"
-          }
-        }
-      }
-    },
-    "The problem type is added in Swedish. Your text is sent as written, with a Swedish translation added under “Översatt från”." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يُضاف نوع المشكلة بالسويدية. يُرسَل نصّك كما كتبته، مع ترجمة سويدية تحت «Översatt från»."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Typ problému se doplní švédsky. Váš text se odešle tak, jak jste ho napsali, a pod „Översatt från“ se přidá švédský překlad."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Problemtypen tilføjes på svensk. Din tekst sendes, som du skrev den, med en svensk oversættelse under »Översatt från«."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Art des Problems wird auf Schwedisch ergänzt. Ihr Text wird so gesendet, wie Sie ihn geschrieben haben, mit einer schwedischen Übersetzung unter „Översatt från“."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ο τύπος του προβλήματος προστίθεται στα σουηδικά. Το κείμενό σας στέλνεται όπως το γράψατε, με σουηδική μετάφραση κάτω από το «Översatt från»."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The problem type is added in Swedish. Your text is sent as written, with a Swedish translation added under “Översatt från”."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El tipo de problema se añade en sueco. Tu texto se envía tal como lo escribiste, con una traducción al sueco bajo «Översatt från»."
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Probleemi liik lisatakse rootsi keeles. Teie tekst saadetakse nii, nagu kirjutasite, ja rootsikeelne tõlge lisatakse pealkirja „Översatt från“ alla."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ongelman tyyppi lisätään ruotsiksi. Tekstisi lähetetään sellaisenaan, ja ruotsinkielinen käännös lisätään otsikon ”Översatt från” alle."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le type de problème est ajouté en suédois. Votre texte est envoyé tel que vous l'avez écrit, avec une traduction suédoise sous « Översatt från »."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A probléma típusa svédül kerül a bejelentésbe. A szövegét úgy küldjük el, ahogy írta, alatta svéd fordítással „Översatt från” címmel."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il tipo di problema viene aggiunto in svedese. Il tuo testo viene inviato così come l'hai scritto, con una traduzione in svedese sotto «Översatt från»."
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Problemos tipas pridedamas švediškai. Jūsų tekstas siunčiamas taip, kaip parašėte, o po „Översatt från“ pridedamas vertimas į švedų kalbą."
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Problēmas veids tiek pievienots zviedriski. Jūsu teksts tiek nosūtīts, kā uzrakstīts, ar tulkojumu zviedru valodā zem “Översatt från”."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Problemtypen legges til på svensk. Teksten din sendes slik du skrev den, med en svensk oversettelse under «Översatt från»."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Het soort probleem wordt in het Zweeds toegevoegd. Je tekst wordt verstuurd zoals je hem schreef, met een Zweedse vertaling onder ‘Översatt från’."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rodzaj problemu jest dodawany po szwedzku. Twój tekst idzie w takiej formie, w jakiej go napisałeś, z tłumaczeniem na szwedzki pod „Översatt från”."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O tipo de problema é acrescentado em sueco. O seu texto é enviado tal como o escreveu, com uma tradução para sueco em «Översatt från»."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tipul problemei se adaugă în suedeză. Textul dumneavoastră se trimite așa cum l-ați scris, cu o traducere în suedeză sub „Översatt från”."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Тип проблемы добавляется по-шведски. Ваш текст отправляется как написан, а под «Översatt från» добавляется перевод на шведский."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Problemtypen läggs till på svenska. Din text skickas som du skrev den, med en svensk översättning under ”Översatt från”."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Тип проблеми додається шведською. Ваш текст надсилається як написаний, а під «Översatt från» додається переклад шведською."
-          }
-        }
-      }
-    },
-    "The problem type is added in Swedish. Your text is sent as written." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يُضاف نوع المشكلة بالسويدية. يُرسَل نصّك كما كتبته."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Typ problému se doplní švédsky. Váš text se odešle tak, jak jste ho napsali."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Problemtypen tilføjes på svensk. Din tekst sendes, som du skrev den."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Art des Problems wird auf Schwedisch ergänzt. Ihr Text wird so gesendet, wie Sie ihn geschrieben haben."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ο τύπος του προβλήματος προστίθεται στα σουηδικά. Το κείμενό σας στέλνεται όπως το γράψατε."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The problem type is added in Swedish. Your text is sent as written."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El tipo de problema se añade en sueco. Tu texto se envía tal como lo escribiste."
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Probleemi liik lisatakse rootsi keeles. Teie tekst saadetakse nii, nagu kirjutasite."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ongelman tyyppi lisätään ruotsiksi. Tekstisi lähetetään sellaisenaan."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le type de problème est ajouté en suédois. Votre texte est envoyé tel que vous l'avez écrit."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A probléma típusa svédül kerül a bejelentésbe. A szövegét úgy küldjük el, ahogy írta."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il tipo di problema viene aggiunto in svedese. Il tuo testo viene inviato così come l'hai scritto."
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Problemos tipas pridedamas švediškai. Jūsų tekstas siunčiamas taip, kaip parašėte."
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Problēmas veids tiek pievienots zviedriski. Jūsu teksts tiek nosūtīts, kā uzrakstīts."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Problemtypen legges til på svensk. Teksten din sendes slik du skrev den."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Het soort probleem wordt in het Zweeds toegevoegd. Je tekst wordt verstuurd zoals je hem schreef."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rodzaj problemu jest dodawany po szwedzku. Twój tekst idzie w takiej formie, w jakiej go napisałeś."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O tipo de problema é acrescentado em sueco. O seu texto é enviado tal como o escreveu."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tipul problemei se adaugă în suedeză. Textul dumneavoastră se trimite așa cum l-ați scris."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Тип проблемы добавляется по-шведски. Ваш текст отправляется как написан."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Problemtypen läggs till på svenska. Din text skickas som du skrev den."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Тип проблеми додається шведською. Ваш текст надсилається як написаний."
-          }
-        }
-      }
-    },
-    "The problem type is added in Swedish. Your text is sent as written; no Swedish translation could be made on this iPhone." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يُضاف نوع المشكلة بالسويدية. يُرسَل نصّك كما كتبته؛ تعذّر إعداد ترجمة سويدية على هذا الـiPhone."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Typ problému se doplní švédsky. Váš text se odešle tak, jak jste ho napsali; švédský překlad se na tomto iPhonu nepodařilo vytvořit."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Problemtypen tilføjes på svensk. Din tekst sendes, som du skrev den; der kunne ikke laves en svensk oversættelse på denne iPhone."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die Art des Problems wird auf Schwedisch ergänzt. Ihr Text wird so gesendet, wie Sie ihn geschrieben haben; auf diesem iPhone konnte keine schwedische Übersetzung erstellt werden."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ο τύπος του προβλήματος προστίθεται στα σουηδικά. Το κείμενό σας στέλνεται όπως το γράψατε· δεν ήταν δυνατή η μετάφραση στα σουηδικά σε αυτό το iPhone."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The problem type is added in Swedish. Your text is sent as written; no Swedish translation could be made on this iPhone."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El tipo de problema se añade en sueco. Tu texto se envía tal como lo escribiste; no se pudo hacer una traducción al sueco en este iPhone."
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Probleemi liik lisatakse rootsi keeles. Teie tekst saadetakse nii, nagu kirjutasite; selles iPhone'is ei õnnestunud rootsikeelset tõlget teha."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ongelman tyyppi lisätään ruotsiksi. Tekstisi lähetetään sellaisenaan; tällä iPhonella ei voitu tehdä ruotsinkielistä käännöstä."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le type de problème est ajouté en suédois. Votre texte est envoyé tel que vous l'avez écrit ; aucune traduction suédoise n'a pu être faite sur cet iPhone."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A probléma típusa svédül kerül a bejelentésbe. A szövegét úgy küldjük el, ahogy írta; ezen az iPhone-on nem sikerült svéd fordítást készíteni."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il tipo di problema viene aggiunto in svedese. Il tuo testo viene inviato così come l'hai scritto; su questo iPhone non è stato possibile tradurlo in svedese."
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Problemos tipas pridedamas švediškai. Jūsų tekstas siunčiamas taip, kaip parašėte; šiame „iPhone“ nepavyko sukurti vertimo į švedų kalbą."
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Problēmas veids tiek pievienots zviedriski. Jūsu teksts tiek nosūtīts, kā uzrakstīts; šajā iPhone neizdevās izveidot tulkojumu zviedru valodā."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Problemtypen legges til på svensk. Teksten din sendes slik du skrev den; det gikk ikke å lage en svensk oversettelse på denne iPhonen."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Het soort probleem wordt in het Zweeds toegevoegd. Je tekst wordt verstuurd zoals je hem schreef; op deze iPhone kon geen Zweedse vertaling worden gemaakt."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rodzaj problemu jest dodawany po szwedzku. Twój tekst idzie w takiej formie, w jakiej go napisałeś; na tym iPhonie nie udało się przetłumaczyć go na szwedzki."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O tipo de problema é acrescentado em sueco. O seu texto é enviado tal como o escreveu; não foi possível fazer uma tradução para sueco neste iPhone."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tipul problemei se adaugă în suedeză. Textul dumneavoastră se trimite așa cum l-ați scris; pe acest iPhone nu s-a putut face o traducere în suedeză."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Тип проблемы добавляется по-шведски. Ваш текст отправляется как написан; перевести его на шведский на этом iPhone не удалось."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Problemtypen läggs till på svenska. Din text skickas som du skrev den; det gick inte att göra en svensk översättning på den här iPhonen."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Тип проблеми додається шведською. Ваш текст надсилається як написаний; перекласти його шведською на цьому iPhone не вдалося."
           }
         }
       }
@@ -37401,278 +36177,6 @@
         }
       }
     },
-    "You can close Fixa. You'll find the report under Sent reports." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يمكنك إغلاق Fixa. ستجد البلاغ في البلاغات المرسلة."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixu můžete zavřít. Hlášení najdete v části Odeslaná hlášení."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Du kan lukke Fixa. Du finder anmeldelsen under Sendte anmeldelser."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sie können Fixa schließen. Die Meldung finden Sie unter „Gesendete Meldungen“."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Μπορείτε να κλείσετε το Fixa. Θα βρείτε την αναφορά στις Απεσταλμένες αναφορές."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can close Fixa. You'll find the report under Sent reports."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Puedes cerrar Fixa. Encontrarás el aviso en Avisos enviados."
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Võite Fixa sulgeda. Teate leiate saadetud teadete alt."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Voit sulkea Fixan. Ilmoitus löytyy kohdasta Lähetetyt ilmoitukset."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vous pouvez fermer Fixa. Vous trouverez le signalement dans Signalements envoyés."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bezárhatja a Fixát. A bejelentést az Elküldött bejelentések között találja."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Puoi chiudere Fixa. Troverai la segnalazione in Segnalazioni inviate."
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Galite uždaryti Fixa. Pranešimą rasite skiltyje „Išsiųsti pranešimai“."
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Varat aizvērt Fixa. Ziņojums būs atrodams sadaļā Nosūtītie ziņojumi."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Du kan lukke Fixa. Du finner meldingen under Sendte meldinger."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Je kunt Fixa sluiten. Je vindt de melding onder Verstuurde meldingen."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Możesz zamknąć Fixa. Zgłoszenie znajdziesz w wysłanych zgłoszeniach."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pode fechar a Fixa. Encontra a participação em Participações enviadas."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Puteți închide Fixa. Găsiți sesizarea la Sesizări trimise."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Можно закрыть Fixa. Заявка будет в разделе «Отправленные заявки»."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Du kan stänga Fixa. Anmälan finns under Skickade anmälningar."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa можна закрити. Звернення буде в розділі «Надіслані звернення»."
-          }
-        }
-      }
-    },
-    "You can delete everything in Settings. To change or remove a report you've already sent, contact %@." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يمكنك حذف كل شيء من الإعدادات. لتعديل بلاغ أرسلته أو سحبه، تواصل مع %@."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Všechno můžete smazat v Nastavení. Chcete-li změnit nebo odstranit už odeslané hlášení, obraťte se na %@."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Du kan slette alt under Indstillinger. Vil du ændre eller fjerne en anmeldelse, du allerede har sendt, så kontakt %@."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Du kannst alles in den Einstellungen löschen. Um eine bereits gesendete Meldung zu ändern oder zu löschen, wende dich an %@."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Μπορείς να τα διαγράψεις όλα στις Ρυθμίσεις. Για να αλλάξεις ή να αφαιρέσεις μια αναφορά που έχεις ήδη στείλει, επικοινώνησε με %@."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can delete everything in Settings. To change or remove a report you've already sent, contact %@."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Puedes borrarlo todo en Ajustes. Para cambiar o eliminar un aviso ya enviado, contacta con %@."
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kõik saad kustutada seadetes. Juba saadetud teate muutmiseks või kustutamiseks võta ühendust: %@."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Voit poistaa kaiken asetuksista. Jos haluat muuttaa tai poistaa jo lähetetyn ilmoituksen, ota yhteyttä: %@."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vous pouvez tout effacer dans Réglages. Pour modifier ou supprimer un signalement déjà envoyé, contactez %@."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mindent törölhetsz a Beállításokban. Egy már elküldött bejelentés módosításához vagy törléséhez fordulj ide: %@."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Puoi cancellare tutto in Impostazioni. Per modificare o eliminare una segnalazione già inviata, contatta %@."
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Viską galite ištrinti nustatymuose. Norėdami pakeisti ar pašalinti jau išsiųstą pranešimą, kreipkitės į %@."
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Visu vari izdzēst iestatījumos. Lai mainītu vai dzēstu jau nosūtītu ziņojumu, sazinies ar %@."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Du kan slette alt under Innstillinger. Vil du endre eller fjerne en melding du allerede har sendt, kontakt %@."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Je kunt alles wissen bij Instellingen. Wil je een verstuurde melding wijzigen of verwijderen, neem dan contact op met %@."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wszystko usuniesz w Ustawieniach. Aby zmienić lub usunąć wysłane już zgłoszenie, skontaktuj się z: %@."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pode apagar tudo nas Definições. Para alterar ou remover uma participação já enviada, contacte %@."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Poți șterge tot din Setări. Ca să modifici sau să retragi o sesizare deja trimisă, contactează %@."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Всё можно удалить в Настройках. Чтобы изменить или отозвать уже отправленную заявку, свяжитесь с %@."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Du kan radera allt under Inställningar. Vill du ändra eller ta bort en anmälan du redan skickat, kontakta %@."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Усе можна видалити в Налаштуваннях. Щоб змінити або відкликати вже надіслану заявку, зверніться до %@."
-          }
-        }
-      }
-    },
     "You've sent many reports in a short time. Try again at %@." : {
       "localizations" : {
         "ar" : {
@@ -38349,278 +36853,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ваш iPhone ділиться лише приблизним місцезнаходженням"
-          }
-        }
-      }
-    },
-    "Your phone seems to be offline. Your report is saved on this phone, and Fixa sends it when you're back online." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يبدو أن هاتفك غير متصل بالإنترنت. بلاغك محفوظ على هذا الهاتف، وسيرسله Fixa عندما تعود متصلًا."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Váš telefon je zřejmě offline. Vaše hlášení je uložené v tomto telefonu a Fixa ho odešle, až budete znovu online."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Din telefon ser ud til at være offline. Din anmeldelse er gemt på denne telefon, og Fixa sender den, når du er online igen."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ihr Telefon scheint offline zu sein. Ihre Meldung ist auf diesem Telefon gespeichert, und Fixa sendet sie, sobald Sie wieder online sind."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Το τηλέφωνό σας φαίνεται να είναι εκτός σύνδεσης. Η αναφορά σας είναι αποθηκευμένη σε αυτό το τηλέφωνο και το Fixa θα τη στείλει όταν συνδεθείτε ξανά."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your phone seems to be offline. Your report is saved on this phone, and Fixa sends it when you're back online."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Parece que tu teléfono no tiene conexión. Tu aviso está guardado en este teléfono y Fixa lo enviará cuando vuelvas a tener conexión."
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Teie telefon näib olevat võrguühenduseta. Teie teade on selles telefonis salvestatud ja Fixa saadab selle, kui olete jälle võrgus."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Puhelin näyttää olevan offline-tilassa. Ilmoituksesi on tallessa tässä puhelimessa, ja Fixa lähettää sen, kun olet taas verkossa."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Votre téléphone semble hors ligne. Votre signalement est enregistré sur ce téléphone, et Fixa l'enverra dès que vous serez de nouveau en ligne."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Úgy tűnik, a telefonnak nincs internetkapcsolata. A bejelentése el van mentve ezen a telefonon, és a Fixa elküldi, amint újra lesz kapcsolat."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il telefono sembra offline. La segnalazione è salvata su questo telefono e Fixa la invierà quando sarai di nuovo online."
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Atrodo, kad jūsų telefonas neprisijungęs prie interneto. Jūsų pranešimas išsaugotas šiame telefone, o Fixa jį išsiųs, kai vėl prisijungsite."
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Šķiet, ka tālrunis nav tiešsaistē. Jūsu ziņojums ir saglabāts šajā tālrunī, un Fixa to nosūtīs, kad būsiet atkal tiešsaistē."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Telefonen ser ut til å være uten nett. Meldingen din er lagret på denne telefonen, og Fixa sender den når du er på nett igjen."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Je telefoon lijkt offline te zijn. Je melding is bewaard op deze telefoon en Fixa verstuurt hem zodra je weer online bent."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wygląda na to, że telefon jest offline. Twoje zgłoszenie jest zapisane na tym telefonie, a Fixa wyśle je, gdy znów będziesz online."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "O seu telemóvel parece estar sem ligação. A sua participação está guardada neste telemóvel e a Fixa envia-a quando houver novamente ligação à internet."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Telefonul pare să fie offline. Sesizarea dumneavoastră este salvată pe acest telefon, iar Fixa o trimite când sunteți din nou online."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Похоже, ваш телефон не подключён к интернету. Ваша заявка сохранена на этом телефоне, и Fixa отправит её, когда вы снова будете в сети."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Telefonen verkar vara offline. Din anmälan är sparad på telefonen, och Fixa skickar den när du är uppkopplad igen."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Схоже, телефон без інтернету. Ваше звернення збережено на цьому телефоні, і Fixa надішле його, щойно ви знову будете онлайн."
-          }
-        }
-      }
-    },
-    "Your report goes straight to the municipality's own fault-report service, just like the website." : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يذهب بلاغك مباشرة إلى خدمة البلاغات الخاصة بالبلدية، تمامًا كما في الموقع الإلكتروني."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vaše hlášení jde přímo do vlastní služby obce pro hlášení závad, stejně jako na webu."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Din anmeldelse går direkte til kommunens egen fejlmeldingstjeneste, ligesom på hjemmesiden."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ihre Meldung geht direkt an den E-Service der Gemeinde für Störungsmeldungen, genau wie über die Website."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Η αναφορά σας πηγαίνει απευθείας στην υπηρεσία αναφοράς βλαβών του ίδιου του δήμου, όπως και στον ιστότοπο."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your report goes straight to the municipality's own fault-report service, just like the website."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tu aviso va directamente al servicio de avisos de incidencias del propio municipio, igual que en la web."
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Teie teade läheb otse omavalitsuse enda rikketeadete teenusesse, täpselt nagu veebisaidil."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ilmoituksesi menee suoraan kunnan omaan vikailmoituspalveluun, aivan kuten verkkosivulla."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Votre signalement est transmis directement au service en ligne de signalement de la commune, comme sur son site web."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A bejelentése közvetlenül az önkormányzat saját hibabejelentő szolgáltatásához kerül, ugyanúgy, mint a weboldalon."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La tua segnalazione arriva direttamente al servizio segnalazioni guasti del comune, proprio come dal sito web."
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jūsų pranešimas keliauja tiesiai į pačios savivaldybės gedimų pranešimų paslaugą, kaip ir per svetainę."
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jūsu ziņojums nonāk tieši pašvaldības bojājumu pieteikšanas pakalpojumā, tāpat kā tīmekļa vietnē."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Meldingen din går rett til kommunens egen feilmeldingstjeneste, akkurat som på nettsiden."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Je melding gaat rechtstreeks naar de eigen meldingsdienst van de gemeente, net als via de website."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Twoje zgłoszenie trafia prosto do własnej usługi zgłaszania usterek gminy, tak jak na stronie internetowej."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A sua participação vai diretamente para o serviço de participação de avarias do próprio município, tal como no site."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sesizarea dumneavoastră ajunge direct la serviciul de sesizări al comunei, la fel ca pe site."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ваша заявка попадает прямо в собственную службу коммуны по приёму заявок о неисправностях, так же как через сайт."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Din anmälan går direkt till kommunens egen felanmälan, precis som på webbplatsen."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ваше звернення йде просто до власної служби звернень муніципалітету, так само як на сайті."
           }
         }
       }
@@ -42867,143 +41099,6 @@
         }
       }
     },
-    "Reports to the kommun become public records. Avoid faces, number plates and other people's names." : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reports to the kommun become public records. Avoid faces, number plates and other people's names."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Det du skickar till kommunen blir allmän handling och kan lämnas ut. Undvik ansikten, registreringsskyltar och andras namn."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hlášení obci se stávají veřejnými dokumenty. Vyhněte se obličejům, SPZ a jménům jiných lidí."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anmeldelser til kommunen bliver offentlige dokumenter. Undgå ansigter, nummerplader og andres navne."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Meldungen an die Gemeinde werden öffentliche Dokumente. Vermeide Gesichter, Kennzeichen und Namen anderer Menschen."
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vallale saadetud teated muutuvad avalikeks dokumentideks. Väldi nägusid, numbrimärke ja teiste inimeste nimesid."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Los avisos al municipio pasan a ser documentos públicos. Evita caras, matrículas y nombres de otras personas."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Les signalements à la commune deviennent des documents publics. Évite les visages, les plaques d’immatriculation et les noms d’autres personnes."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le segnalazioni al comune diventano atti pubblici. Evita volti, targhe e nomi di altre persone."
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ziņojumi pašvaldībai kļūst par publiskiem dokumentiem. Izvairies no sejām, numurzīmēm un citu cilvēku vārdiem."
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pranešimai savivaldybei tampa viešais dokumentais. Venkite veidų, automobilių numerių ir kitų žmonių vardų."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Az önkormányzatnak küldött bejelentések nyilvános iratok lesznek. Kerüld az arcokat, rendszámokat és mások nevét."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Meldingen aan de gemeente worden openbare documenten. Vermijd gezichten, kentekens en namen van anderen."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Meldinger til kommunen blir offentlige dokumenter. Unngå ansikter, bilskilt og andres navn."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zgłoszenia do gminy stają się dokumentami publicznymi. Unikaj twarzy, tablic rejestracyjnych i nazwisk innych osób."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "As participações ao município tornam-se documentos públicos. Evita rostos, matrículas e nomes de outras pessoas."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sesizările către primărie devin documente publice. Evită fețele, numerele de înmatriculare și numele altor oameni."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kunnalle lähetetyistä ilmoituksista tulee julkisia asiakirjoja. Vältä kasvoja, rekisterikilpiä ja muiden ihmisten nimiä."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Οι αναφορές προς τον δήμο γίνονται δημόσια έγγραφα. Απόφυγε πρόσωπα, πινακίδες κυκλοφορίας και ονόματα άλλων."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сообщения в коммуну становятся публичными документами. Избегайте лиц, номерных знаков и имён других людей."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Повідомлення до комуни стають публічними документами. Уникайте облич, номерних знаків та імен інших людей."
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "تصبح البلاغات المرسلة إلى البلدية وثائق عامة. تجنّب الوجوه ولوحات السيارات وأسماء الآخرين."
-          }
-        }
-      }
-    },
     "Sent with a Swedish translation: %@" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -46274,142 +44369,6 @@
         }
       }
     },
-    "Other questions? Ask the kommun on its website" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Other questions? Ask the kommun on its website"
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Andra frågor? Fråga kommunen på dess webbplats"
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jiné otázky? Zeptejte se obce na jejím webu"
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Andre spørgsmål? Spørg kommunen på dens hjemmeside"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Andere Fragen? Fragen Sie die Gemeinde auf ihrer Website"
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Muud küsimused? Küsige omavalitsuselt tema veebisaidil"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "¿Otras preguntas? Pregunta al municipio en su web"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "D'autres questions ? Demandez à la commune sur son site"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Altre domande? Chiedi al comune sul suo sito"
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Citi jautājumi? Jautājiet pašvaldībai tās tīmekļa vietnē"
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kiti klausimai? Klauskite savivaldybės jos svetainėje"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Más kérdése van? Kérdezze az önkormányzatot a honlapján"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Andere vragen? Vraag het de gemeente op haar website"
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Andre spørsmål? Spør kommunen på nettstedet"
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inne pytania? Zapytaj gminę na jej stronie"
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Outras dúvidas? Pergunte ao município no site"
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Alte întrebări? Întrebați comuna pe site-ul ei"
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Muita kysymyksiä? Kysy kunnalta sen verkkosivuilla"
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Άλλες ερωτήσεις; Ρωτήστε τον δήμο στον ιστότοπό του"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Другие вопросы? Спросите коммуну на её сайте"
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Інші питання? Запитайте комуну на її сайті"
-          }
-        },
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "أسئلة أخرى؟ اسأل البلدية على موقعها"
-          }
-        }
-      }
-    },
     "Phone" : {
       "localizations" : {
         "en" : {
@@ -49126,6 +47085,2454 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "تتم معالجة بياناتك. يُرجى الانتظار…"
+          }
+        }
+      }
+    },
+    "Tell the kommun what's broken." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tell the kommun what's broken."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Berätta för kommunen vad som är trasigt."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Řekněte obci, co je rozbité."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fortæl kommunen, hvad der er i stykker."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sagen Sie der Gemeinde, was kaputt ist."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teata vallale, mis on katki."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dile al municipio qué está roto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signalez à la commune ce qui est cassé."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segnala al comune cosa è rotto."
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pastāstiet pašvaldībai, kas ir salūzis."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Praneškite savivaldybei, kas sugedo."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jelezze az önkormányzatnak, mi romlott el."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laat de gemeente weten wat er kapot is."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Si fra til kommunen hva som er ødelagt."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Powiedz gminie, co jest zepsute."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diga ao município o que está avariado."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spuneți primăriei ce este stricat."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kerro kunnalle, mikä on rikki."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Πείτε στον δήμο τι έχει χαλάσει."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сообщите коммуне, что сломалось."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повідомте комуну, що зламалося."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أخبر البلدية بما هو معطّل."
+          }
+        }
+      }
+    },
+    "Reports go straight to the kommun's own fault service." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reports go straight to the kommun's own fault service."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmälan går direkt till kommunens egen felanmälan."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hlášení jdou přímo do vlastní služby obce pro hlášení závad."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmeldelser går direkte til kommunens egen fejlmelding."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meldungen gehen direkt an den eigenen Mängelmelder der Gemeinde."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teated lähevad otse valla enda rikketeenusesse."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los avisos van directamente al servicio de incidencias del propio municipio."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les signalements vont directement au service de signalement de la commune."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le segnalazioni vanno direttamente al servizio guasti del comune."
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziņojumi nonāk tieši pašvaldības bojājumu pieteikšanas dienestā."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pranešimai keliauja tiesiai į savivaldybės gedimų tarnybą."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A bejelentések egyenesen az önkormányzat saját hibabejelentőjébe kerülnek."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meldingen gaan rechtstreeks naar het eigen meldpunt van de gemeente."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meldingene går rett til kommunens egen feilmelding."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zgłoszenia trafiają prosto do gminnego serwisu zgłaszania usterek."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Os relatos vão diretamente para o serviço de avarias do próprio município."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sesizările ajung direct la serviciul de avarii al primăriei."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ilmoitukset menevät suoraan kunnan omaan vikailmoituspalveluun."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Οι αναφορές πηγαίνουν κατευθείαν στην υπηρεσία βλαβών του δήμου."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сообщения уходят прямо в собственную службу неисправностей коммуны."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повідомлення надходять прямо до власної служби несправностей комуни."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تذهب البلاغات مباشرة إلى خدمة الأعطال التابعة للبلدية."
+          }
+        }
+      }
+    },
+    "Other questions? Ask the kommun" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other questions? Ask the kommun"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andra frågor? Fråga kommunen"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jiné dotazy? Zeptejte se obce"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andre spørgsmål? Spørg kommunen"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andere Fragen? Fragen Sie die Gemeinde"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muud küsimused? Küsi vallalt"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Otras preguntas? Pregunta al municipio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "D'autres questions ? Demandez à la commune"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Altre domande? Chiedi al comune"
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Citi jautājumi? Jautājiet pašvaldībai"
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kiti klausimai? Klauskite savivaldybės"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Más kérdés? Kérdezze az önkormányzatot"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andere vragen? Vraag het de gemeente"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andre spørsmål? Spør kommunen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inne pytania? Zapytaj gminę"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outras perguntas? Pergunte ao município"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alte întrebări? Întrebați primăria"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muita kysymyksiä? Kysy kunnalta"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Άλλες ερωτήσεις; Ρωτήστε τον δήμο"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Другие вопросы? Спросите коммуну"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Інші питання? Запитайте комуну"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أسئلة أخرى؟ اسأل البلدية"
+          }
+        }
+      }
+    },
+    "What's broken, and since when? Any language is fine." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What's broken, and since when? Any language is fine."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vad är trasigt, och sedan när? Skriv på vilket språk du vill."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Co je rozbité a od kdy? Můžete psát v jakémkoli jazyce."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hvad er i stykker, og siden hvornår? Skriv på hvilket som helst sprog."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Was ist kaputt, und seit wann? Jede Sprache ist okay."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mis on katki ja mis ajast? Kirjuta mis tahes keeles."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Qué está roto y desde cuándo? Puedes escribir en cualquier idioma."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qu'est-ce qui est cassé, et depuis quand ? Toutes les langues conviennent."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cosa è rotto, e da quando? Va bene qualsiasi lingua."
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kas ir salūzis un kopš kura laika? Var rakstīt jebkurā valodā."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kas sugedo ir nuo kada? Galite rašyti bet kuria kalba."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mi romlott el, és mióta? Bármilyen nyelven írhatsz."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wat is er kapot, en sinds wanneer? Elke taal is goed."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hva er ødelagt, og siden når? Skriv på hvilket språk du vil."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Co jest zepsute i od kiedy? Możesz pisać w dowolnym języku."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O que está avariado e desde quando? Pode escrever em qualquer língua."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce s-a stricat și de când? Poți scrie în orice limbă."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mikä on rikki ja mistä lähtien? Voit kirjoittaa millä kielellä tahansa."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Τι έχει χαλάσει και από πότε; Γράψτε σε όποια γλώσσα θέλετε."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Что сломано и с какого времени? Можно на любом языке."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Що зламано і відколи? Можна будь-якою мовою."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ما المعطّل ومنذ متى؟ يمكنك الكتابة بأي لغة."
+          }
+        }
+      }
+    },
+    "No answer from the e-service. Saved here; Fixa tries again soon." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No answer from the e-service. Saved here; Fixa tries again soon."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-tjänsten svarade inte. Sparad här; Fixa försöker snart igen."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-služba neodpověděla. Uloženo zde; Fixa to brzy zkusí znovu."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-tjenesten svarede ikke. Gemt her; Fixa prøver snart igen."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der E-Service hat nicht geantwortet. Hier gespeichert; Fixa versucht es bald erneut."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-teenus ei vastanud. Salvestatud siia; Fixa proovib varsti uuesti."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El servicio electrónico no respondió. Guardado aquí; Fixa lo reintentará pronto."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le service en ligne n'a pas répondu. Enregistré ici ; Fixa réessaie bientôt."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il servizio online non ha risposto. Salvato qui; Fixa riprova a breve."
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-pakalpojums neatbildēja. Saglabāts šeit; Fixa drīz mēģinās vēlreiz."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E. paslauga neatsakė. Išsaugota čia; Fixa netrukus bandys dar kartą."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Az e-ügyintézés nem válaszolt. Itt elmentve; a Fixa hamarosan újrapróbálja."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De e-dienst gaf geen antwoord. Hier bewaard; Fixa probeert het zo opnieuw."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-tjenesten svarte ikke. Lagret her; Fixa prøver igjen snart."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-usługa nie odpowiedziała. Zapisano tutaj; Fixa wkrótce spróbuje ponownie."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O serviço online não respondeu. Guardado aqui; a Fixa tenta de novo em breve."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serviciul online nu a răspuns. Salvat aici; Fixa reîncearcă în curând."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-palvelu ei vastannut. Tallennettu tänne; Fixa yrittää pian uudelleen."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Η ηλεκτρονική υπηρεσία δεν απάντησε. Αποθηκεύτηκε εδώ· το Fixa θα ξαναδοκιμάσει σύντομα."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Электронная служба не ответила. Сохранено здесь; Fixa скоро попробует снова."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Е-сервіс не відповів. Збережено тут; Fixa невдовзі спробує знову."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لم تستجب الخدمة الإلكترونية. حُفظ هنا؛ وسيعيد Fixa المحاولة قريبًا."
+          }
+        }
+      }
+    },
+    "You're offline. Saved here; Fixa sends it when you're back online." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You're offline. Saved here; Fixa sends it when you're back online."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du är offline. Sparad här; Fixa skickar den när du är online igen."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jste offline. Uloženo zde; Fixa ho odešle, až budete znovu online."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du er offline. Gemt her; Fixa sender den, når du er online igen."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du bist offline. Hier gespeichert; Fixa sendet sie, sobald du wieder online bist."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oled võrguühenduseta. Salvestatud siia; Fixa saadab selle, kui oled taas võrgus."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estás sin conexión. Guardado aquí; Fixa lo enviará cuando vuelvas a estar en línea."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous êtes hors ligne. Enregistré ici ; Fixa l'enverra dès votre retour en ligne."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sei offline. Salvato qui; Fixa lo invia quando torni online."
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu esi bezsaistē. Saglabāts šeit; Fixa to nosūtīs, kad atkal būsi tiešsaistē."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esate neprisijungę. Išsaugota čia; Fixa išsiųs, kai vėl prisijungsite."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nincs internetkapcsolat. Itt elmentve; a Fixa elküldi, amint újra online leszel."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je bent offline. Hier bewaard; Fixa verstuurt het zodra je weer online bent."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du er frakoblet. Lagret her; Fixa sender den når du er på nett igjen."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jesteś offline. Zapisano tutaj; Fixa wyśle zgłoszenie, gdy wrócisz do sieci."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Está offline. Guardado aqui; a Fixa envia quando voltar a estar online."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ești offline. Salvat aici; Fixa îl trimite când revii online."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Olet offline-tilassa. Tallennettu tänne; Fixa lähettää sen, kun olet taas verkossa."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Είστε εκτός σύνδεσης. Αποθηκεύτηκε εδώ· το Fixa θα το στείλει μόλις συνδεθείτε ξανά."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нет сети. Сохранено здесь; Fixa отправит, когда вы снова будете онлайн."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Немає мережі. Збережено тут; Fixa надішле, щойно ви знову будете онлайн."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "أنت غير متصل. حُفظ هنا؛ وسيرسله Fixa عند عودتك إلى الاتصال."
+          }
+        }
+      }
+    },
+    "No confirmation came back. It may well have reached %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No confirmation came back. It may well have reached %@."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingen bekräftelse kom tillbaka. Den kan mycket väl ha nått %@."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nepřišlo žádné potvrzení. Docela možná dorazilo do %@."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der kom ingen bekræftelse. Den kan sagtens være nået frem til %@."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es kam keine Bestätigung zurück. Sie hat %@ aber gut möglich erreicht."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kinnitust ei tulnud. See võis vabalt jõuda kohale: %@."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No llegó ninguna confirmación. Es muy posible que haya llegado a %@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune confirmation n'est revenue. Il est bien possible qu'il soit parvenu à %@."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Non è arrivata alcuna conferma. Potrebbe benissimo essere arrivata a %@."
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apstiprinājums nepienāca. Tas varēja gluži labi sasniegt: %@."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Patvirtinimo negauta. Visai gali būti, kad jis pasiekė: %@."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nem érkezett visszaigazolás. Könnyen lehet, hogy megkapta: %@."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er kwam geen bevestiging terug. Het kan best zijn aangekomen bij %@."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingen bekreftelse kom tilbake. Den kan godt ha nådd %@."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie przyszło potwierdzenie. Bardzo możliwe, że dotarło do: %@."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Não chegou nenhuma confirmação. É bem possível que tenha chegado a %@."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nu a venit nicio confirmare. Se poate foarte bine să fi ajuns la %@."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vahvistusta ei tullut. Se on voinut hyvin mennä perille: %@."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Δεν ήρθε επιβεβαίωση. Μπορεί κάλλιστα να έφτασε στον/στην %@."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подтверждение не пришло. Вполне возможно, отчёт дошёл: %@."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Підтвердження не надійшло. Цілком можливо, звіт дійшов: %@."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لم يصل أي تأكيد. ربما وصل البلاغ بالفعل إلى %@."
+          }
+        }
+      }
+    },
+    "Reports become public records. Leave out faces, plates and names." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reports become public records. Leave out faces, plates and names."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anmälningar blir allmänna handlingar. Undvik ansikten, registreringsskyltar och namn."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hlášení se stávají veřejnými záznamy. Vynechte obličeje, SPZ a jména."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indberetninger bliver offentlige dokumenter. Undgå ansigter, nummerplader og navne."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meldungen werden öffentlich einsehbar. Lass Gesichter, Kennzeichen und Namen weg."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teated muutuvad avalikeks dokumentideks. Jäta välja näod, numbrimärgid ja nimed."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los avisos se vuelven documentos públicos. Evita caras, matrículas y nombres."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les signalements deviennent des documents publics. Évitez visages, plaques et noms."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le segnalazioni diventano atti pubblici. Evita volti, targhe e nomi."
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziņojumi kļūst par publiskiem dokumentiem. Izvairies no sejām, numurzīmēm un vārdiem."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pranešimai tampa viešais dokumentais. Venkite veidų, numerių ir vardų."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A bejelentések nyilvános iratok lesznek. Kerüld az arcokat, rendszámokat és neveket."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meldingen worden openbare stukken. Laat gezichten, kentekens en namen weg."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meldinger blir offentlige dokumenter. Unngå ansikter, skilt og navn."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zgłoszenia stają się dokumentami publicznymi. Pomiń twarze, tablice i nazwiska."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "As participações tornam-se documentos públicos. Evite rostos, matrículas e nomes."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sesizările devin documente publice. Evită fețele, numerele de înmatriculare și numele."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ilmoituksista tulee julkisia asiakirjoja. Jätä pois kasvot, rekisterikilvet ja nimet."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Οι αναφορές γίνονται δημόσια έγγραφα. Αποφύγετε πρόσωπα, πινακίδες και ονόματα."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обращения становятся публичными документами. Без лиц, номеров машин и имён."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Звернення стають публічними документами. Без облич, номерів авто й імен."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تصبح البلاغات سجلات عامة. تجنّب الوجوه ولوحات السيارات والأسماء."
+          }
+        }
+      }
+    },
+    "Sent as written, with a Swedish translation added." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sent as written, with a Swedish translation added."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skickas som du skrev, med en svensk översättning."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odešle se, jak je napsáno, s přidaným švédským překladem."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sendes som skrevet, med en svensk oversættelse."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird wie geschrieben gesendet, mit schwedischer Übersetzung."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saadetakse nii, nagu kirjutatud, koos rootsikeelse tõlkega."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se envía tal cual, con una traducción al sueco."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyé tel quel, avec une traduction en suédois."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inviato così com'è, con una traduzione in svedese."
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiek nosūtīts, kā uzrakstīts, ar tulkojumu zviedru valodā."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siunčiama, kaip parašyta, su vertimu į švedų kalbą."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Úgy küldjük, ahogy írtad, svéd fordítással."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wordt verstuurd zoals geschreven, met een Zweedse vertaling."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sendes som skrevet, med en svensk oversettelse."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wysyłane tak, jak napisano, z tłumaczeniem na szwedzki."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviado tal como escrito, com uma tradução para sueco."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se trimite cum ai scris, cu o traducere în suedeză."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lähetetään sellaisenaan, ruotsinkielisen käännöksen kanssa."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Αποστέλλεται όπως γράφτηκε, με σουηδική μετάφραση."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отправляется как написано, с переводом на шведский."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Надсилається як написано, з перекладом шведською."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يُرسل كما كتبته، مع ترجمة إلى السويدية."
+          }
+        }
+      }
+    },
+    "Sent as written; this iPhone couldn't translate it." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sent as written; this iPhone couldn't translate it."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skickas som du skrev; den här iPhonen kunde inte översätta."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odešle se, jak je napsáno; tento iPhone to nedokázal přeložit."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sendes som skrevet; denne iPhone kunne ikke oversætte den."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird wie geschrieben gesendet; dieses iPhone konnte nicht übersetzen."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saadetakse nii, nagu kirjutatud; see iPhone ei suutnud tõlkida."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se envía tal cual; este iPhone no pudo traducirlo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyé tel quel ; cet iPhone n'a pas pu le traduire."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inviato così com'è; questo iPhone non è riuscito a tradurlo."
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiek nosūtīts, kā uzrakstīts; šis iPhone to nevarēja iztulkot."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siunčiama, kaip parašyta; šis iPhone negalėjo išversti."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Úgy küldjük, ahogy írtad; ez az iPhone nem tudta lefordítani."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wordt verstuurd zoals geschreven; deze iPhone kon het niet vertalen."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sendes som skrevet; denne iPhonen kunne ikke oversette."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wysyłane tak, jak napisano; ten iPhone nie mógł przetłumaczyć."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviado tal como escrito; este iPhone não conseguiu traduzir."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se trimite cum ai scris; acest iPhone nu a putut traduce."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lähetetään sellaisenaan; tämä iPhone ei pystynyt kääntämään."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Αποστέλλεται όπως γράφτηκε· αυτό το iPhone δεν μπόρεσε να το μεταφράσει."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отправляется как написано; этот iPhone не смог перевести."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Надсилається як написано; цей iPhone не зміг перекласти."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يُرسل كما كتبته؛ تعذّر على هذا الـ iPhone ترجمته."
+          }
+        }
+      }
+    },
+    "Sent as written." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sent as written."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skickas som du skrev."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odešle se, jak je napsáno."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sendes som skrevet."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wird wie geschrieben gesendet."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saadetakse nii, nagu kirjutatud."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se envía tal cual."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyé tel quel."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inviato così com'è."
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiek nosūtīts, kā uzrakstīts."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siunčiama, kaip parašyta."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Úgy küldjük, ahogy írtad."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wordt verstuurd zoals geschreven."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sendes som skrevet."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wysyłane tak, jak napisano."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enviado tal como escrito."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se trimite cum ai scris."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lähetetään sellaisenaan."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Αποστέλλεται όπως γράφτηκε."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отправляется как написано."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Надсилається як написано."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "يُرسل كما كتبته."
+          }
+        }
+      }
+    },
+    "Delete from this phone" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete from this phone"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Radera från telefonen"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smazat z tohoto telefonu"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slet fra denne telefon"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Von diesem iPhone löschen"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kustuta sellest telefonist"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar de este teléfono"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer de ce téléphone"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina da questo telefono"
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dzēst no šī tālruņa"
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ištrinti iš šio telefono"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Törlés erről a telefonról"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwijderen van deze telefoon"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slett fra denne telefonen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuń z tego telefonu"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apagar deste telemóvel"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Șterge de pe acest telefon"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poista tästä puhelimesta"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Διαγραφή από αυτό το τηλέφωνο"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить с этого телефона"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Видалити з цього телефона"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حذف من هذا الهاتف"
+          }
+        }
+      }
+    },
+    "Clear the list of sent reports" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear the list of sent reports"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Töm listan med skickade ärenden"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vymazat seznam odeslaných hlášení"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ryd listen over sendte anmeldelser"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liste gesendeter Meldungen leeren"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tühjenda saadetud teadete loend"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vaciar la lista de avisos enviados"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vider la liste des signalements envoyés"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Svuota l'elenco delle segnalazioni inviate"
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notīrīt nosūtīto ziņojumu sarakstu"
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Išvalyti išsiųstų pranešimų sąrašą"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elküldött bejelentések listájának törlése"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lijst met verstuurde meldingen wissen"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tøm listen over sendte meldinger"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyczyść listę wysłanych zgłoszeń"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limpar a lista de pedidos enviados"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Golește lista sesizărilor trimise"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tyhjennä lähetettyjen ilmoitusten lista"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Εκκαθάριση λίστας απεσταλμένων αναφορών"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очистить список отправленных обращений"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Очистити список надісланих звернень"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "مسح قائمة البلاغات المرسلة"
+          }
+        }
+      }
+    },
+    "Delete all my data from this phone" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete all my data from this phone"
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Radera alla mina uppgifter från telefonen"
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Smazat všechna moje data z tohoto telefonu"
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slet alle mine data fra denne telefon"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle meine Daten von diesem iPhone löschen"
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kustuta kõik minu andmed sellest telefonist"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar todos mis datos de este teléfono"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer toutes mes données de ce téléphone"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina tutti i miei dati da questo telefono"
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dzēst visus manus datus no šī tālruņa"
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ištrinti visus mano duomenis iš šio telefono"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minden adatom törlése erről a telefonról"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al mijn gegevens van deze telefoon verwijderen"
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slett alle dataene mine fra denne telefonen"
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuń wszystkie moje dane z tego telefonu"
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apagar todos os meus dados deste telemóvel"
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Șterge toate datele mele de pe acest telefon"
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poista kaikki tietoni tästä puhelimesta"
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Διαγραφή όλων των δεδομένων μου από αυτό το τηλέφωνο"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить все мои данные с этого телефона"
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Видалити всі мої дані з цього телефона"
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "حذف كل بياناتي من هذا الهاتف"
+          }
+        }
+      }
+    },
+    "Your details, drafts and sent reports stay on this phone. No account, no tracking." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your details, drafts and sent reports stay on this phone. No account, no tracking."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dina uppgifter, utkast och skickade ärenden stannar på telefonen. Inget konto, ingen spårning."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vaše údaje, koncepty a odeslaná hlášení zůstávají v tomto telefonu. Žádný účet, žádné sledování."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dine oplysninger, kladder og sendte anmeldelser bliver på denne telefon. Ingen konto, ingen sporing."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Angaben, Entwürfe und gesendeten Meldungen bleiben auf diesem iPhone. Kein Konto, kein Tracking."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sinu andmed, mustandid ja saadetud teated jäävad sellesse telefoni. Kontot pole, jälgimist pole."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus datos, borradores y avisos enviados se quedan en este teléfono. Sin cuenta ni rastreo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos coordonnées, brouillons et signalements envoyés restent sur ce téléphone. Pas de compte, pas de pistage."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I tuoi dati, le bozze e le segnalazioni inviate restano su questo telefono. Nessun account, nessun tracciamento."
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tavi dati, melnraksti un nosūtītie ziņojumi paliek šajā tālrunī. Bez konta, bez izsekošanas."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jūsų duomenys, juodraščiai ir išsiųsti pranešimai lieka šiame telefone. Jokios paskyros, jokio sekimo."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Az adataid, piszkozataid és elküldött bejelentéseid ezen a telefonon maradnak. Nincs fiók, nincs követés."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je gegevens, concepten en verstuurde meldingen blijven op deze telefoon. Geen account, geen tracking."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opplysningene dine, utkast og sendte meldinger blir på denne telefonen. Ingen konto, ingen sporing."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twoje dane, szkice i wysłane zgłoszenia zostają w tym telefonie. Bez konta, bez śledzenia."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Os seus dados, rascunhos e pedidos enviados ficam neste telemóvel. Sem conta, sem rastreio."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datele tale, ciornele și sesizările trimise rămân pe acest telefon. Fără cont, fără urmărire."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tietosi, luonnokset ja lähetetyt ilmoitukset pysyvät tässä puhelimessa. Ei tiliä, ei seurantaa."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Τα στοιχεία σου, τα πρόχειρα και οι απεσταλμένες αναφορές μένουν σε αυτό το τηλέφωνο. Χωρίς λογαριασμό, χωρίς παρακολούθηση."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваши данные, черновики и отправленные обращения остаются на этом телефоне. Без аккаунта и слежки."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ваші дані, чернетки й надіслані звернення залишаються на цьому телефоні. Без облікового запису й стеження."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تبقى بياناتك ومسوداتك وبلاغاتك المرسلة على هذا الهاتف. لا حساب ولا تتبّع."
+          }
+        }
+      }
+    },
+    "A report goes only to the kommun, when you press Send. Photos lose their location first." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A report goes only to the kommun, when you press Send. Photos lose their location first."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ett ärende går bara till kommunen, när du trycker på Skicka. Bilder tappar sin plats först."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hlášení jde jen obci, a to až když stisknete Odeslat. Fotky předtím ztratí polohu."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En anmeldelse går kun til kommunen, når du trykker Send. Billeder mister først deres placering."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eine Meldung geht nur an die Kommune, wenn du auf Senden tippst. Fotos verlieren vorher ihren Ort."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teade läheb ainult vallale ja alles siis, kui vajutad Saada. Fotodelt eemaldatakse enne asukoht."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un aviso solo va al municipio, cuando pulsas Enviar. Antes, las fotos pierden su ubicación."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un signalement ne va qu'à la commune, quand vous appuyez sur Envoyer. Les photos perdent d'abord leur position."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Una segnalazione va solo al comune, quando premi Invia. Prima le foto perdono la posizione."
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ziņojums tiek nosūtīts tikai pašvaldībai, kad nospied Sūtīt. Fotoattēliem vispirms tiek noņemta atrašanās vieta."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pranešimas siunčiamas tik savivaldybei, kai paspaudžiate Siųsti. Nuotraukos pirmiausia netenka vietos."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A bejelentés csak az önkormányzathoz megy, amikor a Küldés gombra koppintasz. A fotókról előbb lekerül a hely."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Een melding gaat alleen naar de gemeente, als je op Verstuur tikt. Foto's verliezen eerst hun locatie."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En melding går bare til kommunen, når du trykker Send. Bilder mister først posisjonen sin."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zgłoszenie trafia tylko do gminy, gdy naciśniesz Wyślij. Zdjęcia najpierw tracą lokalizację."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um pedido vai só para o município, quando toca em Enviar. As fotos perdem primeiro a localização."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O sesizare ajunge doar la primărie, când apeși Trimite. Pozele își pierd mai întâi locația."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ilmoitus menee vain kunnalle, kun painat Lähetä. Kuvista poistetaan ensin sijainti."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Μια αναφορά πηγαίνει μόνο στον δήμο, όταν πατάς Αποστολή. Οι φωτογραφίες χάνουν πρώτα την τοποθεσία τους."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обращение уходит только в коммуну и только когда вы нажимаете «Отправить». С фото сначала удаляется место."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Звернення йде лише до комуни й лише коли ви натискаєте «Надіслати». З фото спершу видаляється місце."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "لا يذهب البلاغ إلا إلى البلدية، وعندما تضغط إرسال فقط. تُزال مواقع الصور أولًا."
+          }
+        }
+      }
+    },
+    "Sent reports become public records. Leave out faces, number plates and names." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sent reports become public records. Leave out faces, number plates and names."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skickade ärenden blir allmänna handlingar. Undvik ansikten, registreringsskyltar och namn."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odeslaná hlášení se stávají veřejnými záznamy. Vynechte obličeje, SPZ a jména."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sendte anmeldelser bliver offentlige dokumenter. Undgå ansigter, nummerplader og navne."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesendete Meldungen werden öffentliche Dokumente. Lass Gesichter, Kennzeichen und Namen weg."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saadetud teated muutuvad avalikeks dokumentideks. Jäta välja näod, numbrimärgid ja nimed."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los avisos enviados pasan a ser documentos públicos. Evita caras, matrículas y nombres."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les signalements envoyés deviennent des documents publics. Évitez visages, plaques et noms."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le segnalazioni inviate diventano atti pubblici. Evita volti, targhe e nomi."
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nosūtītie ziņojumi kļūst par publiskiem dokumentiem. Neiekļauj sejas, numurzīmes un vārdus."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Išsiųsti pranešimai tampa viešais dokumentais. Nerodykite veidų, numerių ir vardų."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Az elküldött bejelentések nyilvánosak lesznek. Ne legyen rajtuk arc, rendszám vagy név."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verstuurde meldingen worden openbare documenten. Laat gezichten, kentekens en namen weg."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sendte meldinger blir offentlige dokumenter. Unngå ansikter, bilskilt og navn."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wysłane zgłoszenia stają się dokumentami publicznymi. Pomiń twarze, tablice rejestracyjne i nazwiska."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Os pedidos enviados tornam-se documentos públicos. Evite rostos, matrículas e nomes."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sesizările trimise devin documente publice. Evită fețele, numerele de înmatriculare și numele."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lähetetyistä ilmoituksista tulee julkisia asiakirjoja. Jätä pois kasvot, rekisterikilvet ja nimet."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Οι απεσταλμένες αναφορές γίνονται δημόσια έγγραφα. Απόφυγε πρόσωπα, πινακίδες και ονόματα."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отправленные обращения становятся публичными документами. Не снимайте лица, номера машин и имена."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Надіслані звернення стають публічними документами. Не знімайте обличчя, номери авто й імена."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "تصبح البلاغات المرسلة سجلات عامة. تجنّب الوجوه ولوحات السيارات والأسماء."
+          }
+        }
+      }
+    },
+    "Delete everything in Settings. To change a sent report, contact %@." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete everything in Settings. To change a sent report, contact %@."
+          }
+        },
+        "sv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Radera allt i Inställningar. Vill du ändra ett skickat ärende, kontakta %@."
+          }
+        },
+        "cs" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vše smažete v Nastavení. Odeslané hlášení změníte přes %@."
+          }
+        },
+        "da" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slet alt under Indstillinger. Kontakt %@ for at ændre en sendt anmeldelse."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lösche alles in den Einstellungen. Um eine gesendete Meldung zu ändern, wende dich an %@."
+          }
+        },
+        "et" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kustuta kõik seadetes. Saadetud teate muutmiseks võta ühendust: %@."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borra todo en Ajustes. Para cambiar un aviso enviado, contacta con %@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimez tout dans Réglages. Pour modifier un signalement envoyé, contactez %@."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina tutto in Impostazioni. Per modificare una segnalazione inviata, contatta %@."
+          }
+        },
+        "lv" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visu izdzēs iestatījumos. Lai mainītu nosūtītu ziņojumu, sazinies ar %@."
+          }
+        },
+        "lt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Viską ištrinkite nustatymuose. Norėdami pakeisti išsiųstą pranešimą, kreipkitės į %@."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mindent törölhetsz a Beállításokban. Elküldött bejelentés módosításához fordulj ide: %@."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwijder alles in Instellingen. Om een verstuurde melding te wijzigen, neem contact op met %@."
+          }
+        },
+        "nb" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Slett alt under Innstillinger. Kontakt %@ for å endre en sendt melding."
+          }
+        },
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wszystko usuniesz w Ustawieniach. Aby zmienić wysłane zgłoszenie, skontaktuj się z: %@."
+          }
+        },
+        "pt" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apague tudo nas Definições. Para alterar um pedido enviado, contacte %@."
+          }
+        },
+        "ro" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Șterge totul din Setări. Pentru a modifica o sesizare trimisă, contactează %@."
+          }
+        },
+        "fi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Poista kaikki Asetuksista. Lähetettyä ilmoitusta voi muuttaa ottamalla yhteyttä: %@."
+          }
+        },
+        "el" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Διάγραψε τα πάντα στις Ρυθμίσεις. Για αλλαγή σε απεσταλμένη αναφορά, επικοινώνησε με: %@."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалить всё можно в Настройках. Чтобы изменить отправленное обращение, свяжитесь с %@."
+          }
+        },
+        "uk" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Видалити все можна в Налаштуваннях. Щоб змінити надіслане звернення, зверніться до %@."
+          }
+        },
+        "ar" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "احذف كل شيء من الإعدادات. لتغيير بلاغ مرسل، تواصل مع %@."
           }
         }
       }

@@ -40,14 +40,14 @@ struct FxPrimaryButton: View {
                     .multilineTextAlignment(.center)
             }
             .foregroundStyle(Fx.Color.onAction)
-            .frame(maxWidth: .infinity, minHeight: 50)
+            .frame(maxWidth: .infinity, minHeight: 54)
             .padding(.horizontal, Fx.Space.l)
             .padding(.vertical, Fx.Space.xs)
-            .background(Fx.Color.action, in: .rect(cornerRadius: Fx.Radius.m, style: .continuous))
+            .background(Fx.Color.action, in: .rect(cornerRadius: Fx.Radius.button, style: .continuous))
             .opacity(isEnabled ? 1 : 0.45)
-            .contentShape(.rect(cornerRadius: Fx.Radius.m, style: .continuous))
+            .contentShape(.rect(cornerRadius: Fx.Radius.button, style: .continuous))
         }
-        .buttonStyle(FxPressStyle())
+        .buttonStyle(FxPressStyle(scales: true))
         .disabled(isLoading)
         .sensoryFeedback(.impact(weight: .medium), trigger: taps) { _, _ in haptics }
         .accessibilityLabel(Text(title))
@@ -101,11 +101,11 @@ struct FxSecondaryLabel: View {
                 .multilineTextAlignment(.center)
         }
         .foregroundStyle(Fx.Color.sea)
-        .frame(maxWidth: .infinity, minHeight: 50)
+        .frame(maxWidth: .infinity, minHeight: 54)
         .padding(.horizontal, Fx.Space.l)
         .padding(.vertical, Fx.Space.xs)
-        .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.m, style: .continuous))
-        .contentShape(.rect(cornerRadius: Fx.Radius.m, style: .continuous))
+        .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.button, style: .continuous))
+        .contentShape(.rect(cornerRadius: Fx.Radius.button, style: .continuous))
     }
 }
 
@@ -174,50 +174,77 @@ struct FxCard<Content: View>: View {
     }
 }
 
-/// Small muted pastel circle with an ink glyph. Decorative.
+/// Small tinted glyph circle. Decorative. Pass `categoryTint` / `categoryGlyph` for a category.
 struct FxBadge: View {
     let systemImage: String
     var fill: Color
     var side: CGFloat
+    var glyph: Color
 
-    init(systemImage: String, fill: Color, side: CGFloat) {
+    init(systemImage: String, fill: Color, side: CGFloat, glyph: Color = Fx.Color.onPastel) {
         self.systemImage = systemImage
         self.fill = fill
         self.side = side
+        self.glyph = glyph
     }
 
     var body: some View {
         Image(systemName: systemImage)
             .font(Fx.Font.body)
             .imageScale(side >= 56 ? .large : .medium)
-            .foregroundStyle(Fx.Color.onPastel)
+            .foregroundStyle(glyph)
             .frame(width: side, height: side)
             .background(fill, in: Circle())
             .accessibilityHidden(true)
     }
 }
 
-/// Category tile for `FxTileGrid`: white card, muted pastel glyph circle centred at the top, a centred
-/// semibold title in the space below. `index` picks the pastel so the grid is varied but stable. The title
-/// never truncates and reserves at least two lines; the grid gives every tile the tallest tile's height, so
-/// icons share one line per row and shorter titles centre in the leftover space. Selected: 2 pt sea border.
-/// Selection haptic.
+/// Category glyph on its category tint in a rounded square (the tile's icon; history rows and receipt
+/// use it too). Decorative. `side` 56 on tiles; scale it with `@ScaledMetric` at the call site.
+struct FxCategoryIcon: View {
+    let systemImage: String
+    var categoryID: String?
+    var side: CGFloat = 56
+
+    var body: some View {
+        Image(systemName: systemImage)
+            .font(.system(size: side * 0.42, weight: .semibold))
+            .foregroundStyle(Fx.Color.categoryGlyph(categoryID))
+            .frame(width: side, height: side)
+            .background(
+                Fx.Color.categoryTint(categoryID),
+                in: .rect(cornerRadius: side * 0.3, style: .continuous)
+            )
+            .accessibilityHidden(true)
+    }
+}
+
+/// Category tile for `FxTileGrid`: white card, the category's tinted rounded-square icon centred at the top,
+/// a centred semibold title below. The title never truncates and reserves at least two lines; the grid gives
+/// every tile the tallest tile's height, so icons share one line per row and shorter titles centre in the
+/// leftover space. Pressed or selected: a 2 pt cone ring (selection is also a VoiceOver trait). Pressing
+/// squeezes to 0.97 except under Reduce Motion. Selection haptic.
 struct FxTile: View {
     let title: String
     let systemImage: String
-    var index: Int = 0
+    var categoryID: String?
     var isSelected: Bool = false
     let action: () -> Void
 
     @State private var taps = 0
     @Environment(\.fxHaptics) private var haptics
-    @Environment(\.fxReduceMotion) private var reduceMotion
-    @ScaledMetric(relativeTo: .body) private var iconSide: CGFloat = 44
+    @ScaledMetric(relativeTo: .body) private var iconSide: CGFloat = 56
 
-    init(title: String, systemImage: String, index: Int = 0, isSelected: Bool = false, action: @escaping () -> Void) {
+    init(
+        title: String,
+        systemImage: String,
+        categoryID: String? = nil,
+        isSelected: Bool = false,
+        action: @escaping () -> Void
+    ) {
         self.title = title
         self.systemImage = systemImage
-        self.index = index
+        self.categoryID = categoryID
         self.isSelected = isSelected
         self.action = action
     }
@@ -227,22 +254,15 @@ struct FxTile: View {
             taps += 1
             action()
         } label: {
-            VStack(spacing: Fx.Space.s) {
-                FxBadge(systemImage: systemImage, fill: Fx.Color.pastel(at: index), side: iconSide)
+            VStack(spacing: Fx.Space.m) {
+                FxCategoryIcon(systemImage: systemImage, categoryID: categoryID, side: min(iconSide, 96))
                 titleText
             }
             .padding(.horizontal, Fx.Space.m)
             .padding(.vertical, Fx.Space.l)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .fxCardSurface(
-                RoundedRectangle(cornerRadius: Fx.Radius.m, style: .continuous),
-                border: isSelected ? Fx.Color.sea : Fx.Color.line,
-                borderWidth: isSelected ? Fx.Border.emphasis : Fx.Border.hairline
-            )
-            .contentShape(.rect(cornerRadius: Fx.Radius.m, style: .continuous))
-            .animation(reduceMotion ? nil : Fx.Motion.select, value: isSelected)
         }
-        .buttonStyle(FxPressStyle())
+        .buttonStyle(FxTileStyle(isSelected: isSelected))
         .sensoryFeedback(.selection, trigger: taps) { _, _ in haptics }
         .accessibilityLabel(Text(title))
         .accessibilityAddTraits(isSelected ? .isSelected : [])
@@ -262,6 +282,37 @@ struct FxTile: View {
         }
         .font(Fx.Font.headline)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+/// Card surface for `FxTile` with the cone ring while pressed or selected, and the shared press squeeze.
+private struct FxTileStyle: ButtonStyle {
+    let isSelected: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        FxTileSurface(label: configuration.label, isPressed: configuration.isPressed, isSelected: isSelected)
+    }
+}
+
+private struct FxTileSurface<Label: View>: View {
+    let label: Label
+    let isPressed: Bool
+    let isSelected: Bool
+    @Environment(\.fxReduceMotion) private var reduceMotion
+
+    var body: some View {
+        let shape = RoundedRectangle(cornerRadius: Fx.Radius.m, style: .continuous)
+        let ringed = isPressed || isSelected
+        label
+            .fxCardSurface(
+                shape,
+                border: ringed ? Fx.Color.cone : Fx.Color.line,
+                borderWidth: ringed ? Fx.Border.emphasis : Fx.Border.hairline
+            )
+            .contentShape(shape)
+            .scaleEffect(isPressed && !reduceMotion ? 0.97 : 1)
+            .animation(Fx.Motion.press, value: isPressed)
+            .animation(reduceMotion ? nil : Fx.Motion.select, value: isSelected)
     }
 }
 

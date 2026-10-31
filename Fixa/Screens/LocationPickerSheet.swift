@@ -14,6 +14,7 @@ struct LocationPickerSheet: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.fxHaptics) private var haptics
     @Environment(\.fxReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     /// The placed spot; nil until the user places it (or a saved draft brings one).
     @State private var pin: CLLocationCoordinate2D?
@@ -33,6 +34,8 @@ struct LocationPickerSheet: View {
     /// The other kommun the pin is in, from reverse geocoding; nil while inside or unknown.
     @State private var otherKommun: String?
     @FocusState private var searchFocused: Bool
+    /// Height of the search + locate controls; the list (and the map at accessibility sizes) starts below it.
+    @State private var controlsHeight: CGFloat = 0
 
     /// Opening view when nothing is known yet: Gustavsberg centrum at about 3 km.
     private static let gustavsberg = CLLocationCoordinate2D(latitude: 59.3262, longitude: 18.3856)
@@ -57,15 +60,24 @@ struct LocationPickerSheet: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                VStack(spacing: Fx.Space.s) {
-                    searchField
-                    locateRow
-                }
-                .padding(Fx.Space.l)
-                if !search.suggestions.isEmpty, searchFocused {
-                    suggestionList
-                } else {
-                    map
+                // One tree for the controls so the search field keeps focus when suggestions appear.
+                ZStack(alignment: .top) {
+                    Group {
+                        if showsSuggestions {
+                            suggestionList
+                                .padding(.top, controlsHeight)
+                        } else {
+                            map
+                                .padding(.top, controlsFloat ? 0 : controlsHeight)
+                        }
+                    }
+                    VStack(spacing: Fx.Space.s) {
+                        searchField
+                        locateRow
+                    }
+                    .padding(controlsFloat ? Fx.Space.m : Fx.Space.l)
+                    .background(controlsFloat ? Color.clear : Fx.Color.paper)
+                    .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { controlsHeight = $0 }
                 }
                 footer
             }
@@ -91,6 +103,11 @@ struct LocationPickerSheet: View {
             geocodeTask?.cancel()
         }
     }
+
+    private var showsSuggestions: Bool { !search.suggestions.isEmpty && searchFocused }
+
+    /// Controls float over the map; at accessibility sizes they stack above it so they never cover the pin.
+    private var controlsFloat: Bool { !showsSuggestions && !dynamicTypeSize.isAccessibilitySize }
 
     // MARK: Parts
 

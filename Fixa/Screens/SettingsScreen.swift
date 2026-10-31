@@ -8,7 +8,7 @@ struct SettingsScreen: View {
     @Environment(\.fxHaptics) private var haptics
     @State private var isClearHistoryPresented = false
     @State private var isDeleteAllPresented = false
-    /// Bumped after "Delete all my data": shows the banner and plays the success haptic.
+    /// Bumped after "Delete all my data from this phone": shows the banner and plays the success haptic.
     @State private var deletions = 0
     /// Set to start "Report a problem with the app" (an e-mail the user sees before sending).
     @State private var developerReport: DeveloperReport?
@@ -33,9 +33,10 @@ struct SettingsScreen: View {
                             : String(localized: "Used only for the report you're writing, then forgotten.", bundle: L10n.bundle, locale: L10n.locale),
                         isOn: $model.rememberDetails
                     )
+                    .fxSettingsRow()
                 }
 
-                section(String(localized: "Language", bundle: L10n.bundle, locale: L10n.locale)) {
+                section(String(localized: "Display", bundle: L10n.bundle, locale: L10n.locale)) {
                     SettingsNavRow(
                         systemImage: "globe",
                         title: String(localized: "Language", bundle: L10n.bundle, locale: L10n.locale),
@@ -44,9 +45,7 @@ struct SettingsScreen: View {
                         model.path.append(.language)
                     }
                     .accessibilityIdentifier("settings.language")
-                }
-
-                section(String(localized: "Display", bundle: L10n.bundle, locale: L10n.locale)) {
+                    FxDivider()
                     SettingsNavRow(
                         systemImage: "textformat.size",
                         title: String(localized: "Text size", bundle: L10n.bundle, locale: L10n.locale),
@@ -58,24 +57,28 @@ struct SettingsScreen: View {
                     AppearancePicker(appearance: $model.display.appearance)
                     FxDivider()
                     FxToggleRow(title: String(localized: "Bold text", bundle: L10n.bundle, locale: L10n.locale), isOn: $model.display.boldText)
+                        .fxSettingsRow()
                     FxDivider()
                     FxToggleRow(
                         title: String(localized: "Higher contrast", bundle: L10n.bundle, locale: L10n.locale),
                         subtitle: String(localized: "Darker borders and text", bundle: L10n.bundle, locale: L10n.locale),
                         isOn: $model.display.higherContrast
                     )
+                    .fxSettingsRow()
                     FxDivider()
                     FxToggleRow(
                         title: String(localized: "Reduce motion", bundle: L10n.bundle, locale: L10n.locale),
                         subtitle: String(localized: "Fewer moving effects", bundle: L10n.bundle, locale: L10n.locale),
                         isOn: $model.display.reduceMotion
                     )
+                    .fxSettingsRow()
                     FxDivider()
                     FxToggleRow(
                         title: String(localized: "Vibration", bundle: L10n.bundle, locale: L10n.locale),
                         subtitle: String(localized: "Small taps when you press buttons", bundle: L10n.bundle, locale: L10n.locale),
                         isOn: $model.display.vibration
                     )
+                    .fxSettingsRow()
                 }
 
                 privacySection
@@ -89,12 +92,6 @@ struct SettingsScreen: View {
                         model.path.append(.about)
                     }
                     FxDivider()
-                    FxIconRow(
-                        systemImage: "hand.raised",
-                        text: String(localized: "Privacy policy", bundle: L10n.bundle, locale: L10n.locale),
-                        link: Self.privacyPolicyURL
-                    )
-                    FxDivider()
                     SettingsNavRow(
                         systemImage: "envelope.badge",
                         title: String(localized: "Report a problem with the app", bundle: L10n.bundle, locale: L10n.locale),
@@ -105,7 +102,10 @@ struct SettingsScreen: View {
                     .accessibilityIdentifier("settings.reportProblem")
                     FxDivider()
                     FxIconRow(systemImage: "number", text: versionText)
+                        .fxSettingsRow()
                 }
+
+                deleteSection
             }
             .padding(Fx.Space.l)
         }
@@ -117,8 +117,7 @@ struct SettingsScreen: View {
     }
 
     private var privacySection: some View {
-        let sentCount = model.history.items.count
-        return section(String(localized: "Privacy", bundle: L10n.bundle, locale: L10n.locale)) {
+        section(String(localized: "Privacy", bundle: L10n.bundle, locale: L10n.locale)) {
             SettingsNavRow(
                 systemImage: "lock",
                 title: String(localized: "What Fixa stores", bundle: L10n.bundle, locale: L10n.locale),
@@ -127,9 +126,22 @@ struct SettingsScreen: View {
                 model.path.append(.privacy)
             }
             FxDivider()
+            FxIconRow(
+                systemImage: "hand.raised",
+                text: String(localized: "Privacy policy", bundle: L10n.bundle, locale: L10n.locale),
+                link: Self.privacyPolicyURL
+            )
+            .fxSettingsRow()
+        }
+    }
+
+    /// Destructive actions on their own card, after everything else, each named for exactly what it removes.
+    private var deleteSection: some View {
+        let sentCount = model.history.items.count
+        return section(String(localized: "Delete from this phone", bundle: L10n.bundle, locale: L10n.locale)) {
             SettingsActionRow(
                 systemImage: "clock.arrow.circlepath",
-                title: String(localized: "Clear sent reports", bundle: L10n.bundle, locale: L10n.locale),
+                title: String(localized: "Clear the list of sent reports", bundle: L10n.bundle, locale: L10n.locale),
                 value: sentCount.formatted(.number.locale(L10n.locale)),
                 tint: Fx.Color.sea
             ) {
@@ -155,7 +167,7 @@ struct SettingsScreen: View {
             FxDivider()
             SettingsActionRow(
                 systemImage: "trash",
-                title: String(localized: "Delete all my data", bundle: L10n.bundle, locale: L10n.locale),
+                title: String(localized: "Delete all my data from this phone", bundle: L10n.bundle, locale: L10n.locale),
                 value: nil,
                 tint: Fx.Color.error
             ) {
@@ -203,10 +215,7 @@ struct SettingsScreen: View {
 
     private func section<Content: View>(_ title: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: Fx.Space.s) {
-            Text(title)
-                .font(Fx.Font.headline)
-                .foregroundStyle(Fx.Color.ink)
-                .accessibilityAddTraits(.isHeader)
+            FxGroupHeader(title)
             FxCard {
                 content()
             }
@@ -270,7 +279,7 @@ struct SettingsNavRow: View {
                     .foregroundStyle(Fx.Color.ink2)
                     .accessibilityHidden(true)
             }
-            .frame(minHeight: Fx.minTarget)
+            .frame(minHeight: Fx.minTarget + Fx.Space.s)
             .contentShape(.rect)
         }
         .buttonStyle(FxPressStyle())
@@ -307,7 +316,7 @@ private struct SettingsActionRow: View {
                 }
             }
             .foregroundStyle(isEnabled ? tint : Fx.Color.ink2)
-            .frame(minHeight: Fx.minTarget)
+            .frame(minHeight: Fx.minTarget + Fx.Space.s)
             .contentShape(.rect)
         }
         .buttonStyle(FxPressStyle())
@@ -367,5 +376,12 @@ private struct AppearancePicker: View {
         case .light: String(localized: "Light", bundle: L10n.bundle, locale: L10n.locale)
         case .dark: String(localized: "Dark", bundle: L10n.bundle, locale: L10n.locale)
         }
+    }
+}
+
+extension View {
+    /// One row height for every Settings row (navigation, action, toggle, info), so cards read evenly.
+    func fxSettingsRow() -> some View {
+        frame(minHeight: Fx.minTarget + Fx.Space.s)
     }
 }
