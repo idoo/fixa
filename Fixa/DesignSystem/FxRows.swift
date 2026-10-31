@@ -243,11 +243,12 @@ struct FxCallRow: View {
 }
 
 /// Short leading-icon line for lists inside an `FxCard` (e.g. About's facts).
-/// Pass `link` to make the whole row open a URL (sea text, trailing arrow).
+/// Pass `link` to make the whole row open a URL, or `action` to make it a button (sea text, trailing arrow).
 struct FxIconRow: View {
     let systemImage: String
     let text: String
     var link: URL? = nil
+    var action: (() -> Void)? = nil
     /// Fixed icon column so every row's text starts on one leading edge, whatever the glyph width.
     @ScaledMetric(relativeTo: .body) private var iconColumn: CGFloat = 28
 
@@ -257,9 +258,23 @@ struct FxIconRow: View {
         self.link = link
     }
 
+    init(systemImage: String, text: String, action: @escaping () -> Void) {
+        self.systemImage = systemImage
+        self.text = text
+        self.action = action
+    }
+
+    private var isTappable: Bool { link != nil || action != nil }
+
     var body: some View {
         if let link {
             Link(destination: link) {
+                content
+                    .contentShape(.rect)
+            }
+            .buttonStyle(FxPressStyle())
+        } else if let action {
+            Button(action: action) {
                 content
                     .contentShape(.rect)
             }
@@ -278,12 +293,12 @@ struct FxIconRow: View {
                 .frame(width: iconColumn)
                 .accessibilityHidden(true)
             Text(text)
-                .font(link == nil ? Fx.Font.body : Fx.Font.body.weight(.semibold))
-                .foregroundStyle(link == nil ? Fx.Color.ink : Fx.Color.sea)
+                .font(isTappable ? Fx.Font.body.weight(.semibold) : Fx.Font.body)
+                .foregroundStyle(isTappable ? Fx.Color.sea : Fx.Color.ink)
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .fixedSize(horizontal: false, vertical: true)
-            if link != nil {
+            if isTappable {
                 Image(systemName: "arrow.up.forward")
                     .font(Fx.Font.footnote.weight(.semibold))
                     .foregroundStyle(Fx.Color.sea)

@@ -4,6 +4,7 @@ import SwiftUI
 struct AboutScreen: View {
     let spec: AdapterSpec
     @Environment(AppModel.self) private var model
+    @State private var developerReport: DeveloperReport?
 
     private static let repoURL = URL(string: "https://github.com/idoo/fixa")!
 
@@ -36,6 +37,25 @@ struct AboutScreen: View {
                     }
                 }
 
+                FxCard {
+                    FxIconRow(
+                        systemImage: "envelope",
+                        text: String(localized: "Questions about Fixa? Write to the developer (\(DeveloperReport.address)), not the kommun.", bundle: L10n.bundle, locale: L10n.locale)
+                    ) {
+                        developerReport = DeveloperReport(spec: spec)
+                    }
+                    .accessibilityIdentifier("about.developer")
+                    if let contact = spec.contact {
+                        FxIconRow(
+                            systemImage: "building.columns",
+                            text: String(localized: "Questions about your report? Ask the kommun on its website.", bundle: L10n.bundle, locale: L10n.locale)
+                        ) {
+                            KommunWeb.open(contact.pageURL, spec: spec)
+                        }
+                        .accessibilityIdentifier("about.kommunContact")
+                    }
+                }
+
                 FxIconRow(
                     systemImage: "phone",
                     text: String(localized: "Call 112 if life or property is in danger.", bundle: L10n.bundle, locale: L10n.locale)
@@ -50,6 +70,7 @@ struct AboutScreen: View {
             .padding(.bottom, Fx.Space.l)
         }
         .fxScreenBackground()
+        .developerReport($developerReport)
         .navigationTitle(Text("About Fixa"))
         .navigationBarTitleDisplayMode(.inline)
     }

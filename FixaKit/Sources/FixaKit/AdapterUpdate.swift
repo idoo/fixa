@@ -195,6 +195,16 @@ public enum AdapterSpecValidator {
         if let info = spec.emergency?.infoURL, !onDomain(info) {
             problems.append("emergency infoURL must be an https page on the municipality's domain")
         }
+        if let contact = spec.contact, !onDomain(contact.pageURL) {
+            problems.append("contact pageURL must be an https page on the municipality's domain")
+        }
+        for host in spec.allowedWebHosts ?? [] {
+            let lower = host.lowercased()
+            let plain = !lower.isEmpty && lower.allSatisfy { $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "." || $0 == "-") }
+            if !plain || domain == nil || !(lower == domain! || lower.hasSuffix("." + domain!)) {
+                problems.append("allowedWebHosts entry \(host) must be a host on the municipality's domain")
+            }
+        }
         return problems
     }
 
@@ -271,6 +281,7 @@ public enum AdapterSpecValidator {
         }
         lists += spec.categories.map { $0.synonyms?.count ?? 0 }
         lists += spec.tiles.map { $0.links?.count ?? 0 }
+        lists.append(spec.allowedWebHosts?.count ?? 0)
         lists.append(spec.municipality.geocoderNames.count)
         if lists.contains(where: { $0 > maxListItems }) { problems.append("a list has more than \(maxListItems) items") }
         return problems

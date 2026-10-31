@@ -1,9 +1,11 @@
+import AppIntents
 import FixaKit
 import SwiftUI
 import UIKit
 
 @main
 struct FixaApp: App {
+    @UIApplicationDelegateAdaptor(FixaAppDelegate.self) private var appDelegate
     @State private var model: AppModel
 
     init() {
@@ -11,6 +13,13 @@ struct FixaApp: App {
         _model = State(initialValue: model)
         // Before launch finishes, as BGTaskScheduler requires.
         BackgroundOutbox.register(model)
+        #if DEBUG
+        // `-FixaShortcut <tileID|sent>`: the same route a quick action or App Shortcut takes.
+        let arguments = ProcessInfo.processInfo.arguments
+        if let index = arguments.firstIndex(of: "-FixaShortcut"), arguments.indices.contains(index + 1) {
+            ShortcutInbox.shared.deliver(ShortcutRoute(argument: arguments[index + 1]))
+        }
+        #endif
     }
 
     var body: some Scene {
@@ -40,6 +49,24 @@ struct RootView: View {
                 if let forced = model.options.language {
                     model.language = forced
                 }
+            }
+            // Quick actions and App Shortcuts; a cold launch's route waits in the inbox until now.
+            .task {
+                if let route = ShortcutInbox.shared.take() {
+                    model.open(route)
+                }
+                model.refreshQuickActions()
+                FixaShortcuts.updateAppShortcutParameters()
+            }
+            .onChange(of: ShortcutInbox.shared.pending) { _, route in
+                if route != nil, let route = ShortcutInbox.shared.take() {
+                    model.open(route)
+                }
+            }
+            // Quick action titles follow the in-app language.
+            .onChange(of: language) {
+                model.refreshQuickActions()
+                FixaShortcuts.updateAppShortcutParameters()
             }
             // In-app display settings; each one leaves the iPhone's setting alone unless chosen.
             .transformEnvironment(\.dynamicTypeSize) { size in

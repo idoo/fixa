@@ -22,6 +22,10 @@ struct SentReport: Equatable, Sendable {
     var historyID: UUID? = nil
     /// What the e-service's receipt page said, trimmed; nil when it said nothing.
     var kommunMessage: String? = nil
+    /// What the resident wrote, in their own language.
+    var residentText: String? = nil
+    /// The Swedish text the kommun's form received (`ReportComposer.filedText`).
+    var filedText: String? = nil
 }
 
 /// Wraps `AbouSubmitter` and publishes progress for the Review screen.
@@ -69,6 +73,7 @@ final class SubmissionService {
         defer { session.session.finishTasksAndInvalidate() }
         let submitter = AbouSubmitter(spec: spec, transport: session)
         do {
+            let composedAt = Date()
             let receipt = try await submitter.submit(draft, dryRun: dryRun, beforeFinalSend: beforeFinalSend) { stage in
                 Task { @MainActor [weak self] in
                     guard let self, self.isSending else { return }
@@ -81,7 +86,9 @@ final class SubmissionService {
                 caseNumber: receipt?.caseNumber,
                 date: receipt?.submittedAt ?? .now,
                 isDryRun: dryRun,
-                kommunMessage: message.isEmpty ? nil : message
+                kommunMessage: message.isEmpty ? nil : message,
+                residentText: draft.description.trimmingCharacters(in: .whitespacesAndNewlines),
+                filedText: ReportComposer.filedText(for: draft, spec: spec, now: composedAt)
             )
         } catch let error as SubmissionError {
             phase = .failed(error)
@@ -148,14 +155,16 @@ extension SubmissionError {
         return false
     }
 
-    var userMessage: String {
+    /// `spec`: the adapter, so the e-service's own validation messages name fields in the app's
+    /// language. Its known messages are translated; anything else stays in the kommun's Swedish.
+    func userMessage(spec: AdapterSpec?) -> String {
         switch self {
         case .sessionLocked:
             String(localized: "The e-service is busy with another report from this phone. Wait a minute and try again.", bundle: L10n.bundle, locale: L10n.locale)
         case .serverValidation(let messages):
             messages.isEmpty
                 ? String(localized: "The e-service didn't accept the report.", bundle: L10n.bundle, locale: L10n.locale)
-                : String(localized: "The e-service says: \(messages.joined(separator: " "))", bundle: L10n.bundle, locale: L10n.locale)
+                : String(localized: "The e-service says: \(KommunText.plain(messages.joined(separator: "\n"), spec: spec))", bundle: L10n.bundle, locale: L10n.locale)
         case .formChanged:
             String(localized: "The municipality seems to have changed its form", bundle: L10n.bundle, locale: L10n.locale)
         case .uploadFailed:

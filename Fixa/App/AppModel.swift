@@ -169,7 +169,7 @@ final class AppModel {
     @ObservationIgnored private var draftSaveTask: Task<Void, Never>?
 
     static let maxPhotos = 3
-    private static let adapterID = "se.varmdo.ksb"
+    static let adapterID = "se.varmdo.ksb"
     private static let contactKey = "fixa.contact"
     private static let rememberKey = "fixa.rememberDetails"
     private static let onboardedKey = "fixa.onboarded"
@@ -296,7 +296,8 @@ final class AppModel {
         if options.demo {
             // "-FixaDemo: no network". Nothing leaves the phone; history is in memory only.
             sent = DemoData.receipt
-            let item = historyItem(id: UUID(), from: draft, date: .now, caseNumber: DemoData.receipt.caseNumber, status: .sent)
+            var item = historyItem(id: UUID(), from: draft, date: .now, caseNumber: DemoData.receipt.caseNumber, status: .sent)
+            item.kommunMessage = DemoData.receipt.kommunMessage
             history.add(item)
             sent?.historyID = item.id
             path.append(.receipt)
@@ -344,7 +345,8 @@ final class AppModel {
             setSendsPaused(nil)
             recordSend(report, date: result.date, caseNumber: result.caseNumber)
             outbox.remove([id])
-            let item = historyItem(id: id, from: report, date: result.date, caseNumber: result.caseNumber, status: .sent)
+            var item = historyItem(id: id, from: report, date: result.date, caseNumber: result.caseNumber, status: .sent)
+            item.record(result)
             history.add(item)
             sent?.historyID = item.id
             clearSavedDraft()
@@ -586,7 +588,7 @@ final class AppModel {
 
     // MARK: Draft persistence
 
-    private var draftHasContent: Bool {
+    var draftHasContent: Bool {
         !draftStorage.description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !photos.isEmpty
     }
 
@@ -717,7 +719,8 @@ final class AppModel {
             longitude: report.coordinate?.longitude,
             caseNumber: caseNumber,
             thumbnail: report.photoJPEG.flatMap { PhotoCollage.thumbnail(from: $0) },
-            status: status
+            status: status,
+            filedText: spec.map { ReportComposer.filedText(for: report, spec: $0, now: date) }
         )
     }
 
@@ -855,7 +858,7 @@ final class AppModel {
         return webFallbackText(for: draft)
     }
 
-    /// Copies `text` (this phone only, for an hour) and opens the kommun's own web form in Safari,
+    /// Copies `text` (this phone only, for an hour) and opens the kommun's own web form (in-app Safari),
     /// where the user pastes it and attaches the photo themselves.
     func openWebForm(_ text: String) {
         UIPasteboard.general.setItems(
@@ -863,7 +866,7 @@ final class AppModel {
             options: [.localOnly: true, .expirationDate: Date.now.addingTimeInterval(60 * 60)]
         )
         guard let spec else { return }
-        UIApplication.shared.open(spec.webFormURL)
+        KommunWeb.open(spec.webFormURL, spec: spec)
     }
 
     /// Whether a waiting or unconfirmed report asked for a reply by e-mail (and so gets a confirmation).
@@ -886,7 +889,7 @@ final class AppModel {
         if options.demo {
             // No network in demo: pretend it went through.
             outbox.remove([id])
-            markSent(id, caseNumber: DemoData.receipt.caseNumber, date: .now)
+            markSent(id, SentReport(caseNumber: DemoData.receipt.caseNumber, date: .now, isDryRun: false, kommunMessage: DemoData.receipt.kommunMessage))
             return
         }
         guard retryBlockedUntil(id) == nil else { return }
@@ -1028,7 +1031,7 @@ final class AppModel {
             }
             recordSend(report, date: result.date, caseNumber: result.caseNumber)
             outbox.remove([id])
-            markSent(id, caseNumber: result.caseNumber, date: result.date)
+            markSent(id, result)
             return
         }
         // Cancelled before the final step: nothing is known, so nothing changes.
@@ -1060,14 +1063,18 @@ final class AppModel {
         }
     }
 
-    private func markSent(_ id: UUID, caseNumber: String?, date: Date) {
+    private func markSent(_ id: UUID, _ result: SentReport) {
         history.update(id: id) {
             $0.status = .sent
-            $0.caseNumber = caseNumber
-            $0.date = date
+            $0.caseNumber = result.caseNumber
+            $0.date = result.date
+            $0.record(result)
         }
         if sent?.historyID == id {
-            sent = SentReport(caseNumber: caseNumber, date: date, isDryRun: false, outcome: .sent, historyID: id)
+            var receipt = result
+            receipt.outcome = .sent
+            receipt.historyID = id
+            sent = receipt
         }
     }
 

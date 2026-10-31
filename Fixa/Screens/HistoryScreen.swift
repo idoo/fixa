@@ -251,6 +251,9 @@ struct HistoryDetailScreen: View {
                                 .accessibilityHidden(true)
                             }
                             field(String(localized: "Description", bundle: L10n.bundle, locale: L10n.locale), value: item.description)
+                            if let filed = item.filedText {
+                                FiledInSwedish(text: filed, isFiled: item.status == .sent || item.status == .maybeSent)
+                            }
                             if item.thumbnail != nil {
                                 HistoryThumbnail(
                                     item: item,
@@ -259,6 +262,16 @@ struct HistoryDetailScreen: View {
                                     accessibilityLabel: String(localized: "Attached photo", bundle: L10n.bundle, locale: L10n.locale)
                                 )
                             }
+                        }
+                        if let message = item.kommunMessage {
+                            KommunTextView(
+                                swedish: message,
+                                spec: spec,
+                                title: String(localized: "Värmdö kommun's receipt", bundle: L10n.bundle, locale: L10n.locale)
+                            )
+                        }
+                        if item.status == .sent {
+                            KommunCaseContact(spec: spec, caseNumber: item.caseNumber)
                         }
                         FxSecondaryButton(title: String(localized: "Remove from this phone", bundle: L10n.bundle, locale: L10n.locale), systemImage: "trash") {
                             isRemoveConfirmPresented = true
@@ -338,8 +351,8 @@ struct HistoryDetailScreen: View {
                     kind: .warning,
                     title: String(localized: "May have been sent", bundle: L10n.bundle, locale: L10n.locale),
                     message: model.wantsReply(item.id)
-                        ? String(localized: "Fixa didn't see a confirmation, but it may well have arrived.", bundle: L10n.bundle, locale: L10n.locale) + " " + String(localized: "You asked for a reply, so the kommun answers by e-mail. If you're unsure whether it arrived, ask the servicecenter.", bundle: L10n.bundle, locale: L10n.locale)
-                        : String(localized: "Fixa didn't see a confirmation, but it may well have arrived.", bundle: L10n.bundle, locale: L10n.locale) + " " + String(localized: "If you're unsure whether it arrived, ask the servicecenter.", bundle: L10n.bundle, locale: L10n.locale)
+                        ? String(localized: "Fixa didn't see a confirmation, but it may well have arrived.", bundle: L10n.bundle, locale: L10n.locale) + " " + String(localized: "You asked for a reply, so the kommun answers by e-mail.", bundle: L10n.bundle, locale: L10n.locale)
+                        : String(localized: "Fixa didn't see a confirmation, but it may well have arrived.", bundle: L10n.bundle, locale: L10n.locale)
                 )
                 ServiceCentreHelp(spec: spec)
                 // Only while the report is still on this phone's outbox (it has text to send).
