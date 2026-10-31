@@ -151,7 +151,9 @@ final class AppModel {
     var language: AppLanguage? {
         didSet {
             guard language != oldValue else { return }
+            let previousDemoText = options.demo ? DemoData.draft(adapterID: Self.adapterID).description : nil
             L10n.apply(language, savesSystemSetting: persists)
+            if let previousDemoText { relocalizeDemo(replacing: previousDemoText) }
             guard persists else { return }
             if let language {
                 UserDefaults.standard.set(language.rawValue, forKey: AppLanguage.storageKey)
@@ -1207,6 +1209,17 @@ final class AppModel {
         case .uncertain?:
             seedDemoUnconfirmed(.maybeSent)
         case nil:
+            sent = DemoData.receipt
+        }
+    }
+
+    /// `-FixaLanguage` switches after the first frame, after `seedDemo` ran in the old language:
+    /// re-word the untouched demo draft and the demo receipt so they match the new language.
+    private func relocalizeDemo(replacing previousText: String) {
+        if draft.description == previousText {
+            draft.description = DemoData.draft(adapterID: Self.adapterID).description
+        }
+        if let current = sent, !current.isDryRun, current.caseNumber == DemoData.receipt.caseNumber, current.historyID == nil {
             sent = DemoData.receipt
         }
     }

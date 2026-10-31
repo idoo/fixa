@@ -90,7 +90,7 @@ enum Fx {
         static let cone = SwiftUI.Color(fxHex: 0xFF6A2B)
         /// Text on `cone` (5.54:1).
         static let onCone = SwiftUI.Color(fxHex: 0x1E2136)
-        /// Glyphs on pastel fills, both appearances (≥ 10.7:1).
+        /// Ink glyph on light fills (`FxBadge` default), both appearances (≥ 10.7:1 on light fills).
         static let onPastel = SwiftUI.Color(fxHex: 0x1E2136)
         /// Errors and validation.
         static let error = SwiftUI.Color(light: 0xB3261E, dark: 0xFF8A80)
@@ -101,27 +101,44 @@ enum Fx {
         /// Very soft card shadow in light mode (black 6 %); none at night.
         static let shadow = SwiftUI.Color(light: UIColor(fxHex: 0x000000, alpha: 0.06), dark: .clear)
 
-        /// Muted pastels (≈ 20 % desaturated) for small icon circles; same in both appearances.
-        enum Pastel {
-            static let mint = SwiftUI.Color(fxHex: 0xC3E4D2)
-            static let sky = SwiftUI.Color(fxHex: 0xCDE2F2)
-            static let sun = SwiftUI.Color(fxHex: 0xF3DA96)
-            static let peach = SwiftUI.Color(fxHex: 0xF8D2BC)
-            static let lilac = SwiftUI.Color(fxHex: 0xDDD3F1)
-            static let sand = SwiftUI.Color(fxHex: 0xE6DAC4)
-            static let rose = SwiftUI.Color(fxHex: 0xF2CBD2)
-            static let foam = SwiftUI.Color(fxHex: 0xD2ECE8)
+        /// Category fill with meaning per adapter category (`categories[].id`): lighting = sun,
+        /// roads = asphalt/sand, graffiti = lilac, parks = mint, water = sky, other / nil / unknown = neutral sand.
+        /// Pastel by day, deep tone at night; `categoryGlyph` on it is ≥ 5.0:1 light and ≥ 7.3:1 dark.
+        static func categoryTint(_ categoryID: String?) -> SwiftUI.Color {
+            categoryPair(categoryID).tint
         }
 
-        /// Tile order: neighbours in a 2-column grid never share a pastel.
-        static let pastels: [SwiftUI.Color] = [
-            Pastel.mint, Pastel.sky, Pastel.sun, Pastel.peach,
-            Pastel.lilac, Pastel.sand, Pastel.rose, Pastel.foam,
-        ]
+        /// Glyph (SF Symbol) colour on `categoryTint` of the same category.
+        static func categoryGlyph(_ categoryID: String?) -> SwiftUI.Color {
+            categoryPair(categoryID).glyph
+        }
 
-        /// Deterministic pastel for the n-th item of a list.
-        static func pastel(at index: Int) -> SwiftUI.Color {
-            pastels[((index % pastels.count) + pastels.count) % pastels.count]
+        private static func categoryPair(_ categoryID: String?) -> (tint: SwiftUI.Color, glyph: SwiftUI.Color) {
+            switch categoryID {
+            case "lighting": (CategoryTone.sunTint, CategoryTone.sunGlyph)
+            case "roads": (CategoryTone.asphaltTint, CategoryTone.asphaltGlyph)
+            case "graffiti": (CategoryTone.lilacTint, CategoryTone.lilacGlyph)
+            case "parks": (CategoryTone.mintTint, CategoryTone.mintGlyph)
+            case "water": (CategoryTone.skyTint, CategoryTone.skyGlyph)
+            default: (CategoryTone.sandTint, CategoryTone.sandGlyph)
+            }
+        }
+
+        /// Tint / glyph pairs (WCAG glyph on tint, light / dark): sun 6.3 / 7.8, asphalt 6.3 / 8.7,
+        /// lilac 6.7 / 8.0, mint 6.0 / 8.1, sky 5.6 / 7.9, sand 5.1 / 7.4.
+        private enum CategoryTone {
+            static let sunTint = SwiftUI.Color(light: 0xF6E2A6, dark: 0x4A3A12)
+            static let sunGlyph = SwiftUI.Color(light: 0x6B4A00, dark: 0xF6D77A)
+            static let asphaltTint = SwiftUI.Color(light: 0xE8DDCB, dark: 0x3A3328)
+            static let asphaltGlyph = SwiftUI.Color(light: 0x5A4A35, dark: 0xE6D5B8)
+            static let lilacTint = SwiftUI.Color(light: 0xE2DAF4, dark: 0x342C4D)
+            static let lilacGlyph = SwiftUI.Color(light: 0x4F3A8C, dark: 0xD2C4F5)
+            static let mintTint = SwiftUI.Color(light: 0xCDE8D6, dark: 0x1F3A2C)
+            static let mintGlyph = SwiftUI.Color(light: 0x245C3A, dark: 0xA9DDBA)
+            static let skyTint = SwiftUI.Color(light: 0xD3E5F4, dark: 0x1D3550)
+            static let skyGlyph = SwiftUI.Color(light: 0x1F5A8A, dark: 0xA9D2F5)
+            static let sandTint = SwiftUI.Color(light: 0xECE6DA, dark: 0x2E3640)
+            static let sandGlyph = SwiftUI.Color(light: 0x5B5F73, dark: 0xD0C8B6)
         }
     }
 
@@ -138,9 +155,13 @@ enum Fx {
 
     enum Radius {
         /// Fields, photos, maps.
-        static let s: CGFloat = 10
-        /// Cards, tiles, buttons.
-        static let m: CGFloat = 12
+        static let s: CGFloat = 12
+        /// Cards, tiles.
+        static let m: CGFloat = 16
+        /// Buttons inside a card or bar with `Space.xs`…`Space.s` inset: concentric with `m`.
+        static let button: CGFloat = 14
+        /// Sheets and hero cards.
+        static let l: CGFloat = 22
     }
 
     /// Border widths: hairline at rest, emphasis for focus, selection and errors.
@@ -149,13 +170,15 @@ enum Fx {
         static let emphasis: CGFloat = 2
     }
 
-    /// Dynamic-Type text styles, SF Pro.
+    /// Dynamic-Type text styles. Titles use the rounded design (the icon's sticker shapes); text stays SF Pro.
     enum Font {
-        static let largeTitle = SwiftUI.Font.system(.largeTitle, weight: .bold)
-        static let title = SwiftUI.Font.system(.title2, weight: .semibold)
-        static let title3 = SwiftUI.Font.system(.title3, weight: .semibold)
-        static let headline = SwiftUI.Font.system(.headline, weight: .semibold)
+        static let largeTitle = SwiftUI.Font.system(.largeTitle, design: .rounded, weight: .bold)
+        static let title = SwiftUI.Font.system(.title2, design: .rounded, weight: .semibold)
+        static let title3 = SwiftUI.Font.system(.title3, design: .rounded, weight: .semibold)
+        static let headline = SwiftUI.Font.system(.headline, design: .rounded, weight: .semibold)
         static let subheadline = SwiftUI.Font.system(.subheadline, weight: .semibold)
+        /// Section headers: one style on every screen.
+        static let section = SwiftUI.Font.system(.footnote, weight: .semibold)
         static let body = SwiftUI.Font.system(.body)
         static let callout = SwiftUI.Font.system(.callout)
         static let footnote = SwiftUI.Font.system(.footnote)
@@ -186,12 +209,27 @@ extension EnvironmentValues {
 
 // MARK: - Pressed state
 
-/// Shared pressed state: a quick opacity dip. Nothing moves, so it is the same with Reduce Motion.
+/// Shared pressed state: a quick opacity dip. `scales` adds a 0.97 squeeze (tiles, primary buttons),
+/// dropped under Reduce Motion so nothing moves.
 struct FxPressStyle: ButtonStyle {
+    var scales: Bool = false
+
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .opacity(configuration.isPressed ? 0.65 : 1)
-            .animation(Fx.Motion.press, value: configuration.isPressed)
+        FxPressBody(label: configuration.label, isPressed: configuration.isPressed, scales: scales)
+    }
+}
+
+private struct FxPressBody<Label: View>: View {
+    let label: Label
+    let isPressed: Bool
+    let scales: Bool
+    @Environment(\.fxReduceMotion) private var reduceMotion
+
+    var body: some View {
+        label
+            .opacity(isPressed ? 0.65 : 1)
+            .scaleEffect(isPressed && scales && !reduceMotion ? 0.97 : 1)
+            .animation(Fx.Motion.press, value: isPressed)
     }
 }
 

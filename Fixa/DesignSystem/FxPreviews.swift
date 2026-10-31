@@ -7,11 +7,11 @@ private struct FxCatalog: View {
     @State private var text = ""
     @State private var wantsReply = true
 
-    private let tiles: [(id: String, title: String, symbol: String)] = [
-        ("streetlight", "Street light out", "lightbulb.slash"),
-        ("pothole", "Pothole or damaged road", "road.lanes"),
-        ("water", "Water or sewer", "drop"),
-        ("other", "Something else", "ellipsis.circle"),
+    private let tiles: [(id: String, category: String, title: String, symbol: String)] = [
+        ("streetlight", "lighting", "Street light out", "lightbulb.slash"),
+        ("pothole", "roads", "Pothole or damaged road", "road.lanes"),
+        ("water", "water", "Water or sewer", "drop"),
+        ("other", "other", "Something else", "ellipsis.circle"),
     ]
 
     var body: some View {
@@ -25,8 +25,8 @@ private struct FxCatalog: View {
                 FxBanner(kind: .warning, title: "Outside Värmdö kommun",
                          message: "Move the pin if that's wrong.")
                 FxTileGrid(columns: 2, spacing: Fx.Space.m) {
-                    ForEach(Array(tiles.enumerated()), id: \.element.id) { index, tile in
-                        FxTile(title: tile.title, systemImage: tile.symbol, index: index,
+                    ForEach(tiles, id: \.id) { tile in
+                        FxTile(title: tile.title, systemImage: tile.symbol, categoryID: tile.category,
                                isSelected: tile.id == selected) { selected = tile.id }
                     }
                 }

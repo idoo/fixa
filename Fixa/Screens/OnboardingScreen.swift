@@ -1,25 +1,35 @@
 import SwiftUI
-import UIKit
 
 /// The first-launch disclaimer: who runs Fixa, where the report goes, what stays on the phone.
 /// Shown once as a full-screen cover from the root (UserDefaults `fixa.onboarded`), again from
-/// About › How Fixa works. Scrolls at accessibility sizes; leading alignment keeps it right in RTL.
+/// About › How Fixa works. Brand moment on top (the cone mark), then leading-aligned facts so RTL
+/// reads right. Scrolls at accessibility sizes.
 struct OnboardingScreen: View {
     @Environment(AppModel.self) private var model
     @State private var isLanguagePresented = false
 
-    @ScaledMetric(relativeTo: .largeTitle) private var iconSide: CGFloat = 72
+    @ScaledMetric(relativeTo: .largeTitle) private var markSide: CGFloat = 88
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Fx.Space.l) {
-                appIcon
-                    .padding(.top, Fx.Space.xl)
-
-                Text(verbatim: "Fixa")
-                    .font(Fx.Font.largeTitle)
-                    .foregroundStyle(Fx.Color.ink)
-                    .accessibilityAddTraits(.isHeader)
+                VStack(spacing: Fx.Space.m) {
+                    FxBrandMark(size: min(markSide, 140))
+                    VStack(spacing: Fx.Space.xs) {
+                        Text(verbatim: "Fixa")
+                            .font(Fx.Font.largeTitle)
+                            .foregroundStyle(Fx.Color.ink)
+                            .accessibilityAddTraits(.isHeader)
+                        Text("Tell the kommun what's broken.")
+                            .font(Fx.Font.callout)
+                            .foregroundStyle(Fx.Color.ink2)
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.top, Fx.Space.xxl)
+                .padding(.bottom, Fx.Space.s)
 
                 FxCard {
                     FxIconRow(
@@ -29,7 +39,7 @@ struct OnboardingScreen: View {
                     FxDivider()
                     FxIconRow(
                         systemImage: "paperplane",
-                        text: String(localized: "Your report goes straight to the municipality's own fault-report service, just like the website.", bundle: L10n.bundle, locale: L10n.locale)
+                        text: String(localized: "Reports go straight to the kommun's own fault service.", bundle: L10n.bundle, locale: L10n.locale)
                     )
                     FxDivider()
                     FxIconRow(
@@ -74,33 +84,6 @@ struct OnboardingScreen: View {
             }
         }
     }
-
-    /// The real icon from the bundle; a sea badge if iOS doesn't expose it.
-    @ViewBuilder
-    private var appIcon: some View {
-        if let image = Self.iconImage {
-            Image(uiImage: image)
-                .resizable()
-                .scaledToFit()
-                .frame(width: iconSide, height: iconSide)
-                .clipShape(.rect(cornerRadius: iconSide * 0.225, style: .continuous))
-                .accessibilityHidden(true)
-        } else {
-            FxBadge(systemImage: "wrench.adjustable", fill: Fx.Color.sea.opacity(0.15), side: iconSide)
-                .accessibilityHidden(true)
-        }
-    }
-
-    private static let iconImage: UIImage? = {
-        if let icons = Bundle.main.infoDictionary?["CFBundleIcons"] as? [String: Any],
-           let primary = icons["CFBundlePrimaryIcon"] as? [String: Any],
-           let files = primary["CFBundleIconFiles"] as? [String],
-           let name = files.last,
-           let image = UIImage(named: name) {
-            return image
-        }
-        return UIImage(named: "AppIcon")
-    }()
 
     /// The current language in its own script, so a newcomer can switch first. Later it lives in Settings.
     private var languageChip: some View {

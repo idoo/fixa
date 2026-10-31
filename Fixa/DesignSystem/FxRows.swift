@@ -27,6 +27,26 @@ struct FxSectionHeader: View {
     }
 }
 
+/// Small group label above a card (settings groups, history sections): footnote semibold ink2.
+/// The one section-label style; use `FxSectionHeader` only for a screen's own title block.
+struct FxGroupHeader: View {
+    let title: String
+
+    init(_ title: String) {
+        self.title = title
+    }
+
+    var body: some View {
+        Text(title)
+            .font(Fx.Font.section)
+            .foregroundStyle(Fx.Color.ink2)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, Fx.Space.xs)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityAddTraits(.isHeader)
+    }
+}
+
 /// 1 pt hairline between rows inside an `FxCard`.
 struct FxDivider: View {
     var body: some View {

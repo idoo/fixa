@@ -1,6 +1,6 @@
 {
   "tools": {
-    "node": "v24.18.0",
+    "node": "v26.10.0",
     "puppeteer": "24.43.1",
     "browser": "HeadlessChrome/148.0.7778.97"
   },
@@ -16,84 +16,86 @@
     "05"
   ],
   "inputs": {
-    "captures/sv/home.png": "dbf130bd3bb7a9887261c7ebad30181fcee25a9e82fb2bf43766d7a7bbac581c",
-    "captures/sv/language.png": "f25e3206e491ab5e7a7c8f585a858d085fbc6d83247491a3201769f4038faa40",
-    "captures/sv/location.png": "ed8173ed3a9a93a843085b5460d9c63e3939851760e78e6867d7f616f57097a3",
-    "captures/sv/privacy.png": "45c1c0e8100a29805183fd063a9111990bedbf9ee446fc6fd5a3a0426a3bcb73",
-    "captures/sv/receipt.png": "0cf83de730ee139910741ed5ed0787bd50d9974e9866ab1185582399ca8f2e4a",
-    "captures/sv/settings.png": "dec9ed9a8601db2f3aef978ef733b90ca954a42865b1ea5d5b4e83ca0e7eef28",
-    "captures/en-US/home.png": "45068fb92bb379a82d0c6ab8de484f52ab9614e61c0f045f6b50d7f726474068",
+    "captures/sv/home.png": "b52da5f7065f6febda219f0076c8d91d4c0ea6857dcd4af37116482b8e2ac739",
+    "captures/sv/language.png": "c0714a9752fb8a69774ceaee68aa63f893bf1c48f93e3312c993b603112d5d8f",
+    "captures/sv/location.png": "d02cfd7e89d630250e8430e4ae9ceeedcd6425f0c8a8d2b099d06aa9e3452e42",
+    "captures/sv/privacy.png": "0961c2b31b677a1d468b229be2ff01f709aa3ea4e79da31b33f097feb32828c4",
+    "captures/sv/receipt-translated.png": "0a39b9e3f1b5af34abf5a1472e6481ce74b92bb5081f34812c93d93ad4a33dd8",
+    "captures/sv/receipt.png": "7fda0bb2d3fdc885bb866275abeb648f5f2d60448d3aafdc66cde21ffd42a29d",
+    "captures/sv/settings.png": "98817d3b759d4df0b7ab557024c4aeb9ae5eb2fcaf1e47ce14dce9adeb8ca1b2",
+    "captures/en-US/home.png": "f9e7010cf7b2362852a9a372ecd2d6fdd92e7c60d005fa15e2f1c26681f7d545",
     "captures/en-US/language.png": "c4b23acd4532cc7394bba7a1fccfd70083061eb6d4cbcbf53bcb623953d484dd",
-    "captures/en-US/location.png": "baa8b521a64e1951995b6dffdd212b16bbb977304818577d40a566dff06c19c7",
-    "captures/en-US/privacy.png": "e43b559768a18739b91becd397d7fcf817662f406995479fd79f70458b1b0a5a",
-    "captures/en-US/receipt.png": "7a3d940b13a45723cf04b99719f73a548d0e7fc1a27aa8c2750fc84b7063f790",
+    "captures/en-US/location.png": "3aa759e4eb1413eec7f7452947fe97180aba8d00d4379ef391eeda2db843db55",
+    "captures/en-US/privacy.png": "45b3ef4b492d8e1de2933b7e1e6b92616ad0504c0f5795bfec36f2db0dbefe65",
+    "captures/en-US/receipt-translated.png": "a8212ce4dbfd13e678f99b18a8755b50b0baf171c5da5903ab8abf7162615d8d",
+    "captures/en-US/receipt.png": "bc5f174725783b08a37dca18c04b91c9ef27fb2b8c4e084680d22feb5aa38327",
     "captures/en-US/settings.png": "09513c26dca423ae1be59f179948ed82e807c371ce521b51fd96e0b13b296ac5"
   },
   "outputs": {
     "out/sv/01.png": {
-      "sha256": "47eb10251a7e2705df3066adb45c9f63cf50d9ddabde44edfb509cffa94607d7",
+      "sha256": "ec0495826369b82a3c8293b2062a210b53e0f78be59a52f5312942e261d41ce0",
       "screen": "home",
       "headline": "Anmäl ett fel på en minut",
       "subline": "Gatlampa släckt? Tryck, fota, skicka."
     },
     "out/sv/02.png": {
-      "sha256": "e48b54af7351211951c4cd71f56e4168980a585a24c14f7e7a0e7f2491de762f",
+      "sha256": "ebe79102264493628acaf64fa32ea05f4dbe10bc0aa838f057e89cc654e71b65",
       "screen": "location",
       "headline": "Sätt nålen på kartan",
       "subline": "Eller tryck på Använd min nuvarande plats."
     },
     "out/sv/03.png": {
-      "sha256": "42ea0531501861ef73fb7c86a6c7c17544e9bfc2c76597f36500f46376bcb697",
+      "sha256": "d0c8cba92ff8a88026f8cb77af326a3685d64e3d7b6322d1a3da9f49ad72e729",
       "screen": "receipt",
       "headline": "Ärendenummer direkt",
-      "subline": "Det sparas i appen, så du kan följa upp."
+      "subline": "Kommunens eget kvitto sparas i appen."
     },
     "out/sv/04.png": {
-      "sha256": "275adf3ab0c7408fda1cafa157a79b7940d83e3cb96cd6bbc973dc226257e25d",
+      "sha256": "3a71174064c205c84bbecc8a7f22b17c2137ab5c484db700dc0125d61fb5f07e",
       "screen": "privacy",
       "headline": "Inget konto behövs",
       "subline": "Dina uppgifter stannar i telefonen. Radera dem när du vill."
     },
     "out/sv/05.png": {
-      "sha256": "175ee0dcd1fc897f35c848a41638c07a9b6193922a7ee32b5d3d90a9b761cb16",
-      "screen": "language",
-      "headline": "Fixa på 22 språk",
-      "subline": "Byt språk direkt i appen."
+      "sha256": "5af28c28e0d47ab7b616e704e0279360b7b600cdfb0f9b5e68fd3dfb4b415802",
+      "screen": "receipt-translated",
+      "headline": "Skriv på ditt språk",
+      "subline": "Fixa översätter till svenska. Kommunens kvitto visas på ditt språk."
     },
     "out/en-US/01.png": {
-      "sha256": "fcda9a3bf735c140882425deed51971e965c0d12c826ef1e5472c900d418723a",
+      "sha256": "e3e3e0fc8f24a3ab841858b8020104b8c2637007c8c0acdb72885cf8a0f1bf6d",
       "screen": "home",
       "headline": "Report a problem in a minute",
       "subline": "Street light out? Tap, snap, send."
     },
     "out/en-US/02.png": {
-      "sha256": "826b3021e83386550f7f7130aa5757d4e4d53e99a8371734daecac6329c8e291",
+      "sha256": "e2c4edb3631a796e686c15e740499ed0843f147a80af28b53abe5d033d7770a3",
       "screen": "location",
       "headline": "Drop a pin on the map",
       "subline": "Or just tap Use my current location."
     },
     "out/en-US/03.png": {
-      "sha256": "527786db78d3f93aec95084452ace8bc7af3e462a5af6948c5e719ba8ca7c91e",
+      "sha256": "3305eab0db54533a1364bffa49820c15ae65560e8667f9da8c1ec8b23cef2290",
       "screen": "receipt",
       "headline": "Your case number, right away",
-      "subline": "It stays in the app so you can follow up."
+      "subline": "The kommun's own receipt stays in the app."
     },
     "out/en-US/04.png": {
-      "sha256": "16d0d18893793f6a5aeebba189be1c8baaad775d192cad75689ba213a5eb6cf7",
+      "sha256": "dd732989bc645e25fb019b715460a2e9555587d5316572328ccbfc6f729f1286",
       "screen": "privacy",
       "headline": "No account needed",
       "subline": "Your details stay on your phone. Delete them anytime."
     },
     "out/en-US/05.png": {
-      "sha256": "7188473fb297bb6ab22e9f2650f0ecf8ae3ad8335cac951a10c3f8e6b4d0c221",
-      "screen": "language",
-      "headline": "Fixa in 22 languages",
-      "subline": "Switch language right in the app."
+      "sha256": "f9308a8d958245cb13f2e72812b3ddd9b1cc0b187e487865c3b1c4ecbd52e911",
+      "screen": "receipt-translated",
+      "headline": "Write in your own language",
+      "subline": "Fixa translates it into Swedish. The kommun's receipt shows in yours."
     }
   },
   "contactSheets": {
-    "out/contact-sv.png": "0a11f37ada6f605b13604ad8154204ee79e3c11d14adc75128d98e6e4a0f9c6f",
-    "out/contact-en-US.png": "2ef10a9dba648f5f596f06c385701174dd668d12c8a6848b47334d79bc357ca8"
+    "out/contact-sv.png": "e70f7dc4dcc1b27bded0c19915b526c138934509610b584568a514ab0fd3b999",
+    "out/contact-en-US.png": "9700e5fcfc21d30d7a145904c5a576ef990bb2650363606fcac8192522ee0605"
   },
   "renderFailures": []
 }

@@ -40,7 +40,7 @@ struct ReceiptScreen: View {
     /// Saved in the outbox; Fixa sends it on its own. Turns into the sent receipt when it goes through.
     private func waitingContent(_ sent: SentReport) -> some View {
         VStack(spacing: Fx.Space.xl) {
-            FxBadge(systemImage: "clock.arrow.circlepath", fill: Fx.Color.Pastel.sky, side: 64)
+            FxBadge(systemImage: "clock.arrow.circlepath", fill: Fx.Color.categoryTint(nil), side: 64)
             VStack(spacing: Fx.Space.s) {
                 Text("Waiting to send")
                     .font(Fx.Font.title)
@@ -48,14 +48,9 @@ struct ReceiptScreen: View {
                     .multilineTextAlignment(.center)
                     .accessibilityAddTraits(.isHeader)
                 Text(model.isOnline
-                    ? String(localized: "The e-service didn't answer. Your report is saved on this phone, and Fixa tries again in a little while.", bundle: L10n.bundle, locale: L10n.locale)
-                    : String(localized: "Your phone seems to be offline. Your report is saved on this phone, and Fixa sends it when you're back online.", bundle: L10n.bundle, locale: L10n.locale))
+                    ? String(localized: "No answer from the e-service. Saved here; Fixa tries again soon.", bundle: L10n.bundle, locale: L10n.locale)
+                    : String(localized: "You're offline. Saved here; Fixa sends it when you're back online.", bundle: L10n.bundle, locale: L10n.locale))
                     .font(Fx.Font.body)
-                    .foregroundStyle(Fx.Color.ink2)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-                Text("You can close Fixa. You'll find the report under Sent reports.")
-                    .font(Fx.Font.callout)
                     .foregroundStyle(Fx.Color.ink2)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
@@ -68,14 +63,14 @@ struct ReceiptScreen: View {
     /// resend from here: sending again lives in the report's Sent reports detail, behind a warning.
     private func maybeSentContent(_ sent: SentReport) -> some View {
         VStack(spacing: Fx.Space.xl) {
-            FxBadge(systemImage: "questionmark.circle", fill: Fx.Color.Pastel.sky, side: 64)
+            FxBadge(systemImage: "questionmark.circle", fill: Fx.Color.categoryTint(nil), side: 64)
             VStack(spacing: Fx.Space.s) {
                 Text("May have been sent")
                     .font(Fx.Font.title)
                     .foregroundStyle(Fx.Color.ink)
                     .multilineTextAlignment(.center)
                     .accessibilityAddTraits(.isHeader)
-                Text("The connection dropped just as the report went out, so Fixa didn't see a confirmation. It may well have reached \(spec.municipality.name).")
+                Text("No confirmation came back. It may well have reached \(spec.municipality.name).")
                     .font(Fx.Font.body)
                     .foregroundStyle(Fx.Color.ink2)
                     .multilineTextAlignment(.center)
@@ -169,11 +164,15 @@ private extension ReceiptScreen {
     @ViewBuilder
     func kommunReceipt(_ message: String?) -> some View {
         if let message {
-            KommunTextView(
-                swedish: message,
-                spec: spec,
-                title: String(localized: "Värmdö kommun's receipt", bundle: L10n.bundle, locale: L10n.locale)
-            )
+            FxCard {
+                KommunTextView(
+                    swedish: message,
+                    spec: spec,
+                    title: String(localized: "Värmdö kommun's receipt", bundle: L10n.bundle, locale: L10n.locale),
+                    // The card already sets the quote apart; a rule inside it would be double chrome.
+                    quoted: false
+                )
+            }
         } else {
             Text("Värmdö kommun has your report.")
                 .font(Fx.Font.body)
@@ -195,7 +194,7 @@ private extension ReceiptScreen {
                     if !ownWords.isEmpty {
                         VStack(alignment: .leading, spacing: Fx.Space.xs) {
                             Text("What you wrote")
-                                .font(Fx.Font.subheadline)
+                                .font(Fx.Font.section)
                                 .foregroundStyle(Fx.Color.ink2)
                             Text(ownWords)
                                 .font(Fx.Font.body)

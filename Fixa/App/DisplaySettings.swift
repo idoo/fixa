@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 /// In-app display preferences, saved in UserDefaults `fixa.display` and applied at the root.
-/// Every value starts at "follow the iPhone". "Delete all my data" keeps them.
+/// Every value starts at "follow the iPhone". "Delete all my data from this phone" keeps them.
 struct DisplaySettings: Codable, Equatable, Sendable {
     enum Appearance: String, Codable, CaseIterable, Sendable {
         case automatic, light, dark

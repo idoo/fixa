@@ -62,7 +62,7 @@ struct SettingsTextSizeScreen: View {
                 .font(Fx.Font.body)
                 .foregroundStyle(Fx.Color.ink)
                 .fixedSize(horizontal: false, vertical: true)
-            FxTile(title: String(localized: "Street light out", bundle: L10n.bundle, locale: L10n.locale), systemImage: "lightbulb.slash", index: 2) {}
+            FxTile(title: String(localized: "Street light out", bundle: L10n.bundle, locale: L10n.locale), systemImage: "lightbulb.slash", categoryID: "lighting") {}
                 .allowsHitTesting(false)
                 .accessibilityHidden(true)
         }
