@@ -191,11 +191,27 @@
         "timeZone": { "type": "string" },
         "note": { "$ref": "#/$defs/localizedText" },
         "holidays": { "type": "string", "enum": ["SE"], "description": "Public-holiday calendar on which no rule applies, so defaultContactID answers. SE: Swedish public holidays plus julafton, nyårsafton and midsommarafton." },
-        "infoURL": { "type": "string", "pattern": "^https://", "description": "The municipality's own page for non-urgent questions, shown as 'Other questions?' under the emergency call card and opened in the browser. An https page on the municipality's domain." }
+        "infoURL": { "type": "string", "pattern": "^https://", "description": "The municipality's own page about water and sewer, shown as 'More about water and sewer' under the water call card. An https page on the municipality's domain; opened in the in-app Safari view when its host is in allowedWebHosts." }
       }
     },
     "webFormURL": { "type": "string", "pattern": "^https://", "description": "The municipality's own web form for this e-service, on the channel's host. Fixa opens it when it cannot send. A downloaded adapter must keep the bundled value." },
-    "disclaimer": { "$ref": "#/$defs/localizedText" }
+    "disclaimer": { "$ref": "#/$defs/localizedText" },
+    "contact": {
+      "type": "object",
+      "required": ["pageURL", "title"],
+      "additionalProperties": false,
+      "description": "Where residents ask the municipality anything, including about a report they sent. Fixa copies the case number and opens this page; it never calls or e-mails the municipality for this.",
+      "properties": {
+        "pageURL": { "type": "string", "pattern": "^https://", "description": "The municipality's contact page (e.g. its contact centre). An https page on the municipality's domain." },
+        "title": { "$ref": "#/$defs/localizedText", "description": "The page's name, e.g. 'Värmdö kommuns kontaktcenter'." }
+      }
+    },
+    "allowedWebHosts": {
+      "type": "array",
+      "maxItems": 50,
+      "items": { "type": "string", "pattern": "^[a-z0-9.-]+$" },
+      "description": "Hosts on the municipality's domain whose https pages open in the in-app Safari view (exact host match). Every other link opens in Safari. Absent: every link opens in Safari."
+    }
   },
   "$defs": {
     "path": {

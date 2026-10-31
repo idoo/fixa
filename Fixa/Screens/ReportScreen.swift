@@ -99,6 +99,7 @@ struct ReportScreen: View {
         }
         .scrollDismissesKeyboard(.interactively)
         .fxScreenBackground()
+        .kommunWebLinks(spec: spec)
         .navigationTitle(Text("New report"))
         .navigationBarTitleDisplayMode(.inline)
         .sensoryFeedback(.error, trigger: failedReviews) { _, _ in haptics }
@@ -209,7 +210,7 @@ struct ReportScreen: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 if let info = emergency.infoURL {
-                    OtherQuestionsLink(url: info)
+                    OtherQuestionsLink(url: info, text: String(localized: "More about water and sewer on the kommun's website", bundle: L10n.bundle, locale: L10n.locale))
                 }
             }
         }

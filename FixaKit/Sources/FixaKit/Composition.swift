@@ -222,6 +222,20 @@ public enum ReportComposer {
         return formatter.string(from: date)
     }
 
+    /// What the municipality's form receives as text, in Swedish: `Område`, `Plats` and the
+    /// description exactly as `description(for:spec:now:)` sends it. Never the contact details.
+    /// Kept in Sent reports so the resident can see what was filed.
+    public static func filedText(for d: ReportDraft, spec: AdapterSpec, now: Date = Date()) -> String {
+        let place = placeText(for: d)
+        return [
+            "Område: \(spec.category(for: d)?.value ?? "-")",
+            "Plats: \(place.isEmpty ? "-" : place)",
+            "",
+            "Beskrivning:",
+            description(for: d, spec: spec, now: now),
+        ].joined(separator: "\n")
+    }
+
     /// `locationText (lat, lng)`, the coordinates rounded to 5 decimals (about a metre).
     public static func placeText(for d: ReportDraft) -> String {
         let text = d.locationText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -239,10 +253,7 @@ public enum ReportComposer {
 /// send (`AdapterSpec.webFormURL`). The resident attaches the photo there themselves.
 public enum WebFallback {
     public static func text(_ d: ReportDraft, spec: AdapterSpec, now: Date = Date()) -> String {
-        var lines = ["Område: \(spec.category(for: d)?.value ?? "-")"]
-        let place = ReportComposer.placeText(for: d)
-        lines.append("Plats: \(place.isEmpty ? "-" : place)")
-        lines += ["", "Beskrivning:", ReportComposer.description(for: d, spec: spec, now: now)]
+        var lines = [ReportComposer.filedText(for: d, spec: spec, now: now)]
 
         guard d.wantsFeedback else { return lines.joined(separator: "\n") }
         lines += ["", "Jag vill ha återkoppling."]

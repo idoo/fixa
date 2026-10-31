@@ -17,6 +17,12 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
     /// (the resident pastes `WebFallback.text` there). Same host as `channel.baseURL`.
     public let webFormURL: URL
     public let disclaimer: LocalizedText
+    /// Where residents ask the municipality about anything, including a report they sent: its own web
+    /// page (Fixa never calls or e-mails it). Optional; an https page on the municipality's domain.
+    public let contact: Contact?
+    /// Hosts whose pages Fixa opens in an in-app Safari view (lowercase, each on the municipality's
+    /// domain). Every other link opens in Safari. Absent means every link opens in Safari.
+    public let allowedWebHosts: [String]?
 
     public struct Municipality: Codable, Sendable {
         public let name: String
@@ -173,6 +179,13 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
         public let phone: String
     }
 
+    public struct Contact: Codable, Sendable {
+        /// The municipality's contact page (e.g. its contact centre), opened in the in-app Safari view.
+        public let pageURL: URL
+        /// The page's name, e.g. "Kommunens kontaktcenter".
+        public let title: LocalizedText
+    }
+
     /// Applies on the listed ISO weekdays (1 = Monday … 7 = Sunday) from `from` (default "00:00") until
     /// before `until` ("HH:mm", local time): `from <= now < until`.
     public struct HoursRule: Codable, Sendable, Hashable {
@@ -195,6 +208,15 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
     /// The draft's explicit category, else its tile's category.
     public func category(for draft: ReportDraft) -> Category? {
         category(id: draft.categoryID) ?? category(id: tile(id: draft.tileID)?.categoryID)
+    }
+
+    /// Whether `url` is one of the municipality's own pages, opened in the in-app Safari view: https,
+    /// no user or port, and a host listed in `allowedWebHosts` (exact match, case-insensitive).
+    public func opensInApp(_ url: URL) -> Bool {
+        guard let c = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              c.scheme?.lowercased() == "https", c.user == nil, c.password == nil, c.port == nil,
+              let host = c.host?.lowercased(), !host.isEmpty else { return false }
+        return (allowedWebHosts ?? []).contains { $0.lowercased() == host }
     }
 }
 

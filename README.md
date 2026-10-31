@@ -17,9 +17,11 @@ Fixa sends the same report to the same destination as Värmdö's own fault-repor
 - eight large tiles for the common cases, mapped to the form's categories;
 - GPS, a real map and address search; coordinates go into both the place text and the form's map field;
 - up to three photos, merged into the single attachment the form accepts, with metadata stripped;
-- a one-tap emergency call that picks the right number for the time of day (service centre or the after-hours water/sewer duty line);
+- a one-tap call for acute water and sewer faults only, picking the right number for the time of day (service centre or the after-hours water/sewer duty line);
+- other questions go to the municipality's own website: Fixa copies the case number and opens the contact page in an in-app Safari view;
 - the interface in 22 languages: Swedish, English, Finnish, Arabic, Ukrainian, Russian, Polish, German, French, Spanish, Italian, Portuguese, Dutch, Danish, Norwegian, Estonian, Latvian, Lithuanian, Romanian, Greek, Hungarian and Czech;
 - a local history of what you sent;
+- Home Screen quick actions and Siri/Spotlight shortcuts to start a report for a problem or open Sent reports (an unsent report always comes first);
 - when Fixa can't send (the form changed, a sign-in is required, or sending is paused), it copies the report text and opens the municipality's own web form instead.
 
 ## How it works
@@ -77,6 +79,7 @@ Fixa is an independent app by one developer; it is not run or approved by the ko
 - **How often.** Only when a resident sends. A phone sends at most 5 reports an hour and 15 a day, warns before a repeat report of the same problem within 14 days, and never re-sends a report whose final step may already have gone through.
 - **No automatic traffic.** No test reports, no scheduled checks, no polling of the e-service. A failed send is retried a few times with growing pauses, honouring `Retry-After`.
 - **Stopping Fixa.** If the kommun asks, we set Värmdö's state in `adapters/status.json` to `down`: installed apps then stop sending and point residents to the kommun's own web form. If the e-service answers 401/403 or asks for a sign-in, the app stops by itself and does the same. We don't work around blocks.
+- **Questions from residents.** Fixa doesn't take them and doesn't phone or e-mail the kommun for them. "Questions about this report?" and "Other questions?" copy the case number and open the kommun's Kontaktcenter page (adapter `contact`) in an in-app Safari view; only acute water and sewer faults (VA-jouren / servicecenter during office hours) and 112 are calls. Questions about the app go to the developer, not the kommun.
 
 ## For other municipalities
 

@@ -82,6 +82,7 @@ struct HomeScreen: View {
             .padding(.bottom, Fx.Space.l)
         }
         .fxScreenBackground()
+        .kommunWebLinks(spec: spec)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
@@ -110,7 +111,7 @@ struct HomeScreen: View {
     /// The kommun's own web form: with the unsent draft's text copied when there is one.
     private func openWebsite() {
         if model.draft.description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            openURL(spec.webFormURL)
+            KommunWeb.open(spec.webFormURL, spec: spec)
         } else {
             model.openWebForm(model.webFallbackText(for: model.draft))
         }
@@ -125,8 +126,8 @@ struct HomeScreen: View {
         return name
     }
 
-    /// Time-aware urgent line under the tiles; the number appears once, in the detail line.
-    /// "Other questions?" under it opens the kommun's own page in the browser.
+    /// Time-aware urgent line under the tiles; the number appears once, in the detail line. Only acute
+    /// water and sewer faults are a call; "Other questions?" under it opens the kommun's contact page.
     private func urgentRow(_ emergency: AdapterSpec.Emergency) -> some View {
         let contact = EmergencyRouter.contact(for: .now, emergency: emergency)
         let digits = contact.phone.filter(\.isNumber)
@@ -142,19 +143,21 @@ struct HomeScreen: View {
                     openURL(url)
                 }
             }
-            if let info = emergency.infoURL {
-                OtherQuestionsLink(url: info)
+            if let page = spec.contact?.pageURL ?? emergency.infoURL {
+                OtherQuestionsLink(url: page, text: String(localized: "Other questions? Ask the kommun on its website", bundle: L10n.bundle, locale: L10n.locale))
             }
         }
     }
 }
 
-/// "Other questions?" under an emergency call card: the kommun's own page, opened in the browser.
+/// A kommun page under an emergency call card ("Other questions?"), opened in the in-app Safari view
+/// when the screen applies `kommunWebLinks(spec:)`.
 struct OtherQuestionsLink: View {
     let url: URL
+    let text: String
 
     var body: some View {
-        FxIconRow(systemImage: "safari", text: String(localized: "Other questions? Open the kommun's website", bundle: L10n.bundle, locale: L10n.locale), link: url)
+        FxIconRow(systemImage: "safari", text: text, link: url)
             .accessibilityHint(Text("Opens in Safari"))
             .accessibilityIdentifier("emergency.otherQuestions")
     }

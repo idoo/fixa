@@ -135,8 +135,27 @@ struct ReviewScreen: View {
                 }
             }
             divider
-            editableRow(String(localized: "Description, as sent", bundle: L10n.bundle, locale: L10n.locale)) {
-                value(ReportComposer.description(for: model.draft, spec: spec))
+            editableRow(isSwedishUI
+                ? String(localized: "Description, as sent", bundle: L10n.bundle, locale: L10n.locale)
+                : String(localized: "Description", bundle: L10n.bundle, locale: L10n.locale)) {
+                if isSwedishUI {
+                    value(ReportComposer.description(for: model.draft, spec: spec))
+                } else {
+                    // The resident's own words first; below, exactly what the kommun receives.
+                    value(model.draft.description.trimmingCharacters(in: .whitespacesAndNewlines))
+                    VStack(alignment: .leading, spacing: Fx.Space.xs) {
+                        Text("As sent, in Swedish")
+                            .font(Fx.Font.footnote.weight(.semibold))
+                            .foregroundStyle(Fx.Color.ink2)
+                        Text(ReportComposer.description(for: model.draft, spec: spec))
+                            .font(Fx.Font.callout)
+                            .foregroundStyle(Fx.Color.ink)
+                            .multilineTextAlignment(.leading)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .environment(\.locale, Locale(identifier: "sv_SE"))
+                    }
+                    .padding(.top, Fx.Space.xs)
+                }
                 translationNote
                     .font(Fx.Font.footnote)
                     .foregroundStyle(Fx.Color.ink)
@@ -179,6 +198,9 @@ struct ReviewScreen: View {
         let text = model.draft.locationText.trimmingCharacters(in: .whitespacesAndNewlines)
         return text.isEmpty ? String(localized: "Pin on the map", bundle: L10n.bundle, locale: L10n.locale) : text
     }
+
+    /// A Swedish UI shows the text exactly as sent; any other language puts the resident's own words first.
+    private var isSwedishUI: Bool { L10n.effectiveLanguage == .sv }
 
     // MARK: Translation
 
@@ -485,10 +507,18 @@ struct ReviewScreen: View {
                         Text("Not sent")
                             .font(Fx.Font.callout.weight(.semibold))
                             .foregroundStyle(Fx.Color.ink)
-                        Text(error.userMessage)
-                            .font(Fx.Font.callout)
-                            .foregroundStyle(Fx.Color.ink2)
-                            .fixedSize(horizontal: false, vertical: true)
+                        if case .serverValidation(let messages) = error, !messages.isEmpty {
+                            // The e-service's own words, in the app's language; the Swedish one tap away.
+                            Text("The e-service says:")
+                                .font(Fx.Font.callout)
+                                .foregroundStyle(Fx.Color.ink2)
+                            KommunTextView(swedish: messages.joined(separator: "\n"), spec: spec, quoted: false)
+                        } else {
+                            Text(error.userMessage(spec: spec))
+                                .font(Fx.Font.callout)
+                                .foregroundStyle(Fx.Color.ink2)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
                         Text("Your report is saved on this phone.")
                             .font(Fx.Font.footnote)
                             .foregroundStyle(Fx.Color.ink2)
@@ -516,7 +546,7 @@ struct ReviewScreen: View {
                     proxy.scrollTo(Self.driftCardID, anchor: .top)
                 }
             }
-            AccessibilityNotification.Announcement(String(localized: "Not sent. \(error.userMessage)", bundle: L10n.bundle, locale: L10n.locale)).post()
+            AccessibilityNotification.Announcement(String(localized: "Not sent. \(error.userMessage(spec: spec))", bundle: L10n.bundle, locale: L10n.locale)).post()
             failureFocused = true
         }
     }

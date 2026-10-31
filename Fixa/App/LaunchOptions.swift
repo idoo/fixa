@@ -14,6 +14,8 @@ import Foundation
 ///   -FixaDemo 1     seeds a demo draft, profile, history and receipt; no network, nothing saved
 ///   -FixaEmptyHistory 1  with -FixaDemo: leaves the demo history empty (History empty state)
 ///   -FixaDryRun 1   Review's Send stops at the Summary page (nothing is submitted)
+///   -FixaShortcut <tileID>|sent  (Debug only, read in `FixaApp`) applies a quick action / App Shortcut
+///                   route at launch: a new report for the tile (an unsent draft wins) or Sent reports
 struct LaunchOptions: Sendable {
     enum Screen: String, CaseIterable, Sendable {
         case home, report, location, review, receipt, history, about, settings, textsize, language, contact, privacy, onboarding

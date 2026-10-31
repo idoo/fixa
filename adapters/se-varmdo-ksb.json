@@ -1079,5 +1079,37 @@
     "el": "Το Fixa είναι μια ανεξάρτητη εφαρμογή ανοιχτού κώδικα και δεν ανήκει στο Värmdö kommun. Στέλνει την αναφορά σας απευθείας στην ηλεκτρονική υπηρεσία αναφοράς βλαβών του δήμου, και ο δήμος τη διαχειρίζεται με τον συνήθη τρόπο. Καλέστε το 112 αν κινδυνεύουν ζωές ή περιουσίες.",
     "hu": "A Fixa független, nyílt forráskódú alkalmazás, és nem része a Värmdö kommunnak. A bejelentését közvetlenül az önkormányzat hibabejelentő e-szolgáltatásába küldi, az önkormányzat pedig a szokásos módon intézi. Ha élet vagy vagyon van veszélyben, hívja a 112-t.",
     "cs": "Fixa je nezávislá aplikace s otevřeným zdrojovým kódem a není součástí Värmdö kommun. Odešle vaše hlášení přímo do e-služby obce pro hlášení závad a obec ho vyřídí obvyklým způsobem. Pokud je ohrožen život nebo majetek, volejte 112."
-  }
+  },
+  "contact": {
+    "pageURL": "https://www.varmdo.se/kommunochpolitik/kontaktcenter.4.1a4e4f4413f7b9c98702cd2.html",
+    "title": {
+      "sv": "Värmdö kommuns kontaktcenter",
+      "en": "Värmdö kommun contact centre",
+      "fi": "Värmdön kunnan asiakaspalvelu",
+      "ar": "مركز الاتصال في بلدية فارمدو",
+      "uk": "Контактний центр комуни Вермдьо",
+      "pl": "Centrum kontaktowe gminy Värmdö",
+      "ru": "Контактный центр коммуны Värmdö",
+      "de": "Kontaktcenter von Värmdö kommun",
+      "fr": "Centre de contact de Värmdö kommun",
+      "es": "Centro de contacto de Värmdö kommun",
+      "it": "Centro contatti di Värmdö kommun",
+      "pt": "Centro de contacto de Värmdö kommun",
+      "nl": "Contactcentrum van Värmdö kommun",
+      "da": "Värmdö kommuns kontaktcenter",
+      "nb": "Kontaktsenteret i Värmdö kommun",
+      "et": "Värmdö kommun: kontaktkeskus",
+      "lv": "Värmdö kommun kontaktu centrs",
+      "lt": "Värmdö kommun kontaktų centras",
+      "ro": "Centrul de contact Värmdö kommun",
+      "el": "Κέντρο επικοινωνίας του Värmdö kommun",
+      "hu": "Värmdö kommun kapcsolattartási központja",
+      "cs": "Kontaktní centrum Värmdö kommun"
+    }
+  },
+  "allowedWebHosts": [
+    "varmdo.se",
+    "www.varmdo.se",
+    "service.varmdo.se"
+  ]
 }

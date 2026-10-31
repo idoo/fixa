@@ -26,9 +26,14 @@ struct HistoryItem: Codable, Identifiable, Hashable, Sendable {
     var thumbnail: Data?
     /// Absent in lists written before 1.1: those were all sent.
     var status: Status = .sent
+    /// The Swedish text the kommun's form got (`ReportComposer.filedText`); `description` is the
+    /// resident's own words. Absent in lists written before build 12.
+    var filedText: String? = nil
+    /// What the e-service's receipt page said. Absent before build 12 and for unconfirmed reports.
+    var kommunMessage: String? = nil
 
     private enum CodingKeys: String, CodingKey {
-        case id, date, tileID, description, locationText, latitude, longitude, caseNumber, thumbnail, status
+        case id, date, tileID, description, locationText, latitude, longitude, caseNumber, thumbnail, status, filedText, kommunMessage
     }
 
     init(
@@ -41,7 +46,9 @@ struct HistoryItem: Codable, Identifiable, Hashable, Sendable {
         longitude: Double?,
         caseNumber: String?,
         thumbnail: Data?,
-        status: Status = .sent
+        status: Status = .sent,
+        filedText: String? = nil,
+        kommunMessage: String? = nil
     ) {
         self.id = id
         self.date = date
@@ -53,6 +60,8 @@ struct HistoryItem: Codable, Identifiable, Hashable, Sendable {
         self.caseNumber = caseNumber
         self.thumbnail = thumbnail
         self.status = status
+        self.filedText = filedText
+        self.kommunMessage = kommunMessage
     }
 
     init(from decoder: Decoder) throws {
@@ -67,6 +76,14 @@ struct HistoryItem: Codable, Identifiable, Hashable, Sendable {
         caseNumber = try c.decodeIfPresent(String.self, forKey: .caseNumber)
         thumbnail = try c.decodeIfPresent(Data.self, forKey: .thumbnail)
         status = try c.decodeIfPresent(Status.self, forKey: .status) ?? .sent
+        filedText = try c.decodeIfPresent(String.self, forKey: .filedText)
+        kommunMessage = try c.decodeIfPresent(String.self, forKey: .kommunMessage)
+    }
+
+    /// Keeps what a confirmed send returned: the exact Swedish filed and the kommun's receipt text.
+    mutating func record(_ sent: SentReport) {
+        if let filedText = sent.filedText { self.filedText = filedText }
+        if let kommunMessage = sent.kommunMessage { self.kommunMessage = kommunMessage }
     }
 }
 
