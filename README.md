@@ -54,6 +54,10 @@ swift run --package-path FixaKit fixa-cli dry-run
 
 Signing settings in `project.yml` are the maintainer's; change `DEVELOPMENT_TEAM` and the bundle ID to build your own copy.
 
+### CI and release
+
+A push to `main` runs `swift test --package-path FixaKit` on the home server (air-ci, `~/code/air-server/ci`). A `v<version>` tag runs the tests and uploads a TestFlight build from the Air, build number = latest in App Store Connect + 1; it does not submit for App Review. The local fastlane path stays the fallback.
+
 ## Privacy
 
 Fixa sends your report only to the municipality's e-service. Your e-mail, name and phone are stored only on your phone, and only while "Remember my details" is on. There is no analytics and no tracking. Details: [PRIVACY.md](PRIVACY.md).

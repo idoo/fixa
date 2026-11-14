@@ -1,0 +1,10 @@
+push:
+  test:
+    run: swift test --package-path FixaKit
+    paths: ["FixaKit/**", "adapters/**", "schema/**"]
+    timeout: 30
+tag:
+  release:
+    run: swift test --package-path FixaKit && ~/jobs/bin/air-release-build --scheme Fixa --upload
+    timeout: 120
+    notify: always
