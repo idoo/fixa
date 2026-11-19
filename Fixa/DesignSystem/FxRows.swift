@@ -57,12 +57,11 @@ struct FxDivider: View {
     }
 }
 
-/// Labelled switch row, whole row toggles. Sea switch.
+/// Labelled switch row, whole row toggles. Sea switch. The system switch plays its own haptic.
 struct FxToggleRow: View {
     let title: String
     var subtitle: String? = nil
     @Binding var isOn: Bool
-    @Environment(\.fxHaptics) private var haptics
 
     init(title: String, subtitle: String? = nil, isOn: Binding<Bool>) {
         self.title = title
@@ -85,7 +84,6 @@ struct FxToggleRow: View {
         }
         .tint(Fx.Color.sea)
         .frame(minHeight: Fx.minTarget)
-        .sensoryFeedback(.selection, trigger: isOn) { _, _ in haptics }
     }
 }
 

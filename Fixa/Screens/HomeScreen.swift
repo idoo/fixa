@@ -16,7 +16,7 @@ struct HomeScreen: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Fx.Space.l) {
                 // Words come from the app by state, never from the downloaded status file.
-                if model.sendsPaused != nil || model.adapterStatus.state == .down {
+                if model.sendsPause(for: nil) != nil || model.adapterStatus(for: nil).state == .down {
                     FxBanner(
                         kind: .warning,
                         title: String(localized: "Fixa can't send to \(spec.municipality.name) right now", bundle: L10n.bundle, locale: L10n.locale),
@@ -25,7 +25,7 @@ struct HomeScreen: View {
                         action: openWebsite
                     )
                     .accessibilityIdentifier("home.pausedBanner")
-                } else if model.adapterStatus.state == .degraded {
+                } else if model.adapterStatus(for: nil).state == .degraded {
                     FxBanner(
                         kind: .warning,
                         title: String(localized: "The municipality's e-service has changed", bundle: L10n.bundle, locale: L10n.locale),
@@ -64,6 +64,7 @@ struct HomeScreen: View {
                         ) {
                             model.startReport(tile: tile)
                         }
+                        .disabled(!model.canStartForm(adapterID: spec.id))
                         .accessibilityIdentifier("home.tile.\(tile.id)")
                     }
                 }
@@ -76,11 +77,13 @@ struct HomeScreen: View {
                                 HomeServiceRow(
                                     title: info.title.resolve(L10n.locale),
                                     subtitle: info.subtitle?.resolve(L10n.locale),
+                                    notice: serviceNotice(service.id),
                                     systemImage: info.symbol,
                                     categoryID: service.tiles.first?.categoryID
                                 ) {
                                     model.openService(adapterID: service.id)
                                 }
+                                .disabled(!model.canStartForm(adapterID: service.id))
                                 .accessibilityIdentifier("home.service.\(service.id)")
                             }
                         }
@@ -132,13 +135,29 @@ struct HomeScreen: View {
         }
     }
 
-    /// The kommun's own web form: with the unsent draft's text copied when there is one.
+    /// The kommun's own web form: with the unsent draft's text copied when there is one, in that
+    /// draft's own form.
     private func openWebsite() {
-        if model.draft.description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            KommunWeb.open(spec.webFormURL, spec: spec)
+        if model.draftHasContent {
+            model.openWebForm(model.webFallbackText(for: model.draft), adapterID: model.draft.adapterID)
         } else {
-            model.openWebForm(model.webFallbackText(for: model.draft))
+            KommunWeb.open(spec.webFormURL, spec: spec)
         }
+    }
+
+    /// A "More forms" row's own state: waiting for the report being sent, paused or down, or changed.
+    private func serviceNotice(_ adapterID: String) -> String? {
+        if !model.canStartForm(adapterID: adapterID) {
+            return String(localized: "Wait until the report is sent", bundle: L10n.bundle, locale: L10n.locale)
+        }
+        let state = model.adapterStatus(for: adapterID).state
+        if model.sendsPause(for: adapterID) != nil || state == .down {
+            return String(localized: "Fixa can't send right now", bundle: L10n.bundle, locale: L10n.locale)
+        }
+        if state == .degraded {
+            return String(localized: "The municipality's e-service has changed", bundle: L10n.bundle, locale: L10n.locale)
+        }
+        return nil
     }
 
     /// "Värmdö" from "Värmdö kommun": the subtitle stays descriptive.
@@ -176,10 +195,12 @@ struct HomeScreen: View {
 }
 
 /// One "More forms" row on Home: the e-service's glyph, title and what it is for, on a card. Opens that
-/// form. Selection haptic like the tiles; at least 44 pt tall, grows with Dynamic Type.
+/// form. Selection haptic like the tiles; at least 44 pt tall, grows with Dynamic Type. `notice` is the
+/// form's own state (paused, down, waiting for a send) on a line of its own.
 private struct HomeServiceRow: View {
     let title: String
     let subtitle: String?
+    let notice: String?
     let systemImage: String
     let categoryID: String?
     let action: () -> Void
@@ -204,6 +225,11 @@ private struct HomeServiceRow: View {
                             .font(Fx.Font.footnote)
                             .foregroundStyle(Fx.Color.ink2)
                     }
+                    if let notice {
+                        Label(notice, systemImage: "exclamationmark.triangle.fill")
+                            .font(Fx.Font.footnote)
+                            .foregroundStyle(Fx.Color.ink2)
+                    }
                 }
                 .multilineTextAlignment(.leading)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -223,7 +249,7 @@ private struct HomeServiceRow: View {
         .sensoryFeedback(.selection, trigger: taps) { _, _ in haptics }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(title))
-        .accessibilityValue(Text(subtitle ?? ""))
+        .accessibilityValue(Text([subtitle, notice].compactMap { $0 }.joined(separator: ", ")))
         .accessibilityHint(Text(String(localized: "Opens the form", bundle: L10n.bundle, locale: L10n.locale)))
         .accessibilityAddTraits(.isButton)
     }

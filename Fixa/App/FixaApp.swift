@@ -34,6 +34,8 @@ struct RootView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    /// "Delete & start" taps: felt like the other destructive confirms (Settings, Profile).
+    @State private var starts = 0
 
     var body: some View {
         let display = model.display
@@ -150,6 +152,7 @@ struct RootView: View {
                 presenting: model.pendingStart
             ) { pending in
                 Button(String(localized: "Delete & start", bundle: L10n.bundle, locale: L10n.locale), role: .destructive) {
+                    starts += 1
                     model.confirmPendingStart(pending)
                 }
                 Button(String(localized: "Keep editing", bundle: L10n.bundle, locale: L10n.locale), role: .cancel) {
@@ -158,6 +161,8 @@ struct RootView: View {
             } message: { _ in
                 Text(String(localized: "Your unsent report will be deleted.", bundle: L10n.bundle, locale: L10n.locale))
             }
+            // On the persistent root, not the dialog, which goes away with the tap.
+            .sensoryFeedback(.success, trigger: starts) { _, _ in model.display.vibration }
         } else {
             ContentUnavailableView(
                 "Fixa couldn't start",

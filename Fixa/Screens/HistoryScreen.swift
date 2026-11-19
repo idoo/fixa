@@ -11,7 +11,7 @@ struct HistoryScreen: View {
         Group {
             if model.history.items.isEmpty {
                 VStack(spacing: 0) {
-                    if model.sendsPaused != nil {
+                    if pausedState != nil {
                         pausedBanner
                             .padding(.horizontal, Fx.Space.l)
                             .padding(.top, Fx.Space.s)
@@ -20,7 +20,7 @@ struct HistoryScreen: View {
                 }
             } else {
                 List {
-                    if model.sendsPaused != nil {
+                    if pausedState != nil {
                         Section {
                             pausedBanner
                                 .listRowInsets(EdgeInsets())
@@ -64,19 +64,31 @@ struct HistoryScreen: View {
     /// kommun's website with the newest report that is still waiting, when there is one.
     @ViewBuilder
     private var pausedBanner: some View {
-        if let pause = model.sendsPaused {
-            let pending = model.history.items.first { $0.status == .waiting || $0.status == .notSent }
+        if let state = pausedState {
             VStack(alignment: .leading, spacing: Fx.Space.m) {
                 FxBanner(
                     kind: .warning,
                     title: String(localized: "Fixa can't send right now", bundle: L10n.bundle, locale: L10n.locale),
-                    message: pause.message
+                    message: state.pause.message
                 )
-                if let pending {
+                if let pending = state.pending {
                     WebFormFallback(text: model.webFallbackText(id: pending.id), spec: model.spec(forAdapterID: pending.adapterID) ?? spec, tileID: pending.tileID)
                 }
             }
         }
+    }
+
+    /// The pause of the newest waiting report whose service can't send, with that report; else
+    /// the app's own pause or any listed report's.
+    private var pausedState: (pause: AppModel.SendsPause, pending: HistoryItem?)? {
+        let items = model.history.items
+        for item in items where item.status == .waiting || item.status == .notSent {
+            if let pause = model.sendsPause(for: item.adapterID) { return (pause, item) }
+        }
+        if let pause = model.sendsPause(for: nil) ?? items.lazy.compactMap({ model.sendsPause(for: $0.adapterID) }).first {
+            return (pause, nil)
+        }
+        return nil
     }
 
     private var emptyState: some View {
@@ -108,10 +120,12 @@ private struct HistoryRow: View {
                 Text(spec.tile(id: item.tileID)?.title.resolve(L10n.locale) ?? String(localized: "Report", bundle: L10n.bundle, locale: L10n.locale))
                     .font(Fx.Font.headline)
                     .foregroundStyle(Fx.Color.ink)
-                Text(item.locationText.isEmpty ? item.description : item.locationText)
-                    .font(Fx.Font.callout)
-                    .foregroundStyle(Fx.Color.ink2)
-                    .lineLimit(2)
+                if let subtitle {
+                    Text(subtitle)
+                        .font(Fx.Font.callout)
+                        .foregroundStyle(Fx.Color.ink2)
+                        .lineLimit(2)
+                }
                 HStack(spacing: Fx.Space.s) {
                     Text(item.date.formatted(.dateTime.day().month().year().locale(locale)))
                         .font(Fx.Font.footnote)
@@ -125,6 +139,15 @@ private struct HistoryRow: View {
         .padding(.vertical, Fx.Space.s)
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("history.row")
+    }
+
+    /// The place (for forms without one, the station or address the report is for), else the
+    /// description; nil when both are empty, so no blank line.
+    private var subtitle: String? {
+        let place = item.locationText.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !place.isEmpty { return place }
+        let description = item.description.trimmingCharacters(in: .whitespacesAndNewlines)
+        return description.isEmpty ? nil : description
     }
 }
 
@@ -266,37 +289,44 @@ struct HistoryDetailScreen: View {
                                 field(String(localized: "Case number", bundle: L10n.bundle, locale: L10n.locale), value: String(localized: "Not given by the e-service", bundle: L10n.bundle, locale: L10n.locale))
                             }
                         }
-                        FxCard {
-                            field(String(localized: "Place", bundle: L10n.bundle, locale: L10n.locale), value: placeText(for: item))
-                            if let lat = item.latitude, let lng = item.longitude {
-                                let center = CLLocationCoordinate2D(latitude: lat, longitude: lng)
-                                Map(initialPosition: .region(MKCoordinateRegion(
-                                    center: center,
-                                    latitudinalMeters: 400,
-                                    longitudinalMeters: 400
-                                )), interactionModes: []) {
-                                    Marker(placeText(for: item), coordinate: center)
-                                        .tint(Fx.Color.sea)
+                        if showsPlace(item) {
+                            FxCard {
+                                field(String(localized: "Place", bundle: L10n.bundle, locale: L10n.locale), value: placeText(for: item))
+                                if let lat = item.latitude, let lng = item.longitude {
+                                    let center = CLLocationCoordinate2D(latitude: lat, longitude: lng)
+                                    Map(initialPosition: .region(MKCoordinateRegion(
+                                        center: center,
+                                        latitudinalMeters: 400,
+                                        longitudinalMeters: 400
+                                    )), interactionModes: []) {
+                                        Marker(placeText(for: item), coordinate: center)
+                                            .tint(Fx.Color.sea)
+                                    }
+                                    .frame(height: 140)
+                                    .clipShape(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous))
+                                    .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous), fill: .clear)
+                                    .allowsHitTesting(false)
+                                    .accessibilityHidden(true)
                                 }
-                                .frame(height: 140)
-                                .clipShape(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous))
-                                .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous), fill: .clear)
-                                .allowsHitTesting(false)
-                                .accessibilityHidden(true)
                             }
                         }
-                        FxCard {
-                            field(String(localized: "Description", bundle: L10n.bundle, locale: L10n.locale), value: item.description)
-                            if let filed = item.filedText {
-                                FiledInSwedish(text: filed, isFiled: item.status == .sent || item.status == .maybeSent)
-                            }
-                            if item.thumbnail != nil {
-                                HistoryThumbnail(
-                                    item: item,
-                                    spec: spec,
-                                    side: 120,
-                                    accessibilityLabel: String(localized: "Attached photo", bundle: L10n.bundle, locale: L10n.locale)
-                                )
+                        // The description field only when the form has one; the filed text and photo still show.
+                        if spec.hasField(.description) || item.filedText != nil || item.thumbnail != nil {
+                            FxCard {
+                                if spec.hasField(.description) {
+                                    field(String(localized: "Description", bundle: L10n.bundle, locale: L10n.locale), value: item.description)
+                                }
+                                if let filed = item.filedText {
+                                    FiledInSwedish(text: filed, isFiled: item.status == .sent || item.status == .maybeSent)
+                                }
+                                if item.thumbnail != nil {
+                                    HistoryThumbnail(
+                                        item: item,
+                                        spec: spec,
+                                        side: 120,
+                                        accessibilityLabel: String(localized: "Attached photo", bundle: L10n.bundle, locale: L10n.locale)
+                                    )
+                                }
                             }
                         }
                         if let message = item.kommunMessage {
@@ -366,7 +396,7 @@ struct HistoryDetailScreen: View {
             case .sent:
                 EmptyView()
             case .waiting:
-                if let pause = model.sendsPaused {
+                if let pause = model.sendsPause(for: item.adapterID) {
                     FxBanner(
                         kind: .warning,
                         title: String(localized: "Fixa can't send right now", bundle: L10n.bundle, locale: L10n.locale),
@@ -435,6 +465,13 @@ struct HistoryDetailScreen: View {
         if model.path.last == .historyDetail(itemID) {
             model.path.removeLast()
         }
+    }
+
+    /// A form without a place or map field shows no Place card, unless the report still names one
+    /// (the station or address of a form that has none).
+    private func showsPlace(_ item: HistoryItem) -> Bool {
+        spec.hasField(.place) || spec.hasField(.mapAnswer) || spec.hasField(.mapChoice)
+            || !item.locationText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
     /// Address or place text only; never coordinates.

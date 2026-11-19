@@ -14,7 +14,7 @@ bundle="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$app/Info.plis
 name="Fixa Shots 17 Pro Max"
 settle="${SETTLE:-4}"
 screens=("$@")
-[ ${#screens[@]} -gt 0 ] || screens=(home location receipt privacy settings language)
+[ ${#screens[@]} -gt 0 ] || screens=(home location receipt privacy settings language recycling)
 
 sim() { timeout 60 xcrun simctl "$@"; }
 
@@ -41,7 +41,10 @@ shoot() { # locale-dir FixaLanguage AppleLocale screen [output-name]
   mkdir -p "$dir"
   raw="$(mktemp -t fixa-shot).png"
   sim terminate "$udid" "$bundle" >/dev/null 2>&1 || true
-  sim launch "$udid" "$bundle" -FixaDemo 1 -FixaScreen "$4" \
+  # "recycling" (frame 06, 1.1): the recycling-station report, one of Home's "More forms".
+  local args=(-FixaScreen "$4")
+  case "$4" in recycling) args=(-FixaScreen report -FixaService se.varmdo.felater) ;; esac
+  sim launch "$udid" "$bundle" -FixaDemo 1 "${args[@]}" \
     -FixaLanguage "$2" -AppleLocale "$3" >/dev/null
   sleep "$settle"
   sim io "$udid" screenshot --type=png "$raw" >/dev/null 2>&1

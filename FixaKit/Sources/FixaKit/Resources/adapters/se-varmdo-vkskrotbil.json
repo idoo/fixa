@@ -270,6 +270,7 @@
     {
       "id": "vehicleType",
       "kind": "text",
+      "translate": true,
       "title": {
         "en": "Type of vehicle",
         "sv": "Typ av fordon",
@@ -763,6 +764,7 @@
     {
       "id": "colour",
       "kind": "text",
+      "translate": true,
       "title": {
         "en": "Colour",
         "sv": "Färg",

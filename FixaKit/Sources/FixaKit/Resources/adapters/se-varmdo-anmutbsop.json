@@ -2,6 +2,7 @@
   "specVersion": 1,
   "minAppBuild": 13,
   "id": "se.varmdo.anmutbsop",
+  "placeQuestion": "address",
   "service": {
     "title": {
       "sv": "Utebliven sophämtning",

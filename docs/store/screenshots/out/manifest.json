@@ -1,6 +1,6 @@
 {
   "tools": {
-    "node": "v26.10.0",
+    "node": "v24.18.0",
     "puppeteer": "24.43.1",
     "browser": "HeadlessChrome/148.0.7778.97"
   },
@@ -13,7 +13,8 @@
     "02",
     "03",
     "04",
-    "05"
+    "05",
+    "06"
   ],
   "inputs": {
     "captures/sv/home.png": "b52da5f7065f6febda219f0076c8d91d4c0ea6857dcd4af37116482b8e2ac739",
@@ -22,6 +23,7 @@
     "captures/sv/privacy.png": "0961c2b31b677a1d468b229be2ff01f709aa3ea4e79da31b33f097feb32828c4",
     "captures/sv/receipt-translated.png": "0a39b9e3f1b5af34abf5a1472e6481ce74b92bb5081f34812c93d93ad4a33dd8",
     "captures/sv/receipt.png": "7fda0bb2d3fdc885bb866275abeb648f5f2d60448d3aafdc66cde21ffd42a29d",
+    "captures/sv/recycling.png": "b9719bb81fda480e71c09aa7f02df52e9d0c982faf88e64aaac97b947d6b6a24",
     "captures/sv/settings.png": "98817d3b759d4df0b7ab557024c4aeb9ae5eb2fcaf1e47ce14dce9adeb8ca1b2",
     "captures/en-US/home.png": "f9e7010cf7b2362852a9a372ecd2d6fdd92e7c60d005fa15e2f1c26681f7d545",
     "captures/en-US/language.png": "c4b23acd4532cc7394bba7a1fccfd70083061eb6d4cbcbf53bcb623953d484dd",
@@ -29,6 +31,7 @@
     "captures/en-US/privacy.png": "45b3ef4b492d8e1de2933b7e1e6b92616ad0504c0f5795bfec36f2db0dbefe65",
     "captures/en-US/receipt-translated.png": "a8212ce4dbfd13e678f99b18a8755b50b0baf171c5da5903ab8abf7162615d8d",
     "captures/en-US/receipt.png": "bc5f174725783b08a37dca18c04b91c9ef27fb2b8c4e084680d22feb5aa38327",
+    "captures/en-US/recycling.png": "7941b46ac0319aff41b661933422675945d89d5af7eb07061498890f57576f1f",
     "captures/en-US/settings.png": "09513c26dca423ae1be59f179948ed82e807c371ce521b51fd96e0b13b296ac5"
   },
   "outputs": {
@@ -62,6 +65,12 @@
       "headline": "Skriv på ditt språk",
       "subline": "Fixa översätter till svenska. Kommunens kvitto visas på ditt språk."
     },
+    "out/sv/06.png": {
+      "sha256": "16078fa0464fe7a08b5bd708453ddf07f10141cf0ee031730bf06db9b9af50be",
+      "screen": "recycling",
+      "headline": "Fler av kommunens formulär",
+      "subline": "Återvinningsstationer, missad sophämtning, invasiva växter och övergivna bilar."
+    },
     "out/en-US/01.png": {
       "sha256": "e3e3e0fc8f24a3ab841858b8020104b8c2637007c8c0acdb72885cf8a0f1bf6d",
       "screen": "home",
@@ -91,11 +100,17 @@
       "screen": "receipt-translated",
       "headline": "Write in your own language",
       "subline": "Fixa translates it into Swedish. The kommun's receipt shows in yours."
+    },
+    "out/en-US/06.png": {
+      "sha256": "577fb8b92236ef1b39a5ad7c9ded396923257c7d1d5d56b34818ae37657b1ae5",
+      "screen": "recycling",
+      "headline": "More of the kommun's forms",
+      "subline": "Recycling stations, missed bin collection, invasive plants and abandoned cars."
     }
   },
   "contactSheets": {
-    "out/contact-sv.png": "e70f7dc4dcc1b27bded0c19915b526c138934509610b584568a514ab0fd3b999",
-    "out/contact-en-US.png": "9700e5fcfc21d30d7a145904c5a576ef990bb2650363606fcac8192522ee0605"
+    "out/contact-sv.png": "50e856a8d757d6e6c672356fa599f974370630e45fb2bccee3830a44758a5da8",
+    "out/contact-en-US.png": "997947abeba37cb1e6a4724e0cf7bee80edb878c5da0f485a176515f202764aa"
   },
   "renderFailures": []
 }

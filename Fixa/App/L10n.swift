@@ -34,11 +34,25 @@ nonisolated enum L10n {
         Locale.Language(identifier: effectiveLanguage.rawValue).characterDirection == .rightToLeft
     }
 
+    /// The iPhone's own language list (UserDefaults `fixa.deviceLanguages`). Once the Language page
+    /// writes this app's `AppleLanguages`, `Locale.preferredLanguages` returns that instead, so the
+    /// list is saved on the first `apply` of a launch while the app has no `AppleLanguages` of its
+    /// own. Only this app's defaults are read.
+    static let deviceLanguagesKey = "fixa.deviceLanguages"
+    nonisolated(unsafe) private static var savedDeviceLanguages = false
+
     /// Switches the UI language. `savesSystemSetting` also writes `AppleLanguages`, the value iOS
     /// shows in Settings › Fixa › Language and uses for system sheets from the next launch.
     @MainActor
     static func apply(_ language: AppLanguage?, savesSystemSetting: Bool) {
         installBundleOverride()
+        if savesSystemSetting, !savedDeviceLanguages {
+            savedDeviceLanguages = true
+            let own = UserDefaults.standard.persistentDomain(forName: Bundle.main.bundleIdentifier ?? "")?["AppleLanguages"]
+            if own == nil {
+                UserDefaults.standard.set(Locale.preferredLanguages, forKey: deviceLanguagesKey)
+            }
+        }
         let code = (language ?? .system).rawValue
         let url = Bundle.main.bundleURL.appendingPathComponent("\(code).lproj", isDirectory: true)
         let bundle = Bundle(url: url)

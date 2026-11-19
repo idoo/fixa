@@ -196,12 +196,14 @@
           "required": { "type": "boolean" },
           "options": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/questionOption" }, "description": "choice, multiChoice: non-empty, unique values; value is the exact form option." },
           "suggestions": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/questionOption" }, "description": "text: tap-to-fill chips; the Swedish value becomes the answer." },
-          "maxLength": { "type": "integer", "minimum": 1, "description": "text, longText: longest answer the form takes." }
+          "maxLength": { "type": "integer", "minimum": 1, "description": "text, longText: longest answer the form takes." },
+          "translate": { "type": "boolean", "description": "text, longText: an answer typed in another language goes as \"<Swedish machine translation> (<original>)\", or as typed past maxLength. Leave unset for codes and names (number plates, makes, addresses)." }
         }
       }
     },
     "descriptionTitle": { "$ref": "#/$defs/localizedText", "description": "Heading of the description box when the form's description means something narrower (\"Where is it growing?\"). Absent: Fixa's own wording." },
     "descriptionPrompt": { "$ref": "#/$defs/localizedText", "description": "Placeholder of that box." },
+    "placeQuestion": { "type": "string", "description": "Forms without a place field: id of the question whose answer says where the report is for (a station, an address). Shown in Sent reports and used by the repeat-report check." },
     "emergency": {
       "type": "object",
       "required": ["contacts", "rules", "defaultContactID", "timeZone", "note"],

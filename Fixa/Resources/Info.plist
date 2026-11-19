@@ -59,9 +59,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Fixa uses the camera so you can take a photo of the problem.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Fixa uses your location to put the pin where the problem is: when you tap Use my current location, and on a new report once you have allowed it. Your position is only sent with a report you send.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Fixa lets you pick photos of the problem to attach to your report.</string>
+	<string>Fixa uses your location to put the pin where the problem is and to find the nearest recycling station: when you tap Use my current location or Find the nearest, and on a new report once you have allowed it. Your position leaves your phone only as the pin of a report you send.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

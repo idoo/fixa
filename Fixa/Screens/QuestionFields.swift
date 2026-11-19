@@ -17,6 +17,7 @@ struct QuestionField: View {
     @Environment(AppModel.self) private var model
     @Environment(\.fxHaptics) private var haptics
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.fxReduceMotion) private var reduceMotion
     /// Bumped by every choose, tick and suggestion: drives the selection haptic.
     @State private var taps = 0
     /// Current position read without asking (precise location already allowed) or by "Find the nearest".
@@ -29,6 +30,10 @@ struct QuestionField: View {
     @State private var nearestFailure: String?
     /// Bumped by "Find the nearest": drives the selection haptic.
     @State private var nearestTaps = 0
+    /// Bumped when "Find the nearest" picks a station: drives the success haptic.
+    @State private var nearestFound = 0
+    /// Bumped when "Find the nearest" fails: drives the error haptic.
+    @State private var nearestFailed = 0
 
     /// Scroll target of a question on the Report screen.
     static func scrollID(_ questionID: String) -> String { "report.question.\(questionID)" }
@@ -54,8 +59,8 @@ struct QuestionField: View {
             }
             control
             if hasLocatedOptions {
-                nearestFootnote
                 nearestButton
+                nearestStatus
             }
             if let issue, question.kind != .text, question.kind != .longText {
                 QuestionIssueText(message: issue)
@@ -63,6 +68,8 @@ struct QuestionField: View {
         }
         .sensoryFeedback(.selection, trigger: taps) { _, _ in haptics }
         .sensoryFeedback(.selection, trigger: nearestTaps) { _, _ in haptics }
+        .sensoryFeedback(.success, trigger: nearestFound) { _, _ in haptics }
+        .sensoryFeedback(.error, trigger: nearestFailed) { _, _ in haptics }
         .task(id: hasLocatedOptions) {
             guard hasLocatedOptions else { return }
             await readQuietFix()
@@ -96,10 +103,26 @@ struct QuestionField: View {
 
     // MARK: Text
 
+    /// Shows a suggestion's answer by its title in the app's language; stores the Swedish `value`.
+    /// Typed text equal to a suggestion's title stores that suggestion's value; other text as typed.
     private var textBinding: Binding<String> {
-        Binding(
-            get: { values.first ?? "" },
-            set: { model.draft.answers[question.id] = $0.isEmpty ? nil : [$0] }
+        let suggestions = question.suggestions ?? []
+        return Binding(
+            get: {
+                let value = values.first ?? ""
+                return suggestions.first { $0.value.caseInsensitiveCompare(value) == .orderedSame }?
+                    .title.resolve(L10n.locale) ?? value
+            },
+            set: { text in
+                guard !text.isEmpty else {
+                    model.draft.answers[question.id] = nil
+                    return
+                }
+                let match = suggestions.first {
+                    $0.title.resolve(L10n.locale).compare(text, options: [.caseInsensitive, .diacriticInsensitive], locale: L10n.locale) == .orderedSame
+                }
+                model.draft.answers[question.id] = [match?.value ?? text]
+            }
         )
     }
 
@@ -179,7 +202,10 @@ struct QuestionField: View {
     /// Ticks `value` (several) or chooses it (one). Ticked values keep the options' order.
     private func pick(_ value: String, multiple: Bool) {
         taps += 1
-        nearestPick = nil
+        withAnimation(reduceMotion ? nil : Fx.Motion.select) {
+            nearestPick = nil
+            nearestFailure = nil
+        }
         guard multiple else {
             model.draft.answers[question.id] = [value]
             return
@@ -228,7 +254,9 @@ struct QuestionField: View {
         }
         .buttonStyle(FxPressStyle())
         .accessibilityLabel(Text(label))
-        .accessibilityAddTraits(selected ? .isSelected : [])
+        // A checkbox reads its state ticked or not; a single choice reads "Selected" on the chosen one.
+        .accessibilityValue(multiple ? (selected ? Text("Ticked") : Text("Not ticked")) : Text(""))
+        .accessibilityAddTraits(!multiple && selected ? .isSelected : [])
         .accessibilityIdentifier("report.question.\(question.id).option.\(index)")
     }
 
@@ -309,58 +337,83 @@ struct QuestionField: View {
             .formatted(.measurement(width: .abbreviated, usage: .road).locale(L10n.locale))
     }
 
-    @ViewBuilder
-    private var nearestFootnote: some View {
-        if let nearestPick, values == [nearestPick], let reference,
-           let place = question.options?.first(where: { $0.value == nearestPick })?.location {
-            let distance = Self.distanceText(reference.point.distance(to: place))
-            Text(reference.fromPhoto
-                ? String(localized: "Nearest to where the photo was taken · \(distance)", bundle: L10n.bundle, locale: L10n.locale)
-                : String(localized: "Nearest to you · \(distance)", bundle: L10n.bundle, locale: L10n.locale))
-                .font(Fx.Font.footnote)
-                .foregroundStyle(Fx.Color.ink2)
-                .multilineTextAlignment(.leading)
-                .fixedSize(horizontal: false, vertical: true)
-                .accessibilityIdentifier("report.question.\(question.id).nearestNote")
+    /// "Nearest to you · 350 m" for the option Fixa chose, while it is still the answer.
+    private var nearestNote: String? {
+        guard let nearestPick, values == [nearestPick], let reference,
+              let place = question.options?.first(where: { $0.value == nearestPick })?.location else { return nil }
+        return Self.nearestNote(meters: reference.point.distance(to: place), fromPhoto: reference.fromPhoto)
+    }
+
+    private static func nearestNote(meters: Double, fromPhoto: Bool) -> String {
+        let distance = distanceText(meters)
+        return fromPhoto
+            ? String(localized: "Nearest to where the photo was taken · \(distance)", bundle: L10n.bundle, locale: L10n.locale)
+            : String(localized: "Nearest to you · \(distance)", bundle: L10n.bundle, locale: L10n.locale)
+    }
+
+    /// The nearest note or the failure, in a line that is always reserved for the longest of them:
+    /// a result landing seconds later fades in place instead of pushing the form down.
+    private var nearestStatus: some View {
+        ZStack(alignment: .topLeading) {
+            ForEach([
+                Self.nearestNote(meters: 10_000, fromPhoto: true),
+                Self.message(for: .denied),
+                Self.message(for: .servicesOff),
+                Self.message(for: .unavailable),
+            ], id: \.self) { longest in
+                Text(longest)
+                    .hidden()
+                    .accessibilityHidden(true)
+            }
+            if let nearestFailure {
+                Text(nearestFailure)
+                    .transition(.opacity)
+            } else if let nearestNote {
+                Text(nearestNote)
+                    .transition(.opacity)
+                    .accessibilityIdentifier("report.question.\(question.id).nearestNote")
+            }
         }
+        .font(Fx.Font.footnote)
+        .foregroundStyle(Fx.Color.ink2)
+        .multilineTextAlignment(.leading)
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     /// Explicit: may ask for location permission, then picks the nearest option at any distance.
     private var nearestButton: some View {
-        VStack(alignment: .leading, spacing: Fx.Space.xs) {
-            Button(action: findNearest) {
-                Label {
-                    Text(isFindingNearest
-                        ? String(localized: "Finding where you are…", bundle: L10n.bundle, locale: L10n.locale)
-                        : String(localized: "Find the nearest", bundle: L10n.bundle, locale: L10n.locale))
-                        .multilineTextAlignment(.leading)
-                        .fixedSize(horizontal: false, vertical: true)
-                } icon: {
-                    Image(systemName: "location.fill")
-                        .accessibilityHidden(true)
+        Button(action: findNearest) {
+            Label {
+                // Both labels lay out so the longer one sets the height: no jump when it switches.
+                ZStack(alignment: .topLeading) {
+                    Text(String(localized: "Finding where you are…", bundle: L10n.bundle, locale: L10n.locale))
+                        .opacity(isFindingNearest ? 1 : 0)
+                        .accessibilityHidden(!isFindingNearest)
+                    Text(String(localized: "Find the nearest", bundle: L10n.bundle, locale: L10n.locale))
+                        .opacity(isFindingNearest ? 0 : 1)
+                        .accessibilityHidden(isFindingNearest)
                 }
-                .font(Fx.Font.callout.weight(.semibold))
-                .foregroundStyle(Fx.Color.sea)
-                .frame(maxWidth: .infinity, minHeight: Fx.minTarget, alignment: .leading)
-                .contentShape(.rect)
+                .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
+            } icon: {
+                Image(systemName: "location.fill")
+                    .accessibilityHidden(true)
             }
-            .buttonStyle(FxPressStyle())
-            .disabled(isFindingNearest)
-            .accessibilityIdentifier("report.question.\(question.id).nearest")
-            if let nearestFailure {
-                Text(nearestFailure)
-                    .font(Fx.Font.footnote)
-                    .foregroundStyle(Fx.Color.ink2)
-                    .multilineTextAlignment(.leading)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+            .font(Fx.Font.callout.weight(.semibold))
+            .foregroundStyle(Fx.Color.sea)
+            .frame(maxWidth: .infinity, minHeight: Fx.minTarget, alignment: .leading)
+            .contentShape(.rect)
         }
+        .buttonStyle(FxPressStyle())
+        .disabled(isFindingNearest)
+        .accessibilityIdentifier("report.question.\(question.id).nearest")
     }
 
     private func findNearest() {
         guard !isFindingNearest else { return }
         nearestTaps += 1
-        nearestFailure = nil
+        withAnimation(reduceMotion ? nil : Fx.Motion.select) { nearestFailure = nil }
         isFindingNearest = true
         Task {
             defer { isFindingNearest = false }
@@ -369,12 +422,20 @@ struct QuestionField: View {
                 deviceFix = fix.coordinate
                 deviceFixIsExplicit = true
                 guard let nearest = question.locatedOptions(nearestTo: fix.coordinate).first else { return }
-                model.draft.answers[question.id] = [nearest.option.value]
-                nearestPick = nearest.option.value
-            } catch let failure as LocationProvider.Failure {
-                nearestFailure = Self.message(for: failure)
+                withAnimation(reduceMotion ? nil : Fx.Motion.select) {
+                    model.draft.answers[question.id] = [nearest.option.value]
+                    nearestPick = nearest.option.value
+                }
+                nearestFound += 1
+                let station = nearest.option.title.resolve(L10n.locale)
+                let note = Self.nearestNote(meters: nearest.meters, fromPhoto: false)
+                AccessibilityNotification.Announcement("\(station), \(note)").post()
             } catch {
-                nearestFailure = Self.message(for: .unavailable)
+                let failure = (error as? LocationProvider.Failure) ?? .unavailable
+                let message = Self.message(for: failure)
+                withAnimation(reduceMotion ? nil : Fx.Motion.select) { nearestFailure = message }
+                nearestFailed += 1
+                AccessibilityNotification.Announcement(message).post()
             }
         }
     }
@@ -403,8 +464,11 @@ struct QuestionField: View {
         guard values.isEmpty, let reference,
               let nearest = question.locatedOptions(nearestTo: reference.point).first,
               nearest.meters <= Self.autoFillMeters else { return }
-        model.draft.answers[question.id] = [nearest.option.value]
-        nearestPick = nearest.option.value
+        withAnimation(reduceMotion ? nil : Fx.Motion.select) {
+            model.draft.answers[question.id] = [nearest.option.value]
+            nearestPick = nearest.option.value
+            nearestFailure = nil
+        }
     }
 
     // MARK: Date and time

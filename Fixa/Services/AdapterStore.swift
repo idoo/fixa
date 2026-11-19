@@ -21,8 +21,6 @@ final class AdapterStore {
 
     /// The primary adapter (KSB).
     var spec: AdapterSpec? { spec(id: primaryID) }
-    /// The primary adapter's status.
-    var status: AdapterStatus { status(id: primaryID) }
 
     @ObservationIgnored let primaryID: String
     @ObservationIgnored private let bundled: [String: AdapterSpec]

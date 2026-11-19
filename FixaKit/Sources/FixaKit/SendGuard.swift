@@ -18,14 +18,23 @@ public enum SendGuard {
     /// At most `count` sends in any rolling `window`.
     public static let limits: [(count: Int, window: TimeInterval)] = [(5, 60 * 60), (15, 24 * 60 * 60)]
 
-    public static func check(_ draft: ReportDraft, history: [SentRecord], now: Date) -> Decision {
-        let duplicates = history.filter { record in
-            now.timeIntervalSince(record.date) < duplicateWindow
-                && record.tileID == draft.tileID
-                && samePlace(draft.coordinate, draft.locationText, record.coordinate, record.locationText)
-        }
-        if let latest = duplicates.max(by: { $0.date < $1.date }) {
-            return .duplicate(previous: latest.date, caseNumber: latest.caseNumber)
+    /// A repeat has the same tile, the same place (pin, place text, or for forms without a place the
+    /// answer naming it) and, when the earlier record has one, the same subject. `checksDuplicate: false`
+    /// checks the rate limit only.
+    public static func check(_ draft: ReportDraft, spec: AdapterSpec?, history: [SentRecord], now: Date,
+                             checksDuplicate: Bool = true) -> Decision {
+        if checksDuplicate {
+            let place = place(of: draft, spec: spec)
+            let subject = subject(of: draft, spec: spec)
+            let duplicates = history.filter { record in
+                now.timeIntervalSince(record.date) < duplicateWindow
+                    && record.tileID == draft.tileID
+                    && samePlace(draft.coordinate, place, record.coordinate, record.locationText)
+                    && (record.subject == nil || record.subject == subject)
+            }
+            if let latest = duplicates.max(by: { $0.date < $1.date }) {
+                return .duplicate(previous: latest.date, caseNumber: latest.caseNumber)
+            }
         }
 
         var retryAfter: Date?
@@ -37,6 +46,27 @@ public enum SendGuard {
             retryAfter = max(retryAfter ?? freed, freed)
         }
         return retryAfter.map { .tooMany(retryAfter: $0) } ?? .ok
+    }
+
+    /// `AdapterSpec.placeText(for:)`, or the trimmed place text without a spec.
+    static func place(of draft: ReportDraft, spec: AdapterSpec?) -> String {
+        spec?.placeText(for: draft) ?? draft.locationText.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    /// The draft's identifying answers as one normalized string: `choice`, `multiChoice` and `text`
+    /// answers of the questions it shows, the place question left out, sorted by question id. Nil
+    /// without a spec or without such answers, so reports without answers compare as before.
+    static func subject(of draft: ReportDraft, spec: AdapterSpec?) -> String? {
+        guard let spec else { return nil }
+        let kinds: Set<AdapterSpec.Question.Kind> = [.choice, .multiChoice, .text]
+        let parts = spec.visibleQuestions(tileID: draft.tileID)
+            .filter { kinds.contains($0.kind) && $0.id != spec.placeQuestion }
+            .sorted { $0.id < $1.id }
+            .compactMap { question -> String? in
+                let values = (draft.answers[question.id] ?? []).map(normalized).filter { !$0.isEmpty }.sorted()
+                return values.isEmpty ? nil : question.id + "=" + values.joined(separator: "|")
+            }
+        return parts.isEmpty ? nil : parts.joined(separator: ";")
     }
 
     /// Within `duplicateRadius` when both have a pin; otherwise the same place text.

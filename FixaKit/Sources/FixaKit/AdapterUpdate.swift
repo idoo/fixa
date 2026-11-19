@@ -134,6 +134,9 @@ extension AdapterSpec {
                 problems.append("upload on \(upload.pageID) depends on unknown question \(when.question)")
             }
         }
+        if let placeQuestion, question(id: placeQuestion) == nil {
+            problems.append("placeQuestion \(placeQuestion) is not a question")
+        }
         if let service {
             for language in ["sv", "en"]
             where (service.title.values[language] ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {

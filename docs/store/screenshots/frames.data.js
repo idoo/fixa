@@ -120,4 +120,31 @@ window.FRAMES = [
       scale: 0.93, radius: 40, rotate: 0,
     }],
   },
+  {
+    // 1.1: Home's "More forms" (recycling station, missed bin collection, invasive plants, abandoned
+    // car). Shown through the recycling-station report, the one with a station and "Find the nearest".
+    id: "06", screen: "recycling", purpose: "breadth: more of the kommun's e-services",
+    desire: "Report the other everyday things too, not only street faults.",
+    objection: "The app only does one kind of report.",
+    proof: "Recycling station report: 'What needs doing?' (Needs cleaning up / Needs emptying), 'Which station?' with Djurö, utanför ÅVC and Change, 'Find the nearest', then what needs cleaning up.",
+    evidence: [
+      "Fixa/App/AppModel.swift:33 More forms: every bundled adapter but the primary",
+      "Fixa/Screens/HomeScreen.swift:74 the More forms group on Home",
+      "Fixa/Screens/QuestionFields.swift:393 'Find the nearest' station",
+      "Fixa/App/LaunchOptions.swift:43 -FixaService se.varmdo.felater (capture.sh screen 'recycling')",
+      "captures/*/recycling.png",
+    ],
+    background: { from: "#F7F5F0", to: "#DDECEB", glow: "#C7E0DE" },
+    headline: { "sv": "Fler av kommunens formulär", "en-US": "More of the kommun's forms" },
+    subline: {
+      "sv": "Återvinningsstationer, missad sophämtning, invasiva växter och övergivna bilar.",
+      "en-US": "Recycling stations, missed bin collection, invasive plants and abandoned cars.",
+    },
+    // The station card, measured inside its outline: x 51..1268, y 1112..1333 (both captures).
+    pops: [{
+      src: "recycling",
+      crop: { "sv": { x: 51, y: 1112, w: 1218, h: 222 }, "en-US": { x: 51, y: 1112, w: 1218, h: 222 } },
+      scale: 0.93, radius: 40, rotate: 0,
+    }],
+  },
 ];

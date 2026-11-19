@@ -38,7 +38,7 @@ struct ReviewScreen: View {
                             message: String(localized: "This place is in \(other). Fixa only sends reports to Värmdö kommun.", bundle: L10n.bundle, locale: L10n.locale)
                         )
                     }
-                    if let pause = model.sendsPaused, model.submission.error == nil {
+                    if let pause = model.sendsPause(for: model.draft.adapterID), model.submission.error == nil {
                         FxBanner(
                             kind: .warning,
                             title: String(localized: "Fixa can't send right now", bundle: L10n.bundle, locale: L10n.locale),
@@ -118,6 +118,12 @@ struct ReviewScreen: View {
                 }
                 editableRow(row.title) {
                     value(row.text)
+                    if let translated = model.draft.translation?.answers?[row.id] {
+                        Text("Sent with a Swedish translation: \(translated)")
+                            .font(Fx.Font.footnote)
+                            .foregroundStyle(Fx.Color.ink)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
                 .accessibilityIdentifier("review.answer.\(row.id)")
             }
@@ -212,14 +218,18 @@ struct ReviewScreen: View {
     }
 
     /// Each answer the form gets, in the app's language: the tile's own answers first, then the
-    /// resident's in question order.
+    /// resident's in question order. A typed answer shows as typed; its Swedish translation, if
+    /// any, is the line under it.
     private var answerRows: [(id: String, title: String, text: String)] {
         let answers = spec.answers(for: model.draft)
         let visible = spec.visibleQuestions(tileID: model.draft.tileID)
         let visibleIDs = Set(visible.map(\.id))
         let fixed = (spec.questions ?? []).filter { !visibleIDs.contains($0.id) }
         return (fixed + visible).compactMap { question in
-            guard let values = answers[question.id], !values.isEmpty else { return nil }
+            guard var values = answers[question.id], !values.isEmpty else { return nil }
+            if model.draft.translation?.answers?[question.id] != nil, let typed = model.draft.answers[question.id] {
+                values = typed
+            }
             return (question.id, question.title.resolve(L10n.locale), QuestionAnswerText.text(question, values: values))
         }
     }
@@ -233,12 +243,15 @@ struct ReviewScreen: View {
             || spec.hasField(.phone) || spec.hasField(.email)
     }
 
-    /// Name, e-mail and phone the form gets without a reply choice.
+    /// Only what the form takes of name, e-mail and phone, as `WebFallback.text` sends it.
     private var contactSummary: String {
         let c = model.draft.contact
-        let name = [c.firstName, c.lastName].map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }.joined(separator: " ")
-        let email = c.email.isEmpty ? "" : c.email.ltrIsolated
-        let phone = c.phone.isEmpty ? "" : c.phone.ltrIsolated
+        let takesName = spec.hasField(.firstName) || spec.hasField(.lastName) || spec.hasField(.fullName)
+        let name = takesName
+            ? [c.firstName, c.lastName].map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }.joined(separator: " ")
+            : ""
+        let email = spec.hasField(.email) && !c.email.isEmpty ? c.email.ltrIsolated : ""
+        let phone = spec.hasField(.phone) && !c.phone.isEmpty ? c.phone.ltrIsolated : ""
         let lines = [name, email, phone].filter { !$0.isEmpty }
         return lines.isEmpty ? String(localized: "None given", bundle: L10n.bundle, locale: L10n.locale) : lines.joined(separator: "\n")
     }
@@ -319,26 +332,45 @@ struct ReviewScreen: View {
         return (text, source)
     }
 
-    /// What one translation session translates: the description's language decides; the place
-    /// goes along when it is in the same language. Nil when nothing needs translating.
-    private var translationPlan: (source: Locale.Language, description: String?, place: String?)? {
+    /// Typed free-text answers that need a translation, by question id. A suggestion chip's
+    /// Swedish value is left as is.
+    private var answersToTranslate: [(id: String, text: String, source: Locale.Language)] {
+        spec.visibleQuestions(tileID: model.draft.tileID).compactMap { question in
+            guard question.kind == .text || question.kind == .longText, question.translate == true,
+                  let text = model.draft.answers[question.id]?.first?.trimmingCharacters(in: .whitespacesAndNewlines),
+                  !text.isEmpty,
+                  !(question.suggestions ?? []).contains(where: { $0.value.caseInsensitiveCompare(text) == .orderedSame }),
+                  let source = nonSwedishLanguage(of: text, swedishLetters: true) else { return nil }
+            return (question.id, text, source)
+        }
+    }
+
+    /// What one translation session translates: the description's language decides, else the
+    /// place's, else the first answer's; the others go along when they are in the same language.
+    /// Nil when nothing needs translating.
+    private var translationPlan: (source: Locale.Language, description: String?, place: String?, answers: [String: String])? {
         let description = descriptionToTranslate
         let place = placeToTranslate
-        guard let source = description?.source ?? place?.source else { return nil }
-        return (source, description?.text, place?.source == source ? place?.text : nil)
+        let answers = answersToTranslate
+        guard let source = description?.source ?? place?.source ?? answers.first?.source else { return nil }
+        var sameLanguage: [String: String] = [:]
+        for answer in answers where answer.source == source {
+            sameLanguage[answer.id] = answer.text
+        }
+        return (source, description?.text, place?.source == source ? place?.text : nil, sameLanguage)
     }
 
     /// Starts an on-device translation into Swedish when the text needs one and has none yet.
     /// The Report screen clears `draft.translation` whenever the description changes; a typed
-    /// place is translated again each time, since it may have changed since.
+    /// place and the answers are translated again each time, since they may have changed since.
     private func prepareTranslation() {
         guard let plan = translationPlan else {
             model.draft.translation = nil
             translationState = .idle
             return
         }
-        if plan.place == nil, let existing = model.draft.translation,
-           existing.sourceLanguage == plan.source.languageCode?.identifier, existing.locationText == nil {
+        if plan.place == nil, plan.answers.isEmpty, let existing = model.draft.translation,
+           existing.sourceLanguage == plan.source.languageCode?.identifier, existing.locationText == nil, existing.answers == nil {
             return
         }
         model.draft.translation = nil
@@ -361,6 +393,10 @@ struct ReviewScreen: View {
         if let text = plan.place {
             requests.append(TranslationSession.Request(sourceText: text, clientIdentifier: "place"))
         }
+        // Answers go by question id, prefixed so a question named "place" can't collide.
+        for (id, text) in plan.answers {
+            requests.append(TranslationSession.Request(sourceText: text, clientIdentifier: "answer." + id))
+        }
         do {
             // The session belongs to this `.translationTask` call and is used only here, as in Apple's
             // samples; region isolation can't see that, so opt out for this one call.
@@ -368,7 +404,7 @@ struct ReviewScreen: View {
             let responses = try await session.translations(from: requests)
             // The resident may have gone back and changed the text, or already sent it.
             guard let current = translationPlan, current.description == plan.description, current.place == plan.place,
-                  !model.submission.isSending else { return }
+                  current.answers == plan.answers, !model.submission.isSending else { return }
             func swedish(_ id: String, original: String?) -> String? {
                 guard let original,
                       let text = responses.first(where: { $0.clientIdentifier == id })?.targetText.trimmingCharacters(in: .whitespacesAndNewlines),
@@ -377,9 +413,14 @@ struct ReviewScreen: View {
             }
             let description = swedish("description", original: plan.description)
             let place = swedish("place", original: plan.place)
-            if description != nil || place != nil {
+            var answers: [String: String] = [:]
+            for (id, text) in plan.answers {
+                answers[id] = swedish("answer." + id, original: text)
+            }
+            if description != nil || place != nil || !answers.isEmpty {
                 var translation = MachineTranslation(sourceLanguage: code, text: description ?? "")
                 translation.locationText = place
+                translation.answers = answers.isEmpty ? nil : answers
                 model.draft.translation = translation
             }
             translationState = .idle

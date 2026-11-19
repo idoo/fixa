@@ -36,9 +36,8 @@ targets:
         CFBundleLocalizations: [en, sv, cs, da, de, et, es, fr, it, lv, lt, hu, nl, nb, pl, pt, ro, fi, el, ru, uk, ar]
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
-        NSLocationWhenInUseUsageDescription: "Fixa uses your location to put the pin where the problem is: when you tap Use my current location, and on a new report once you have allowed it. Your position is only sent with a report you send."
+        NSLocationWhenInUseUsageDescription: "Fixa uses your location to put the pin where the problem is and to find the nearest recycling station: when you tap Use my current location or Find the nearest, and on a new report once you have allowed it. Your position leaves your phone only as the pin of a report you send."
         NSCameraUsageDescription: Fixa uses the camera so you can take a photo of the problem.
-        NSPhotoLibraryUsageDescription: Fixa lets you pick photos of the problem to attach to your report.
         LSApplicationQueriesSchemes: [mailto]
         UILaunchScreen: {}
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]

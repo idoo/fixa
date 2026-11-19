@@ -278,269 +278,133 @@
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "يستخدم Fixa موقعك لوضع الدبوس في مكان المشكلة: عند الضغط على «استخدم موقعي الحالي»، وفي البلاغ الجديد بعد أن تسمح بذلك. لا يُرسل موقعك إلا مع بلاغ ترسله أنت."
+            "value" : "يستخدم Fixa موقعك لوضع الدبوس في مكان المشكلة ولإيجاد أقرب محطة إعادة تدوير: عند الضغط على «استخدم موقعي الحالي» أو «ابحث عن الأقرب»، وفي البلاغ الجديد بعد أن تسمح بذلك. لا يغادر موقعك هاتفك إلا كدبوس في بلاغ ترسله أنت."
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa používá vaši polohu k umístění špendlíku na místo závady: když klepnete na Použít mou aktuální polohu, a u nového hlášení, jakmile polohu povolíte. Poloha se odešle jen s hlášením, které odešlete."
+            "value" : "Fixa používá vaši polohu k umístění špendlíku na místo závady a k nalezení nejbližšího sběrného místa: když klepnete na Použít mou aktuální polohu nebo Najít nejbližší, a u nového hlášení, jakmile polohu povolíte. Poloha opustí telefon jen jako špendlík hlášení, které odešlete."
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa bruger din placering til at sætte nålen, hvor problemet er: når du trykker på Brug min nuværende placering, og på en ny anmeldelse, når du har givet adgang. Placeringen sendes kun med en anmeldelse, du sender."
+            "value" : "Fixa bruger din placering til at sætte nålen, hvor problemet er, og til at finde den nærmeste genbrugsstation: når du trykker på Brug min nuværende placering eller Find den nærmeste, og på en ny anmeldelse, når du har givet adgang. Placeringen forlader kun telefonen som nålen i en anmeldelse, du sender."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa verwendet Ihren Standort, um die Stecknadel dort zu setzen, wo das Problem ist: wenn Sie auf „Aktuellen Standort verwenden“ tippen, und bei einer neuen Meldung, sobald Sie es erlaubt haben. Der Standort wird nur mit einer Meldung gesendet, die Sie absenden."
+            "value" : "Fixa verwendet Ihren Standort, um die Stecknadel dort zu setzen, wo das Problem ist, und um den nächsten Recyclinghof zu finden: wenn Sie auf „Aktuellen Standort verwenden“ oder „Nächste finden“ tippen, und bei einer neuen Meldung, sobald Sie es erlaubt haben. Der Standort verlässt Ihr Telefon nur als Stecknadel einer Meldung, die Sie absenden."
           }
         },
         "el" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Το Fixa χρησιμοποιεί την τοποθεσία σας για να βάλει την πινέζα εκεί που είναι το πρόβλημα: όταν πατάτε «Χρήση της τρέχουσας τοποθεσίας μου» και σε νέα αναφορά αφού το επιτρέψετε. Η θέση σας στέλνεται μόνο με αναφορά που στέλνετε εσείς."
+            "value" : "Το Fixa χρησιμοποιεί την τοποθεσία σας για να βάλει την πινέζα εκεί που είναι το πρόβλημα και για να βρει τον πλησιέστερο σταθμό ανακύκλωσης: όταν πατάτε «Χρήση της τρέχουσας τοποθεσίας μου» ή «Εύρεση του πλησιέστερου» και σε νέα αναφορά αφού το επιτρέψετε. Η θέση σας φεύγει από το τηλέφωνο μόνο ως πινέζα μιας αναφοράς που στέλνετε εσείς."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa uses your location to put the pin where the problem is: when you tap Use my current location, and on a new report once you have allowed it. Your position is only sent with a report you send."
+            "value" : "Fixa uses your location to put the pin where the problem is and to find the nearest recycling station: when you tap Use my current location or Find the nearest, and on a new report once you have allowed it. Your position leaves your phone only as the pin of a report you send."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa usa su ubicación para poner el marcador donde está el problema: cuando toca Usar mi ubicación actual y en un aviso nuevo una vez que lo ha permitido. Su posición solo se envía con un aviso que usted envíe."
+            "value" : "Fixa usa su ubicación para poner el marcador donde está el problema y para buscar el punto limpio más cercano: cuando toca Usar mi ubicación actual o Buscar el más cercano, y en un aviso nuevo una vez que lo ha permitido. Su posición solo sale del teléfono como el marcador de un aviso que usted envíe."
           }
         },
         "et" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa kasutab sinu asukohta, et panna nööpnõel probleemi kohale: kui puudutad nuppu Kasuta minu praegust asukohta ja uue teate puhul, kui oled selle lubanud. Asukoht saadetakse ainult koos teatega, mille sa saadad."
+            "value" : "Fixa kasutab sinu asukohta, et panna nööpnõel probleemi kohale ja leida lähim taaskasutuspunkt: kui puudutad nuppu Kasuta minu praegust asukohta või Leia lähim ja uue teate puhul, kui oled selle lubanud. Asukoht lahkub telefonist ainult sinu saadetava teate nööpnõelana."
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa käyttää sijaintiasi asettaakseen nuppineulan vian kohdalle: kun napautat Käytä nykyistä sijaintiani, ja uudessa ilmoituksessa, kun olet sallinut sen. Sijainti lähetetään vain lähettämäsi ilmoituksen mukana."
+            "value" : "Fixa käyttää sijaintiasi asettaakseen nuppineulan vian kohdalle ja löytääkseen lähimmän kierrätysaseman: kun napautat Käytä nykyistä sijaintiani tai Etsi lähin, ja uudessa ilmoituksessa, kun olet sallinut sen. Sijainti lähtee puhelimesta vain lähettämäsi ilmoituksen nuppineulana."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa utilise votre position pour placer l'épingle là où se trouve le problème : quand vous touchez Utiliser ma position actuelle, et sur un nouveau signalement une fois que vous l'avez autorisé. Votre position n'est envoyée qu'avec un signalement que vous envoyez."
+            "value" : "Fixa utilise votre position pour placer l'épingle là où se trouve le problème et pour trouver la déchèterie la plus proche : quand vous touchez Utiliser ma position actuelle ou Trouver le plus proche, et sur un nouveau signalement une fois que vous l'avez autorisé. Votre position ne quitte le téléphone que comme épingle d'un signalement que vous envoyez."
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A Fixa a helyzetét arra használja, hogy oda tegye a tűt, ahol a hiba van: amikor a Jelenlegi helyzetem gombra koppint, és új bejelentésnél, ha már engedélyezte. A helyzete csak az Ön által elküldött bejelentéssel megy el."
+            "value" : "A Fixa a helyzetét arra használja, hogy oda tegye a tűt, ahol a hiba van, és megtalálja a legközelebbi hulladékgyűjtő pontot: amikor a Jelenlegi helyzetem vagy A legközelebbi keresése gombra koppint, és új bejelentésnél, ha már engedélyezte. A helyzete csak az Ön által elküldött bejelentés tűjeként hagyja el a telefont."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa usa la tua posizione per mettere il segnaposto dove si trova il problema: quando tocchi Usa la mia posizione attuale e in una nuova segnalazione dopo che l'hai consentito. La posizione viene inviata solo con una segnalazione che invii tu."
+            "value" : "Fixa usa la tua posizione per mettere il segnaposto dove si trova il problema e per trovare l'isola ecologica più vicina: quando tocchi Usa la mia posizione attuale o Trova il più vicino e in una nuova segnalazione dopo che l'hai consentito. La posizione lascia il telefono solo come segnaposto di una segnalazione che invii tu."
           }
         },
         "lt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa naudoja jūsų vietą, kad padėtų smeigtuką ten, kur yra problema: kai paliečiate Naudoti mano dabartinę vietą, ir naujame pranešime, kai tai leidote. Vieta siunčiama tik su jūsų siunčiamu pranešimu."
+            "value" : "Fixa naudoja jūsų vietą, kad padėtų smeigtuką ten, kur yra problema, ir rastų artimiausią rūšiavimo aikštelę: kai paliečiate Naudoti mano dabartinę vietą arba Rasti artimiausią, ir naujame pranešime, kai tai leidote. Vieta palieka telefoną tik kaip jūsų siunčiamo pranešimo smeigtukas."
           }
         },
         "lv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa izmanto jūsu atrašanās vietu, lai novietotu adatu problēmas vietā: kad pieskaraties Izmantot manu pašreizējo atrašanās vietu, un jaunā ziņojumā, kad esat to atļāvis. Atrašanās vieta tiek nosūtīta tikai ar ziņojumu, ko nosūtāt."
+            "value" : "Fixa izmanto jūsu atrašanās vietu, lai novietotu adatu problēmas vietā un atrastu tuvāko šķirošanas laukumu: kad pieskaraties Izmantot manu pašreizējo atrašanās vietu vai Atrast tuvāko, un jaunā ziņojumā, kad esat to atļāvis. Atrašanās vieta atstāj tālruni tikai kā adata ziņojumā, ko nosūtāt."
           }
         },
         "nb" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa bruker posisjonen din til å sette nålen der problemet er: når du trykker på Bruk min posisjon, og på en ny melding når du har gitt tillatelse. Posisjonen sendes bare med en melding du sender."
+            "value" : "Fixa bruker posisjonen din til å sette nålen der problemet er og til å finne nærmeste gjenvinningsstasjon: når du trykker på Bruk min posisjon eller Finn den nærmeste, og på en ny melding når du har gitt tillatelse. Posisjonen forlater telefonen bare som nålen i en melding du sender."
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa gebruikt uw locatie om de speld te zetten waar het probleem is: als u op Gebruik mijn huidige locatie tikt, en bij een nieuwe melding zodra u het hebt toegestaan. Uw positie wordt alleen meegestuurd met een melding die u verstuurt."
+            "value" : "Fixa gebruikt uw locatie om de speld te zetten waar het probleem is en om het dichtstbijzijnde milieupark te vinden: als u op Gebruik mijn huidige locatie of Dichtstbijzijnde zoeken tikt, en bij een nieuwe melding zodra u het hebt toegestaan. Uw positie verlaat de telefoon alleen als speld van een melding die u verstuurt."
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa używa Twojej lokalizacji, by postawić pinezkę tam, gdzie jest usterka: gdy stukniesz Użyj mojej bieżącej lokalizacji, oraz w nowym zgłoszeniu, gdy już na to pozwolisz. Pozycja jest wysyłana tylko ze zgłoszeniem, które wyślesz."
+            "value" : "Fixa używa Twojej lokalizacji, by postawić pinezkę tam, gdzie jest usterka, i znaleźć najbliższy punkt recyklingu: gdy stukniesz Użyj mojej bieżącej lokalizacji lub Znajdź najbliższy, oraz w nowym zgłoszeniu, gdy już na to pozwolisz. Pozycja opuszcza telefon tylko jako pinezka zgłoszenia, które wyślesz."
           }
         },
         "pt" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A Fixa usa a sua localização para pôr o pino onde está o problema: quando toca em Usar a minha localização atual e numa nova participação depois de o permitir. A posição só é enviada com uma participação que envie."
+            "value" : "A Fixa usa a sua localização para pôr o pino onde está o problema e para encontrar o ecocentro mais próximo: quando toca em Usar a minha localização atual ou Encontrar o mais próximo e numa nova participação depois de o permitir. A posição só sai do telefone como o pino de uma participação que envie."
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa folosește locația dvs. pentru a pune pinul unde este problema: când atingeți Folosiți locația mea actuală și la o sesizare nouă, după ce ați permis. Poziția se trimite doar cu o sesizare pe care o trimiteți."
+            "value" : "Fixa folosește locația dvs. pentru a pune pinul unde este problema și pentru a găsi cel mai apropiat centru de reciclare: când atingeți Folosiți locația mea actuală sau Găsește cel mai apropiat și la o sesizare nouă, după ce ați permis. Poziția părăsește telefonul doar ca pinul unei sesizări pe care o trimiteți."
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa использует вашу геопозицию, чтобы поставить метку там, где проблема: когда вы нажимаете «Использовать мою геопозицию», а также в новой заявке, если доступ уже разрешён. Геопозиция отправляется только с заявкой, которую вы отправите."
+            "value" : "Fixa использует вашу геопозицию, чтобы поставить метку там, где проблема, и найти ближайший пункт приёма вторсырья: когда вы нажимаете «Использовать мою геопозицию» или «Найти ближайший», а также в новой заявке, если доступ уже разрешён. Геопозиция покидает телефон только как метка заявки, которую вы отправите."
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa använder din plats för att sätta nålen där felet är: när du trycker på Använd min nuvarande plats, och på en ny anmälan när du har gett lov. Positionen skickas bara med en anmälan du skickar."
+            "value" : "Fixa använder din plats för att sätta nålen där felet är och för att hitta närmaste återvinningsstation: när du trycker på Använd min nuvarande plats eller Hitta närmaste, och på en ny anmälan när du har gett lov. Positionen lämnar telefonen bara som nålen i en anmälan du skickar."
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fixa використовує ваше місцезнаходження, щоб поставити мітку там, де проблема: коли ви натискаєте «Використати моє поточне місцезнаходження», а також у новому зверненні, якщо доступ уже дозволено. Місцезнаходження надсилається лише зі зверненням, яке ви надішлете."
-          }
-        }
-      }
-    },
-    "NSPhotoLibraryUsageDescription" : {
-      "localizations" : {
-        "ar" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "يتيح لك Fixa اختيار صور للمشكلة لإرفاقها ببلاغك."
-          }
-        },
-        "cs" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ve Fixe můžete vybrat fotky problému a přiložit je k hlášení."
-          }
-        },
-        "da" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Med Fixa kan du vælge billeder af problemet og vedhæfte dem din anmeldelse."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mit Fixa können Sie Fotos vom Problem auswählen und Ihrer Meldung beifügen."
-          }
-        },
-        "el" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Με το Fixa μπορείτε να επιλέξετε φωτογραφίες του προβλήματος και να τις επισυνάψετε στην αναφορά σας."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa lets you pick photos of the problem to attach to your report."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa te permite elegir fotos del problema para adjuntarlas a tu aviso."
-          }
-        },
-        "et" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa abil saate valida probleemi fotod ja lisada need teatele."
-          }
-        },
-        "fi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixalla voit valita kuvia ongelmasta ja liittää ne ilmoitukseen."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa vous permet de choisir des photos du problème à joindre à votre signalement."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A Fixával fényképeket választhat a problémáról, és csatolhatja őket a bejelentéshez."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Con Fixa puoi scegliere foto del problema da allegare alla segnalazione."
-          }
-        },
-        "lt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa leidžia pasirinkti problemos nuotraukas ir pridėti jas prie pranešimo."
-          }
-        },
-        "lv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fixa ļauj izvēlēties problēmas fotoattēlus, ko pievienot ziņojumam."
-          }
-        },
-        "nb" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Med Fixa kan du velge bilder av problemet og legge dem ved meldingen."
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Met Fixa kun je foto's van het probleem kiezen en aan je melding toevoegen."
-          }
-        },
-        "pl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "W aplikacji Fixa możesz wybrać zdjęcia problemu i dołączyć je do zgłoszenia."
-          }
-        },
-        "pt" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A Fixa permite-lhe escolher fotografias do problema para anexar à sua participação."
-          }
-        },
-        "ro" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cu Fixa puteți alege fotografii ale problemei pe care să le atașați la sesizare."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "В Fixa можно выбрать фото проблемы и прикрепить их к заявке."
-          }
-        },
-        "sv" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Med Fixa kan du välja bilder på problemet och bifoga dem i anmälan."
-          }
-        },
-        "uk" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "У Fixa можна вибрати фото проблеми й додати їх до звернення."
+            "value" : "Fixa використовує ваше місцезнаходження, щоб поставити мітку там, де проблема, і знайти найближчий пункт приймання вторсировини: коли ви натискаєте «Використати моє поточне місцезнаходження» або «Знайти найближчий», а також у новому зверненні, якщо доступ уже дозволено. Місцезнаходження залишає телефон лише як мітка звернення, яке ви надішлете."
           }
         }
       }

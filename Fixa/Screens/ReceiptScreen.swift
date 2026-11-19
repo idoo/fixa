@@ -143,8 +143,9 @@ struct ReceiptScreen: View {
                     kommunReceipt(sent.kommunMessage)
                     yourReport(sent)
                     KommunCaseContact(spec: spec, caseNumber: sent.caseNumber)
-                    // The kommun's e-mail reply arrives outside Fixa, still in Swedish.
-                    if model.draft.wantsFeedback, locale.language.languageCode != .swedish {
+                    // The kommun's e-mail reply arrives outside Fixa, still in Swedish; only forms that
+                    // take an e-mail can get one.
+                    if takesReply, locale.language.languageCode != .swedish {
                         Text("The reply will be in Swedish. You can open it in Translate.")
                             .font(Fx.Font.callout)
                             .foregroundStyle(Fx.Color.ink2)
@@ -155,6 +156,13 @@ struct ReceiptScreen: View {
                 }
             }
         }
+    }
+
+    /// The resident asked for a reply and the form takes an e-mail to send it to.
+    private var takesReply: Bool {
+        model.draft.wantsFeedback
+            && (spec.hasField(.feedback) || spec.hasField(.email))
+            && !model.draft.contact.email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 }
 

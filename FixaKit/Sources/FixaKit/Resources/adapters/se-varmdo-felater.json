@@ -2,6 +2,7 @@
   "specVersion": 1,
   "minAppBuild": 13,
   "id": "se.varmdo.felater",
+  "placeQuestion": "station",
   "service": {
     "title": {
       "sv": "Återvinningsstation",

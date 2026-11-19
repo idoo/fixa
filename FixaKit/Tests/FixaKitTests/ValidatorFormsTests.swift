@@ -18,11 +18,12 @@ enum FormsFixtures {
     }
 
     static func question(_ id: String, _ kind: String, _ sv: String, required: Bool = true, options: [String]? = nil,
-                         suggestions: [String]? = nil, maxLength: Int? = nil) -> [String: Any] {
+                         suggestions: [String]? = nil, maxLength: Int? = nil, translate: Bool = false) -> [String: Any] {
         var q: [String: Any] = ["id": id, "kind": kind, "title": text(sv, id), "required": required]
         if let options { q["options"] = options.map { option($0) } }
         if let suggestions { q["suggestions"] = suggestions.map { option($0) } }
         if let maxLength { q["maxLength"] = maxLength }
+        if translate { q["translate"] = true }
         return q
     }
 
@@ -136,7 +137,7 @@ enum FormsFixtures {
             ]]],
             uploads: [["pageID": "Uppgifterombilen", "kind": "formFile", "key": "VKSKROTBIL_10", "control": "fileUploadControl"]],
             questions: [
-                question("vehicleType", "text", "Typ av fordon", suggestions: ["Personbil", "Husvagn"]),
+                question("vehicleType", "text", "Typ av fordon", suggestions: ["Personbil", "Husvagn"], maxLength: 30, translate: true),
                 question("registration", "text", "Registreringsnummer", suggestions: ["Saknas"], maxLength: 20),
             ],
             tiles: [["id": "t-car", "questionIDs": ["vehicleType", "registration"]]],

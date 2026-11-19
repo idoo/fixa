@@ -54,15 +54,18 @@ public struct Contact: Codable, Sendable, Equatable {
 public struct MachineTranslation: Codable, Sendable, Equatable {
     /// BCP-47 code of the original text, e.g. `uk`, `ar`.
     public var sourceLanguage: String
-    /// Swedish machine translation of `ReportDraft.description`.
+    /// Swedish machine translation of `ReportDraft.description`; empty when only other text was translated.
     public var text: String
     /// Swedish machine translation of `ReportDraft.locationText`, if the place was written in another language.
     public var locationText: String?
+    /// Swedish machine translations of free-text answers, by question id. Absent in older drafts.
+    public var answers: [String: String]?
 
-    public init(sourceLanguage: String, text: String, locationText: String? = nil) {
+    public init(sourceLanguage: String, text: String, locationText: String? = nil, answers: [String: String]? = nil) {
         self.sourceLanguage = sourceLanguage
         self.text = text
         self.locationText = locationText
+        self.answers = answers
     }
 }
 
@@ -160,20 +163,28 @@ public struct SentRecord: Codable, Sendable, Equatable {
     public var date: Date
     public var tileID: String?
     public var coordinate: Coordinate?
+    /// Where the report was for: the place text, or for forms without one the answer that names the
+    /// place (`AdapterSpec.placeText(for:)`).
     public var locationText: String
     /// The municipality's case number from the receipt, if one was read.
     public var caseNumber: String?
+    /// What the report was about beyond its tile: the draft's identifying answers (`SendGuard.subject`).
+    /// Nil for drafts without answers and for records saved before it existed.
+    public var subject: String?
 
-    public init(date: Date, tileID: String?, coordinate: Coordinate?, locationText: String, caseNumber: String? = nil) {
+    public init(date: Date, tileID: String?, coordinate: Coordinate?, locationText: String, caseNumber: String? = nil, subject: String? = nil) {
         self.date = date
         self.tileID = tileID
         self.coordinate = coordinate
         self.locationText = locationText
         self.caseNumber = caseNumber
+        self.subject = subject
     }
 
-    public init(_ draft: ReportDraft, date: Date, caseNumber: String? = nil) {
-        self.init(date: date, tileID: draft.tileID, coordinate: draft.coordinate, locationText: draft.locationText, caseNumber: caseNumber)
+    public init(_ draft: ReportDraft, spec: AdapterSpec?, date: Date, caseNumber: String? = nil) {
+        self.init(date: date, tileID: draft.tileID, coordinate: draft.coordinate,
+                  locationText: SendGuard.place(of: draft, spec: spec), caseNumber: caseNumber,
+                  subject: SendGuard.subject(of: draft, spec: spec))
     }
 }
 
@@ -248,17 +259,18 @@ public enum ReportValidator {
             issues.append(.init(field: .photo, code: .missing))
         }
 
+        // Format checks only for what the form takes: a profile address the form never gets can't block it.
         let email = d.contact.email.trimmingCharacters(in: .whitespacesAndNewlines)
         if email.isEmpty {
             if (d.wantsFeedback && rules.emailRequiredWhenFeedback) || (rules.emailRequired == true && spec.hasField(.email)) {
                 issues.append(.init(field: .email, code: .missing))
             }
-        } else if !isEmail(email) {
+        } else if spec.hasField(.email) && !isEmail(email) {
             issues.append(.init(field: .email, code: .invalidFormat))
         }
 
         let phone = d.contact.phone.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !phone.isEmpty && !isPhone(phone) {
+        if spec.hasField(.phone) && !phone.isEmpty && !isPhone(phone) {
             issues.append(.init(field: .phone, code: .invalidFormat))
         }
 

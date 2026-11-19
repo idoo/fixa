@@ -32,6 +32,9 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
     /// narrower ("Where exactly did you see it?", "Anything else?"); absent: Fixa's own wording.
     public let descriptionTitle: LocalizedText?
     public let descriptionPrompt: LocalizedText?
+    /// For forms without a place field: the question whose answer says where the report is for
+    /// (a recycling station, a pick-up address). Used in Sent reports and by `SendGuard`.
+    public let placeQuestion: String?
 
     public struct Municipality: Codable, Sendable {
         public let name: String
@@ -192,6 +195,9 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
         public let suggestions: [QuestionOption]?
         /// `text`, `longText`: longest answer the form takes.
         public let maxLength: Int?
+        /// `text`, `longText`: a typed answer in another language goes with a Swedish machine
+        /// translation. Off unless set: codes and names (number plates, makes, addresses) stay as typed.
+        public var translate: Bool? = nil
     }
 
     public struct QuestionOption: Codable, Sendable, Hashable, Identifiable {
@@ -342,19 +348,43 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
     }
 
     /// What the form receives per question: the draft's answers of visible questions with empty
-    /// strings dropped, overlaid by the tile's fixed answers.
+    /// strings dropped, overlaid by the tile's fixed answers. A free-text answer of a `translate`
+    /// question with a Swedish machine translation (`MachineTranslation.answers`) goes as
+    /// `"<Swedish> (<original>)"`, or as typed when that would pass the question's `maxLength`.
     public func answers(for draft: ReportDraft) -> [String: [String]] {
         var result: [String: [String]] = [:]
         for question in visibleQuestions(tileID: draft.tileID) {
             let values = (draft.answers[question.id] ?? [])
                 .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
                 .filter { !$0.isEmpty }
-            if !values.isEmpty { result[question.id] = values }
+            guard !values.isEmpty else { continue }
+            let original = values.joined(separator: ", ")
+            if question.kind == .text || question.kind == .longText, question.translate == true,
+               let swedish = draft.translation?.answers?[question.id]?.trimmingCharacters(in: .whitespacesAndNewlines),
+               !swedish.isEmpty, swedish != original {
+                let combined = "\(swedish) (\(original))"
+                result[question.id] = combined.count <= (question.maxLength ?? .max) ? [combined] : values
+            } else {
+                result[question.id] = values
+            }
         }
         for (id, values) in tile(id: draft.tileID)?.answers ?? [:] {
             result[id] = values
         }
         return result
+    }
+}
+
+extension AdapterSpec {
+    /// Where the report is for, in Swedish: the draft's place text, else the answer to `placeQuestion`
+    /// (a choice option's value, a text answer as typed), else "".
+    public func placeText(for draft: ReportDraft) -> String {
+        let typed = draft.locationText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard typed.isEmpty, let id = placeQuestion else { return typed }
+        let values = (tile(id: draft.tileID)?.answers?[id] ?? draft.answers[id] ?? [])
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        return values.joined(separator: ", ")
     }
 }
 

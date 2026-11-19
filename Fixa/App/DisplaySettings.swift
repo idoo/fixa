@@ -110,11 +110,10 @@ enum AppLanguage: String, CaseIterable, Identifiable, Sendable {
         return name.capitalized(with: locale)
     }
 
-    /// The first of the iPhone's preferred languages that Fixa ships, else English. Reads the
-    /// iPhone-wide list, not this app's `AppleLanguages` that the Language page writes.
+    /// The first of the iPhone's preferred languages that Fixa ships, else English: the list `L10n`
+    /// saved while the app had no `AppleLanguages` of its own, else `Locale.preferredLanguages`.
     nonisolated static var system: AppLanguage {
-        let device = UserDefaults.standard.persistentDomain(forName: UserDefaults.globalDomain)?["AppleLanguages"] as? [String]
-        for identifier in device ?? Locale.preferredLanguages {
+        for identifier in UserDefaults.standard.stringArray(forKey: L10n.deviceLanguagesKey) ?? Locale.preferredLanguages {
             if let code = Locale(identifier: identifier).language.languageCode?.identifier,
                let language = AppLanguage(rawValue: code) {
                 return language

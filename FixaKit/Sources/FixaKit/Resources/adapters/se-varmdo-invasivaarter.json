@@ -260,6 +260,7 @@
     {
       "id": "species",
       "kind": "text",
+      "translate": true,
       "title": {
         "en": "Which plant?",
         "sv": "Vilken växt?",

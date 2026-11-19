@@ -39,8 +39,11 @@ final class AppModel {
     func spec(forAdapterID id: String?) -> AdapterSpec? {
         spec(id: id) ?? spec
     }
-    /// What Home shows about the municipality's e-service; `-FixaStatus` forces one for screenshots.
-    var adapterStatus: AdapterStatus { options.status ?? adapters.status }
+    /// What the e-service of `adapterID` (nil: the primary) says in the status file; `-FixaStatus`
+    /// forces one for every form, for screenshots.
+    func adapterStatus(for adapterID: String?) -> AdapterStatus {
+        options.status ?? adapters.status(id: adapterID ?? adapters.primaryID)
+    }
     let options: LaunchOptions
     let history: HistoryStore
     let submission = SubmissionService()
@@ -80,13 +83,21 @@ final class AppModel {
     }
 
     /// Why Fixa sends nothing on its own right now: the e-service refused Fixa (401/403), asked
-    /// for a login, or the status file says it is down. Saved (UserDefaults `fixa.sendsPaused`);
+    /// for a login, or the status file says it is down. Saved (UserDefaults `fixa.sendsPauses`);
     /// cleared by a send the user started that goes through, or by the status file saying ok.
     enum SendsPause: String, Codable, Sendable {
         case blocked, loginRequired, serviceDown
     }
 
-    private(set) var sendsPaused: SendsPause?
+    /// Pauses by adapter id. `.blocked` (a 403 from the host every form shares) is kept under
+    /// `Self.everyForm` and stops all of them; a login or a down status stops only that form.
+    private var sendsPauses: [String: SendsPause] = [:]
+    private static let everyForm = "*"
+
+    /// The pause that holds reports of `adapterID` (nil: the primary form), if any.
+    func sendsPause(for adapterID: String?) -> SendsPause? {
+        sendsPauses[Self.everyForm] ?? sendsPauses[adapterID ?? adapters.primaryID]
+    }
     /// The other kommun the pin is in (reverse geocoding, else the adapter's box); nil when the
     /// pin is inside, unknown or missing. Review is not allowed while it is set.
     private(set) var outsideMunicipalityName: String?
@@ -194,7 +205,9 @@ final class AppModel {
     private static let contactKey = "fixa.contact"
     private static let rememberKey = "fixa.rememberDetails"
     private static let onboardedKey = "fixa.onboarded"
-    private static let sendsPausedKey = "fixa.sendsPaused"
+    private static let sendsPausesKey = "fixa.sendsPauses"
+    /// 1.0 and 1.1 betas kept one pause for every form under this key.
+    private static let legacySendsPausedKey = "fixa.sendsPaused"
 
     init(options: LaunchOptions = .current) {
         self.options = options
@@ -221,7 +234,7 @@ final class AppModel {
         draftStorage = ReportDraft(adapterID: adapters.spec?.id ?? Self.adapterID)
         draftStorage = freshDraft()
         if persists {
-            sendsPaused = UserDefaults.standard.string(forKey: Self.sendsPausedKey).flatMap(SendsPause.init(rawValue:))
+            sendsPauses = loadSendsPauses()
             loadGuardRecords()
             // Before the draft comes back: a draft whose send was cut off must not reopen.
             settleInterruptedSends()
@@ -266,7 +279,7 @@ final class AppModel {
     /// draft for that adapter; an unsent one with content is not dropped without asking (`pendingStart`).
     func startReport(tile: AdapterSpec.Tile, in spec: AdapterSpec) {
         if draftStorage.adapterID != spec.id {
-            guard !submission.isSending, !isSendingDraft else { return }
+            guard canStartForm(adapterID: spec.id) else { return }
             if draftHasContent {
                 pendingStart = PendingStart(tile: tile, adapterID: spec.id)
                 return
@@ -295,10 +308,16 @@ final class AppModel {
         startReport(tile: tile, in: spec)
     }
 
+    /// False while the user's own send runs and `adapterID` is another form than the draft's:
+    /// switching would replace the report being sent. Home disables those rows meanwhile.
+    func canStartForm(adapterID: String) -> Bool {
+        draftStorage.adapterID == adapterID || (!submission.isSending && !isSendingDraft)
+    }
+
     /// "Delete & start": drops the unsent report and starts the one that was asked for.
     func confirmPendingStart(_ pending: PendingStart) {
         pendingStart = nil
-        guard let spec = adapters.spec(id: pending.adapterID), !submission.isSending, !isSendingDraft else { return }
+        guard let spec = adapters.spec(id: pending.adapterID), canStartForm(adapterID: spec.id) else { return }
         switchDraft(to: spec.id)
         startReport(tile: pending.tile, in: spec)
     }
@@ -428,7 +447,7 @@ final class AppModel {
         }
         sent = result
         if !result.isDryRun {
-            setSendsPaused(nil)
+            clearSendsPause(for: report.adapterID)
             recordSend(report, date: result.date, caseNumber: result.caseNumber)
             outbox.remove([id])
             var item = historyItem(id: id, from: report, date: result.date, caseNumber: result.caseNumber, status: .sent)
@@ -449,7 +468,7 @@ final class AppModel {
     /// outbox (with its photo and reply details) and Sent reports, and the receipt explains what next.
     /// `id` is the outbox entry the final-step mark may already have written.
     private func keepUnconfirmed(_ report: ReportDraft, id: UUID, after error: SubmissionError) {
-        pauseIfRefused(error)
+        pauseIfRefused(error, adapterID: report.adapterID)
         let status: HistoryItem.Status
         if error.isRetrySafe {
             status = .waiting
@@ -501,12 +520,19 @@ final class AppModel {
         path = []
     }
 
-    /// A new report: replies default to on when the profile already has a usable e-mail.
+    /// A new report: replies default to on when the profile already has a usable e-mail and the
+    /// form takes one.
     private func freshDraft(adapterID: String? = nil) -> ReportDraft {
         var fresh = ReportDraft(adapterID: adapterID ?? spec?.id ?? Self.adapterID)
-        fresh.wantsFeedback = profileHasEmail
+        fresh.wantsFeedback = profileHasEmail && takesReply(fresh.adapterID)
         fresh.contact = carriesContact(fresh) ? profileStorage : Contact()
         return fresh
+    }
+
+    /// The form of `adapterID` posts an e-mail or a reply choice, so the kommun can answer.
+    private func takesReply(_ adapterID: String?) -> Bool {
+        guard let spec = spec(forAdapterID: adapterID) else { return false }
+        return spec.hasField(.feedback) || spec.hasField(.email)
     }
 
     // MARK: Onboarding
@@ -812,7 +838,7 @@ final class AppModel {
             date: date,
             tileID: report.tileID,
             description: report.description,
-            locationText: report.locationText,
+            locationText: spec(forAdapterID: report.adapterID)?.placeText(for: report) ?? report.locationText,
             latitude: report.coordinate?.latitude,
             longitude: report.coordinate?.longitude,
             caseNumber: caseNumber,
@@ -871,8 +897,7 @@ final class AppModel {
 
     /// A send whose final step went out: a receipt, or no answer (may have been sent).
     private func recordSend(_ draft: ReportDraft, date: Date, caseNumber: String?) {
-        var record = SentRecord(draft, date: date)
-        record.caseNumber = caseNumber
+        let record = SentRecord(draft, spec: spec(forAdapterID: draft.adapterID), date: date, caseNumber: caseNumber)
         guardRecords = sentRecords + [record]
         saveGuardRecords()
     }
@@ -907,14 +932,9 @@ final class AppModel {
     }
 
     /// `checksDuplicate: false` is for a send the user already confirmed (an outbox retry, "Send
-    /// anyway"): without a place it matches no earlier report, so only the rate limit can answer.
+    /// anyway"): only the rate limit can answer.
     private func sendGuardDecision(for draft: ReportDraft, checksDuplicate: Bool) -> SendGuard.Decision {
-        var probe = draft
-        if !checksDuplicate {
-            probe.coordinate = nil
-            probe.locationText = ""
-        }
-        return SendGuard.check(probe, history: sentRecords, now: .now)
+        SendGuard.check(draft, spec: spec(forAdapterID: draft.adapterID), history: sentRecords, now: .now, checksDuplicate: checksDuplicate)
     }
 
     /// For Home: reports Fixa still sends on its own, or that stopped and need the user.
@@ -931,9 +951,10 @@ final class AppModel {
                 message: String(localized: "Fixa couldn't send a report. Open Sent reports to try again.", bundle: L10n.bundle, locale: L10n.locale)
             )
         }
-        guard history.items.contains(where: { $0.status == .waiting }) else { return nil }
+        let waiting = history.items.filter { $0.status == .waiting }
+        guard !waiting.isEmpty else { return nil }
         let message: String
-        if sendsPaused != nil {
+        if waiting.contains(where: { sendsPause(for: $0.adapterID) != nil }) {
             message = String(localized: "Your report is saved on this phone. Fixa isn't sending on its own right now. Open Sent reports to use the kommun's website instead.", bundle: L10n.bundle, locale: L10n.locale)
         } else if isOnline {
             message = String(localized: "Your report is saved on this phone. Fixa tries again in a little while, also in the background.", bundle: L10n.bundle, locale: L10n.locale)
@@ -968,9 +989,11 @@ final class AppModel {
         KommunWeb.open(spec.webFormURL, spec: spec)
     }
 
-    /// Whether a waiting or unconfirmed report asked for a reply by e-mail (and so gets a confirmation).
+    /// Whether a waiting or unconfirmed report asked for a reply by e-mail (and so gets a confirmation);
+    /// never for a form that takes no e-mail.
     func wantsReply(_ id: UUID) -> Bool {
-        outbox.item(id: id)?.draft.wantsFeedback ?? false
+        guard let draft = outbox.item(id: id)?.draft else { return false }
+        return draft.wantsFeedback && takesReply(draft.adapterID)
     }
 
     /// The e-service asked Fixa to wait until then; not even "Try again" sends this report sooner.
@@ -1067,9 +1090,9 @@ final class AppModel {
     }
 
     /// Reports Fixa may try on its own now: not held, not mid-send, tries left, back-off and
-    /// `Retry-After` passed. None while sends are paused.
+    /// `Retry-After` passed. None while its form's sends are paused.
     private func isDue(_ item: PendingReport, at now: Date) -> Bool {
-        sendsPaused == nil && !item.held && item.finalSendAt == nil
+        sendsPause(for: item.draft.adapterID) == nil && !item.held && item.finalSendAt == nil
             && item.attempts < Self.maxAutomaticAttempts && item.nextAttemptAt <= now
             && (item.serverRetryAfter ?? .distantPast) <= now
     }
@@ -1127,7 +1150,7 @@ final class AppModel {
         }
         if let result {
             if !automatic {
-                setSendsPaused(nil)
+                clearSendsPause(for: report.adapterID)
             }
             recordSend(report, date: result.date, caseNumber: result.caseNumber)
             outbox.remove([id])
@@ -1136,7 +1159,7 @@ final class AppModel {
         }
         // Cancelled before the final step: nothing is known, so nothing changes.
         guard let error = service.error ?? interruptedAfterFinalSend(id) else { return }
-        pauseIfRefused(error)
+        pauseIfRefused(error, adapterID: report.adapterID)
         let now = Date.now
         // `item` predates the final-step mark, so writing it back clears the mark.
         item.finalSendAt = nil
@@ -1215,52 +1238,84 @@ final class AppModel {
 
     // MARK: Paused sends
 
-    private func setSendsPaused(_ pause: SendsPause?) {
-        guard pause != sendsPaused else { return }
-        sendsPaused = pause
-        if persists {
-            if let pause {
-                UserDefaults.standard.set(pause.rawValue, forKey: Self.sendsPausedKey)
-            } else {
-                UserDefaults.standard.removeObject(forKey: Self.sendsPausedKey)
-            }
-        }
+    /// Sets or lifts the pause of one form; `.blocked` goes to every form.
+    private func setSendsPause(_ pause: SendsPause?, for adapterID: String) {
+        let key = pause == .blocked ? Self.everyForm : adapterID
+        guard sendsPauses[key] != pause else { return }
+        sendsPauses[key] = pause
+        saveSendsPauses()
         scheduleRetry()
     }
 
-    /// The e-service refused Fixa or asked for a login: nothing more goes out on its own.
-    private func pauseIfRefused(_ error: SubmissionError) {
+    /// A send of `adapterID` the user started went through: lifts that form's pause and a host-wide block.
+    private func clearSendsPause(for adapterID: String) {
+        guard sendsPauses[adapterID] != nil || sendsPauses[Self.everyForm] != nil else { return }
+        sendsPauses[adapterID] = nil
+        sendsPauses[Self.everyForm] = nil
+        saveSendsPauses()
+        scheduleRetry()
+    }
+
+    private func saveSendsPauses() {
+        guard persists else { return }
+        if sendsPauses.isEmpty {
+            UserDefaults.standard.removeObject(forKey: Self.sendsPausesKey)
+        } else {
+            UserDefaults.standard.set(sendsPauses.mapValues(\.rawValue), forKey: Self.sendsPausesKey)
+        }
+    }
+
+    /// Saved pauses. The single pause of earlier builds stays for every form, as it worked there
+    /// (builds 13-14 set it from any form), except "down", which was the primary's status file.
+    private func loadSendsPauses() -> [String: SendsPause] {
+        let defaults = UserDefaults.standard
+        var pauses = (defaults.dictionary(forKey: Self.sendsPausesKey) as? [String: String] ?? [:])
+            .compactMapValues(SendsPause.init(rawValue:))
+        if let legacy = defaults.string(forKey: Self.legacySendsPausedKey).flatMap(SendsPause.init(rawValue:)) {
+            pauses[legacy == .serviceDown ? adapters.primaryID : Self.everyForm] = legacy
+            defaults.removeObject(forKey: Self.legacySendsPausedKey)
+            defaults.set(pauses.mapValues(\.rawValue), forKey: Self.sendsPausesKey)
+        }
+        return pauses
+    }
+
+    /// The e-service refused Fixa or asked for a login: nothing more goes out on its own, for
+    /// every form (refused by the host) or for this one (login).
+    private func pauseIfRefused(_ error: SubmissionError, adapterID: String) {
         switch error {
-        case .blocked: setSendsPaused(.blocked)
-        case .loginRequired: setSendsPaused(.loginRequired)
+        case .blocked: setSendsPause(.blocked, for: adapterID)
+        case .loginRequired: setSendsPause(.loginRequired, for: adapterID)
         default: break
         }
     }
 
-    /// The status file says down: pause. Back to ok: lifts a pause it caused, and any pause when
-    /// it was down before (the e-service is back for everyone).
-    private func syncSendsPauseWithStatus(previous: AdapterStatus.State? = nil) {
+    /// Per form: the status file says down: pause. Back to ok: lifts a pause it caused, and any
+    /// pause of that form when it was down before (the e-service is back for everyone).
+    private func syncSendsPauseWithStatus(previous: [String: AdapterStatus.State] = [:]) {
         guard persists else { return }
-        let state = adapters.status.state
-        if state == .down {
-            if sendsPaused == nil { setSendsPaused(.serviceDown) }
-        } else if sendsPaused == .serviceDown || previous == .down {
-            setSendsPaused(nil)
+        for id in adapters.specs.map(\.id) {
+            let state = adapters.status(id: id).state
+            if state == .down {
+                if sendsPauses[id] == nil { setSendsPause(.serviceDown, for: id) }
+            } else if sendsPauses[id] == .serviceDown || (previous[id] == .down && sendsPauses[id] != nil) {
+                setSendsPause(nil, for: id)
+            }
         }
     }
 
-    /// `AdapterStore.refreshAfterFormChange(adapterID:)` plus the status it may bring along.
+    /// `AdapterStore.refreshAfterFormChange(adapterID:)` plus the status file it may bring along,
+    /// which can change any form's state.
     private func refreshAdapterAfterFormChange(adapterID: String) async -> Bool {
-        let previous = adapters.status.state
+        let previous = Dictionary(adapters.specs.map { ($0.id, adapters.status(id: $0.id).state) }, uniquingKeysWith: { first, _ in first })
         let changed = await adapters.refreshAfterFormChange(adapterID: adapterID)
         syncSendsPauseWithStatus(previous: previous)
         return changed
     }
 
-    /// The earliest moment an outbox report is due on its own; nil while paused or none waits.
+    /// The earliest moment an outbox report is due on its own; nil while none waits on a form that isn't paused.
     private var nextAutomaticAttempt: Date? {
-        guard sendsPaused == nil else { return nil }
-        return outbox.items
+        outbox.items
+            .filter { sendsPause(for: $0.draft.adapterID) == nil }
             .filter { !$0.held && $0.finalSendAt == nil && $0.attempts < Self.maxAutomaticAttempts }
             .map { max($0.nextAttemptAt, $0.serverRetryAfter ?? .distantPast) }
             .min()
@@ -1292,7 +1347,7 @@ final class AppModel {
 
     private func seedDemo() {
         profileStorage = DemoData.profile
-        if let service = options.service.flatMap({ adapters.spec(id: $0) }) {
+        if let service = demoService {
             // `-FixaService`: that e-service's report; a photo only where the form takes one.
             draft = DemoData.draft(for: service, tileID: options.tile)
             if !service.allUploads.isEmpty, let image = DemoData.photo {
@@ -1308,15 +1363,32 @@ final class AppModel {
             }
         }
         recomposePhoto()
-        history.replaceAll(options.emptyHistory ? [] : DemoData.historyItems())
+        var demoHistory = DemoData.historyItems()
+        if demoService != nil, !demoHistory.isEmpty {
+            // The newest row is the chosen e-service's report, so Sent reports can be shot for it.
+            var item = historyItem(id: UUID(), from: draft, date: demoHistory[0].date, caseNumber: DemoData.receipt.caseNumber, status: .sent)
+            item.kommunMessage = DemoData.kommunMessage
+            demoHistory[0] = item
+        }
+        history.replaceAll(options.emptyHistory ? [] : demoHistory)
         switch options.sendState {
         case .offline?:
             seedDemoUnconfirmed(.waiting)
         case .uncertain?:
             seedDemoUnconfirmed(.maybeSent)
         case nil:
-            sent = DemoData.receipt
+            sent = demoReceipt
         }
+    }
+
+    /// `-FixaService`'s adapter in demo launches.
+    private var demoService: AdapterSpec? {
+        options.service.flatMap { adapters.spec(id: $0) }
+    }
+
+    /// The demo receipt: the chosen e-service's report with `-FixaService`, else the KSB one.
+    private var demoReceipt: SentReport {
+        demoService.map { DemoData.receipt(for: draft, spec: $0) } ?? DemoData.receipt
     }
 
     /// `-FixaLanguage` switches after the first frame, after `seedDemo` ran in the old language:
@@ -1326,13 +1398,13 @@ final class AppModel {
             draft.description = demoDescription
         }
         if let current = sent, !current.isDryRun, current.caseNumber == DemoData.receipt.caseNumber, current.historyID == nil {
-            sent = DemoData.receipt
+            sent = demoReceipt
         }
     }
 
     /// The demo draft's description in the current language (`-FixaService` has its own).
     private var demoDescription: String {
-        options.service.flatMap { adapters.spec(id: $0) } != nil
+        demoService != nil
             ? DemoData.serviceDescription
             : DemoData.draft(adapterID: Self.adapterID).description
     }

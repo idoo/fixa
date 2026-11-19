@@ -17,6 +17,9 @@ struct ReportScreen: View {
     @State private var pickerItems: [PhotosPickerItem] = []
     @State private var isCameraPresented = false
     @State private var cameraTaps = 0
+    /// Bumped when picked photos arrive or a photo is removed: the light impact of "Take photo".
+    /// Played here, on the screen, because a removed slot is gone before its own haptic could play.
+    @State private var photoTaps = 0
     /// Photos picked but still loading; each reserves a slot in the row.
     @State private var pendingPhotos = 0
     /// Bumped when Review is tapped with issues: drives the error haptic.
@@ -131,6 +134,7 @@ struct ReportScreen: View {
         .navigationBarTitleDisplayMode(.inline)
         .sensoryFeedback(.error, trigger: failedReviews) { _, _ in haptics }
         .sensoryFeedback(.impact(weight: .light), trigger: cameraTaps) { _, _ in haptics }
+        .sensoryFeedback(.impact(weight: .light), trigger: photoTaps) { _, _ in haptics }
         .sensoryFeedback(.selection, trigger: phraseTaps) { _, _ in haptics }
         .sensoryFeedback(.selection, trigger: tileTaps) { _, _ in haptics }
         .onAppear {
@@ -147,6 +151,7 @@ struct ReportScreen: View {
             if isEmpty { photoPlace = nil }
         }
         .onChange(of: pickerItems) { _, items in
+            if !items.isEmpty { photoTaps += 1 }
             loadPicked(items)
         }
         .fullScreenCover(isPresented: $isCameraPresented) {
@@ -248,11 +253,24 @@ struct ReportScreen: View {
 
     // MARK: Tiles of a service
 
+    /// Title of the question every tile answers (FELATER "What needs doing?"), as Review names it.
+    private var tileQuestionTitle: String? {
+        let ids = spec.tiles.map { Set(($0.answers ?? [:]).keys) }
+        guard let first = ids.first, first.count == 1, ids.allSatisfy({ $0 == first }),
+              let question = spec.questions?.first(where: { $0.id == first.first }) else { return nil }
+        return question.title.resolve(L10n.locale)
+    }
+
+    /// The tiles' section header: the tile question's own title, else "Problem".
+    private var tileSectionTitle: String {
+        tileQuestionTitle ?? String(localized: "Problem", bundle: L10n.bundle, locale: L10n.locale)
+    }
+
     /// A form with several problems (a recycling station that needs cleaning or emptying): one tap switches.
     private var tileSwitcher: some View {
         let issue = model.issue(for: .category)?.message(in: spec)
         return VStack(alignment: .leading, spacing: Fx.Space.s) {
-            FxSectionHeader(String(localized: "Problem", bundle: L10n.bundle, locale: L10n.locale))
+            FxSectionHeader(tileSectionTitle)
                 .accessibilityValue(issue.map { Text($0) } ?? Text(""))
                 .accessibilityFocused($a11yFocus, equals: .problem)
             FxCard {
@@ -374,7 +392,7 @@ struct ReportScreen: View {
         let title = tile?.title.resolve(L10n.locale) ?? String(localized: "Choose a problem", bundle: L10n.bundle, locale: L10n.locale)
         let issue = model.issue(for: .category)?.message
         return VStack(alignment: .leading, spacing: Fx.Space.s) {
-            FxSectionHeader(String(localized: "Problem", bundle: L10n.bundle, locale: L10n.locale))
+            FxSectionHeader(tileSectionTitle)
             Menu {
                 ForEach(spec.tiles, id: \.id) { tile in
                     Button {
@@ -403,9 +421,9 @@ struct ReportScreen: View {
                 }
             }
             .buttonStyle(FxPressStyle())
-            .accessibilityLabel(Text("Problem: \(title)"))
+            .accessibilityLabel(tileQuestionTitle.map { Text(verbatim: "\($0): \(title)") } ?? Text("Problem: \(title)"))
             .accessibilityValue(issue.map { Text($0) } ?? Text(""))
-            .accessibilityInputLabels([Text("Change problem"), Text("Problem")])
+            .accessibilityInputLabels([Text("Change problem"), Text(verbatim: tileSectionTitle)])
             .accessibilityFocused($a11yFocus, equals: .problem)
             if let note = tile?.responsibility?.resolve(L10n.locale) {
                 Text(note)
@@ -455,6 +473,7 @@ struct ReportScreen: View {
                             label: String(localized: "Photo \(index + 1)", bundle: L10n.bundle, locale: L10n.locale),
                             removeLabel: String(localized: "Remove photo \(index + 1)", bundle: L10n.bundle, locale: L10n.locale)
                         ) {
+                            photoTaps += 1
                             model.removePhoto(at: index)
                         }
                     }
