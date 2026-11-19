@@ -138,6 +138,26 @@ struct RootView: View {
             } message: { alert in
                 Text(sendGuardMessage(alert))
             }
+            // Another form while an unsent report of a different form has content: ask before deleting it.
+            // Here, not on Home, because a tile link on Report can ask too.
+            .confirmationDialog(
+                String(localized: "Start a new report?", bundle: L10n.bundle, locale: L10n.locale),
+                isPresented: Binding(
+                    get: { model.pendingStart != nil },
+                    set: { if !$0, model.pendingStart != nil { model.pendingStart = nil } }
+                ),
+                titleVisibility: .visible,
+                presenting: model.pendingStart
+            ) { pending in
+                Button(String(localized: "Delete & start", bundle: L10n.bundle, locale: L10n.locale), role: .destructive) {
+                    model.confirmPendingStart(pending)
+                }
+                Button(String(localized: "Keep editing", bundle: L10n.bundle, locale: L10n.locale), role: .cancel) {
+                    model.cancelPendingStart()
+                }
+            } message: { _ in
+                Text(String(localized: "Your unsent report will be deleted.", bundle: L10n.bundle, locale: L10n.locale))
+            }
         } else {
             ContentUnavailableView(
                 "Fixa couldn't start",
@@ -177,11 +197,13 @@ struct RootView: View {
     @ViewBuilder
     private func destination(_ route: Route, spec: AdapterSpec) -> some View {
         switch route {
-        case .report: ReportScreen(spec: spec)
-        case .review: ReviewScreen(spec: spec)
-        case .receipt: ReceiptScreen(spec: spec)
+        // Report, Review and the receipt belong to the draft's form; a sent report to its own.
+        case .report: ReportScreen(spec: model.draftSpec ?? spec)
+        case .review: ReviewScreen(spec: model.draftSpec ?? spec)
+        case .receipt: ReceiptScreen(spec: model.draftSpec ?? spec)
         case .history: HistoryScreen(spec: spec)
-        case .historyDetail(let id): HistoryDetailScreen(spec: spec, itemID: id)
+        case .historyDetail(let id):
+            HistoryDetailScreen(spec: model.spec(forAdapterID: model.history.item(id: id)?.adapterID) ?? spec, itemID: id)
         case .about: AboutScreen(spec: spec)
         case .settings: SettingsScreen()
         case .contactDetails: ProfileScreen()

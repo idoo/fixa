@@ -67,8 +67,10 @@
                   "properties": {
                     "role": {
                       "type": "string",
-                      "enum": ["category", "place", "mapChoice", "mapAnswer", "description", "feedback", "firstName", "lastName", "phone", "email"]
+                      "enum": ["category", "place", "mapChoice", "mapAnswer", "description", "feedback", "firstName", "lastName", "fullName", "phone", "email", "answer"],
+                      "description": "fullName: first and last name joined with a space, for forms with one name field. answer: the draft's answer to `question` (tile answers win); a text/textarea gets the first value, a select or radio the matching option (exact value, visible text, synonyms), a checkbox list one ticked box per value. Nothing is posted for an empty answer."
                     },
+                    "question": { "type": "string", "description": "Role answer: id of the question in `questions` this field sends. Several fields may send the same question (e.g. one per conditional block)." },
                     "key": { "type": "string", "description": "Input name ends in $<key>_field$<control>" },
                     "control": { "type": "string" },
                     "yesValue": { "type": "string" },
@@ -90,17 +92,12 @@
             }
           }
         },
-        "upload": {
-          "type": "object",
-          "required": ["pageID", "fieldID", "path", "filePartName", "fileName", "actionPath"],
-          "properties": {
-            "pageID": { "type": "string" },
-            "fieldID": { "type": "string" },
-            "path": { "$ref": "#/$defs/path" },
-            "filePartName": { "type": "string", "pattern": "^[^\"\\\\/;\\u0000-\\u001f]+$" },
-            "fileName": { "type": "string", "pattern": "^[^\"\\\\/;\\u0000-\\u001f]+$" },
-            "actionPath": { "$ref": "#/$defs/path" }
-          }
+        "upload": { "$ref": "#/$defs/upload", "description": "The single photo upload of adapters written before `uploads`; still read. Prefer `uploads`." },
+        "uploads": {
+          "type": "array",
+          "maxItems": 20,
+          "description": "Photo uploads. Each applies on its page when its `when` holds (none: always); the photo goes with the first that applies.",
+          "items": { "$ref": "#/$defs/upload" }
         }
       }
     },
@@ -140,9 +137,20 @@
               "required": ["title", "url"],
               "properties": {
                 "title": { "$ref": "#/$defs/localizedText" },
-                "url": { "type": "string", "pattern": "^https://" }
+                "url": { "type": "string", "pattern": "^https://" },
+                "adapterID": { "type": "string", "minLength": 1, "description": "A bundled adapter (e.g. se.varmdo.felater) whose form this link opens in Fixa; builds that don't know it open `url`." }
               }
             }
+          },
+          "answers": {
+            "type": "object",
+            "description": "Answers this tile fixes, by question id, e.g. {\"action\": [\"Städning\"]}. Never asked in the app; choice values must be options of the question.",
+            "additionalProperties": { "type": "array", "items": { "type": "string" } }
+          },
+          "questionIDs": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Questions asked for this tile, in order. Absent: every question not fixed by `answers`."
           }
         }
       }
@@ -154,9 +162,46 @@
         "descriptionMin": { "type": "integer" },
         "descriptionMax": { "type": "integer" },
         "emailRequiredWhenFeedback": { "type": "boolean" },
-        "requireLocation": { "type": "boolean" }
+        "requireLocation": { "type": "boolean" },
+        "photoRequired": { "type": "boolean", "description": "The form refuses a report without a photo." },
+        "emailRequired": { "type": "boolean", "description": "The form needs an e-mail address whether or not a reply is wanted (only with an email field)." },
+        "descriptionRequired": { "type": "boolean", "description": "False when the description field may stay empty (an \"Övrig information\" box): no minimum then, the maximum still applies. Default true." }
       }
     },
+    "service": {
+      "type": "object",
+      "required": ["title", "symbol"],
+      "additionalProperties": false,
+      "description": "Present on every adapter listed under Home's \"More forms\". Absent on the municipality's main fault-report adapter, whose tiles fill Home's grid (that one must have category and description fields).",
+      "properties": {
+        "title": { "$ref": "#/$defs/localizedText", "description": "The e-service's name for residents; needs sv and en." },
+        "subtitle": { "$ref": "#/$defs/localizedText", "description": "One short line: what the form is for." },
+        "symbol": { "type": "string", "description": "SF Symbol name" },
+        "order": { "type": "integer", "description": "Ascending order on Home; absent sorts last, then by id." }
+      }
+    },
+    "questions": {
+      "type": "array",
+      "maxItems": 100,
+      "description": "Questions the resident answers in Fixa's own controls. Every question is sent by at least one answer field; ids are unique.",
+      "items": {
+        "type": "object",
+        "required": ["id", "kind", "title", "required"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "kind": { "type": "string", "enum": ["text", "longText", "choice", "multiChoice", "dateTime"], "description": "Answers are stored as a list: the typed text, the chosen option value, every ticked value, or an ISO 8601 date-time with offset (sent as yyyy-MM-dd HH:mm Stockholm time, never more than 5 minutes ahead)." },
+          "title": { "$ref": "#/$defs/localizedText", "description": "The question; its sv text heads the answer line in the filed text." },
+          "hint": { "$ref": "#/$defs/localizedText" },
+          "required": { "type": "boolean" },
+          "options": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/questionOption" }, "description": "choice, multiChoice: non-empty, unique values; value is the exact form option." },
+          "suggestions": { "type": "array", "maxItems": 100, "items": { "$ref": "#/$defs/questionOption" }, "description": "text: tap-to-fill chips; the Swedish value becomes the answer." },
+          "maxLength": { "type": "integer", "minimum": 1, "description": "text, longText: longest answer the form takes." }
+        }
+      }
+    },
+    "descriptionTitle": { "$ref": "#/$defs/localizedText", "description": "Heading of the description box when the form's description means something narrower (\"Where is it growing?\"). Absent: Fixa's own wording." },
+    "descriptionPrompt": { "$ref": "#/$defs/localizedText", "description": "Placeholder of that box." },
     "emergency": {
       "type": "object",
       "required": ["contacts", "rules", "defaultContactID", "timeZone", "note"],
@@ -233,6 +278,39 @@
       "description": "Language code to text; resolves to the user's language, then en, then sv.",
       "required": ["sv", "en"],
       "additionalProperties": { "type": "string" }
+    },
+    "questionOption": {
+      "type": "object",
+      "required": ["value", "title"],
+      "additionalProperties": false,
+      "properties": {
+        "value": { "type": "string", "description": "Exact option value (choices) or Swedish text (suggestions) sent to the form." },
+        "title": { "$ref": "#/$defs/localizedText" }
+      }
+    },
+    "upload": {
+      "type": "object",
+      "required": ["pageID"],
+      "additionalProperties": false,
+      "description": "kind ajax (default): the platform's FileUploadField2, posted to `path` before the page and checked at `actionPath`; needs fieldID, path, actionPath, filePartName, fileName. kind formFile: an <input type=\"file\"> named by key/control, sent in the page's own multipart/form-data POST (every form field, every file input as an empty part, the photo in this one). A page whose <form> has enctype=\"multipart/form-data\" is always posted as multipart.",
+      "properties": {
+        "pageID": { "type": "string", "description": "A page id: the page the upload precedes (ajax) or travels with (formFile)." },
+        "kind": { "type": "string", "enum": ["ajax", "formFile"] },
+        "fieldID": { "type": "string", "description": "ajax: field id with dots, e.g. FELATER.7" },
+        "path": { "$ref": "#/$defs/path" },
+        "filePartName": { "type": "string", "pattern": "^[^\"\\\\/;\\u0000-\\u001f]+$" },
+        "fileName": { "type": "string", "pattern": "^[^\"\\\\/;\\u0000-\\u001f]+$" },
+        "actionPath": { "$ref": "#/$defs/path" },
+        "key": { "type": "string", "pattern": "^[A-Za-z0-9_]+$", "description": "formFile: field key of the file input, e.g. invasivaarter_8" },
+        "control": { "type": "string", "pattern": "^[A-Za-z0-9_]+$", "description": "formFile: control of the file input, e.g. fileUploadControl" },
+        "when": {
+          "type": "object",
+          "required": ["question", "value"],
+          "additionalProperties": false,
+          "description": "Upload only when the draft's answer to `question` (tile answers win) contains `value`.",
+          "properties": { "question": { "type": "string" }, "value": { "type": "string" } }
+        }
+      }
     }
   }
 }

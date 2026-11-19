@@ -71,6 +71,9 @@ public struct ReportDraft: Codable, Sendable, Equatable {
     public var createdAt: Date?
     /// Set when the resident sends again although `SendGuard` found an earlier report of the same problem.
     public var previousReport: PreviousReport?
+    /// Answers to the adapter's `questions`, by question id (see `AdapterSpec.Question`). Drafts saved
+    /// before answers existed decode with none.
+    public var answers: [String: [String]]
 
     public init(
         adapterID: String,
@@ -84,7 +87,8 @@ public struct ReportDraft: Codable, Sendable, Equatable {
         contact: Contact = Contact(),
         translation: MachineTranslation? = nil,
         createdAt: Date? = nil,
-        previousReport: PreviousReport? = nil
+        previousReport: PreviousReport? = nil,
+        answers: [String: [String]] = [:]
     ) {
         self.adapterID = adapterID
         self.tileID = tileID
@@ -98,6 +102,33 @@ public struct ReportDraft: Codable, Sendable, Equatable {
         self.translation = translation
         self.createdAt = createdAt
         self.previousReport = previousReport
+        self.answers = answers
+    }
+}
+
+extension ReportDraft {
+    enum CodingKeys: String, CodingKey {
+        case adapterID, tileID, categoryID, description, coordinate, locationText, photoJPEG, wantsFeedback
+        case contact, translation, createdAt, previousReport, answers
+    }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.init(
+            adapterID: try c.decode(String.self, forKey: .adapterID),
+            tileID: try c.decodeIfPresent(String.self, forKey: .tileID),
+            categoryID: try c.decodeIfPresent(String.self, forKey: .categoryID),
+            description: try c.decode(String.self, forKey: .description),
+            coordinate: try c.decodeIfPresent(Coordinate.self, forKey: .coordinate),
+            locationText: try c.decode(String.self, forKey: .locationText),
+            photoJPEG: try c.decodeIfPresent(Data.self, forKey: .photoJPEG),
+            wantsFeedback: try c.decode(Bool.self, forKey: .wantsFeedback),
+            contact: try c.decode(Contact.self, forKey: .contact),
+            translation: try c.decodeIfPresent(MachineTranslation.self, forKey: .translation),
+            createdAt: try c.decodeIfPresent(Date.self, forKey: .createdAt),
+            previousReport: try c.decodeIfPresent(PreviousReport.self, forKey: .previousReport),
+            answers: try c.decodeIfPresent([String: [String]].self, forKey: .answers) ?? [:]
+        )
     }
 }
 
@@ -126,6 +157,10 @@ public struct SentRecord: Codable, Sendable, Equatable {
 public struct ValidationIssue: Sendable, Equatable, Hashable {
     public enum Field: String, Sendable {
         case category, description, location, email, phone
+        /// The adapter requires a photo (`validation.photoRequired`).
+        case photo
+        /// An answer to the question `questionID`.
+        case question
     }
 
     public enum Code: String, Sendable {
@@ -134,10 +169,13 @@ public struct ValidationIssue: Sendable, Equatable, Hashable {
 
     public let field: Field
     public let code: Code
+    /// Set for `.question`.
+    public let questionID: String?
 
-    public init(field: Field, code: Code) {
+    public init(field: Field, code: Code, questionID: String? = nil) {
         self.field = field
         self.code = code
+        self.questionID = questionID
     }
 }
 
@@ -146,21 +184,32 @@ public enum ReportValidator {
     /// is enough when the tile summary already says what is wrong.
     public static let minimumLetters = 3
 
-    public static func validate(_ d: ReportDraft, spec: AdapterSpec) -> [ValidationIssue] {
+    /// Issues in screen order: category, questions (visible order), description, location, photo,
+    /// e-mail, phone. A rule about a field applies only when the adapter's form has that field.
+    public static func validate(_ d: ReportDraft, spec: AdapterSpec, now: Date = Date()) -> [ValidationIssue] {
         var issues: [ValidationIssue] = []
         let rules = spec.validation
 
-        if spec.category(for: d) == nil {
+        if spec.hasField(.category) && spec.category(for: d) == nil {
             issues.append(.init(field: .category, code: .missing))
         }
 
-        let text = d.description.trimmingCharacters(in: .whitespacesAndNewlines)
-        if text.isEmpty {
-            issues.append(.init(field: .description, code: .missing))
-        } else if text.filter(\.isLetter).count < minimumLetters || composedLength(of: d, spec: spec) < rules.descriptionMin {
-            issues.append(.init(field: .description, code: .tooShort))
-        } else if ReportComposer.untruncatedLength(of: d, spec: spec) > rules.descriptionMax {
-            issues.append(.init(field: .description, code: .tooLong))
+        for question in spec.visibleQuestions(tileID: d.tileID) {
+            if let issue = questionIssue(question, values: d.answers[question.id] ?? [], now: now) {
+                issues.append(issue)
+            }
+        }
+
+        if spec.hasField(.description) {
+            let text = d.description.trimmingCharacters(in: .whitespacesAndNewlines)
+            let required = rules.descriptionRequired ?? true
+            if text.isEmpty && required {
+                issues.append(.init(field: .description, code: .missing))
+            } else if required && (text.filter(\.isLetter).count < minimumLetters || composedLength(of: d, spec: spec) < rules.descriptionMin) {
+                issues.append(.init(field: .description, code: .tooShort))
+            } else if ReportComposer.untruncatedLength(of: d, spec: spec) > rules.descriptionMax {
+                issues.append(.init(field: .description, code: .tooLong))
+            }
         }
 
         let place = d.locationText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -172,9 +221,13 @@ public enum ReportValidator {
             issues.append(.init(field: .location, code: .missing))
         }
 
+        if rules.photoRequired == true && d.photoJPEG == nil {
+            issues.append(.init(field: .photo, code: .missing))
+        }
+
         let email = d.contact.email.trimmingCharacters(in: .whitespacesAndNewlines)
         if email.isEmpty {
-            if d.wantsFeedback && rules.emailRequiredWhenFeedback {
+            if (d.wantsFeedback && rules.emailRequiredWhenFeedback) || (rules.emailRequired == true && spec.hasField(.email)) {
                 issues.append(.init(field: .email, code: .missing))
             }
         } else if !isEmail(email) {
@@ -195,6 +248,34 @@ public enum ReportValidator {
         let text = d.description.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let summary = spec.tile(id: d.tileID)?.swedishSummary, !summary.isEmpty else { return text.count }
         return summary.count + 2 + text.count
+    }
+
+    /// Answers may lie at most this far in the future (clock drift between picker and send).
+    static let futureTolerance: TimeInterval = 5 * 60
+
+    /// The first problem with an answer: missing when required, too long, an option the form lacks,
+    /// or a date-time that doesn't parse or lies in the future.
+    static func questionIssue(_ q: AdapterSpec.Question, values raw: [String], now: Date) -> ValidationIssue? {
+        let values = raw.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
+        func issue(_ code: ValidationIssue.Code) -> ValidationIssue {
+            .init(field: .question, code: code, questionID: q.id)
+        }
+        if values.isEmpty { return q.required ? issue(.missing) : nil }
+        switch q.kind {
+        case .text, .longText:
+            if let max = q.maxLength, values.contains(where: { $0.count > max }) { return issue(.tooLong) }
+        case .choice, .multiChoice:
+            let allowed = Set((q.options ?? []).map(\.value))
+            if values.contains(where: { !allowed.contains($0) }) { return issue(.invalidFormat) }
+        case .dateTime:
+            let parser = ISO8601DateFormatter()
+            for value in values {
+                guard let date = parser.date(from: value), date <= now.addingTimeInterval(futureTolerance) else {
+                    return issue(.invalidFormat)
+                }
+            }
+        }
+        return nil
     }
 
     /// One `@`, a non-empty local part, a domain with a dot and a TLD of two or more letters, no spaces.

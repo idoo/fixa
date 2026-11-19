@@ -194,18 +194,36 @@ final class AdapterSpecTests: XCTestCase {
         XCTAssertEqual(String(decoding: encoded, as: UTF8.self), #"{"sv":"Hej"}"#)
     }
 
-    func testBundledCopyIsByteIdentical() throws {
-        let root = try Data(contentsOf: repoRoot.appendingPathComponent("adapters/se-varmdo-ksb.json"))
-        let bundledURL = try XCTUnwrap(AdapterCatalog.bundledURLs().first { $0.lastPathComponent == "se-varmdo-ksb.json" })
-        XCTAssertEqual(try Data(contentsOf: bundledURL), root, "Copy adapters/se-varmdo-ksb.json into FixaKit/Sources/FixaKit/Resources/adapters/")
-        XCTAssertEqual(AdapterCatalog.bundled().map(\.id), ["se.varmdo.ksb"])
+    /// Every adapter file in `adapters/` (not `status.json`).
+    private func adapterFiles() throws -> [URL] {
+        try FileManager.default.contentsOfDirectory(at: repoRoot.appendingPathComponent("adapters"), includingPropertiesForKeys: nil)
+            .filter { $0.pathExtension == "json" && $0.lastPathComponent != "status.json" }
+            .sorted { $0.lastPathComponent < $1.lastPathComponent }
     }
 
-    func testVarmdoMatchesSchema() throws {
+    func testBundledCopyIsByteIdentical() throws {
+        let files = try adapterFiles()
+        XCTAssertFalse(files.isEmpty)
+        var ids = Set<String>()
+        for file in files {
+            let name = file.lastPathComponent
+            let root = try Data(contentsOf: file)
+            let bundledURL = try XCTUnwrap(AdapterCatalog.bundledURLs().first { $0.lastPathComponent == name }, "\(name) is not bundled")
+            XCTAssertEqual(try Data(contentsOf: bundledURL), root, "Copy adapters/\(name) into FixaKit/Sources/FixaKit/Resources/adapters/")
+            ids.insert(try JSONDecoder().decode(AdapterSpec.self, from: root).id)
+        }
+        XCTAssertEqual(Set(AdapterCatalog.bundled().map(\.id)), ids)
+    }
+
+    func testAdaptersMatchSchema() throws {
         let schema = try JSONSerialization.jsonObject(with: Data(contentsOf: repoRoot.appendingPathComponent("schema/adapter.schema.json")))
-        let instance = try JSONSerialization.jsonObject(with: Data(contentsOf: repoRoot.appendingPathComponent("adapters/se-varmdo-ksb.json")))
         let validator = MiniSchemaValidator(root: try XCTUnwrap(schema as? [String: Any]))
-        XCTAssertEqual(validator.validate(instance), [])
+        for file in try adapterFiles() {
+            let instance = try JSONSerialization.jsonObject(with: Data(contentsOf: file))
+            XCTAssertEqual(validator.validate(instance), [], file.lastPathComponent)
+        }
+
+        let instance = try JSONSerialization.jsonObject(with: Data(contentsOf: repoRoot.appendingPathComponent("adapters/se-varmdo-ksb.json")))
 
         var broken = try XCTUnwrap(instance as? [String: Any])
         broken["tiles"] = "nope"

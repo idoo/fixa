@@ -31,9 +31,11 @@ struct HistoryItem: Codable, Identifiable, Hashable, Sendable {
     var filedText: String? = nil
     /// What the e-service's receipt page said. Absent before build 12 and for unconfirmed reports.
     var kommunMessage: String? = nil
+    /// The adapter (e-service) the report went to. Absent before the extra forms: the primary one.
+    var adapterID: String? = nil
 
     private enum CodingKeys: String, CodingKey {
-        case id, date, tileID, description, locationText, latitude, longitude, caseNumber, thumbnail, status, filedText, kommunMessage
+        case id, date, tileID, description, locationText, latitude, longitude, caseNumber, thumbnail, status, filedText, kommunMessage, adapterID
     }
 
     init(
@@ -48,7 +50,8 @@ struct HistoryItem: Codable, Identifiable, Hashable, Sendable {
         thumbnail: Data?,
         status: Status = .sent,
         filedText: String? = nil,
-        kommunMessage: String? = nil
+        kommunMessage: String? = nil,
+        adapterID: String? = nil
     ) {
         self.id = id
         self.date = date
@@ -62,6 +65,7 @@ struct HistoryItem: Codable, Identifiable, Hashable, Sendable {
         self.status = status
         self.filedText = filedText
         self.kommunMessage = kommunMessage
+        self.adapterID = adapterID
     }
 
     init(from decoder: Decoder) throws {
@@ -78,6 +82,7 @@ struct HistoryItem: Codable, Identifiable, Hashable, Sendable {
         status = try c.decodeIfPresent(Status.self, forKey: .status) ?? .sent
         filedText = try c.decodeIfPresent(String.self, forKey: .filedText)
         kommunMessage = try c.decodeIfPresent(String.self, forKey: .kommunMessage)
+        adapterID = try c.decodeIfPresent(String.self, forKey: .adapterID)
     }
 
     /// Keeps what a confirmed send returned: the exact Swedish filed and the kommun's receipt text.

@@ -17,6 +17,15 @@ struct FormControl: Sendable, Equatable {
 struct FormOption: Sendable, Equatable {
     let value: String
     let text: String
+    /// Own input name of a checkbox-list option (`…$FELATER_2_field$checkBoxListFieldControl$1`): every
+    /// ticked box is posted under its own name. Nil for select options and radio choices.
+    let inputName: String?
+
+    init(value: String, text: String, inputName: String? = nil) {
+        self.value = value
+        self.text = text
+        self.inputName = inputName
+    }
 }
 
 /// A question block: the visible label (or legend), whether it is marked required, and its controls.
@@ -30,6 +39,18 @@ struct FormQuestion: Sendable, Equatable {
 struct FormStructure: Sendable {
     let controls: [FormControl]
     let questions: [FormQuestion]
+    /// Visibility rules of the page script (`fieldRef_dependency`), enabled ones only.
+    let activationBlocks: [ActivationBlock]
+
+    /// One `fieldRef_dependency` block: its fields show while `condition` of `answer` holds for `field`.
+    struct ActivationBlock: Sendable, Equatable {
+        /// Trigger field key, e.g. `FELATER_2`.
+        let field: String
+        let condition: String
+        let answer: String
+        /// Keys shown by the rule, e.g. `FELATER_3`.
+        let keys: [String]
+    }
 
     init(html: String) {
         let labelTexts = Dictionary(
@@ -49,7 +70,12 @@ struct FormStructure: Sendable {
             let isSelect = !m[1].isEmpty || m[0].lowercased().hasPrefix("<select")
             let isTextarea = m[0].lowercased().hasPrefix("<textarea")
             let attributes = AbouPageParser.attributes(of: "<x \(isSelect ? m[1] : isTextarea ? m[3] : m[4])>")
-            guard let name = attributes["name"], let split = Self.split(name) else { continue }
+            guard let name = attributes["name"] else { continue }
+            // A checkbox list posts each box under its own name `…$KEY_field$checkBoxListFieldControl$N`;
+            // the boxes of one list become one control named without the trailing `$N`.
+            let listName = Self.checkboxListName(name, type: isSelect || isTextarea ? nil : attributes["type"])
+            guard let split = Self.split(listName ?? name) else { continue }
+            let groupName = listName ?? name
             let type: String
             var options: [FormOption] = []
             if isSelect {
@@ -67,21 +93,21 @@ struct FormStructure: Sendable {
                 if raw == "radio" || raw == "checkbox" {
                     let value = attributes["value"] ?? "on"
                     let text = attributes["id"].flatMap { labelTexts[$0] } ?? value
-                    options = [FormOption(value: value, text: text)]
+                    options = [FormOption(value: value, text: text, inputName: listName == nil ? nil : name)]
                 }
             }
-            if let existing = indexByName[name] {
+            if let existing = indexByName[groupName] {
                 let old = located[existing].control
                 located[existing].control = FormControl(name: old.name, key: old.key, control: old.control, type: old.type, options: old.options + options)
             } else {
-                indexByName[name] = located.count
-                located.append((location, FormControl(name: name, key: split.key, control: split.control, type: type, options: options)))
+                indexByName[groupName] = located.count
+                located.append((location, FormControl(name: groupName, key: split.key, control: split.control, type: type, options: options)))
             }
         }
         controls = located.map(\.control)
 
-        // Question blocks run from one `field-question-block` to the next.
-        let starts = Self.locatedMatches(#"class="[^"]*\bfield-question-block\b[^"]*"[^>]*>"#, in: html)
+        // Question blocks run from one `field-question-block` (FieldPage.aspx: `field-question`) to the next.
+        let starts = Self.locatedMatches(#"class="[^"]*\bfield-question(?:-block)?(?![\w-])[^"]*"[^>]*>"#, in: html)
             .map { $0.location + ($0.groups[0] as NSString).length }
         let ns = html as NSString
         var questions: [FormQuestion] = []
@@ -98,6 +124,7 @@ struct FormStructure: Sendable {
             questions.append(FormQuestion(label: label, required: required, controls: inside))
         }
         self.questions = questions
+        activationBlocks = Self.activationBlocks(in: html)
     }
 
     /// `…$KSB_14_field$dropDownListFieldControl` → (`KSB_14`, `dropDownListFieldControl`).
@@ -107,6 +134,54 @@ struct FormStructure: Sendable {
         let key = String(name[..<marker.lowerBound].split(separator: "$", omittingEmptySubsequences: false).last ?? "")
         guard !key.isEmpty, !control.isEmpty, !control.contains("$") else { return nil }
         return (key, control)
+    }
+
+    /// `…$FELATER_2_field$checkBoxListFieldControl$1` (a checkbox) → `…$FELATER_2_field$checkBoxListFieldControl`.
+    static func checkboxListName(_ name: String, type: String?) -> String? {
+        guard type?.lowercased() == "checkbox", let dollar = name.lastIndex(of: "$") else { return nil }
+        let index = name[name.index(after: dollar)...]
+        guard !index.isEmpty, index.allSatisfy(\.isASCII), index.allSatisfy(\.isNumber) else { return nil }
+        let base = String(name[..<dollar])
+        return split(base) == nil ? nil : base
+    }
+
+    /// Enabled visibility blocks of `fieldRef_dependency['KEY.N'] = { 'blocks': [...], 'fields': [...] }`.
+    static func activationBlocks(in html: String) -> [ActivationBlock] {
+        let pattern = #"fieldRef_dependency\[\s*'[^']*'\s*\]\s*=\s*\{\s*'blocks'\s*:\s*(\[.*?\])\s*,\s*'fields'\s*:\s*(\[.*?\])\s*\}"#
+        let key = { (ref: String) in ref.replacingOccurrences(of: ".", with: "_") }
+        return locatedMatches(pattern, in: html).flatMap { match -> [ActivationBlock] in
+            [match.groups[1], match.groups[2]].flatMap { json -> [ActivationBlock] in
+                guard let entries = try? JSONSerialization.jsonObject(with: Data(json.utf8)) as? [[String: Any]] else { return [] }
+                return entries.compactMap { entry in
+                    guard let rule = entry["activationRule"] as? [String: Any],
+                          rule["enabled"] as? Bool == true, rule["setsVisibility"] as? Bool == true,
+                          let field = rule["field"] as? String,
+                          let fields = entry["Fields"] as? [String] else { return nil }
+                    return ActivationBlock(
+                        field: key(field),
+                        condition: rule["condition"] as? String ?? "",
+                        answer: rule["answer"] as? String ?? "",
+                        keys: fields.map(key)
+                    )
+                }
+            }
+        }
+    }
+
+    /// Whether `block` shows its fields for the posted `values` of its trigger (nothing posted = `""`).
+    /// An unknown condition counts as shown.
+    static func isActive(_ block: ActivationBlock, posted: [String]) -> Bool {
+        let values = posted.isEmpty ? [""] : posted
+        let answer = block.answer
+        switch block.condition.lowercased() {
+        case "stringcontains", "contains": return values.contains { $0.contains(answer) }
+        case "notcontains", "stringnotcontains": return !values.contains { $0.contains(answer) }
+        case "equalto", "equals": return values.contains(answer)
+        case "notequalto", "notequals": return !values.contains(answer)
+        case "isempty": return values.allSatisfy { $0.isEmpty }
+        case "isnotempty": return values.contains { !$0.isEmpty }
+        default: return true
+        }
     }
 
     static func locatedMatches(_ pattern: String, in text: String) -> [(location: Int, groups: [String])] {
@@ -158,10 +233,32 @@ struct FormStructure: Sendable {
         return nil
     }
 
-    /// Labels of required questions none of whose controls are in `filled`.
-    func unfilledRequired(filled: Set<String>) -> [String] {
+    /// Labels of required questions none of whose controls are in `filled`, skipping questions whose
+    /// controls all have a key in `inactive` (hidden by the page's activation rules).
+    func unfilledRequired(filled: Set<String>, inactive: Set<String> = []) -> [String] {
         questions
-            .filter { $0.required && !$0.controls.isEmpty && !$0.controls.contains { filled.contains($0.name) } }
+            .filter { $0.required && !$0.controls.isEmpty && !$0.controls.contains { Self.isFilled($0, filled) } }
+            .filter { !$0.controls.allSatisfy { inactive.contains($0.key) } }
             .map { $0.label.isEmpty ? $0.controls[0].key : $0.label }
+    }
+
+    /// A control is filled when its name is posted, or for a checkbox list when any of its boxes is.
+    private static func isFilled(_ control: FormControl, _ filled: Set<String>) -> Bool {
+        filled.contains(control.name) || control.options.contains { $0.inputName.map(filled.contains) ?? false }
+    }
+
+    /// Keys (`FELATER_4`) of the fields the page's activation rules (`fieldRef_dependency`) hide when
+    /// Fixa posts `values` (field key → posted values; a checkbox list posts every ticked value).
+    func inactiveKeys(posting values: [String: [String]]) -> Set<String> {
+        var shown: Set<String> = []
+        var hidden: Set<String> = []
+        for block in activationBlocks {
+            if Self.isActive(block, posted: values[block.field] ?? []) {
+                shown.formUnion(block.keys)
+            } else {
+                hidden.formUnion(block.keys)
+            }
+        }
+        return hidden.subtracting(shown)
     }
 }

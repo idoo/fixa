@@ -102,7 +102,8 @@ enum Fx {
         static let shadow = SwiftUI.Color(light: UIColor(fxHex: 0x000000, alpha: 0.06), dark: .clear)
 
         /// Category fill with meaning per adapter category (`categories[].id`): lighting = sun,
-        /// roads = asphalt/sand, graffiti = lilac, parks = mint, water = sky, other / nil / unknown = neutral sand.
+        /// roads and vehicles = asphalt/sand, graffiti = lilac, parks and nature = mint, water and recycling = sky,
+        /// waste, other / nil / unknown = neutral sand.
         /// Pastel by day, deep tone at night; `categoryGlyph` on it is ≥ 5.0:1 light and ≥ 7.3:1 dark.
         static func categoryTint(_ categoryID: String?) -> SwiftUI.Color {
             categoryPair(categoryID).tint
@@ -116,10 +117,10 @@ enum Fx {
         private static func categoryPair(_ categoryID: String?) -> (tint: SwiftUI.Color, glyph: SwiftUI.Color) {
             switch categoryID {
             case "lighting": (CategoryTone.sunTint, CategoryTone.sunGlyph)
-            case "roads": (CategoryTone.asphaltTint, CategoryTone.asphaltGlyph)
+            case "roads", "vehicles": (CategoryTone.asphaltTint, CategoryTone.asphaltGlyph)
             case "graffiti": (CategoryTone.lilacTint, CategoryTone.lilacGlyph)
-            case "parks": (CategoryTone.mintTint, CategoryTone.mintGlyph)
-            case "water": (CategoryTone.skyTint, CategoryTone.skyGlyph)
+            case "parks", "nature": (CategoryTone.mintTint, CategoryTone.mintGlyph)
+            case "water", "recycling": (CategoryTone.skyTint, CategoryTone.skyGlyph)
             default: (CategoryTone.sandTint, CategoryTone.sandGlyph)
             }
         }

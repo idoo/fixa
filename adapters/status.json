@@ -1,5 +1,17 @@
 {
   "se.varmdo.ksb": {
     "state": "ok"
+  },
+  "se.varmdo.felater": {
+    "state": "ok"
+  },
+  "se.varmdo.anmutbsop": {
+    "state": "ok"
+  },
+  "se.varmdo.invasivaarter": {
+    "state": "ok"
+  },
+  "se.varmdo.vkskrotbil": {
+    "state": "ok"
   }
 }

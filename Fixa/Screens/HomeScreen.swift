@@ -68,6 +68,25 @@ struct HomeScreen: View {
                     }
                 }
 
+                if !model.services.isEmpty {
+                    VStack(alignment: .leading, spacing: Fx.Space.s) {
+                        FxGroupHeader(String(localized: "More forms", bundle: L10n.bundle, locale: L10n.locale))
+                        ForEach(model.services, id: \.id) { service in
+                            if let info = service.service {
+                                HomeServiceRow(
+                                    title: info.title.resolve(L10n.locale),
+                                    subtitle: info.subtitle?.resolve(L10n.locale),
+                                    systemImage: info.symbol,
+                                    categoryID: service.tiles.first?.categoryID
+                                ) {
+                                    model.openService(adapterID: service.id)
+                                }
+                                .accessibilityIdentifier("home.service.\(service.id)")
+                            }
+                        }
+                    }
+                }
+
                 VStack(spacing: Fx.Space.m) {
                     if let emergency = spec.emergency {
                         urgentRow(emergency)
@@ -153,6 +172,60 @@ struct HomeScreen: View {
                     .padding(.horizontal, Fx.Space.xs)
             }
         }
+    }
+}
+
+/// One "More forms" row on Home: the e-service's glyph, title and what it is for, on a card. Opens that
+/// form. Selection haptic like the tiles; at least 44 pt tall, grows with Dynamic Type.
+private struct HomeServiceRow: View {
+    let title: String
+    let subtitle: String?
+    let systemImage: String
+    let categoryID: String?
+    let action: () -> Void
+
+    @State private var taps = 0
+    @Environment(\.fxHaptics) private var haptics
+    @ScaledMetric(relativeTo: .body) private var iconSide: CGFloat = 40
+
+    var body: some View {
+        Button {
+            taps += 1
+            action()
+        } label: {
+            HStack(spacing: Fx.Space.m) {
+                FxCategoryIcon(systemImage: systemImage, categoryID: categoryID, side: min(iconSide, 72))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(Fx.Font.headline)
+                        .foregroundStyle(Fx.Color.ink)
+                    if let subtitle {
+                        Text(subtitle)
+                            .font(Fx.Font.footnote)
+                            .foregroundStyle(Fx.Color.ink2)
+                    }
+                }
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .fixedSize(horizontal: false, vertical: true)
+                Image(systemName: "chevron.right")
+                    .font(Fx.Font.footnote.weight(.semibold))
+                    .foregroundStyle(Fx.Color.ink2)
+                    .accessibilityHidden(true)
+            }
+            .padding(.horizontal, Fx.Space.m)
+            .padding(.vertical, Fx.Space.s)
+            .frame(minHeight: Fx.minTarget + Fx.Space.s)
+            .fxCardSurface(RoundedRectangle(cornerRadius: Fx.Radius.m, style: .continuous))
+            .contentShape(.rect(cornerRadius: Fx.Radius.m, style: .continuous))
+        }
+        .buttonStyle(FxPressStyle())
+        .sensoryFeedback(.selection, trigger: taps) { _, _ in haptics }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(title))
+        .accessibilityValue(Text(subtitle ?? ""))
+        .accessibilityHint(Text(String(localized: "Opens the form", bundle: L10n.bundle, locale: L10n.locale)))
+        .accessibilityAddTraits(.isButton)
     }
 }
 

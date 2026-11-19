@@ -13,6 +13,8 @@ import Foundation
 ///                   through the same path as the Language page (saved only outside -FixaDemo)
 ///   -FixaDemo 1     seeds a demo draft, profile, history and receipt; no network, nothing saved
 ///   -FixaEmptyHistory 1  with -FixaDemo: leaves the demo history empty (History empty state)
+///   -FixaService <adapterID>  with -FixaDemo 1: the demo report is that e-service's first tile (or -FixaTile
+///                   of it) with a sample answer to every visible question and the demo photo when it takes one
 ///   -FixaDryRun 1   Review's Send stops at the Summary page (nothing is submitted)
 ///   -FixaShortcut <tileID>|sent  (Debug only, read in `FixaApp`) applies a quick action / App Shortcut
 ///                   route at launch: a new report for the tile (an unsent draft wins) or Sent reports
@@ -38,6 +40,8 @@ struct LaunchOptions: Sendable {
     var dryRun: Bool
     /// `-FixaTile <id>`: the demo report's tile, for screenshots of tile-specific screens.
     var tile: String?
+    /// `-FixaService <adapterID>`: the demo report's e-service ("More forms"), e.g. `se.varmdo.felater`.
+    var service: String?
 
     static let current = LaunchOptions(arguments: ProcessInfo.processInfo.arguments)
 
@@ -67,5 +71,6 @@ struct LaunchOptions: Sendable {
         emptyHistory = isOn("-FixaEmptyHistory")
         dryRun = isOn("-FixaDryRun")
         tile = value("-FixaTile")
+        service = value("-FixaService")
     }
 }

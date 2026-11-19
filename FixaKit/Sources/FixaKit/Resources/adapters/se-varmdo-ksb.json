@@ -854,7 +854,8 @@
             "hu": "Szelektív gyűjtőpontok",
             "cs": "Sběrná místa tříděného odpadu"
           },
-          "url": "https://service.varmdo.se/FELATER"
+          "url": "https://service.varmdo.se/FELATER",
+          "adapterID": "se.varmdo.felater"
         },
         {
           "title": {
@@ -881,7 +882,8 @@
             "hu": "Elmaradt szemétszállítás",
             "cs": "Nevyvezený odpad"
           },
-          "url": "https://service.varmdo.se/anmutbsop"
+          "url": "https://service.varmdo.se/anmutbsop",
+          "adapterID": "se.varmdo.anmutbsop"
         },
         {
           "title": {

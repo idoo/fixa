@@ -23,6 +23,15 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
     /// Hosts whose pages Fixa opens in an in-app Safari view (lowercase, each on the municipality's
     /// domain). Every other link opens in Safari. Absent means every link opens in Safari.
     public let allowedWebHosts: [String]?
+    /// Present on every adapter listed under Home's "More forms": the e-service's own name and symbol.
+    /// Absent on the municipality's main fault-report adapter, whose tiles make up Home's grid.
+    public let service: Service?
+    /// Questions the resident answers in Fixa's own controls, sent through `answer` fields.
+    public let questions: [Question]?
+    /// Heading and placeholder of the description box when the form's description means something
+    /// narrower ("Where exactly did you see it?", "Anything else?"); absent: Fixa's own wording.
+    public let descriptionTitle: LocalizedText?
+    public let descriptionPrompt: LocalizedText?
 
     public struct Municipality: Codable, Sendable {
         public let name: String
@@ -73,7 +82,10 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
         public let maxCompletionPostBacks: Int?
         /// Pages in the order the platform shows them. The last page is the summary page whose Next submits the case.
         public let pages: [PageSpec]
+        /// The single photo upload of adapters written before `uploads` existed. Use `allUploads`.
         public let upload: UploadSpec?
+        /// Photo uploads; each applies on its page when its `when` condition holds (none = always).
+        public let uploads: [UploadSpec]?
     }
 
     public struct PageSpec: Codable, Sendable {
@@ -88,11 +100,18 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
         public enum Role: String, Codable, Sendable {
             case category, place, mapChoice, mapAnswer, description, feedback
             case firstName, lastName, phone, email
+            /// One name field: first and last name joined with a space.
+            case fullName
+            /// The draft's answer to `question` (tile answers win): text, a select or radio option, or
+            /// every ticked option of a checkbox list.
+            case answer
         }
         public let role: Role
         /// Field key, e.g. `KSB_14`; the input name ends in `$<key>_field$<control>`.
         public let key: String
         public let control: String
+        /// Role `answer`: id of the question in `AdapterSpec.questions` this field sends.
+        public let question: String?
         /// Radio value meaning yes (mapChoice, feedback).
         public let yesValue: String?
         /// Radio value meaning no (mapChoice, feedback).
@@ -114,13 +133,72 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
     }
 
     public struct UploadSpec: Codable, Sendable {
-        /// Page whose POST the upload must precede.
+        /// `ajax` (default): the platform's FileUploadField2, posted to `path` before the page and checked
+        /// with `getFiles` at `actionPath`. `formFile`: an `<input type="file">` (`key`/`control`) sent in
+        /// the page's own multipart POST.
+        public enum Kind: String, Codable, Sendable {
+            case ajax, formFile
+        }
+        /// Page whose POST the upload must precede (`ajax`) or travel with (`formFile`).
         public let pageID: String
-        public let fieldID: String
-        public let path: String
-        public let filePartName: String
-        public let fileName: String
-        public let actionPath: String
+        /// `ajax`: the field id with dots, e.g. `U.29.1.2`.
+        public let fieldID: String?
+        public let path: String?
+        public let filePartName: String?
+        public let fileName: String?
+        public let actionPath: String?
+        public let kind: Kind?
+        /// `formFile`: key and control of the file input, e.g. `invasivaarter_8` / `fileUploadControl`.
+        public let key: String?
+        public let control: String?
+        /// Upload only when the draft's answer to `question` (tile answers win) contains `value`.
+        public let when: UploadCondition?
+
+        public var resolvedKind: Kind { kind ?? .ajax }
+    }
+
+    public struct UploadCondition: Codable, Sendable, Hashable {
+        public let question: String
+        public let value: String
+    }
+
+    /// Home's "More forms" row for this e-service.
+    public struct Service: Codable, Sendable, Hashable {
+        public let title: LocalizedText
+        /// One short line under the title: what the form is for.
+        public let subtitle: LocalizedText?
+        /// SF Symbol.
+        public let symbol: String
+        /// Ascending order on Home; absent sorts last, then by id.
+        public let order: Int?
+    }
+
+    /// A question the resident answers in the app. Answers are stored as `[String]` per question id:
+    /// the typed text (`text`, `longText`), the chosen option value (`choice`), every ticked value
+    /// (`multiChoice`) or an ISO 8601 date-time with offset (`dateTime`, sent as Stockholm time).
+    public struct Question: Codable, Sendable, Hashable, Identifiable {
+        public enum Kind: String, Codable, Sendable {
+            case text, longText, choice, multiChoice, dateTime
+        }
+        public let id: String
+        public let kind: Kind
+        public let title: LocalizedText
+        /// Help under the field (what to write, where to find it).
+        public let hint: LocalizedText?
+        public let required: Bool
+        /// `choice` and `multiChoice`: what the form accepts.
+        public let options: [QuestionOption]?
+        /// `text`: tap-to-fill chips; the chip's `value` (Swedish) becomes the answer.
+        public let suggestions: [QuestionOption]?
+        /// `text`, `longText`: longest answer the form takes.
+        public let maxLength: Int?
+    }
+
+    public struct QuestionOption: Codable, Sendable, Hashable, Identifiable {
+        /// Exact option value (choices) or the Swedish text (suggestions) sent to the form.
+        public let value: String
+        public let title: LocalizedText
+        public var id: String { value }
     }
 
     public struct Category: Codable, Sendable, Identifiable, Hashable {
@@ -133,6 +211,7 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
     }
 
     public struct Tile: Codable, Sendable, Identifiable, Hashable {
+        /// Unique across all adapters of the app.
         public let id: String
         public let symbol: String
         public let categoryID: String
@@ -145,11 +224,18 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
         public let responsibility: LocalizedText?
         /// The municipality's other e-services for things that don't belong in this one (https only).
         public let links: [TileLink]?
+        /// Answers this tile fixes, by question id (e.g. `{"action": ["Städning"]}`); not asked in the app.
+        public let answers: [String: [String]]?
+        /// Questions asked for this tile, in order. Absent: every adapter question not fixed by `answers`.
+        public let questionIDs: [String]?
     }
 
     public struct TileLink: Codable, Sendable, Hashable {
         public let title: LocalizedText
+        /// The e-service's web page; builds that know `adapterID` open that form in the app instead.
         public let url: URL
+        /// A bundled adapter (e.g. `se.varmdo.felater`) whose form this link opens in Fixa.
+        public let adapterID: String?
     }
 
     public struct ValidationRules: Codable, Sendable {
@@ -157,6 +243,12 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
         public let descriptionMax: Int
         public let emailRequiredWhenFeedback: Bool
         public let requireLocation: Bool
+        /// The form refuses a report without a photo.
+        public let photoRequired: Bool?
+        /// The form needs an e-mail address whether or not a reply is wanted.
+        public let emailRequired: Bool?
+        /// False when the description field may stay empty (an "Övrig information" box); default true.
+        public let descriptionRequired: Bool?
     }
 
     public struct Emergency: Codable, Sendable {
@@ -217,6 +309,49 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
               c.scheme?.lowercased() == "https", c.user == nil, c.password == nil, c.port == nil,
               let host = c.host?.lowercased(), !host.isEmpty else { return false }
         return (allowedWebHosts ?? []).contains { $0.lowercased() == host }
+    }
+
+    /// The main fault-report adapter (Home's grid) has no `service`.
+    public var isPrimary: Bool { service == nil }
+
+    /// `channel.uploads` followed by the legacy `channel.upload`.
+    public var allUploads: [UploadSpec] {
+        (channel.uploads ?? []) + (channel.upload.map { [$0] } ?? [])
+    }
+
+    public func question(id: String?) -> Question? {
+        guard let id else { return nil }
+        return questions?.first { $0.id == id }
+    }
+
+    /// Whether any page has a field with `role`.
+    public func hasField(_ role: FieldSpec.Role) -> Bool {
+        channel.pages.contains { $0.fields.contains { $0.role == role } }
+    }
+
+    /// Questions the resident answers for `tileID`, in order: the tile's `questionIDs`, else every
+    /// adapter question; never one the tile already answers.
+    public func visibleQuestions(tileID: String?) -> [Question] {
+        let tile = tile(id: tileID)
+        let fixed = Set(tile?.answers?.keys.map { $0 } ?? [])
+        let all = tile?.questionIDs?.compactMap { question(id: $0) } ?? questions ?? []
+        return all.filter { !fixed.contains($0.id) }
+    }
+
+    /// What the form receives per question: the draft's answers of visible questions with empty
+    /// strings dropped, overlaid by the tile's fixed answers.
+    public func answers(for draft: ReportDraft) -> [String: [String]] {
+        var result: [String: [String]] = [:]
+        for question in visibleQuestions(tileID: draft.tileID) {
+            let values = (draft.answers[question.id] ?? [])
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty }
+            if !values.isEmpty { result[question.id] = values }
+        }
+        for (id, values) in tile(id: draft.tileID)?.answers ?? [:] {
+            result[id] = values
+        }
+        return result
     }
 }
 

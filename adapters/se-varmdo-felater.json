@@ -1,0 +1,1181 @@
+{
+  "specVersion": 1,
+  "minAppBuild": 13,
+  "id": "se.varmdo.felater",
+  "service": {
+    "title": {
+      "sv": "Återvinningsstation",
+      "en": "Recycling station",
+      "fi": "Kierrätysasema",
+      "ar": "محطة إعادة التدوير",
+      "uk": "Пункт сортування відходів",
+      "pl": "Stacja recyklingu",
+      "ru": "Пункт сортировки отходов",
+      "de": "Recyclingstation",
+      "fr": "Point de recyclage",
+      "es": "Punto de reciclaje",
+      "it": "Stazione di riciclo",
+      "pt": "Ecoponto",
+      "nl": "Recyclingstation",
+      "da": "Genbrugsstation",
+      "nb": "Returpunkt",
+      "et": "Taaskasutuspunkt",
+      "lv": "Šķirošanas punkts",
+      "lt": "Rūšiavimo aikštelė",
+      "ro": "Stație de reciclare",
+      "el": "Σημείο ανακύκλωσης",
+      "hu": "Szelektív gyűjtőpont",
+      "cs": "Sběrné místo tříděného odpadu"
+    },
+    "subtitle": {
+      "sv": "Överfull, nedskräpad eller trasig",
+      "en": "Overflowing, littered or broken",
+      "fi": "Täynnä, roskainen tai rikki",
+      "ar": "ممتلئة أو متسخة أو معطلة",
+      "uk": "Переповнений, засмічений або зламаний",
+      "pl": "Przepełniona, zaśmiecona lub zepsuta",
+      "ru": "Переполнен, замусорен или сломан",
+      "de": "Überfüllt, vermüllt oder kaputt",
+      "fr": "Plein, sale ou abîmé",
+      "es": "Lleno, sucio o roto",
+      "it": "Piena, sporca o rotta",
+      "pt": "Cheio, sujo ou avariado",
+      "nl": "Overvol, vervuild of kapot",
+      "da": "Overfyldt, tilsvinet eller i stykker",
+      "nb": "Overfylt, forsøplet eller ødelagt",
+      "et": "Täis, prügine või katki",
+      "lv": "Pārpildīts, piegružots vai salauzts",
+      "lt": "Perpildyta, šiukšlina ar sugadinta",
+      "ro": "Plin, murdar sau stricat",
+      "el": "Γεμάτο, βρόμικο ή χαλασμένο",
+      "hu": "Túltelt, szemetes vagy rongált",
+      "cs": "Přeplněné, znečištěné nebo rozbité"
+    },
+    "symbol": "arrow.3.trianglepath",
+    "order": 1
+  },
+  "municipality": {
+    "name": "Värmdö kommun",
+    "countryCode": "SE",
+    "region": {
+      "center": {
+        "latitude": 59.31,
+        "longitude": 18.55
+      },
+      "bbox": {
+        "minLatitude": 59.15,
+        "maxLatitude": 59.45,
+        "minLongitude": 18.25,
+        "maxLongitude": 19.05
+      }
+    },
+    "geocoderNames": [
+      "Värmdö",
+      "Värmdö kommun"
+    ]
+  },
+  "channel": {
+    "kind": "abou",
+    "baseURL": "https://service.varmdo.se",
+    "service": "FELATER",
+    "introPath": "/FELATER",
+    "startPath": "/Setup.aspx?Service=FELATER&skipintro=true",
+    "nextEventTarget": "ctl00$ctl00$LeftAndMainSection$MainSection$ServiceSection$ServicePageNavigationSection$NextAndBackButtons$NextButton",
+    "sessionLockedMarker": "Du har ett ärende igång redan",
+    "completionPostBackMarker": "var doPostBack = 'True'",
+    "maxCompletionPostBacks": 3,
+    "pages": [
+      {
+        "id": "page",
+        "stage": "sendingReport",
+        "fields": [
+          {
+            "role": "answer",
+            "key": "FELATER_1",
+            "control": "dropDownSelect2FieldControl",
+            "question": "station",
+            "type": "select",
+            "labels": {
+              "sv": [
+                "Välj återvinningsstation"
+              ],
+              "en": [
+                "Choose recycling station"
+              ]
+            }
+          },
+          {
+            "role": "answer",
+            "key": "FELATER_2",
+            "control": "checkBoxListFieldControl",
+            "question": "action",
+            "type": "checkbox",
+            "labels": {
+              "sv": [
+                "Vad bör göras?"
+              ],
+              "en": [
+                "What should be done?"
+              ]
+            }
+          },
+          {
+            "role": "answer",
+            "key": "FELATER_3",
+            "control": "checkBoxListFieldControl",
+            "question": "cleanWhat",
+            "type": "checkbox",
+            "labels": {
+              "sv": [
+                "Vad behöver städas?"
+              ],
+              "en": [
+                "What needs cleaning up?"
+              ]
+            }
+          },
+          {
+            "role": "answer",
+            "key": "FELATER_5",
+            "control": "textFieldControl",
+            "question": "visited",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "När besökte du återvinningsstationen?"
+              ],
+              "en": [
+                "When did you visit the recycling station?"
+              ]
+            }
+          },
+          {
+            "role": "answer",
+            "key": "FELATER_4",
+            "control": "checkBoxListFieldControl",
+            "question": "emptyWhat",
+            "type": "checkbox",
+            "labels": {
+              "sv": [
+                "Vad behöver tömmas?"
+              ],
+              "en": [
+                "What needs emptying?"
+              ]
+            }
+          },
+          {
+            "role": "answer",
+            "key": "FELATER_6",
+            "control": "textFieldControl",
+            "question": "visited",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "När besökte du återvinningsstationen?"
+              ],
+              "en": [
+                "When did you visit the recycling station?"
+              ]
+            }
+          },
+          {
+            "role": "fullName",
+            "key": "FELATER_15",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Namn"
+              ],
+              "en": [
+                "Name"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "SummaryPage",
+        "stage": "confirming",
+        "fields": []
+      }
+    ],
+    "uploads": [
+      {
+        "pageID": "page",
+        "fieldID": "FELATER.7",
+        "path": "/Citizen/Field/UploadFile/FELATER.7",
+        "filePartName": "files[]",
+        "fileName": "foto.jpg",
+        "actionPath": "/Citizen/Field/Action",
+        "when": {
+          "question": "action",
+          "value": "Städning"
+        }
+      },
+      {
+        "pageID": "page",
+        "fieldID": "FELATER.8",
+        "path": "/Citizen/Field/UploadFile/FELATER.8",
+        "filePartName": "files[]",
+        "fileName": "foto.jpg",
+        "actionPath": "/Citizen/Field/Action",
+        "when": {
+          "question": "action",
+          "value": "Extra tömning"
+        }
+      }
+    ]
+  },
+  "categories": [
+    {
+      "id": "recycling",
+      "value": "Återvinningsstation",
+      "title": {
+        "sv": "Återvinningsstation",
+        "en": "Recycling station",
+        "fi": "Kierrätysasema",
+        "ar": "محطة إعادة التدوير",
+        "uk": "Пункт сортування відходів",
+        "pl": "Stacja recyklingu",
+        "ru": "Пункт сортировки отходов",
+        "de": "Recyclingstation",
+        "fr": "Point de recyclage",
+        "es": "Punto de reciclaje",
+        "it": "Stazione di riciclo",
+        "pt": "Ecoponto",
+        "nl": "Recyclingstation",
+        "da": "Genbrugsstation",
+        "nb": "Returpunkt",
+        "et": "Taaskasutuspunkt",
+        "lv": "Šķirošanas punkts",
+        "lt": "Rūšiavimo aikštelė",
+        "ro": "Stație de reciclare",
+        "el": "Σημείο ανακύκλωσης",
+        "hu": "Szelektív gyűjtőpont",
+        "cs": "Sběrné místo tříděného odpadu"
+      }
+    }
+  ],
+  "questions": [
+    {
+      "id": "station",
+      "kind": "choice",
+      "title": {
+        "sv": "Vilken station?",
+        "en": "Which station?",
+        "fi": "Mikä asema?",
+        "ar": "أي محطة؟",
+        "uk": "Який пункт?",
+        "pl": "Która stacja?",
+        "ru": "Какой пункт?",
+        "de": "Welche Station?",
+        "fr": "Quel point ?",
+        "es": "¿Qué punto?",
+        "it": "Quale stazione?",
+        "pt": "Qual ecoponto?",
+        "nl": "Welk station?",
+        "da": "Hvilken station?",
+        "nb": "Hvilket returpunkt?",
+        "et": "Milline punkt?",
+        "lv": "Kurš punkts?",
+        "lt": "Kuri aikštelė?",
+        "ro": "Ce stație?",
+        "el": "Ποιο σημείο;",
+        "hu": "Melyik gyűjtőpont?",
+        "cs": "Které místo?"
+      },
+      "required": true,
+      "options": [
+        {
+          "value": "780001, Djurö, utanför ÅVC|Djuröhällsvägen, Human Bridge",
+          "title": {
+            "sv": "Djurö, utanför ÅVC (Djuröhällsvägen)",
+            "en": "Djurö, utanför ÅVC (Djuröhällsvägen)"
+          }
+        },
+        {
+          "value": "780002, Bullandö Marina|, Ingen insamling",
+          "title": {
+            "sv": "Bullandö Marina",
+            "en": "Bullandö Marina"
+          }
+        },
+        {
+          "value": "780003, Grisslinge|Skärgårdsvägen 160, Human Bridge",
+          "title": {
+            "sv": "Grisslinge (Skärgårdsvägen 160)",
+            "en": "Grisslinge (Skärgårdsvägen 160)"
+          }
+        },
+        {
+          "value": "780004, Munkmora/Skyttevägen|Skyttevägen 25-27, Myrorna",
+          "title": {
+            "sv": "Munkmora/Skyttevägen (Skyttevägen 25-27)",
+            "en": "Munkmora/Skyttevägen (Skyttevägen 25-27)"
+          }
+        },
+        {
+          "value": "780005, Gustavsberg centrum|Coop parkeringen, Myrorna",
+          "title": {
+            "sv": "Gustavsberg centrum (Coop parkeringen)",
+            "en": "Gustavsberg centrum (Coop parkeringen)"
+          }
+        },
+        {
+          "value": "780006, Hemmesta centrum|Skärgårdsvägen, Human Bridge",
+          "title": {
+            "sv": "Hemmesta centrum (Skärgårdsvägen)",
+            "en": "Hemmesta centrum (Skärgårdsvägen)"
+          }
+        },
+        {
+          "value": "780007, Holmviksskogen Fyren|Skärgårdsvägen, Myrorna",
+          "title": {
+            "sv": "Holmviksskogen Fyren (Skärgårdsvägen)",
+            "en": "Holmviksskogen Fyren (Skärgårdsvägen)"
+          }
+        },
+        {
+          "value": "780008, Långvik, Ingarö|Långviksvägen, Myrorna",
+          "title": {
+            "sv": "Långvik, Ingarö (Långviksvägen)",
+            "en": "Långvik, Ingarö (Långviksvägen)"
+          }
+        },
+        {
+          "value": "780009, Södra Kopparmora|Angöringsvägen, Human Bridge",
+          "title": {
+            "sv": "Södra Kopparmora (Angöringsvägen)",
+            "en": "Södra Kopparmora (Angöringsvägen)"
+          }
+        },
+        {
+          "value": "780010, Stavsnäs, ICA|, Human Bridge",
+          "title": {
+            "sv": "Stavsnäs, ICA",
+            "en": "Stavsnäs, ICA"
+          }
+        },
+        {
+          "value": "780011, Djurö Björkås|Björkås centrum, Human Bridge",
+          "title": {
+            "sv": "Djurö Björkås (Björkås centrum)",
+            "en": "Djurö Björkås (Björkås centrum)"
+          }
+        },
+        {
+          "value": "780012, Östra Ekedal|Gezelius Väg, Kapellvägen, Myrorna",
+          "title": {
+            "sv": "Östra Ekedal (Gezelius Väg, Kapellvägen)",
+            "en": "Östra Ekedal (Gezelius Väg, Kapellvägen)"
+          }
+        },
+        {
+          "value": "780013, Stavsnäs Vinterhamn|Stavsnäs vinterhamn, Human Bridge",
+          "title": {
+            "sv": "Stavsnäs Vinterhamn (Stavsnäs vinterhamn)",
+            "en": "Stavsnäs Vinterhamn (Stavsnäs vinterhamn)"
+          }
+        },
+        {
+          "value": "780014, Farsta Slottsvik|Godeniusvägen, Odelbergsvägen, Ingen insamling",
+          "title": {
+            "sv": "Farsta Slottsvik (Godeniusvägen, Odelbergsvägen)",
+            "en": "Farsta Slottsvik (Godeniusvägen, Odelbergsvägen)"
+          }
+        },
+        {
+          "value": "780015, Hästhagen|Gamle Svartens väg 1, Myrorna",
+          "title": {
+            "sv": "Hästhagen (Gamle Svartens väg 1)",
+            "en": "Hästhagen (Gamle Svartens väg 1)"
+          }
+        },
+        {
+          "value": "780016, Styrmannen|Björnskogsvägen, Myrorna",
+          "title": {
+            "sv": "Styrmannen (Björnskogsvägen)",
+            "en": "Styrmannen (Björnskogsvägen)"
+          }
+        },
+        {
+          "value": "780017, Mölnviks Handelsplats, Lidl|Medeas väg 2, Myrorna",
+          "title": {
+            "sv": "Mölnviks Handelsplats, Lidl (Medeas väg 2)",
+            "en": "Mölnviks Handelsplats, Lidl (Medeas väg 2)"
+          }
+        },
+        {
+          "value": "780018, Hemmestatorp|Värmdövägen, Ingen insamling",
+          "title": {
+            "sv": "Hemmestatorp (Värmdövägen)",
+            "en": "Hemmestatorp (Värmdövägen)"
+          }
+        },
+        {
+          "value": "780019, Fågelbro pendlarparkering|Stavsnäsvägen, Fågelbro, Human Bridge",
+          "title": {
+            "sv": "Fågelbro pendlarparkering (Stavsnäsvägen, Fågelbro)",
+            "en": "Fågelbro pendlarparkering (Stavsnäsvägen, Fågelbro)"
+          }
+        },
+        {
+          "value": "780020, Brunn pendlarparkering/Näsuddsvägen|Näsuddsvägen, Eknäsvägen, Myrorna",
+          "title": {
+            "sv": "Brunn pendlarparkering/Näsuddsvägen (Näsuddsvägen, Eknäsvägen)",
+            "en": "Brunn pendlarparkering/Näsuddsvägen (Näsuddsvägen, Eknäsvägen)"
+          }
+        },
+        {
+          "value": "780021, Villagatan/Porslinsfabriken|Villagatan, Kvarntorpsvägen, Human Bridge",
+          "title": {
+            "sv": "Villagatan/Porslinsfabriken (Villagatan, Kvarntorpsvägen)",
+            "en": "Villagatan/Porslinsfabriken (Villagatan, Kvarntorpsvägen)"
+          }
+        },
+        {
+          "value": "780022, Sollenkroka hamn|Lövdalsvägen, Human Bridge",
+          "title": {
+            "sv": "Sollenkroka hamn (Lövdalsvägen)",
+            "en": "Sollenkroka hamn (Lövdalsvägen)"
+          }
+        },
+        {
+          "value": "780024, Ekobacken|Leveransvägen 29, Human Bridge",
+          "title": {
+            "sv": "Ekobacken (Leveransvägen 29)",
+            "en": "Ekobacken (Leveransvägen 29)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "action",
+      "kind": "multiChoice",
+      "title": {
+        "sv": "Vad behöver göras?",
+        "en": "What needs doing?",
+        "fi": "Mitä pitää tehdä?",
+        "ar": "ما المطلوب؟",
+        "uk": "Що потрібно зробити?",
+        "pl": "Co trzeba zrobić?",
+        "ru": "Что нужно сделать?",
+        "de": "Was muss getan werden?",
+        "fr": "Que faut-il faire ?",
+        "es": "¿Qué hay que hacer?",
+        "it": "Cosa bisogna fare?",
+        "pt": "O que é preciso fazer?",
+        "nl": "Wat moet er gebeuren?",
+        "da": "Hvad skal gøres?",
+        "nb": "Hva må gjøres?",
+        "et": "Mida tuleb teha?",
+        "lv": "Kas jādara?",
+        "lt": "Ką reikia padaryti?",
+        "ro": "Ce trebuie făcut?",
+        "el": "Τι πρέπει να γίνει;",
+        "hu": "Mit kell tenni?",
+        "cs": "Co je potřeba udělat?"
+      },
+      "required": true,
+      "options": [
+        {
+          "value": "Städning",
+          "title": {
+            "sv": "Städning",
+            "en": "Cleaning up",
+            "fi": "Siivous",
+            "ar": "تنظيف",
+            "uk": "Прибирання",
+            "pl": "Sprzątanie",
+            "ru": "Уборка",
+            "de": "Reinigung",
+            "fr": "Nettoyage",
+            "es": "Limpieza",
+            "it": "Pulizia",
+            "pt": "Limpeza",
+            "nl": "Schoonmaken",
+            "da": "Oprydning",
+            "nb": "Rydding",
+            "et": "Koristamine",
+            "lv": "Uzkopšana",
+            "lt": "Sutvarkymas",
+            "ro": "Curățenie",
+            "el": "Καθαρισμός",
+            "hu": "Takarítás",
+            "cs": "Úklid"
+          }
+        },
+        {
+          "value": "Extra tömning",
+          "title": {
+            "sv": "Extra tömning",
+            "en": "Extra emptying",
+            "fi": "Ylimääräinen tyhjennys",
+            "ar": "تفريغ إضافي",
+            "uk": "Додаткове вивезення",
+            "pl": "Dodatkowe opróżnienie",
+            "ru": "Дополнительный вывоз",
+            "de": "Zusätzliche Leerung",
+            "fr": "Vidage supplémentaire",
+            "es": "Vaciado extra",
+            "it": "Svuotamento extra",
+            "pt": "Esvaziamento extra",
+            "nl": "Extra legen",
+            "da": "Ekstra tømning",
+            "nb": "Ekstra tømming",
+            "et": "Lisatühjendus",
+            "lv": "Papildu iztukšošana",
+            "lt": "Papildomas ištuštinimas",
+            "ro": "Golire suplimentară",
+            "el": "Επιπλέον άδειασμα",
+            "hu": "Soron kívüli ürítés",
+            "cs": "Mimořádný vývoz"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cleanWhat",
+      "kind": "multiChoice",
+      "title": {
+        "sv": "Vad behöver städas?",
+        "en": "What needs cleaning up?",
+        "fi": "Mitä pitää siivota?",
+        "ar": "ما الذي يحتاج إلى تنظيف؟",
+        "uk": "Що треба прибрати?",
+        "pl": "Co trzeba posprzątać?",
+        "ru": "Что нужно убрать?",
+        "de": "Was muss gereinigt werden?",
+        "fr": "Que faut-il nettoyer ?",
+        "es": "¿Qué hay que limpiar?",
+        "it": "Cosa va pulito?",
+        "pt": "O que precisa de limpeza?",
+        "nl": "Wat moet er schoongemaakt worden?",
+        "da": "Hvad skal ryddes op?",
+        "nb": "Hva må ryddes?",
+        "et": "Mida tuleb koristada?",
+        "lv": "Ko vajag uzkopt?",
+        "lt": "Ką reikia sutvarkyti?",
+        "ro": "Ce trebuie curățat?",
+        "el": "Τι χρειάζεται καθάρισμα;",
+        "hu": "Mit kell kitakarítani?",
+        "cs": "Co je potřeba uklidit?"
+      },
+      "required": true,
+      "options": [
+        {
+          "value": "Batterier",
+          "title": {
+            "sv": "Batterier",
+            "en": "Batteries",
+            "fi": "Paristot",
+            "ar": "البطاريات",
+            "uk": "Батарейки",
+            "pl": "Baterie",
+            "ru": "Батарейки",
+            "de": "Batterien",
+            "fr": "Piles",
+            "es": "Pilas",
+            "it": "Batterie",
+            "pt": "Pilhas",
+            "nl": "Batterijen",
+            "da": "Batterier",
+            "nb": "Batterier",
+            "et": "Patareid",
+            "lv": "Baterijas",
+            "lt": "Baterijos",
+            "ro": "Baterii",
+            "el": "Μπαταρίες",
+            "hu": "Elemek",
+            "cs": "Baterie"
+          }
+        },
+        {
+          "value": "Tidningar",
+          "title": {
+            "sv": "Tidningar",
+            "en": "Newspapers",
+            "fi": "Sanomalehdet",
+            "ar": "الصحف",
+            "uk": "Газети",
+            "pl": "Gazety",
+            "ru": "Газеты",
+            "de": "Zeitungen",
+            "fr": "Journaux",
+            "es": "Periódicos",
+            "it": "Giornali",
+            "pt": "Jornais",
+            "nl": "Kranten",
+            "da": "Aviser",
+            "nb": "Aviser",
+            "et": "Ajalehed",
+            "lv": "Avīzes",
+            "lt": "Laikraščiai",
+            "ro": "Ziare",
+            "el": "Εφημερίδες",
+            "hu": "Újságok",
+            "cs": "Noviny"
+          }
+        },
+        {
+          "value": "Klädinsamling",
+          "title": {
+            "sv": "Klädinsamling",
+            "en": "Clothes collection",
+            "fi": "Vaatekeräys",
+            "ar": "جمع الملابس",
+            "uk": "Збір одягу",
+            "pl": "Zbiórka odzieży",
+            "ru": "Сбор одежды",
+            "de": "Kleidersammlung",
+            "fr": "Collecte de vêtements",
+            "es": "Recogida de ropa",
+            "it": "Raccolta abiti",
+            "pt": "Recolha de roupa",
+            "nl": "Kledinginzameling",
+            "da": "Tøjindsamling",
+            "nb": "Klesinnsamling",
+            "et": "Riiete kogumine",
+            "lv": "Apģērbu savākšana",
+            "lt": "Drabužių surinkimas",
+            "ro": "Colectare haine",
+            "el": "Συλλογή ρούχων",
+            "hu": "Ruhagyűjtés",
+            "cs": "Sběr oblečení"
+          }
+        },
+        {
+          "value": "Förpackningar",
+          "title": {
+            "sv": "Förpackningar",
+            "en": "Packaging",
+            "fi": "Pakkaukset",
+            "ar": "العبوات",
+            "uk": "Упаковка",
+            "pl": "Opakowania",
+            "ru": "Упаковка",
+            "de": "Verpackungen",
+            "fr": "Emballages",
+            "es": "Envases",
+            "it": "Imballaggi",
+            "pt": "Embalagens",
+            "nl": "Verpakkingen",
+            "da": "Emballager",
+            "nb": "Emballasje",
+            "et": "Pakendid",
+            "lv": "Iepakojumi",
+            "lt": "Pakuotės",
+            "ro": "Ambalaje",
+            "el": "Συσκευασίες",
+            "hu": "Csomagolások",
+            "cs": "Obaly"
+          }
+        },
+        {
+          "value": "Farligt avfall",
+          "title": {
+            "sv": "Farligt avfall",
+            "en": "Hazardous waste",
+            "fi": "Vaarallinen jäte",
+            "ar": "نفايات خطرة",
+            "uk": "Небезпечні відходи",
+            "pl": "Odpady niebezpieczne",
+            "ru": "Опасные отходы",
+            "de": "Sondermüll",
+            "fr": "Déchets dangereux",
+            "es": "Residuos peligrosos",
+            "it": "Rifiuti pericolosi",
+            "pt": "Resíduos perigosos",
+            "nl": "Gevaarlijk afval",
+            "da": "Farligt affald",
+            "nb": "Farlig avfall",
+            "et": "Ohtlikud jäätmed",
+            "lv": "Bīstamie atkritumi",
+            "lt": "Pavojingos atliekos",
+            "ro": "Deșeuri periculoase",
+            "el": "Επικίνδυνα απόβλητα",
+            "hu": "Veszélyes hulladék",
+            "cs": "Nebezpečný odpad"
+          }
+        },
+        {
+          "value": "Klotter och sanering",
+          "title": {
+            "sv": "Klotter och sanering",
+            "en": "Graffiti and clean-up",
+            "fi": "Töhryt ja puhdistus",
+            "ar": "الكتابة على الجدران والتنظيف",
+            "uk": "Графіті та очищення",
+            "pl": "Graffiti i usuwanie",
+            "ru": "Граффити и очистка",
+            "de": "Graffiti und Beseitigung",
+            "fr": "Graffitis et nettoyage",
+            "es": "Grafitis y limpieza",
+            "it": "Graffiti e pulizia",
+            "pt": "Grafitos e limpeza",
+            "nl": "Graffiti en reiniging",
+            "da": "Graffiti og afrensning",
+            "nb": "Tagging og sanering",
+            "et": "Grafiti ja puhastus",
+            "lv": "Grafiti un attīrīšana",
+            "lt": "Grafitai ir valymas",
+            "ro": "Graffiti și curățare",
+            "el": "Γκράφιτι και καθαρισμός",
+            "hu": "Graffiti és eltávolítás",
+            "cs": "Graffiti a čištění"
+          }
+        },
+        {
+          "value": "Grovsopor",
+          "title": {
+            "sv": "Grovsopor",
+            "en": "Bulky waste",
+            "fi": "Suurikokoinen jäte",
+            "ar": "النفايات الضخمة",
+            "uk": "Великогабаритні відходи",
+            "pl": "Odpady wielkogabarytowe",
+            "ru": "Крупногабаритный мусор",
+            "de": "Sperrmüll",
+            "fr": "Encombrants",
+            "es": "Residuos voluminosos",
+            "it": "Rifiuti ingombranti",
+            "pt": "Monstros",
+            "nl": "Grofvuil",
+            "da": "Storskrald",
+            "nb": "Grovavfall",
+            "et": "Suurjäätmed",
+            "lv": "Lielgabarīta atkritumi",
+            "lt": "Didžiosios atliekos",
+            "ro": "Deșeuri voluminoase",
+            "el": "Ογκώδη απορρίμματα",
+            "hu": "Lomtalanítás",
+            "cs": "Objemný odpad"
+          }
+        },
+        {
+          "value": "Snöröjning och halkbekämpning",
+          "title": {
+            "sv": "Snöröjning och halkbekämpning",
+            "en": "Snow clearing and gritting",
+            "fi": "Lumityöt ja liukkauden torjunta",
+            "ar": "إزالة الثلوج ومكافحة الانزلاق",
+            "uk": "Прибирання снігу та посипання",
+            "pl": "Odśnieżanie i posypywanie",
+            "ru": "Уборка снега и посыпка",
+            "de": "Schneeräumung und Streuen",
+            "fr": "Déneigement et salage",
+            "es": "Limpieza de nieve y antideslizante",
+            "it": "Sgombero neve e antighiaccio",
+            "pt": "Remoção de neve e antiderrapante",
+            "nl": "Sneeuwruimen en strooien",
+            "da": "Snerydning og glatførebekæmpelse",
+            "nb": "Brøyting og strøing",
+            "et": "Lumekoristus ja libedustõrje",
+            "lv": "Sniega tīrīšana un kaisīšana",
+            "lt": "Sniego valymas ir barstymas",
+            "ro": "Deszăpezire și antiderapant",
+            "el": "Αποχιονισμός και αντιολισθητικά",
+            "hu": "Hóeltakarítás és síkosságmentesítés",
+            "cs": "Odklízení sněhu a posyp"
+          }
+        }
+      ]
+    },
+    {
+      "id": "emptyWhat",
+      "kind": "multiChoice",
+      "title": {
+        "sv": "Vad behöver tömmas?",
+        "en": "What needs emptying?",
+        "fi": "Mitä pitää tyhjentää?",
+        "ar": "ما الذي يحتاج إلى تفريغ؟",
+        "uk": "Що треба вивезти?",
+        "pl": "Co trzeba opróżnić?",
+        "ru": "Что нужно вывезти?",
+        "de": "Was muss geleert werden?",
+        "fr": "Que faut-il vider ?",
+        "es": "¿Qué hay que vaciar?",
+        "it": "Cosa va svuotato?",
+        "pt": "O que precisa de ser esvaziado?",
+        "nl": "Wat moet er geleegd worden?",
+        "da": "Hvad skal tømmes?",
+        "nb": "Hva må tømmes?",
+        "et": "Mida tuleb tühjendada?",
+        "lv": "Ko vajag iztukšot?",
+        "lt": "Ką reikia ištuštinti?",
+        "ro": "Ce trebuie golit?",
+        "el": "Τι χρειάζεται άδειασμα;",
+        "hu": "Mit kell üríteni?",
+        "cs": "Co je potřeba vyvézt?"
+      },
+      "required": true,
+      "options": [
+        {
+          "value": "Klädinsamling",
+          "title": {
+            "sv": "Klädinsamling",
+            "en": "Clothes collection",
+            "fi": "Vaatekeräys",
+            "ar": "جمع الملابس",
+            "uk": "Збір одягу",
+            "pl": "Zbiórka odzieży",
+            "ru": "Сбор одежды",
+            "de": "Kleidersammlung",
+            "fr": "Collecte de vêtements",
+            "es": "Recogida de ropa",
+            "it": "Raccolta abiti",
+            "pt": "Recolha de roupa",
+            "nl": "Kledinginzameling",
+            "da": "Tøjindsamling",
+            "nb": "Klesinnsamling",
+            "et": "Riiete kogumine",
+            "lv": "Apģērbu savākšana",
+            "lt": "Drabužių surinkimas",
+            "ro": "Colectare haine",
+            "el": "Συλλογή ρούχων",
+            "hu": "Ruhagyűjtés",
+            "cs": "Sběr oblečení"
+          }
+        },
+        {
+          "value": "Plastförpackningar",
+          "title": {
+            "sv": "Plastförpackningar",
+            "en": "Plastic packaging",
+            "fi": "Muovipakkaukset",
+            "ar": "العبوات البلاستيكية",
+            "uk": "Пластикова упаковка",
+            "pl": "Opakowania plastikowe",
+            "ru": "Пластиковая упаковка",
+            "de": "Kunststoffverpackungen",
+            "fr": "Emballages plastiques",
+            "es": "Envases de plástico",
+            "it": "Imballaggi di plastica",
+            "pt": "Embalagens de plástico",
+            "nl": "Plastic verpakkingen",
+            "da": "Plastemballager",
+            "nb": "Plastemballasje",
+            "et": "Plastpakendid",
+            "lv": "Plastmasas iepakojumi",
+            "lt": "Plastikinės pakuotės",
+            "ro": "Ambalaje de plastic",
+            "el": "Πλαστικές συσκευασίες",
+            "hu": "Műanyag csomagolások",
+            "cs": "Plastové obaly"
+          }
+        },
+        {
+          "value": "Tidningar",
+          "title": {
+            "sv": "Tidningar",
+            "en": "Newspapers",
+            "fi": "Sanomalehdet",
+            "ar": "الصحف",
+            "uk": "Газети",
+            "pl": "Gazety",
+            "ru": "Газеты",
+            "de": "Zeitungen",
+            "fr": "Journaux",
+            "es": "Periódicos",
+            "it": "Giornali",
+            "pt": "Jornais",
+            "nl": "Kranten",
+            "da": "Aviser",
+            "nb": "Aviser",
+            "et": "Ajalehed",
+            "lv": "Avīzes",
+            "lt": "Laikraščiai",
+            "ro": "Ziare",
+            "el": "Εφημερίδες",
+            "hu": "Újságok",
+            "cs": "Noviny"
+          }
+        },
+        {
+          "value": "Pappersförpackningar",
+          "title": {
+            "sv": "Pappersförpackningar",
+            "en": "Paper packaging",
+            "fi": "Kartonkipakkaukset",
+            "ar": "العبوات الورقية",
+            "uk": "Паперова упаковка",
+            "pl": "Opakowania papierowe",
+            "ru": "Бумажная упаковка",
+            "de": "Papierverpackungen",
+            "fr": "Emballages en papier",
+            "es": "Envases de papel",
+            "it": "Imballaggi di carta",
+            "pt": "Embalagens de papel",
+            "nl": "Papieren verpakkingen",
+            "da": "Papemballager",
+            "nb": "Papiremballasje",
+            "et": "Paberpakendid",
+            "lv": "Papīra iepakojumi",
+            "lt": "Popierinės pakuotės",
+            "ro": "Ambalaje de hârtie",
+            "el": "Χάρτινες συσκευασίες",
+            "hu": "Papír csomagolások",
+            "cs": "Papírové obaly"
+          }
+        },
+        {
+          "value": "Glasförpackningar",
+          "title": {
+            "sv": "Glasförpackningar",
+            "en": "Glass packaging",
+            "fi": "Lasipakkaukset",
+            "ar": "العبوات الزجاجية",
+            "uk": "Скляна тара",
+            "pl": "Opakowania szklane",
+            "ru": "Стеклянная тара",
+            "de": "Glasverpackungen",
+            "fr": "Emballages en verre",
+            "es": "Envases de vidrio",
+            "it": "Imballaggi di vetro",
+            "pt": "Embalagens de vidro",
+            "nl": "Glazen verpakkingen",
+            "da": "Glasemballager",
+            "nb": "Glassemballasje",
+            "et": "Klaaspakendid",
+            "lv": "Stikla iepakojumi",
+            "lt": "Stiklinės pakuotės",
+            "ro": "Ambalaje de sticlă",
+            "el": "Γυάλινες συσκευασίες",
+            "hu": "Üveg csomagolások",
+            "cs": "Skleněné obaly"
+          }
+        },
+        {
+          "value": "Batterier",
+          "title": {
+            "sv": "Batterier",
+            "en": "Batteries",
+            "fi": "Paristot",
+            "ar": "البطاريات",
+            "uk": "Батарейки",
+            "pl": "Baterie",
+            "ru": "Батарейки",
+            "de": "Batterien",
+            "fr": "Piles",
+            "es": "Pilas",
+            "it": "Batterie",
+            "pt": "Pilhas",
+            "nl": "Batterijen",
+            "da": "Batterier",
+            "nb": "Batterier",
+            "et": "Patareid",
+            "lv": "Baterijas",
+            "lt": "Baterijos",
+            "ro": "Baterii",
+            "el": "Μπαταρίες",
+            "hu": "Elemek",
+            "cs": "Baterie"
+          }
+        },
+        {
+          "value": "Metallförpackningar",
+          "title": {
+            "sv": "Metallförpackningar",
+            "en": "Metal packaging",
+            "fi": "Metallipakkaukset",
+            "ar": "العبوات المعدنية",
+            "uk": "Металева упаковка",
+            "pl": "Opakowania metalowe",
+            "ru": "Металлическая упаковка",
+            "de": "Metallverpackungen",
+            "fr": "Emballages métalliques",
+            "es": "Envases de metal",
+            "it": "Imballaggi di metallo",
+            "pt": "Embalagens de metal",
+            "nl": "Metalen verpakkingen",
+            "da": "Metalemballager",
+            "nb": "Metallemballasje",
+            "et": "Metallpakendid",
+            "lv": "Metāla iepakojumi",
+            "lt": "Metalinės pakuotės",
+            "ro": "Ambalaje metalice",
+            "el": "Μεταλλικές συσκευασίες",
+            "hu": "Fém csomagolások",
+            "cs": "Kovové obaly"
+          }
+        }
+      ]
+    },
+    {
+      "id": "visited",
+      "kind": "dateTime",
+      "title": {
+        "sv": "När var du där?",
+        "en": "When were you there?",
+        "fi": "Milloin kävit siellä?",
+        "ar": "متى كنت هناك؟",
+        "uk": "Коли ви там були?",
+        "pl": "Kiedy tam byłeś?",
+        "ru": "Когда вы там были?",
+        "de": "Wann waren Sie dort?",
+        "fr": "Quand y étiez-vous ?",
+        "es": "¿Cuándo estuviste allí?",
+        "it": "Quando ci sei stato?",
+        "pt": "Quando esteve lá?",
+        "nl": "Wanneer was je daar?",
+        "da": "Hvornår var du der?",
+        "nb": "Når var du der?",
+        "et": "Millal te seal käisite?",
+        "lv": "Kad jūs tur bijāt?",
+        "lt": "Kada ten buvote?",
+        "ro": "Când ați fost acolo?",
+        "el": "Πότε ήσασταν εκεί;",
+        "hu": "Mikor járt ott?",
+        "cs": "Kdy jste tam byli?"
+      },
+      "required": true
+    }
+  ],
+  "tiles": [
+    {
+      "id": "recycling-clean",
+      "symbol": "sparkles",
+      "categoryID": "recycling",
+      "title": {
+        "sv": "Behöver städas",
+        "en": "Needs cleaning up",
+        "fi": "Pitää siivota",
+        "ar": "تحتاج إلى تنظيف",
+        "uk": "Треба прибрати",
+        "pl": "Trzeba posprzątać",
+        "ru": "Нужна уборка",
+        "de": "Muss gereinigt werden",
+        "fr": "À nettoyer",
+        "es": "Necesita limpieza",
+        "it": "Da pulire",
+        "pt": "Precisa de limpeza",
+        "nl": "Moet schoongemaakt",
+        "da": "Skal ryddes op",
+        "nb": "Må ryddes",
+        "et": "Vajab koristamist",
+        "lv": "Jāuzkopj",
+        "lt": "Reikia sutvarkyti",
+        "ro": "Trebuie curățat",
+        "el": "Χρειάζεται καθάρισμα",
+        "hu": "Takarítani kell",
+        "cs": "Potřeba uklidit"
+      },
+      "answers": {
+        "action": [
+          "Städning"
+        ]
+      },
+      "questionIDs": [
+        "station",
+        "cleanWhat",
+        "visited"
+      ]
+    },
+    {
+      "id": "recycling-empty",
+      "symbol": "trash.fill",
+      "categoryID": "recycling",
+      "title": {
+        "sv": "Behöver tömmas",
+        "en": "Needs emptying",
+        "fi": "Pitää tyhjentää",
+        "ar": "تحتاج إلى تفريغ",
+        "uk": "Треба вивезти",
+        "pl": "Trzeba opróżnić",
+        "ru": "Нужно вывезти",
+        "de": "Muss geleert werden",
+        "fr": "À vider",
+        "es": "Necesita vaciado",
+        "it": "Da svuotare",
+        "pt": "Precisa de esvaziamento",
+        "nl": "Moet geleegd",
+        "da": "Skal tømmes",
+        "nb": "Må tømmes",
+        "et": "Vajab tühjendamist",
+        "lv": "Jāiztukšo",
+        "lt": "Reikia ištuštinti",
+        "ro": "Trebuie golit",
+        "el": "Χρειάζεται άδειασμα",
+        "hu": "Üríteni kell",
+        "cs": "Potřeba vyvézt"
+      },
+      "answers": {
+        "action": [
+          "Extra tömning"
+        ]
+      },
+      "questionIDs": [
+        "station",
+        "emptyWhat",
+        "visited"
+      ]
+    }
+  ],
+  "validation": {
+    "descriptionMin": 0,
+    "descriptionMax": 4000,
+    "emailRequiredWhenFeedback": false,
+    "requireLocation": false,
+    "photoRequired": true,
+    "descriptionRequired": false
+  },
+  "webFormURL": "https://service.varmdo.se/FELATER",
+  "disclaimer": {
+    "sv": "Fixa är en fristående app med öppen källkod och ingen del av Värmdö kommun. Appen skickar din anmälan direkt till kommunens e-tjänst Felanmälan av återvinningsstation, och kommunen hanterar ärendet på sitt vanliga sätt. Ring 112 om liv eller egendom är i fara.",
+    "en": "Fixa is an independent open-source app and is not part of Värmdö kommun. It sends your report straight to the municipality's e-service for recycling station reports, and the municipality handles it the usual way. Call 112 if life or property is in danger.",
+    "fi": "Fixa on itsenäinen avoimen lähdekoodin sovellus, eikä se ole osa Värmdön kuntaa. Sovellus lähettää ilmoituksesi suoraan kunnan kierrätysasemailmoitusten sähköiseen palveluun, ja kunta käsittelee sen tavalliseen tapaan. Soita 112, jos henki tai omaisuus on vaarassa.",
+    "ar": "Fixa تطبيق مستقل ومفتوح المصدر، وليس جزءاً من بلدية فارمدو. يرسل التطبيق بلاغك مباشرة إلى الخدمة الإلكترونية للبلدية الخاصة بالإبلاغ عن محطات إعادة التدوير، وتتعامل البلدية معه بالطريقة المعتادة. اتصل بالرقم 112 إذا كانت الأرواح أو الممتلكات في خطر.",
+    "uk": "Fixa — незалежний застосунок із відкритим кодом, який не належить комуні Вермдьо. Він надсилає ваше повідомлення безпосередньо до електронного сервісу комуни для повідомлень про пункти сортування відходів, і комуна розглядає його у звичайному порядку. Якщо є загроза життю чи майну, телефонуйте 112.",
+    "pl": "Fixa to niezależna aplikacja open source, która nie należy do gminy Värmdö. Wysyła Twoje zgłoszenie bezpośrednio do e-usługi gminy do zgłaszania problemów ze stacjami recyklingu, a gmina zajmuje się nim w zwykły sposób. Jeśli zagrożone jest życie lub mienie, dzwoń pod 112.",
+    "ru": "Fixa является независимым приложением с открытым исходным кодом и не относится к коммуне Värmdö. Оно отправляет вашу заявку напрямую в электронную услугу коммуны для заявок о пунктах сортировки отходов, и коммуна рассматривает её в обычном порядке. Если под угрозой жизнь или имущество, звоните 112.",
+    "de": "Fixa ist eine unabhängige Open-Source-App und gehört nicht zu Värmdö kommun. Die App sendet Ihre Meldung direkt an den E-Service der Gemeinde für Meldungen zu Recyclingstationen, und die Gemeinde bearbeitet sie wie gewohnt. Rufen Sie 112 an, wenn Leben oder Eigentum in Gefahr sind.",
+    "fr": "Fixa est une app indépendante et open source, qui ne fait pas partie de Värmdö kommun. Elle envoie votre signalement directement au service en ligne de la commune pour les points de recyclage, qui le traite de la manière habituelle. Appelez le 112 si des vies ou des biens sont en danger.",
+    "es": "Fixa es una app independiente de código abierto y no forma parte de Värmdö kommun. Envía tu aviso directamente al servicio electrónico del municipio para avisos sobre puntos de reciclaje, que lo gestiona de la forma habitual. Llama al 112 si hay peligro para personas o bienes.",
+    "it": "Fixa è un'app indipendente e open source e non fa parte di Värmdö kommun. Invia la tua segnalazione direttamente al servizio online del comune per le stazioni di riciclo, e il comune la gestisce come di consueto. Chiama il 112 se ci sono pericoli per persone o cose.",
+    "pt": "A Fixa é uma app independente de código aberto e não faz parte de Värmdö kommun. Envia a sua participação diretamente para o serviço online do município para ecopontos, que a trata da forma habitual. Ligue 112 se houver perigo para pessoas ou bens.",
+    "nl": "Fixa is een onafhankelijke opensource-app en hoort niet bij Värmdö kommun. De app stuurt je melding rechtstreeks naar de e-dienst van de gemeente voor meldingen over recyclingstations, en de gemeente behandelt die op de gewone manier. Bel 112 als levens of eigendommen in gevaar zijn.",
+    "da": "Fixa er en uafhængig app med åben kildekode og er ikke en del af Värmdö kommun. Den sender din anmeldelse direkte til kommunens e-tjeneste for genbrugsstationer, og kommunen behandler den på sædvanlig vis. Ring 112, hvis liv eller ejendom er i fare.",
+    "nb": "Fixa er en uavhengig app med åpen kildekode og er ikke en del av Värmdö kommun. Appen sender meldingen din direkte til kommunens e-tjeneste for returpunkter, og kommunen behandler den på vanlig måte. Ring 112 hvis liv eller eiendom er i fare.",
+    "et": "Fixa on sõltumatu avatud lähtekoodiga rakendus ega kuulu omavalitsusele Värmdö kommun. See saadab teie teate otse omavalitsuse taaskasutuspunktide e-teenusesse ja omavalitsus menetleb seda tavapärasel viisil. Kui elu või vara on ohus, helistage 112.",
+    "lv": "Fixa ir neatkarīga atvērtā koda lietotne, un tā nav saistīta ar Värmdö kommun. Tā nosūta jūsu ziņojumu tieši pašvaldības e-pakalpojumam par šķirošanas punktiem, un pašvaldība to izskata ierastajā kārtībā. Zvaniet 112, ja apdraudēta dzīvība vai īpašums.",
+    "lt": "Fixa yra nepriklausoma atvirojo kodo programėlė ir nėra Värmdö kommun dalis. Ji siunčia jūsų pranešimą tiesiai į savivaldybės rūšiavimo aikštelių e. paslaugą, o savivaldybė jį nagrinėja įprasta tvarka. Skambinkite 112, jei gresia pavojus gyvybei ar turtui.",
+    "ro": "Fixa este o aplicație independentă, open-source, și nu face parte din Värmdö kommun. Trimite sesizarea dumneavoastră direct la serviciul online al comunei pentru stațiile de reciclare, iar comuna o tratează în mod obișnuit. Sunați la 112 dacă viața sau bunurile cuiva sunt în pericol.",
+    "el": "Το Fixa είναι μια ανεξάρτητη εφαρμογή ανοιχτού κώδικα και δεν ανήκει στο Värmdö kommun. Στέλνει την αναφορά σας απευθείας στην ηλεκτρονική υπηρεσία του δήμου για τα σημεία ανακύκλωσης, και ο δήμος τη διαχειρίζεται με τον συνήθη τρόπο. Καλέστε το 112 αν κινδυνεύουν ζωές ή περιουσίες.",
+    "hu": "A Fixa független, nyílt forráskódú alkalmazás, és nem része a Värmdö kommunnak. A bejelentését közvetlenül az önkormányzat szelektív gyűjtőpontokkal kapcsolatos e-szolgáltatásába küldi, az önkormányzat pedig a szokásos módon intézi. Ha élet vagy vagyon van veszélyben, hívja a 112-t.",
+    "cs": "Fixa je nezávislá aplikace s otevřeným zdrojovým kódem a není součástí Värmdö kommun. Odešle vaše hlášení přímo do e-služby obce pro sběrná místa tříděného odpadu a obec ho vyřídí obvyklým způsobem. Pokud je ohrožen život nebo majetek, volejte 112."
+  },
+  "contact": {
+    "pageURL": "https://www.varmdo.se/kommunochpolitik/kontaktcenter.4.1a4e4f4413f7b9c98702cd2.html",
+    "title": {
+      "sv": "Värmdö kommuns kontaktcenter",
+      "en": "Värmdö kommun contact centre",
+      "fi": "Värmdön kunnan asiakaspalvelu",
+      "ar": "مركز الاتصال في بلدية فارمدو",
+      "uk": "Контактний центр комуни Вермдьо",
+      "pl": "Centrum kontaktowe gminy Värmdö",
+      "ru": "Контактный центр коммуны Värmdö",
+      "de": "Kontaktcenter von Värmdö kommun",
+      "fr": "Centre de contact de Värmdö kommun",
+      "es": "Centro de contacto de Värmdö kommun",
+      "it": "Centro contatti di Värmdö kommun",
+      "pt": "Centro de contacto de Värmdö kommun",
+      "nl": "Contactcentrum van Värmdö kommun",
+      "da": "Värmdö kommuns kontaktcenter",
+      "nb": "Kontaktsenteret i Värmdö kommun",
+      "et": "Värmdö kommun: kontaktkeskus",
+      "lv": "Värmdö kommun kontaktu centrs",
+      "lt": "Värmdö kommun kontaktų centras",
+      "ro": "Centrul de contact Värmdö kommun",
+      "el": "Κέντρο επικοινωνίας του Värmdö kommun",
+      "hu": "Värmdö kommun kapcsolattartási központja",
+      "cs": "Kontaktní centrum Värmdö kommun"
+    }
+  },
+  "allowedWebHosts": [
+    "varmdo.se",
+    "www.varmdo.se",
+    "service.varmdo.se"
+  ]
+}

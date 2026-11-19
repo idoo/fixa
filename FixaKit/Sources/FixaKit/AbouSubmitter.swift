@@ -95,14 +95,21 @@ public struct AbouSubmitter: Sendable {
 
             // Check the page against the adapter before anything is uploaded: a changed form never
             // leaves an orphan photo on the server.
-            let pageValues = try values(for: pageSpec, draft: draft, html: page.html)
-            if let upload = channel.upload, upload.pageID == pageSpec.id, let photo = draft.photoJPEG {
-                progress(.uploadingPhoto)
-                try await uploadPhoto(photo, upload: upload, base: base, referer: page.url)
+            let uploads = uploads(on: pageSpec.id, draft: draft)
+            var file: FilePart?
+            if let photo = draft.photoJPEG, let upload = uploads.first(where: { $0.resolvedKind == .formFile }) {
+                file = FilePart(name: try fileInput(for: upload, pageID: pageSpec.id, html: page.html), data: photo)
+            }
+            let pageValues = try values(for: pageSpec, draft: draft, html: page.html, filled: Set([file?.name].compactMap { $0 }))
+            if let photo = draft.photoJPEG {
+                for upload in uploads where upload.resolvedKind == .ajax {
+                    progress(.uploadingPhoto)
+                    try await uploadPhoto(photo, upload: upload, base: base, referer: page.url)
+                }
             }
 
             progress(stage(pageSpec.stage))
-            page = try await post(page, values: pageValues)
+            page = try await post(page, values: pageValues, file: file)
             index += 1
         }
         throw SubmissionError.invalidSpec("No summary page")
@@ -221,73 +228,146 @@ public struct AbouSubmitter: Sendable {
     }
 
     /// Name/value pairs for the page; `.formChanged` listing every field, option or new required
-    /// question that doesn't match the adapter.
-    private func values(for page: AdapterSpec.PageSpec, draft: ReportDraft, html: String) throws -> [(String, String)] {
+    /// question that doesn't match the adapter. `filled` names further inputs Fixa fills (a file input).
+    /// Answer fields the page's activation rules hide for what Fixa posts are neither posted nor drift;
+    /// every other role posts as it always has (KSB's feedback radio must go out for water reports).
+    private func values(for page: AdapterSpec.PageSpec, draft: ReportDraft, html: String, filled: Set<String> = []) throws -> [(String, String)] {
         let form = FormStructure(html: html)
         var taken: Set<String> = []
-        var pairs: [(String, String)] = []
-        var missing: [String] = []
+        var filled = filled
+        var fields: [(key: String, hideable: Bool, pairs: [(String, String)], posted: [String])] = []
+        var missing: [(key: String, hideable: Bool, label: String)] = []
         for field in page.fields {
             let label = field.allLabels.first ?? "\(field.role.rawValue) (\(field.key))"
+            let hideable = field.role == .answer
             guard let control = form.control(for: field, excluding: taken) else {
-                missing.append(label)
+                missing.append((field.key, hideable, label))
                 continue
             }
             taken.insert(control.name)
-            var value = value(for: field, draft: draft)
-            if !value.isEmpty, !control.options.isEmpty {
-                let synonyms = field.role == .category
+            let synonyms = { (value: String) -> [String] in
+                field.role == .category
                     ? spec.category(for: draft)?.synonyms ?? []
                     : field.optionSynonyms?[value] ?? []
-                guard let resolved = FormStructure.option(for: value, synonyms: synonyms, in: control.options) else {
-                    missing.append("\(label): \(value)")
+            }
+            let wanted = postedValues(for: field, draft: draft)
+            if control.type == "checkbox", control.options.contains(where: { $0.inputName != nil }) {
+                // A checkbox list: every ticked box under its own name; nothing ticked posts nothing.
+                var pairs: [(String, String)] = []
+                var unmatched = false
+                for value in wanted where !value.isEmpty {
+                    guard let resolved = FormStructure.option(for: value, synonyms: synonyms(value), in: control.options),
+                          let option = control.options.first(where: { $0.value == resolved }) else {
+                        missing.append((control.key, hideable, "\(label): \(value)"))
+                        unmatched = true
+                        continue
+                    }
+                    let name = option.inputName ?? control.name
+                    filled.insert(name)
+                    pairs.append((name, option.value))
+                }
+                if !unmatched { fields.append((control.key, hideable, pairs, pairs.map(\.1))) }
+                continue
+            }
+            var value = wanted.first ?? ""
+            if !value.isEmpty, !control.options.isEmpty {
+                guard let resolved = FormStructure.option(for: value, synonyms: synonyms(value), in: control.options) else {
+                    missing.append((control.key, hideable, "\(label): \(value)"))
                     continue
                 }
                 value = resolved
             }
-            pairs.append((control.name, value))
+            fields.append((control.key, hideable, [(control.name, value)], value.isEmpty ? [] : [value]))
         }
-        for question in form.unfilledRequired(filled: taken) where !missing.contains(question) {
-            missing.append(question)
+
+        var posted: [String: [String]] = [:]
+        for field in fields { posted[field.key, default: []] += field.posted }
+        let inactive = form.inactiveKeys(posting: posted)
+        var problems = missing.filter { !($0.hideable && inactive.contains($0.key)) }.map(\.label)
+        for question in form.unfilledRequired(filled: taken.union(filled), inactive: inactive) where !problems.contains(question) {
+            problems.append(question)
         }
-        guard missing.isEmpty else {
+        guard problems.isEmpty else {
             throw SubmissionError.formChanged(FormDrift(
                 pageID: page.id,
-                missing: missing,
+                missing: problems,
                 detail: "Some fields on this page are missing, renamed beyond recognition, or new and required."
             ))
         }
-        return pairs
+        return fields.filter { !($0.hideable && inactive.contains($0.key)) }.flatMap(\.pairs)
     }
 
-    private func value(for field: AdapterSpec.FieldSpec, draft: ReportDraft) -> String {
+    /// What the form gets for `field`: one value, or for an `answer` every value of the question
+    /// (`ReportComposer.formValues`), empty when unanswered.
+    private func postedValues(for field: AdapterSpec.FieldSpec, draft: ReportDraft) -> [String] {
         let contact = draft.contact
         switch field.role {
-        case .category: return spec.category(for: draft)?.value ?? ""
-        case .place: return ReportComposer.placeText(for: draft)
-        case .mapChoice: return (draft.coordinate != nil ? field.yesValue : field.noValue) ?? ""
-        case .mapAnswer: return draft.coordinate?.formValue ?? ""
-        case .description: return ReportComposer.description(for: draft, spec: spec)
-        case .feedback: return (draft.wantsFeedback ? field.yesValue : field.noValue) ?? ""
-        case .firstName: return contact.firstName.trimmingCharacters(in: .whitespacesAndNewlines)
-        case .lastName: return contact.lastName.trimmingCharacters(in: .whitespacesAndNewlines)
-        case .phone: return contact.phone.trimmingCharacters(in: .whitespacesAndNewlines)
-        case .email: return contact.email.trimmingCharacters(in: .whitespacesAndNewlines)
+        case .category: return [spec.category(for: draft)?.value ?? ""]
+        case .place: return [ReportComposer.placeText(for: draft)]
+        case .mapChoice: return [(draft.coordinate != nil ? field.yesValue : field.noValue) ?? ""]
+        case .mapAnswer: return [draft.coordinate?.formValue ?? ""]
+        case .description: return [ReportComposer.description(for: draft, spec: spec)]
+        case .feedback: return [(draft.wantsFeedback ? field.yesValue : field.noValue) ?? ""]
+        case .firstName: return [contact.firstName.trimmingCharacters(in: .whitespacesAndNewlines)]
+        case .lastName: return [contact.lastName.trimmingCharacters(in: .whitespacesAndNewlines)]
+        case .phone: return [contact.phone.trimmingCharacters(in: .whitespacesAndNewlines)]
+        case .email: return [contact.email.trimmingCharacters(in: .whitespacesAndNewlines)]
+        case .fullName:
+            return [[contact.firstName, contact.lastName]
+                .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                .filter { !$0.isEmpty }
+                .joined(separator: " ")]
+        case .answer:
+            let given = spec.answers(for: draft)[field.question ?? ""] ?? []
+            guard let question = spec.question(id: field.question) else { return given }
+            return ReportComposer.formValues(for: question, values: given)
         }
+    }
+
+    /// Uploads that apply on `pageID` for this draft: the page matches and the `when` answer holds.
+    private func uploads(on pageID: String, draft: ReportDraft) -> [AdapterSpec.UploadSpec] {
+        let answers = spec.answers(for: draft)
+        return spec.allUploads.filter { upload in
+            guard upload.pageID == pageID else { return false }
+            guard let when = upload.when else { return true }
+            return answers[when.question]?.contains(when.value) == true
+        }
+    }
+
+    /// The file input on `html` named by a `formFile` upload's key and control; `.formChanged` if the
+    /// page has none.
+    private func fileInput(for upload: AdapterSpec.UploadSpec, pageID: String, html: String) throws -> String {
+        guard let key = upload.key, let control = upload.control else {
+            throw SubmissionError.invalidSpec("File upload on \(pageID) lacks key or control")
+        }
+        if let name = AbouPageParser.fileInputNames(html).first(where: { name in
+            FormStructure.split(name).map { $0.key == key && $0.control == control } ?? false
+        }) {
+            return name
+        }
+        throw SubmissionError.formChanged(FormDrift(
+            pageID: pageID,
+            missing: ["\(key) (\(control))"],
+            detail: "The page has no file input \(key) for the photo."
+        ))
     }
 
     // MARK: - Upload
 
     private func uploadPhoto(_ photo: Data, upload: AdapterSpec.UploadSpec, base: URL, referer: URL) async throws {
-        let boundary = "----WebKitFormBoundary" + String((0..<16).map { _ in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".randomElement()! })
+        guard let path = upload.path, let filePartName = upload.filePartName, let actionPath = upload.actionPath,
+              let fieldID = upload.fieldID else {
+            throw SubmissionError.invalidSpec("Upload on \(upload.pageID) lacks path, filePartName, actionPath or fieldID")
+        }
+        let boundary = Self.multipartBoundary()
         var body = Data()
         body.append(Data("--\(boundary)\r\n".utf8))
-        body.append(Data("Content-Disposition: form-data; name=\"\(upload.filePartName)\"; filename=\"\(Self.photoFileName())\"\r\n".utf8))
+        body.append(Data("Content-Disposition: form-data; name=\"\(filePartName)\"; filename=\"\(Self.photoFileName())\"\r\n".utf8))
         body.append(Data("Content-Type: image/jpeg\r\n\r\n".utf8))
         body.append(photo)
         body.append(Data("\r\n--\(boundary)--\r\n".utf8))
 
-        var request = makeRequest(try url(upload.path, base: base), method: "POST", timeout: SubmissionTimeouts.upload)
+        var request = makeRequest(try url(path, base: base), method: "POST", timeout: SubmissionTimeouts.upload)
         setOriginAndReferer(&request, referer: referer)
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
         request.setValue("XMLHttpRequest", forHTTPHeaderField: "X-Requested-With")
@@ -298,18 +378,18 @@ public struct AbouSubmitter: Sendable {
             throw SubmissionError.uploadFailed(uploaded["message"] as? String ?? "Upload rejected")
         }
 
-        var verify = makeRequest(try url(upload.actionPath, base: base), method: "POST")
+        var verify = makeRequest(try url(actionPath, base: base), method: "POST")
         setOriginAndReferer(&verify, referer: referer)
         verify.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
         verify.setValue("XMLHttpRequest", forHTTPHeaderField: "X-Requested-With")
         verify.setValue("application/json", forHTTPHeaderField: "Accept")
         verify.httpBody = try JSONSerialization.data(withJSONObject: [
-            "FieldId": upload.fieldID,
+            "FieldId": fieldID,
             "Properties": ["action": "getFiles"],
         ])
         let files = try json(try await send(verify).0)
         guard files["success"] as? Bool == true, let list = files["files"] as? [Any], !list.isEmpty else {
-            throw SubmissionError.uploadFailed("Photo not attached to \(upload.fieldID)")
+            throw SubmissionError.uploadFailed("Photo not attached to \(fieldID)")
         }
     }
 
@@ -371,13 +451,21 @@ public struct AbouSubmitter: Sendable {
         return page
     }
 
-    /// Posts the page's form with all hidden inputs, an event target (the Next button by default) and `values`.
-    private func post(_ page: Page, values: [(String, String)], eventTarget: String? = nil) async throws -> Page {
-        try await self.page(try postRequest(page, values: values, eventTarget: eventTarget))
+    /// Posts the page's form with all hidden inputs, an event target (the Next button by default),
+    /// `values` and, in a multipart form, `file`.
+    private func post(_ page: Page, values: [(String, String)], eventTarget: String? = nil, file: FilePart? = nil) async throws -> Page {
+        try await self.page(try postRequest(page, values: values, eventTarget: eventTarget, file: file))
     }
 
-    /// The form POST for `page`, built without sending anything.
-    private func postRequest(_ page: Page, values: [(String, String)], eventTarget: String? = nil) throws -> URLRequest {
+    /// The photo sent in a page's own multipart POST, in the file input `name`.
+    struct FilePart {
+        let name: String
+        let data: Data
+    }
+
+    /// The form POST for `page`, built without sending anything: urlencoded, or `multipart/form-data`
+    /// when the page's form says so or a photo travels with it.
+    private func postRequest(_ page: Page, values: [(String, String)], eventTarget: String? = nil, file: FilePart? = nil) throws -> URLRequest {
         guard let action = AbouPageParser.formAction(page.html),
               let target = URL(string: action, relativeTo: page.url)?.absoluteURL else {
             throw SubmissionError.formChanged(FormDrift(
@@ -390,13 +478,45 @@ public struct AbouSubmitter: Sendable {
         fields["__EVENTTARGET"] = eventTarget ?? spec.channel.nextEventTarget
         fields["__EVENTARGUMENT"] = ""
         for (name, value) in values { fields[name] = value }
+        let pairs = fields.sorted { $0.key < $1.key }
 
         var request = makeRequest(target, method: "POST")
         setOriginAndReferer(&request, referer: page.url)
-        request.setValue("application/x-www-form-urlencoded; charset=utf-8", forHTTPHeaderField: "Content-Type")
+        if file != nil || AbouPageParser.isMultipartForm(page.html) {
+            let boundary = Self.multipartBoundary()
+            request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+            request.httpBody = Self.multipartBody(pairs, fileInputs: AbouPageParser.fileInputNames(page.html), file: file, boundary: boundary)
+        } else {
+            request.setValue("application/x-www-form-urlencoded; charset=utf-8", forHTTPHeaderField: "Content-Type")
+            request.httpBody = Data(Self.formEncode(pairs).utf8)
+        }
         request.setValue(Self.acceptHTML, forHTTPHeaderField: "Accept")
-        request.httpBody = Data(Self.formEncode(fields.sorted { $0.key < $1.key }).utf8)
         return request
+    }
+
+    /// Safari's boundary: `----WebKitFormBoundary` and 16 random letters or digits.
+    static func multipartBoundary() -> String {
+        "----WebKitFormBoundary" + String((0..<16).map { _ in "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".randomElement()! })
+    }
+
+    /// Text parts for `pairs`, then one part per file input: empty, or the photo in `file`'s input.
+    static func multipartBody(_ pairs: [(key: String, value: String)], fileInputs: [String], file: FilePart?, boundary: String) -> Data {
+        var body = Data()
+        for (name, value) in pairs {
+            body.append(Data("--\(boundary)\r\nContent-Disposition: form-data; name=\"\(name)\"\r\n\r\n\(value)\r\n".utf8))
+        }
+        for name in fileInputs {
+            body.append(Data("--\(boundary)\r\n".utf8))
+            if let file, file.name == name {
+                body.append(Data("Content-Disposition: form-data; name=\"\(name)\"; filename=\"\(photoFileName())\"\r\nContent-Type: image/jpeg\r\n\r\n".utf8))
+                body.append(file.data)
+            } else {
+                body.append(Data("Content-Disposition: form-data; name=\"\(name)\"; filename=\"\"\r\nContent-Type: application/octet-stream\r\n\r\n".utf8))
+            }
+            body.append(Data("\r\n".utf8))
+        }
+        body.append(Data("--\(boundary)--\r\n".utf8))
+        return body
     }
 
     /// Sends `request` and reads the HTML page. With `interstitials` (every request before the final

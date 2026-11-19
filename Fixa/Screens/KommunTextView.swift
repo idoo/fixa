@@ -72,6 +72,8 @@ nonisolated enum KommunText {
         case .lastName: String(localized: "Last name", bundle: L10n.bundle, locale: L10n.locale)
         case .phone: String(localized: "Phone", bundle: L10n.bundle, locale: L10n.locale)
         case .email: String(localized: "E-mail", bundle: L10n.bundle, locale: L10n.locale)
+        case .fullName: String(localized: "Name", bundle: L10n.bundle, locale: L10n.locale)
+        case .answer: label
         }
     }
 }

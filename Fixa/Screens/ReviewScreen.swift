@@ -98,84 +98,149 @@ struct ReviewScreen: View {
     // MARK: Summary
 
     private var summaryCard: some View {
-        FxCard {
-            editableRow(String(localized: "Category", bundle: L10n.bundle, locale: L10n.locale)) {
-                value(problemTitle)
-                if let category = municipalityCategory {
-                    Text(category)
-                        .font(Fx.Font.callout)
-                        .foregroundStyle(Fx.Color.ink2)
-                        .fixedSize(horizontal: false, vertical: true)
+        let answers = answerRows
+        let hasCategory = spec.hasField(.category)
+        return FxCard {
+            if hasCategory {
+                editableRow(String(localized: "Category", bundle: L10n.bundle, locale: L10n.locale)) {
+                    value(problemTitle)
+                    if let category = municipalityCategory {
+                        Text(category)
+                            .font(Fx.Font.callout)
+                            .foregroundStyle(Fx.Color.ink2)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
             }
-            divider
-            editableRow(String(localized: "Place", bundle: L10n.bundle, locale: L10n.locale)) {
-                value(placeText)
-                if let translated = model.draft.translation?.locationText {
-                    Text("Sent with a Swedish translation: \(translated)")
+            ForEach(Array(answers.enumerated()), id: \.element.id) { index, row in
+                if hasCategory || index > 0 {
+                    divider
+                }
+                editableRow(row.title) {
+                    value(row.text)
+                }
+                .accessibilityIdentifier("review.answer.\(row.id)")
+            }
+            if hasPlace {
+                if hasCategory || !answers.isEmpty {
+                    divider
+                }
+                editableRow(String(localized: "Place", bundle: L10n.bundle, locale: L10n.locale)) {
+                    value(placeText)
+                    if let translated = model.draft.translation?.locationText {
+                        Text("Sent with a Swedish translation: \(translated)")
+                            .font(Fx.Font.footnote)
+                            .foregroundStyle(Fx.Color.ink)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    if let coordinate = model.draft.coordinate {
+                        Map(initialPosition: .region(MKCoordinateRegion(
+                            center: coordinate.clLocation,
+                            latitudinalMeters: 400,
+                            longitudinalMeters: 400
+                        )), interactionModes: []) {
+                            Marker(placeText, coordinate: coordinate.clLocation)
+                                .tint(Fx.Color.sea)
+                        }
+                        .frame(height: 160)
+                        .clipShape(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous))
+                        .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous), fill: .clear)
+                        .allowsHitTesting(false)
+                        .accessibilityHidden(true)
+                        .padding(.top, Fx.Space.xs)
+                    }
+                }
+            }
+            if spec.hasField(.description) {
+                divider
+                editableRow(isSwedishUI
+                    ? String(localized: "Description, as sent", bundle: L10n.bundle, locale: L10n.locale)
+                    : String(localized: "Description", bundle: L10n.bundle, locale: L10n.locale)) {
+                    if isSwedishUI {
+                        value(ReportComposer.description(for: model.draft, spec: spec))
+                    } else {
+                        // The resident's own words first; below, exactly what the kommun receives.
+                        value(model.draft.description.trimmingCharacters(in: .whitespacesAndNewlines))
+                        VStack(alignment: .leading, spacing: Fx.Space.xs) {
+                            Text("As sent, in Swedish")
+                                .font(Fx.Font.section)
+                                .foregroundStyle(Fx.Color.ink2)
+                            Text(ReportComposer.description(for: model.draft, spec: spec))
+                                .font(Fx.Font.callout)
+                                .foregroundStyle(Fx.Color.ink)
+                                .multilineTextAlignment(.leading)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .environment(\.locale, Locale(identifier: "sv_SE"))
+                        }
+                        .padding(.top, Fx.Space.xs)
+                    }
+                    translationNote
                         .font(Fx.Font.footnote)
                         .foregroundStyle(Fx.Color.ink)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                if let coordinate = model.draft.coordinate {
-                    Map(initialPosition: .region(MKCoordinateRegion(
-                        center: coordinate.clLocation,
-                        latitudinalMeters: 400,
-                        longitudinalMeters: 400
-                    )), interactionModes: []) {
-                        Marker(placeText, coordinate: coordinate.clLocation)
-                            .tint(Fx.Color.sea)
-                    }
-                    .frame(height: 160)
-                    .clipShape(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous))
-                    .fxOutline(RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous), fill: .clear)
-                    .allowsHitTesting(false)
-                    .accessibilityHidden(true)
-                    .padding(.top, Fx.Space.xs)
-                }
             }
-            divider
-            editableRow(isSwedishUI
-                ? String(localized: "Description, as sent", bundle: L10n.bundle, locale: L10n.locale)
-                : String(localized: "Description", bundle: L10n.bundle, locale: L10n.locale)) {
-                if isSwedishUI {
-                    value(ReportComposer.description(for: model.draft, spec: spec))
-                } else {
-                    // The resident's own words first; below, exactly what the kommun receives.
-                    value(model.draft.description.trimmingCharacters(in: .whitespacesAndNewlines))
-                    VStack(alignment: .leading, spacing: Fx.Space.xs) {
-                        Text("As sent, in Swedish")
-                            .font(Fx.Font.section)
+            if !spec.allUploads.isEmpty {
+                divider
+                editableRow(String(localized: "Photo", bundle: L10n.bundle, locale: L10n.locale)) {
+                    if let data = model.draft.photoJPEG, let image = UIImage(data: data) {
+                        photo(image)
+                    } else {
+                        Text("No photo")
+                            .font(Fx.Font.body)
                             .foregroundStyle(Fx.Color.ink2)
-                        Text(ReportComposer.description(for: model.draft, spec: spec))
-                            .font(Fx.Font.callout)
-                            .foregroundStyle(Fx.Color.ink)
-                            .multilineTextAlignment(.leading)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .environment(\.locale, Locale(identifier: "sv_SE"))
                     }
-                    .padding(.top, Fx.Space.xs)
-                }
-                translationNote
-                    .font(Fx.Font.footnote)
-                    .foregroundStyle(Fx.Color.ink)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            divider
-            editableRow(String(localized: "Photo", bundle: L10n.bundle, locale: L10n.locale)) {
-                if let data = model.draft.photoJPEG, let image = UIImage(data: data) {
-                    photo(image)
-                } else {
-                    Text("No photo")
-                        .font(Fx.Font.body)
-                        .foregroundStyle(Fx.Color.ink2)
                 }
             }
-            divider
-            editableRow(String(localized: "Reply", bundle: L10n.bundle, locale: L10n.locale), extraInputLabel: String(localized: "Change reply details", bundle: L10n.bundle, locale: L10n.locale)) {
-                value(replySummary)
+            if spec.hasField(.feedback) {
+                divider
+                editableRow(String(localized: "Reply", bundle: L10n.bundle, locale: L10n.locale), extraInputLabel: String(localized: "Change reply details", bundle: L10n.bundle, locale: L10n.locale)) {
+                    value(replySummary)
+                }
+            } else if hasContactFields {
+                divider
+                editableRow(String(localized: "Your details", bundle: L10n.bundle, locale: L10n.locale)) {
+                    value(contactSummary)
+                }
+            }
+            if !spec.isPrimary {
+                // Every answer as the form gets it; a Swedish UI already reads it above.
+                divider
+                FiledInSwedish(text: ReportComposer.filedText(for: model.draft, spec: spec), isFiled: false)
             }
         }
+    }
+
+    /// Each answer the form gets, in the app's language: the tile's own answers first, then the
+    /// resident's in question order.
+    private var answerRows: [(id: String, title: String, text: String)] {
+        let answers = spec.answers(for: model.draft)
+        let visible = spec.visibleQuestions(tileID: model.draft.tileID)
+        let visibleIDs = Set(visible.map(\.id))
+        let fixed = (spec.questions ?? []).filter { !visibleIDs.contains($0.id) }
+        return (fixed + visible).compactMap { question in
+            guard let values = answers[question.id], !values.isEmpty else { return nil }
+            return (question.id, question.title.resolve(L10n.locale), QuestionAnswerText.text(question, values: values))
+        }
+    }
+
+    private var hasPlace: Bool {
+        spec.hasField(.place) || spec.hasField(.mapAnswer) || spec.hasField(.mapChoice)
+    }
+
+    private var hasContactFields: Bool {
+        spec.hasField(.firstName) || spec.hasField(.lastName) || spec.hasField(.fullName)
+            || spec.hasField(.phone) || spec.hasField(.email)
+    }
+
+    /// Name, e-mail and phone the form gets without a reply choice.
+    private var contactSummary: String {
+        let c = model.draft.contact
+        let name = [c.firstName, c.lastName].map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }.joined(separator: " ")
+        let email = c.email.isEmpty ? "" : c.email.ltrIsolated
+        let phone = c.phone.isEmpty ? "" : c.phone.ltrIsolated
+        let lines = [name, email, phone].filter { !$0.isEmpty }
+        return lines.isEmpty ? String(localized: "None given", bundle: L10n.bundle, locale: L10n.locale) : lines.joined(separator: "\n")
     }
 
     /// The tile people chose ("Streetlight out"); the category when there is no tile.

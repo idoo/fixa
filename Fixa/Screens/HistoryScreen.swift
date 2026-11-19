@@ -30,7 +30,7 @@ struct HistoryScreen: View {
                     Section {
                         ForEach(model.history.items) { item in
                             NavigationLink(value: Route.historyDetail(item.id)) {
-                                HistoryRow(item: item, spec: spec, isSending: model.sendingIDs.contains(item.id))
+                                HistoryRow(item: item, spec: model.spec(forAdapterID: item.adapterID) ?? spec, isSending: model.sendingIDs.contains(item.id))
                             }
                             .listRowBackground(Fx.Color.card)
                         }
@@ -73,7 +73,7 @@ struct HistoryScreen: View {
                     message: pause.message
                 )
                 if let pending {
-                    WebFormFallback(text: model.webFallbackText(id: pending.id), spec: spec, tileID: pending.tileID)
+                    WebFormFallback(text: model.webFallbackText(id: pending.id), spec: model.spec(forAdapterID: pending.adapterID) ?? spec, tileID: pending.tileID)
                 }
             }
         }

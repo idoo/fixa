@@ -1,0 +1,738 @@
+{
+  "specVersion": 1,
+  "minAppBuild": 13,
+  "id": "se.varmdo.invasivaarter",
+  "service": {
+    "title": {
+      "en": "Invasive plants",
+      "sv": "Invasiva växter",
+      "cs": "Invazní rostliny",
+      "da": "Invasive planter",
+      "de": "Invasive Pflanzen",
+      "et": "Invasiivsed taimed",
+      "es": "Plantas invasoras",
+      "fr": "Plantes invasives",
+      "it": "Piante invasive",
+      "lv": "Invazīvie augi",
+      "lt": "Invaziniai augalai",
+      "hu": "Invazív növények",
+      "nl": "Invasieve planten",
+      "nb": "Invaderende planter",
+      "pl": "Rośliny inwazyjne",
+      "pt": "Plantas invasoras",
+      "ro": "Plante invazive",
+      "fi": "Vieraslajikasvit",
+      "el": "Χωροκατακτητικά φυτά",
+      "ru": "Инвазивные растения",
+      "uk": "Інвазивні рослини",
+      "ar": "نباتات غازية"
+    },
+    "subtitle": {
+      "en": "Lupins, giant hogweed, knotweed …",
+      "sv": "Lupiner, jätteloka, parkslide …",
+      "cs": "Lupiny, bolševník, křídlatka …",
+      "da": "Lupiner, kæmpe-bjørneklo, pileurt …",
+      "de": "Lupinen, Riesen-Bärenklau, Knöterich …",
+      "et": "Lupiinid, hiid-karuputk, pargitatar …",
+      "es": "Altramuces, perejil gigante, hierba nudosa …",
+      "fr": "Lupins, berce du Caucase, renouée …",
+      "it": "Lupini, panace, poligono …",
+      "lv": "Lupīnas, latvānis, reinūtrija …",
+      "lt": "Lubinai, barštis, pelėvirkštis …",
+      "hu": "Csillagfürt, medvetalp, japánkeserűfű …",
+      "nl": "Lupines, reuzenberenklauw, duizendknoop …",
+      "nb": "Lupiner, kjempebjørnekjeks, slirekne …",
+      "pl": "Łubin, barszcz, rdestowiec …",
+      "pt": "Tremoços, canabraz-gigante, erva-japonesa …",
+      "ro": "Lupin, crucea-pământului, hrișcă japoneză …",
+      "fi": "Lupiinit, jättiputki, tatar …",
+      "el": "Λούπινα, γιγάντιο ηράκλειο, πολύγονο …",
+      "ru": "Люпин, борщевик, рейнутрия …",
+      "uk": "Люпин, борщівник, рейнутрія …",
+      "ar": "الترمس، الحويجرة العملاقة، عقدة الأرض …"
+    },
+    "symbol": "leaf",
+    "order": 3
+  },
+  "municipality": {
+    "name": "Värmdö kommun",
+    "countryCode": "SE",
+    "region": {
+      "center": {
+        "latitude": 59.31,
+        "longitude": 18.55
+      },
+      "bbox": {
+        "minLatitude": 59.15,
+        "maxLatitude": 59.45,
+        "minLongitude": 18.25,
+        "maxLongitude": 19.05
+      }
+    },
+    "geocoderNames": [
+      "Värmdö",
+      "Värmdö kommun"
+    ]
+  },
+  "channel": {
+    "kind": "abou",
+    "baseURL": "https://service.varmdo.se",
+    "service": "invasivaarter",
+    "introPath": "/invasivaarter",
+    "startPath": "/Setup.aspx?Service=invasivaarter&skipintro=true",
+    "nextEventTarget": "ctl00$ctl00$LeftAndMainSection$MainSection$ServiceSection$ServicePageNavigationSection$NextAndBackButtons$NextButton",
+    "sessionLockedMarker": "Du har ett ärende igång redan",
+    "completionPostBackMarker": "var doPostBack = 'True'",
+    "maxCompletionPostBacks": 3,
+    "pages": [
+      {
+        "id": "newpage",
+        "stage": "sendingReport",
+        "fields": [
+          {
+            "role": "answer",
+            "question": "species",
+            "key": "invasivaarter_13",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Ange vilken invasiv art det rör sig om"
+              ],
+              "en": [
+                "Which invasive species is it"
+              ]
+            }
+          },
+          {
+            "role": "description",
+            "key": "invasivaarter_6",
+            "control": "textFieldControl",
+            "type": "textarea",
+            "labels": {
+              "sv": [
+                "Beskrivning"
+              ],
+              "en": [
+                "Description"
+              ]
+            }
+          },
+          {
+            "role": "mapAnswer",
+            "key": "invasivaarter_11",
+            "control": "MapAnswer",
+            "type": "hidden",
+            "labels": {
+              "sv": [
+                "Ange gärna platsen i kartan"
+              ],
+              "en": [
+                "Mark the place on the map"
+              ]
+            }
+          },
+          {
+            "role": "answer",
+            "question": "amount",
+            "key": "invasivaarter_7",
+            "control": "radioButtonListFieldControl",
+            "type": "radio",
+            "labels": {
+              "sv": [
+                "Är det enstaka växter eller ett större bestånd?"
+              ],
+              "en": [
+                "Single plants or a larger patch?"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "newpage1",
+        "stage": "sendingContact",
+        "fields": [
+          {
+            "role": "firstName",
+            "key": "invasivaarter_2",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Förnamn"
+              ],
+              "en": [
+                "First name"
+              ]
+            }
+          },
+          {
+            "role": "lastName",
+            "key": "invasivaarter_3",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Efternamn"
+              ],
+              "en": [
+                "Last name"
+              ]
+            }
+          },
+          {
+            "role": "phone",
+            "key": "invasivaarter_4",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Telefonnummer"
+              ],
+              "en": [
+                "Phone"
+              ]
+            }
+          },
+          {
+            "role": "email",
+            "key": "invasivaarter_5",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "E-postadress"
+              ],
+              "en": [
+                "Email"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "SummaryPage",
+        "stage": "confirming",
+        "fields": []
+      }
+    ],
+    "uploads": [
+      {
+        "pageID": "newpage",
+        "kind": "formFile",
+        "key": "invasivaarter_8",
+        "control": "fileUploadControl"
+      }
+    ]
+  },
+  "categories": [
+    {
+      "id": "nature",
+      "value": "Invasiva arter",
+      "title": {
+        "en": "Invasive species",
+        "sv": "Invasiva arter",
+        "cs": "Invazní druhy",
+        "da": "Invasive arter",
+        "de": "Invasive Arten",
+        "et": "Invasiivsed liigid",
+        "es": "Especies invasoras",
+        "fr": "Espèces invasives",
+        "it": "Specie invasive",
+        "lv": "Invazīvās sugas",
+        "lt": "Invazinės rūšys",
+        "hu": "Invazív fajok",
+        "nl": "Invasieve soorten",
+        "nb": "Fremmede arter",
+        "pl": "Gatunki inwazyjne",
+        "pt": "Espécies invasoras",
+        "ro": "Specii invazive",
+        "fi": "Vieraslajit",
+        "el": "Χωροκατακτητικά είδη",
+        "ru": "Инвазивные виды",
+        "uk": "Інвазивні види",
+        "ar": "أنواع غازية"
+      }
+    }
+  ],
+  "questions": [
+    {
+      "id": "species",
+      "kind": "text",
+      "title": {
+        "en": "Which plant?",
+        "sv": "Vilken växt?",
+        "cs": "Která rostlina?",
+        "da": "Hvilken plante?",
+        "de": "Welche Pflanze?",
+        "et": "Milline taim?",
+        "es": "¿Qué planta?",
+        "fr": "Quelle plante ?",
+        "it": "Quale pianta?",
+        "lv": "Kurš augs?",
+        "lt": "Kuris augalas?",
+        "hu": "Melyik növény?",
+        "nl": "Welke plant?",
+        "nb": "Hvilken plante?",
+        "pl": "Jaka roślina?",
+        "pt": "Que planta?",
+        "ro": "Ce plantă?",
+        "fi": "Mikä kasvi?",
+        "el": "Ποιο φυτό;",
+        "ru": "Какое растение?",
+        "uk": "Яка рослина?",
+        "ar": "ما النبتة؟"
+      },
+      "hint": {
+        "en": "Type its name if you know it",
+        "sv": "Skriv namnet om du vet det",
+        "cs": "Napište název, pokud ho znáte",
+        "da": "Skriv navnet, hvis du kender det",
+        "de": "Schreiben Sie den Namen, wenn Sie ihn kennen",
+        "et": "Kirjutage nimi, kui teate seda",
+        "es": "Escribe el nombre si lo sabes",
+        "fr": "Indiquez son nom si vous le connaissez",
+        "it": "Scrivi il nome se lo conosci",
+        "lv": "Ierakstiet nosaukumu, ja to zināt",
+        "lt": "Įrašykite pavadinimą, jei žinote",
+        "hu": "Írja be a nevét, ha tudja",
+        "nl": "Typ de naam als je die weet",
+        "nb": "Skriv navnet hvis du vet det",
+        "pl": "Wpisz nazwę, jeśli ją znasz",
+        "pt": "Escreva o nome, se o souber",
+        "ro": "Scrieți numele, dacă îl știți",
+        "fi": "Kirjoita nimi, jos tiedät sen",
+        "el": "Γράψτε το όνομά του, αν το ξέρετε",
+        "ru": "Укажите название, если знаете",
+        "uk": "Вкажіть назву, якщо знаєте",
+        "ar": "اكتب اسمها إن كنت تعرفه"
+      },
+      "required": true,
+      "suggestions": [
+        {
+          "value": "Blomsterlupin",
+          "title": {
+            "en": "Garden lupin",
+            "sv": "Blomsterlupin",
+            "cs": "Lupina mnoholistá",
+            "da": "Mangebladet lupin",
+            "de": "Vielblättrige Lupine",
+            "et": "Hulgalehine lupiin",
+            "es": "Altramuz de jardín",
+            "fr": "Lupin des jardins",
+            "it": "Lupino fogliato",
+            "lv": "Daudzlapu lupīna",
+            "lt": "Daugialapis lubinas",
+            "hu": "Erdei csillagfürt",
+            "nl": "Vaste lupine",
+            "nb": "Hagelupin",
+            "pl": "Łubin trwały",
+            "pt": "Tremoço-de-jardim",
+            "ro": "Lupin de grădină",
+            "fi": "Komealupiini",
+            "el": "Λούπινο κήπου",
+            "ru": "Люпин многолистный",
+            "uk": "Люпин багатолистий",
+            "ar": "الترمس متعدد الأوراق"
+          }
+        },
+        {
+          "value": "Jätteloka",
+          "title": {
+            "en": "Giant hogweed",
+            "sv": "Jätteloka",
+            "cs": "Bolševník velkolepý",
+            "da": "Kæmpe-bjørneklo",
+            "de": "Riesen-Bärenklau",
+            "et": "Hiid-karuputk",
+            "es": "Perejil gigante",
+            "fr": "Berce du Caucase",
+            "it": "Panace di Mantegazza",
+            "lv": "Mantegaca latvānis",
+            "lt": "Mantegaco barštis",
+            "hu": "Kaukázusi medvetalp",
+            "nl": "Reuzenberenklauw",
+            "nb": "Kjempebjørnekjeks",
+            "pl": "Barszcz Mantegazziego",
+            "pt": "Canabraz-gigante",
+            "ro": "Crucea-pământului gigantică",
+            "fi": "Jättiputki",
+            "el": "Γιγάντιο ηράκλειο",
+            "ru": "Борщевик Мантегацци",
+            "uk": "Борщівник Мантегацці",
+            "ar": "الحُوَيْجِرة العملاقة"
+          }
+        },
+        {
+          "value": "Jättebalsamin",
+          "title": {
+            "en": "Himalayan balsam",
+            "sv": "Jättebalsamin",
+            "cs": "Netýkavka žláznatá",
+            "da": "Kæmpe-balsamin",
+            "de": "Drüsiges Springkraut",
+            "et": "Verev lemmalts",
+            "es": "Balsamina del Himalaya",
+            "fr": "Balsamine de l'Himalaya",
+            "it": "Balsamina ghiandolosa",
+            "lv": "Puķu sprigane",
+            "lt": "Liaukuotoji sprigė",
+            "hu": "Bíbor nebáncsvirág",
+            "nl": "Reuzenbalsemien",
+            "nb": "Kjempespringfrø",
+            "pl": "Niecierpek gruczołowaty",
+            "pt": "Balsamina-do-himalaia",
+            "ro": "Balsamină himalayană",
+            "fi": "Jättipalsami",
+            "el": "Βάλσαμο των Ιμαλαΐων",
+            "ru": "Недотрога железистая",
+            "uk": "Розрив-трава залозиста",
+            "ar": "البلسم الهيمالائي"
+          }
+        },
+        {
+          "value": "Parkslide",
+          "title": {
+            "en": "Japanese knotweed",
+            "sv": "Parkslide",
+            "cs": "Křídlatka japonská",
+            "da": "Japansk pileurt",
+            "de": "Japanischer Staudenknöterich",
+            "et": "Jaapani pargitatar",
+            "es": "Hierba nudosa japonesa",
+            "fr": "Renouée du Japon",
+            "it": "Poligono del Giappone",
+            "lv": "Japānas reinūtrija",
+            "lt": "Japoninis pelėvirkštis",
+            "hu": "Japánkeserűfű",
+            "nl": "Japanse duizendknoop",
+            "nb": "Parkslirekne",
+            "pl": "Rdestowiec ostrokończysty",
+            "pt": "Erva-japonesa",
+            "ro": "Hrișcă japoneză",
+            "fi": "Japanintatar",
+            "el": "Ιαπωνικό πολύγονο",
+            "ru": "Рейнутрия японская",
+            "uk": "Рейнутрія японська",
+            "ar": "عقدة الأرض اليابانية"
+          }
+        },
+        {
+          "value": "Vresros",
+          "title": {
+            "en": "Japanese rose",
+            "sv": "Vresros",
+            "cs": "Růže svraskalá",
+            "da": "Rynket rose",
+            "de": "Kartoffelrose",
+            "et": "Kurdlehine kibuvits",
+            "es": "Rosa rugosa",
+            "fr": "Rosier rugueux",
+            "it": "Rosa rugosa",
+            "lv": "Grumbuļainā roze",
+            "lt": "Raukšlėtalapis erškėtis",
+            "hu": "Japán rózsa",
+            "nl": "Rimpelroos",
+            "nb": "Rynkerose",
+            "pl": "Róża pomarszczona",
+            "pt": "Rosa-rugosa",
+            "ro": "Trandafir japonez",
+            "fi": "Kurtturuusu",
+            "el": "Ιαπωνικό τριαντάφυλλο",
+            "ru": "Шиповник морщинистый",
+            "uk": "Шипшина зморшкувата",
+            "ar": "الورد الياباني"
+          }
+        },
+        {
+          "value": "Kanadensiskt gullris",
+          "title": {
+            "en": "Canadian goldenrod",
+            "sv": "Kanadensiskt gullris",
+            "cs": "Zlatobýl kanadský",
+            "da": "Kanadisk gyldenris",
+            "de": "Kanadische Goldrute",
+            "et": "Kanada kuldvits",
+            "es": "Vara de oro canadiense",
+            "fr": "Solidage du Canada",
+            "it": "Verga d'oro del Canada",
+            "lv": "Kanādas zeltslotiņa",
+            "lt": "Kanadinė rykštenė",
+            "hu": "Kanadai aranyvessző",
+            "nl": "Canadese guldenroede",
+            "nb": "Kanadagullris",
+            "pl": "Nawłoć kanadyjska",
+            "pt": "Vara-de-ouro-do-canadá",
+            "ro": "Splinuță canadiană",
+            "fi": "Kanadanpiisku",
+            "el": "Καναδικό χρυσόκλαδο",
+            "ru": "Золотарник канадский",
+            "uk": "Золотушник канадський",
+            "ar": "العصا الذهبية الكندية"
+          }
+        },
+        {
+          "value": "Vet inte",
+          "title": {
+            "en": "Not sure",
+            "sv": "Vet inte",
+            "cs": "Nevím",
+            "da": "Ved ikke",
+            "de": "Weiß nicht",
+            "et": "Ei tea",
+            "es": "No lo sé",
+            "fr": "Je ne sais pas",
+            "it": "Non so",
+            "lv": "Nezinu",
+            "lt": "Nežinau",
+            "hu": "Nem tudom",
+            "nl": "Weet ik niet",
+            "nb": "Vet ikke",
+            "pl": "Nie wiem",
+            "pt": "Não sei",
+            "ro": "Nu știu",
+            "fi": "En tiedä",
+            "el": "Δεν ξέρω",
+            "ru": "Не знаю",
+            "uk": "Не знаю",
+            "ar": "لا أعرف"
+          }
+        }
+      ]
+    },
+    {
+      "id": "amount",
+      "kind": "choice",
+      "title": {
+        "en": "How many plants?",
+        "sv": "Hur många växter?",
+        "cs": "Kolik rostlin?",
+        "da": "Hvor mange planter?",
+        "de": "Wie viele Pflanzen?",
+        "et": "Kui palju taimi?",
+        "es": "¿Cuántas plantas?",
+        "fr": "Combien de plantes ?",
+        "it": "Quante piante?",
+        "lv": "Cik augu?",
+        "lt": "Kiek augalų?",
+        "hu": "Hány növény?",
+        "nl": "Hoeveel planten?",
+        "nb": "Hvor mange planter?",
+        "pl": "Ile roślin?",
+        "pt": "Quantas plantas?",
+        "ro": "Câte plante?",
+        "fi": "Kuinka monta kasvia?",
+        "el": "Πόσα φυτά;",
+        "ru": "Сколько растений?",
+        "uk": "Скільки рослин?",
+        "ar": "كم عدد النباتات؟"
+      },
+      "required": true,
+      "options": [
+        {
+          "value": "Större bestånd",
+          "title": {
+            "en": "A large patch",
+            "sv": "Ett större bestånd",
+            "cs": "Velký porost",
+            "da": "Et større bestand",
+            "de": "Ein größerer Bestand",
+            "et": "Suurem kogum",
+            "es": "Una zona grande",
+            "fr": "Une grande zone",
+            "it": "Una zona estesa",
+            "lv": "Liela audze",
+            "lt": "Didelis sąžalynas",
+            "hu": "Nagyobb állomány",
+            "nl": "Een grote groep",
+            "nb": "Et større bestand",
+            "pl": "Duże skupisko",
+            "pt": "Uma mancha grande",
+            "ro": "O zonă mare",
+            "fi": "Laaja kasvusto",
+            "el": "Μεγάλη συστάδα",
+            "ru": "Большие заросли",
+            "uk": "Великі зарості",
+            "ar": "رقعة كبيرة"
+          }
+        },
+        {
+          "value": "Enstaka växter (upp till fem stycken)",
+          "title": {
+            "en": "A few plants, up to five",
+            "sv": "Enstaka växter, upp till fem",
+            "cs": "Několik rostlin, nejvýš pět",
+            "da": "Enkelte planter, op til fem",
+            "de": "Einzelne Pflanzen, bis zu fünf",
+            "et": "Üksikud taimed, kuni viis",
+            "es": "Unas pocas plantas, hasta cinco",
+            "fr": "Quelques plantes, jusqu'à cinq",
+            "it": "Poche piante, fino a cinque",
+            "lv": "Daži augi, līdz pieciem",
+            "lt": "Keli augalai, iki penkių",
+            "hu": "Néhány növény, legfeljebb öt",
+            "nl": "Een paar planten, tot vijf",
+            "nb": "Enkelte planter, opptil fem",
+            "pl": "Kilka roślin, do pięciu",
+            "pt": "Algumas plantas, até cinco",
+            "ro": "Câteva plante, până la cinci",
+            "fi": "Muutama kasvi, enintään viisi",
+            "el": "Λίγα φυτά, έως πέντε",
+            "ru": "Несколько растений, до пяти",
+            "uk": "Кілька рослин, до п'яти",
+            "ar": "بضع نباتات، حتى خمس"
+          }
+        }
+      ]
+    }
+  ],
+  "tiles": [
+    {
+      "id": "invasive-plants",
+      "symbol": "leaf",
+      "categoryID": "nature",
+      "title": {
+        "en": "Invasive plant",
+        "sv": "Invasiv växt",
+        "cs": "Invazní rostlina",
+        "da": "Invasiv plante",
+        "de": "Invasive Pflanze",
+        "et": "Invasiivne taim",
+        "es": "Planta invasora",
+        "fr": "Plante invasive",
+        "it": "Pianta invasiva",
+        "lv": "Invazīvs augs",
+        "lt": "Invazinis augalas",
+        "hu": "Invazív növény",
+        "nl": "Invasieve plant",
+        "nb": "Fremmed plante",
+        "pl": "Roślina inwazyjna",
+        "pt": "Planta invasora",
+        "ro": "Plantă invazivă",
+        "fi": "Vieraslajikasvi",
+        "el": "Χωροκατακτητικό φυτό",
+        "ru": "Инвазивное растение",
+        "uk": "Інвазивна рослина",
+        "ar": "نبتة غازية"
+      },
+      "questionIDs": [
+        "species",
+        "amount"
+      ]
+    }
+  ],
+  "validation": {
+    "descriptionMin": 10,
+    "descriptionMax": 4000,
+    "descriptionRequired": true,
+    "emailRequiredWhenFeedback": false,
+    "requireLocation": true,
+    "photoRequired": false
+  },
+  "descriptionTitle": {
+    "en": "Where is it growing?",
+    "sv": "Var växer den?",
+    "cs": "Kde roste?",
+    "da": "Hvor vokser den?",
+    "de": "Wo wächst sie?",
+    "et": "Kus see kasvab?",
+    "es": "¿Dónde crece?",
+    "fr": "Où pousse-t-elle ?",
+    "it": "Dove cresce?",
+    "lv": "Kur tas aug?",
+    "lt": "Kur jis auga?",
+    "hu": "Hol nő?",
+    "nl": "Waar groeit hij?",
+    "nb": "Hvor vokser den?",
+    "pl": "Gdzie rośnie?",
+    "pt": "Onde está a crescer?",
+    "ro": "Unde crește?",
+    "fi": "Missä se kasvaa?",
+    "el": "Πού φυτρώνει;",
+    "ru": "Где оно растёт?",
+    "uk": "Де вона росте?",
+    "ar": "أين تنمو؟"
+  },
+  "descriptionPrompt": {
+    "en": "Address or place, and how to find it, e.g. next to the red house",
+    "sv": "Adress eller plats, och hur man hittar dit, t.ex. bredvid röda huset",
+    "cs": "Adresa nebo místo a jak tam trefit, např. vedle červeného domu",
+    "da": "Adresse eller sted, og hvordan man finder det, fx ved siden af det røde hus",
+    "de": "Adresse oder Ort und wie man hinfindet, z. B. neben dem roten Haus",
+    "et": "Aadress või koht ja kuidas sinna jõuda, nt punase maja kõrval",
+    "es": "Dirección o lugar, y cómo llegar, p. ej. junto a la casa roja",
+    "fr": "Adresse ou lieu, et comment le trouver, p. ex. à côté de la maison rouge",
+    "it": "Indirizzo o luogo e come arrivarci, ad es. accanto alla casa rossa",
+    "lv": "Adrese vai vieta un kā to atrast, piem., blakus sarkanajai mājai",
+    "lt": "Adresas ar vieta ir kaip ją rasti, pvz., šalia raudono namo",
+    "hu": "Cím vagy hely, és hogyan lehet odatalálni, pl. a piros ház mellett",
+    "nl": "Adres of plek, en hoe je er komt, bijv. naast het rode huis",
+    "nb": "Adresse eller sted, og hvordan man finner frem, f.eks. ved siden av det røde huset",
+    "pl": "Adres lub miejsce i jak tam trafić, np. obok czerwonego domu",
+    "pt": "Morada ou local e como lá chegar, p. ex. ao lado da casa vermelha",
+    "ro": "Adresa sau locul și cum se ajunge acolo, de ex. lângă casa roșie",
+    "fi": "Osoite tai paikka ja miten sinne löytää, esim. punaisen talon vieressä",
+    "el": "Διεύθυνση ή σημείο και πώς θα το βρει κανείς, π.χ. δίπλα στο κόκκινο σπίτι",
+    "ru": "Адрес или место и как туда найти дорогу, например рядом с красным домом",
+    "uk": "Адреса або місце і як туди дістатися, наприклад біля червоного будинку",
+    "ar": "العنوان أو المكان وكيفية الوصول إليه، مثلاً بجانب البيت الأحمر"
+  },
+  "webFormURL": "https://service.varmdo.se/invasivaarter",
+  "disclaimer": {
+    "en": "Fixa is an independent open-source app and is not part of Värmdö kommun. It sends your report straight to the municipality's e-service “Felanmälan invasiva arter”, and the municipality handles it the usual way. Call 112 if life or property is in danger.",
+    "sv": "Fixa är en fristående app med öppen källkod och ingen del av Värmdö kommun. Appen skickar din anmälan direkt till kommunens e-tjänst Felanmälan invasiva arter, och kommunen hanterar ärendet på sitt vanliga sätt. Ring 112 om liv eller egendom är i fara.",
+    "cs": "Fixa je nezávislá aplikace s otevřeným zdrojovým kódem a není součástí Värmdö kommun. Odešle vaše hlášení přímo do e-služby obce „Felanmälan invasiva arter“ a obec ho vyřídí obvyklým způsobem. Pokud je ohrožen život nebo majetek, volejte 112.",
+    "da": "Fixa er en uafhængig app med åben kildekode og er ikke en del af Värmdö kommun. Den sender din anmeldelse direkte til kommunens e-tjeneste »Felanmälan invasiva arter«, og kommunen behandler den på sædvanlig vis. Ring 112, hvis liv eller ejendom er i fare.",
+    "de": "Fixa ist eine unabhängige Open-Source-App und gehört nicht zu Värmdö kommun. Die App sendet Ihre Meldung direkt an den E-Service der Gemeinde „Felanmälan invasiva arter“, und die Gemeinde bearbeitet sie wie gewohnt. Rufen Sie 112 an, wenn Leben oder Eigentum in Gefahr sind.",
+    "et": "Fixa on sõltumatu avatud lähtekoodiga rakendus ega kuulu omavalitsusele Värmdö kommun. See saadab teie teate otse omavalitsuse e-teenusesse „Felanmälan invasiva arter” ja omavalitsus menetleb seda tavapärasel viisil. Kui elu või vara on ohus, helistage 112.",
+    "es": "Fixa es una app independiente de código abierto y no forma parte de Värmdö kommun. Envía tu aviso directamente al servicio electrónico del municipio «Felanmälan invasiva arter», que lo gestiona de la forma habitual. Llama al 112 si hay peligro para personas o bienes.",
+    "fr": "Fixa est une app indépendante et open source, qui ne fait pas partie de Värmdö kommun. Elle envoie votre signalement directement au service en ligne de la commune « Felanmälan invasiva arter », qui le traite de la manière habituelle. Appelez le 112 si des vies ou des biens sont en danger.",
+    "it": "Fixa è un'app indipendente e open source e non fa parte di Värmdö kommun. Invia la tua segnalazione direttamente al servizio online del comune «Felanmälan invasiva arter», e il comune la gestisce come di consueto. Chiama il 112 se ci sono pericoli per persone o cose.",
+    "lv": "Fixa ir neatkarīga atvērtā koda lietotne, un tā nav saistīta ar Värmdö kommun. Tā nosūta jūsu ziņojumu tieši pašvaldības e-pakalpojumam “Felanmälan invasiva arter”, un pašvaldība to izskata ierastajā kārtībā. Zvaniet 112, ja apdraudēta dzīvība vai īpašums.",
+    "lt": "Fixa yra nepriklausoma atvirojo kodo programėlė ir nėra Värmdö kommun dalis. Ji siunčia jūsų pranešimą tiesiai į savivaldybės e. paslaugą „Felanmälan invasiva arter“, o savivaldybė jį nagrinėja įprasta tvarka. Skambinkite 112, jei gresia pavojus gyvybei ar turtui.",
+    "hu": "A Fixa független, nyílt forráskódú alkalmazás, és nem része a Värmdö kommunnak. A bejelentését közvetlenül az önkormányzat „Felanmälan invasiva arter” e-szolgáltatásába küldi, az önkormányzat pedig a szokásos módon intézi. Ha élet vagy vagyon van veszélyben, hívja a 112-t.",
+    "nl": "Fixa is een onafhankelijke opensource-app en hoort niet bij Värmdö kommun. De app stuurt je melding rechtstreeks naar de e-dienst ‘Felanmälan invasiva arter’ van de gemeente, en de gemeente behandelt die op de gewone manier. Bel 112 als levens of eigendommen in gevaar zijn.",
+    "nb": "Fixa er en uavhengig app med åpen kildekode og er ikke en del av Värmdö kommun. Appen sender meldingen din direkte til kommunens e-tjeneste «Felanmälan invasiva arter», og kommunen behandler den på vanlig måte. Ring 112 hvis liv eller eiendom er i fare.",
+    "pl": "Fixa to niezależna aplikacja open source, która nie należy do gminy Värmdö. Wysyła Twoje zgłoszenie bezpośrednio do e-usługi gminy „Felanmälan invasiva arter”, a gmina zajmuje się nim w zwykły sposób. Jeśli zagrożone jest życie lub mienie, dzwoń pod 112.",
+    "pt": "A Fixa é uma app independente de código aberto e não faz parte de Värmdö kommun. Envia a sua participação diretamente para o serviço online do município «Felanmälan invasiva arter», que a trata da forma habitual. Ligue 112 se houver perigo para pessoas ou bens.",
+    "ro": "Fixa este o aplicație independentă, open-source, și nu face parte din Värmdö kommun. Trimite sesizarea dumneavoastră direct la serviciul online al comunei „Felanmälan invasiva arter”, iar comuna o tratează în mod obișnuit. Sunați la 112 dacă viața sau bunurile cuiva sunt în pericol.",
+    "fi": "Fixa on itsenäinen avoimen lähdekoodin sovellus, eikä se ole osa Värmdön kuntaa. Sovellus lähettää ilmoituksesi suoraan kunnan sähköiseen palveluun ”Felanmälan invasiva arter”, ja kunta käsittelee sen tavalliseen tapaan. Soita 112, jos henki tai omaisuus on vaarassa.",
+    "el": "Το Fixa είναι μια ανεξάρτητη εφαρμογή ανοιχτού κώδικα και δεν ανήκει στο Värmdö kommun. Στέλνει την αναφορά σας απευθείας στην ηλεκτρονική υπηρεσία του δήμου «Felanmälan invasiva arter», και ο δήμος τη διαχειρίζεται με τον συνήθη τρόπο. Καλέστε το 112 αν κινδυνεύουν ζωές ή περιουσίες.",
+    "ru": "Fixa является независимым приложением с открытым исходным кодом и не относится к коммуне Värmdö. Оно отправляет вашу заявку напрямую в электронную услугу коммуны «Felanmälan invasiva arter», и коммуна рассматривает её в обычном порядке. Если под угрозой жизнь или имущество, звоните 112.",
+    "uk": "Fixa — незалежний застосунок із відкритим кодом, який не належить комуні Вермдьо. Він надсилає ваше повідомлення безпосередньо до електронного сервісу комуни «Felanmälan invasiva arter», і комуна розглядає його у звичайному порядку. Якщо є загроза життю чи майну, телефонуйте 112.",
+    "ar": "Fixa تطبيق مستقل ومفتوح المصدر، وليس جزءاً من بلدية فارمدو. يرسل التطبيق بلاغك مباشرة إلى الخدمة الإلكترونية للبلدية «Felanmälan invasiva arter»، وتتعامل البلدية معه بالطريقة المعتادة. اتصل بالرقم 112 إذا كانت الأرواح أو الممتلكات في خطر."
+  },
+  "contact": {
+    "pageURL": "https://www.varmdo.se/kommunochpolitik/kontaktcenter.4.1a4e4f4413f7b9c98702cd2.html",
+    "title": {
+      "sv": "Värmdö kommuns kontaktcenter",
+      "en": "Värmdö kommun contact centre",
+      "fi": "Värmdön kunnan asiakaspalvelu",
+      "ar": "مركز الاتصال في بلدية فارمدو",
+      "uk": "Контактний центр комуни Вермдьо",
+      "pl": "Centrum kontaktowe gminy Värmdö",
+      "ru": "Контактный центр коммуны Värmdö",
+      "de": "Kontaktcenter von Värmdö kommun",
+      "fr": "Centre de contact de Värmdö kommun",
+      "es": "Centro de contacto de Värmdö kommun",
+      "it": "Centro contatti di Värmdö kommun",
+      "pt": "Centro de contacto de Värmdö kommun",
+      "nl": "Contactcentrum van Värmdö kommun",
+      "da": "Värmdö kommuns kontaktcenter",
+      "nb": "Kontaktsenteret i Värmdö kommun",
+      "et": "Värmdö kommun: kontaktkeskus",
+      "lv": "Värmdö kommun kontaktu centrs",
+      "lt": "Värmdö kommun kontaktų centras",
+      "ro": "Centrul de contact Värmdö kommun",
+      "el": "Κέντρο επικοινωνίας του Värmdö kommun",
+      "hu": "Värmdö kommun kapcsolattartási központja",
+      "cs": "Kontaktní centrum Värmdö kommun"
+    }
+  },
+  "allowedWebHosts": [
+    "varmdo.se",
+    "www.varmdo.se",
+    "service.varmdo.se"
+  ]
+}

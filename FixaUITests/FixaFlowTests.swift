@@ -230,6 +230,78 @@ final class FixaFlowTests: XCTestCase {
         XCTAssertEqual(app.state, .runningForeground, "App died after switching Higher contrast back")
         XCTAssertEqual(toggle.value as? String, initial, "Higher contrast did not switch back")
     }
+
+    /// More forms › Abandoned vehicle: suggestion chips, a typed plate, a place, Review, Send, receipt.
+    @MainActor
+    func testG_AbandonedVehicleFormFlow() {
+        let app = launch(["-FixaLanguage", "en"])
+        openService(app, "se.varmdo.vkskrotbil")
+        // Top to bottom, each control scrolled clear of the pinned Review bar first.
+        let type = element(app, "report.question.vehicleType.suggestion.0")
+        clearOfBar(app, type)
+        type.tap()
+        let plate = element(app, "report.question.registration.field")
+        clearOfBar(app, plate)
+        plate.tap()
+        plate.typeText("ABC123\n")
+        for question in ["make", "colour"] {
+            let chip = element(app, "report.question.\(question).suggestion.0")
+            clearOfBar(app, chip)
+            chip.tap()
+        }
+        pickPlaceBySearch(app)
+        shot("g-vehicle-report")
+        element(app, "report.review").tap()
+        let send = element(app, "review.send")
+        XCTAssertTrue(send.waitForHittable(timeout: 20), "Send never became available")
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'ABC123'")).firstMatch.exists, "Review doesn't show the plate")
+        shot("g-vehicle-review")
+        send.tap()
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'DEMO-1234'")).firstMatch.waitForExistence(timeout: 10), "Receipt without case number")
+        shot("g-vehicle-receipt")
+    }
+
+    /// More forms › Recycling station: the form needs a photo, so Review stays shut without one.
+    @MainActor
+    func testH_RecyclingStationNeedsPhoto() {
+        let app = launch(["-FixaLanguage", "en"])
+        openService(app, "se.varmdo.felater")
+        // 23 stations: a menu, not a list.
+        element(app, "report.question.station.menu").tap()
+        element(app, "report.question.station.option.0").tap()
+        let item = element(app, "report.question.cleanWhat.option.0")
+        reveal(app, item)
+        item.tap()
+        element(app, "report.review").tap()
+        XCTAssertFalse(app.descendants(matching: .any).matching(identifier: "review.send").firstMatch.waitForExistence(timeout: 2), "Review opened without the required photo")
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] 'photo'")).firstMatch.exists, "No photo issue shown")
+        shot("h-recycling-photo-required")
+    }
+
+    /// Home › More forms › `adapterID`. The demo's unsent street-light report belongs to another form,
+    /// so Fixa asks before deleting it: "Delete & start".
+    @MainActor
+    private func openService(_ app: XCUIApplication, _ adapterID: String) {
+        let service = element(app, "home.service.\(adapterID)")
+        reveal(app, service)
+        service.tap()
+        let start = app.buttons["Delete & start"]
+        XCTAssertTrue(start.waitForExistence(timeout: 5), "No question before deleting the unsent report")
+        start.tap()
+    }
+
+    /// Scrolls until `target` is hittable and sits fully above the pinned Review bar (a control
+    /// partly under the bar is "hittable" but the tap lands on the bar).
+    @MainActor
+    private func clearOfBar(_ app: XCUIApplication, _ target: XCUIElement) {
+        reveal(app, target)
+        let bar = element(app, "report.review")
+        var tries = 0
+        while target.frame.maxY > bar.frame.minY - 8 && tries < 4 {
+            app.swipeUp()
+            tries += 1
+        }
+    }
 }
 
 private extension XCUIElement {

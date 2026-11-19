@@ -1,0 +1,496 @@
+{
+  "specVersion": 1,
+  "minAppBuild": 13,
+  "id": "se.varmdo.anmutbsop",
+  "service": {
+    "title": {
+      "sv": "Utebliven sophämtning",
+      "en": "Missed bin collection",
+      "fi": "Tyhjentämättä jäänyt jäteastia",
+      "ar": "عدم جمع النفايات",
+      "uk": "Сміття не вивезли",
+      "pl": "Nieodebrane śmieci",
+      "ru": "Мусор не вывезли",
+      "de": "Ausgefallene Müllabfuhr",
+      "fr": "Collecte des déchets manquée",
+      "es": "Recogida de basura no realizada",
+      "it": "Raccolta rifiuti mancata",
+      "pt": "Recolha de lixo não feita",
+      "nl": "Afval niet opgehaald",
+      "da": "Manglende affaldsafhentning",
+      "nb": "Uteblitt søppeltømming",
+      "et": "Prügi jäi viimata",
+      "lv": "Atkritumi nav izvesti",
+      "lt": "Neišvežtos atliekos",
+      "ro": "Gunoi neridicat",
+      "el": "Δεν έγινε αποκομιδή απορριμμάτων",
+      "hu": "Elmaradt szemétszállítás",
+      "cs": "Nevyvezený odpad"
+    },
+    "subtitle": {
+      "sv": "Kärlet tömdes inte (fastlandet)",
+      "en": "Your bin wasn't emptied (mainland)",
+      "fi": "Jäteastiaa ei tyhjennetty (mantereella)",
+      "ar": "لم تُفرَّغ الحاوية (البر الرئيسي)",
+      "uk": "Контейнер не спорожнили (материк)",
+      "pl": "Pojemnik nie został opróżniony (ląd)",
+      "ru": "Контейнер не опорожнили (материк)",
+      "de": "Ihre Tonne wurde nicht geleert (Festland)",
+      "fr": "Votre bac n'a pas été vidé (continent)",
+      "es": "No se vació tu contenedor (tierra firme)",
+      "it": "Il bidone non è stato svuotato (terraferma)",
+      "pt": "O contentor não foi esvaziado (continente)",
+      "nl": "Je container is niet geleegd (vasteland)",
+      "da": "Din beholder blev ikke tømt (fastlandet)",
+      "nb": "Dunken ble ikke tømt (fastlandet)",
+      "et": "Konteinerit ei tühjendatud (mandril)",
+      "lv": "Konteiners netika iztukšots (kontinentā)",
+      "lt": "Konteineris nebuvo ištuštintas (žemyne)",
+      "ro": "Pubela nu a fost golită (continent)",
+      "el": "Ο κάδος δεν αδειάστηκε (ηπειρωτικό τμήμα)",
+      "hu": "Nem ürítették a kukát (szárazföld)",
+      "cs": "Popelnice nebyla vyvezena (pevnina)"
+    },
+    "symbol": "trash",
+    "order": 2
+  },
+  "municipality": {
+    "name": "Värmdö kommun",
+    "countryCode": "SE",
+    "region": {
+      "center": {
+        "latitude": 59.31,
+        "longitude": 18.55
+      },
+      "bbox": {
+        "minLatitude": 59.15,
+        "maxLatitude": 59.45,
+        "minLongitude": 18.25,
+        "maxLongitude": 19.05
+      }
+    },
+    "geocoderNames": [
+      "Värmdö",
+      "Värmdö kommun"
+    ]
+  },
+  "channel": {
+    "kind": "abou",
+    "baseURL": "https://service.varmdo.se",
+    "service": "anmutbsop",
+    "introPath": "/anmutbsop",
+    "startPath": "/Setup.aspx?Service=anmutbsop&skipintro=true",
+    "nextEventTarget": "ctl00$ctl00$LeftAndMainSection$MainSection$ServiceSection$ServicePageNavigationSection$NextAndBackButtons$NextButton",
+    "sessionLockedMarker": "Du har ett ärende igång redan",
+    "completionPostBackMarker": "var doPostBack = 'True'",
+    "maxCompletionPostBacks": 3,
+    "pages": [
+      {
+        "id": "dinauppgifter",
+        "stage": "sendingReport",
+        "fields": [
+          {
+            "role": "firstName",
+            "key": "anmutbsop_1",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Förnamn"
+              ],
+              "en": [
+                "First name"
+              ]
+            }
+          },
+          {
+            "role": "lastName",
+            "key": "anmutbsop_2",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Efternamn"
+              ],
+              "en": [
+                "Last name"
+              ]
+            }
+          },
+          {
+            "role": "answer",
+            "key": "anmutbsop_3",
+            "control": "textFieldControl",
+            "question": "address",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Hämtadress"
+              ],
+              "en": [
+                "Pickup address"
+              ]
+            }
+          },
+          {
+            "role": "email",
+            "key": "anmutbsop_6",
+            "control": "AnswerTextBoxControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "E-post"
+              ],
+              "en": [
+                "Email"
+              ]
+            }
+          },
+          {
+            "role": "phone",
+            "key": "anmutbsop_9",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Mobilnummer"
+              ],
+              "en": [
+                "Mobile number"
+              ]
+            }
+          },
+          {
+            "role": "answer",
+            "key": "anmutbsop_7",
+            "control": "dropDownListFieldControl",
+            "question": "missed",
+            "type": "select",
+            "labels": {
+              "sv": [
+                "Vad har inte hämtats"
+              ],
+              "en": [
+                "What has not been collected"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "SummaryPage",
+        "stage": "confirming",
+        "fields": []
+      }
+    ],
+    "uploads": [
+      {
+        "pageID": "dinauppgifter",
+        "fieldID": "anmutbsop.10",
+        "path": "/Citizen/Field/UploadFile/anmutbsop.10",
+        "filePartName": "files[]",
+        "fileName": "foto.jpg",
+        "actionPath": "/Citizen/Field/Action"
+      }
+    ]
+  },
+  "categories": [
+    {
+      "id": "waste",
+      "value": "Utebliven sophämtning",
+      "title": {
+        "sv": "Utebliven sophämtning",
+        "en": "Missed bin collection",
+        "fi": "Tyhjentämättä jäänyt jäteastia",
+        "ar": "عدم جمع النفايات",
+        "uk": "Сміття не вивезли",
+        "pl": "Nieodebrane śmieci",
+        "ru": "Мусор не вывезли",
+        "de": "Ausgefallene Müllabfuhr",
+        "fr": "Collecte des déchets manquée",
+        "es": "Recogida de basura no realizada",
+        "it": "Raccolta rifiuti mancata",
+        "pt": "Recolha de lixo não feita",
+        "nl": "Afval niet opgehaald",
+        "da": "Manglende affaldsafhentning",
+        "nb": "Uteblitt søppeltømming",
+        "et": "Prügi jäi viimata",
+        "lv": "Atkritumi nav izvesti",
+        "lt": "Neišvežtos atliekos",
+        "ro": "Gunoi neridicat",
+        "el": "Δεν έγινε αποκομιδή απορριμμάτων",
+        "hu": "Elmaradt szemétszállítás",
+        "cs": "Nevyvezený odpad"
+      }
+    }
+  ],
+  "questions": [
+    {
+      "id": "address",
+      "kind": "text",
+      "title": {
+        "sv": "Hämtadress",
+        "en": "Pickup address",
+        "fi": "Noutoosoite",
+        "ar": "عنوان الجمع",
+        "uk": "Адреса вивезення",
+        "pl": "Adres odbioru",
+        "ru": "Адрес вывоза",
+        "de": "Abholadresse",
+        "fr": "Adresse de collecte",
+        "es": "Dirección de recogida",
+        "it": "Indirizzo di ritiro",
+        "pt": "Morada de recolha",
+        "nl": "Ophaaladres",
+        "da": "Afhentningsadresse",
+        "nb": "Henteadresse",
+        "et": "Äraveo aadress",
+        "lv": "Izvešanas adrese",
+        "lt": "Išvežimo adresas",
+        "ro": "Adresa de colectare",
+        "el": "Διεύθυνση αποκομιδής",
+        "hu": "Elszállítási cím",
+        "cs": "Adresa svozu"
+      },
+      "hint": {
+        "sv": "Gatuadressen där kärlet står, t.ex. Skogsbovägen 9",
+        "en": "Street address where your bin stands, e.g. Skogsbovägen 9",
+        "fi": "Katuosoite, jossa jäteastia on, esim. Skogsbovägen 9",
+        "ar": "عنوان الشارع حيث توجد الحاوية، مثل Skogsbovägen 9",
+        "uk": "Адреса, де стоїть контейнер, напр. Skogsbovägen 9",
+        "pl": "Adres, pod którym stoi pojemnik, np. Skogsbovägen 9",
+        "ru": "Адрес, где стоит контейнер, напр. Skogsbovägen 9",
+        "de": "Straße und Hausnummer, wo die Tonne steht, z. B. Skogsbovägen 9",
+        "fr": "Adresse où se trouve votre bac, ex. Skogsbovägen 9",
+        "es": "Dirección donde está tu contenedor, p. ej. Skogsbovägen 9",
+        "it": "Indirizzo dove si trova il bidone, es. Skogsbovägen 9",
+        "pt": "Morada onde está o contentor, ex. Skogsbovägen 9",
+        "nl": "Adres waar je container staat, bijv. Skogsbovägen 9",
+        "da": "Adressen hvor beholderen står, fx Skogsbovägen 9",
+        "nb": "Adressen der dunken står, f.eks. Skogsbovägen 9",
+        "et": "Aadress, kus konteiner asub, nt Skogsbovägen 9",
+        "lv": "Adrese, kur atrodas konteiners, piem., Skogsbovägen 9",
+        "lt": "Adresas, kur stovi konteineris, pvz., Skogsbovägen 9",
+        "ro": "Adresa unde se află pubela, ex. Skogsbovägen 9",
+        "el": "Διεύθυνση όπου βρίσκεται ο κάδος, π.χ. Skogsbovägen 9",
+        "hu": "A cím, ahol a kuka áll, pl. Skogsbovägen 9",
+        "cs": "Adresa, kde stojí popelnice, např. Skogsbovägen 9"
+      },
+      "required": true,
+      "maxLength": 200
+    },
+    {
+      "id": "missed",
+      "kind": "choice",
+      "title": {
+        "sv": "Vad hämtades inte?",
+        "en": "What wasn't collected?",
+        "fi": "Mitä ei noudettu?",
+        "ar": "ما الذي لم يُجمع؟",
+        "uk": "Що не вивезли?",
+        "pl": "Czego nie odebrano?",
+        "ru": "Что не вывезли?",
+        "de": "Was wurde nicht abgeholt?",
+        "fr": "Qu'est-ce qui n'a pas été collecté ?",
+        "es": "¿Qué no se recogió?",
+        "it": "Cosa non è stato ritirato?",
+        "pt": "O que não foi recolhido?",
+        "nl": "Wat is niet opgehaald?",
+        "da": "Hvad blev ikke hentet?",
+        "nb": "Hva ble ikke hentet?",
+        "et": "Mida ei viidud ära?",
+        "lv": "Kas netika izvests?",
+        "lt": "Kas nebuvo išvežta?",
+        "ro": "Ce nu s-a ridicat?",
+        "el": "Τι δεν συλλέχθηκε;",
+        "hu": "Mit nem szállítottak el?",
+        "cs": "Co nebylo vyvezeno?"
+      },
+      "required": true,
+      "options": [
+        {
+          "value": "Hushållsavfall",
+          "title": {
+            "sv": "Hushållsavfall",
+            "en": "Household waste",
+            "fi": "Sekajäte",
+            "ar": "النفايات المنزلية",
+            "uk": "Побутові відходи",
+            "pl": "Odpady komunalne",
+            "ru": "Бытовые отходы",
+            "de": "Hausmüll",
+            "fr": "Ordures ménagères",
+            "es": "Residuos domésticos",
+            "it": "Rifiuti domestici",
+            "pt": "Lixo doméstico",
+            "nl": "Huishoudelijk afval",
+            "da": "Husholdningsaffald",
+            "nb": "Husholdningsavfall",
+            "et": "Olmejäätmed",
+            "lv": "Sadzīves atkritumi",
+            "lt": "Buitinės atliekos",
+            "ro": "Deșeuri menajere",
+            "el": "Οικιακά απορρίμματα",
+            "hu": "Háztartási hulladék",
+            "cs": "Směsný odpad"
+          }
+        },
+        {
+          "value": "Matavfall",
+          "title": {
+            "sv": "Matavfall",
+            "en": "Food waste",
+            "fi": "Biojäte",
+            "ar": "نفايات الطعام",
+            "uk": "Харчові відходи",
+            "pl": "Odpady spożywcze",
+            "ru": "Пищевые отходы",
+            "de": "Bioabfall",
+            "fr": "Déchets alimentaires",
+            "es": "Restos de comida",
+            "it": "Rifiuti alimentari",
+            "pt": "Resíduos alimentares",
+            "nl": "Etensresten",
+            "da": "Madaffald",
+            "nb": "Matavfall",
+            "et": "Toidujäätmed",
+            "lv": "Pārtikas atkritumi",
+            "lt": "Maisto atliekos",
+            "ro": "Deșeuri alimentare",
+            "el": "Υπολείμματα τροφών",
+            "hu": "Ételhulladék",
+            "cs": "Bioodpad"
+          }
+        },
+        {
+          "value": "Båda",
+          "title": {
+            "sv": "Båda",
+            "en": "Both",
+            "fi": "Molemmat",
+            "ar": "كلاهما",
+            "uk": "Обидва",
+            "pl": "Oba",
+            "ru": "Оба",
+            "de": "Beides",
+            "fr": "Les deux",
+            "es": "Ambos",
+            "it": "Entrambi",
+            "pt": "Ambos",
+            "nl": "Beide",
+            "da": "Begge",
+            "nb": "Begge",
+            "et": "Mõlemad",
+            "lv": "Abi",
+            "lt": "Abu",
+            "ro": "Ambele",
+            "el": "Και τα δύο",
+            "hu": "Mindkettő",
+            "cs": "Obojí"
+          }
+        }
+      ]
+    }
+  ],
+  "tiles": [
+    {
+      "id": "bins-missed",
+      "symbol": "trash",
+      "categoryID": "waste",
+      "title": {
+        "sv": "Soporna hämtades inte",
+        "en": "Bin not emptied",
+        "fi": "Jäteastiaa ei tyhjennetty",
+        "ar": "لم تُجمع النفايات",
+        "uk": "Сміття не вивезли",
+        "pl": "Śmieci nie odebrane",
+        "ru": "Мусор не вывезли",
+        "de": "Tonne nicht geleert",
+        "fr": "Bac non vidé",
+        "es": "Contenedor sin vaciar",
+        "it": "Bidone non svuotato",
+        "pt": "Contentor não esvaziado",
+        "nl": "Container niet geleegd",
+        "da": "Affald ikke hentet",
+        "nb": "Søppel ikke hentet",
+        "et": "Prügi viimata",
+        "lv": "Atkritumi nav izvesti",
+        "lt": "Atliekos neišvežtos",
+        "ro": "Gunoi neridicat",
+        "el": "Ο κάδος δεν αδειάστηκε",
+        "hu": "Nem vitték el a szemetet",
+        "cs": "Odpad nevyvezen"
+      },
+      "questionIDs": [
+        "address",
+        "missed"
+      ]
+    }
+  ],
+  "validation": {
+    "descriptionMin": 0,
+    "descriptionMax": 4000,
+    "emailRequiredWhenFeedback": false,
+    "requireLocation": false,
+    "photoRequired": false,
+    "emailRequired": true,
+    "descriptionRequired": false
+  },
+  "webFormURL": "https://service.varmdo.se/anmutbsop",
+  "disclaimer": {
+    "sv": "Fixa är en fristående app med öppen källkod och ingen del av Värmdö kommun. Appen skickar din anmälan direkt till kommunens e-tjänst Anmälan om utebliven sophämtning, och kommunen hanterar ärendet på sitt vanliga sätt. Ring 112 om liv eller egendom är i fara.",
+    "en": "Fixa is an independent open-source app and is not part of Värmdö kommun. It sends your report straight to the municipality's e-service for missed bin collections, and the municipality handles it the usual way. Call 112 if life or property is in danger.",
+    "fi": "Fixa on itsenäinen avoimen lähdekoodin sovellus, eikä se ole osa Värmdön kuntaa. Sovellus lähettää ilmoituksesi suoraan kunnan sähköiseen palveluun tyhjentämättä jääneistä jäteastioista, ja kunta käsittelee sen tavalliseen tapaan. Soita 112, jos henki tai omaisuus on vaarassa.",
+    "ar": "Fixa تطبيق مستقل ومفتوح المصدر، وليس جزءاً من بلدية فارمدو. يرسل التطبيق بلاغك مباشرة إلى الخدمة الإلكترونية للبلدية الخاصة بالإبلاغ عن عدم جمع النفايات، وتتعامل البلدية معه بالطريقة المعتادة. اتصل بالرقم 112 إذا كانت الأرواح أو الممتلكات في خطر.",
+    "uk": "Fixa — незалежний застосунок із відкритим кодом, який не належить комуні Вермдьо. Він надсилає ваше повідомлення безпосередньо до електронного сервісу комуни для повідомлень про невивезене сміття, і комуна розглядає його у звичайному порядку. Якщо є загроза життю чи майну, телефонуйте 112.",
+    "pl": "Fixa to niezależna aplikacja open source, która nie należy do gminy Värmdö. Wysyła Twoje zgłoszenie bezpośrednio do e-usługi gminy do zgłaszania nieodebranych śmieci, a gmina zajmuje się nim w zwykły sposób. Jeśli zagrożone jest życie lub mienie, dzwoń pod 112.",
+    "ru": "Fixa является независимым приложением с открытым исходным кодом и не относится к коммуне Värmdö. Оно отправляет вашу заявку напрямую в электронную услугу коммуны для заявок о невывезенном мусоре, и коммуна рассматривает её в обычном порядке. Если под угрозой жизнь или имущество, звоните 112.",
+    "de": "Fixa ist eine unabhängige Open-Source-App und gehört nicht zu Värmdö kommun. Die App sendet Ihre Meldung direkt an den E-Service der Gemeinde für ausgefallene Müllabfuhr, und die Gemeinde bearbeitet sie wie gewohnt. Rufen Sie 112 an, wenn Leben oder Eigentum in Gefahr sind.",
+    "fr": "Fixa est une app indépendante et open source, qui ne fait pas partie de Värmdö kommun. Elle envoie votre signalement directement au service en ligne de la commune pour les collectes de déchets manquées, qui le traite de la manière habituelle. Appelez le 112 si des vies ou des biens sont en danger.",
+    "es": "Fixa es una app independiente de código abierto y no forma parte de Värmdö kommun. Envía tu aviso directamente al servicio electrónico del municipio para recogidas de basura no realizadas, que lo gestiona de la forma habitual. Llama al 112 si hay peligro para personas o bienes.",
+    "it": "Fixa è un'app indipendente e open source e non fa parte di Värmdö kommun. Invia la tua segnalazione direttamente al servizio online del comune per la raccolta rifiuti mancata, e il comune la gestisce come di consueto. Chiama il 112 se ci sono pericoli per persone o cose.",
+    "pt": "A Fixa é uma app independente de código aberto e não faz parte de Värmdö kommun. Envia a sua participação diretamente para o serviço online do município para recolhas de lixo não feitas, que a trata da forma habitual. Ligue 112 se houver perigo para pessoas ou bens.",
+    "nl": "Fixa is een onafhankelijke opensource-app en hoort niet bij Värmdö kommun. De app stuurt je melding rechtstreeks naar de e-dienst van de gemeente voor niet-opgehaald afval, en de gemeente behandelt die op de gewone manier. Bel 112 als levens of eigendommen in gevaar zijn.",
+    "da": "Fixa er en uafhængig app med åben kildekode og er ikke en del af Värmdö kommun. Den sender din anmeldelse direkte til kommunens e-tjeneste for manglende affaldsafhentning, og kommunen behandler den på sædvanlig vis. Ring 112, hvis liv eller ejendom er i fare.",
+    "nb": "Fixa er en uavhengig app med åpen kildekode og er ikke en del av Värmdö kommun. Appen sender meldingen din direkte til kommunens e-tjeneste for uteblitt søppeltømming, og kommunen behandler den på vanlig måte. Ring 112 hvis liv eller eiendom er i fare.",
+    "et": "Fixa on sõltumatu avatud lähtekoodiga rakendus ega kuulu omavalitsusele Värmdö kommun. See saadab teie teate otse omavalitsuse e-teenusesse viimata jäänud prügi kohta ja omavalitsus menetleb seda tavapärasel viisil. Kui elu või vara on ohus, helistage 112.",
+    "lv": "Fixa ir neatkarīga atvērtā koda lietotne, un tā nav saistīta ar Värmdö kommun. Tā nosūta jūsu ziņojumu tieši pašvaldības e-pakalpojumam par neizvestiem atkritumiem, un pašvaldība to izskata ierastajā kārtībā. Zvaniet 112, ja apdraudēta dzīvība vai īpašums.",
+    "lt": "Fixa yra nepriklausoma atvirojo kodo programėlė ir nėra Värmdö kommun dalis. Ji siunčia jūsų pranešimą tiesiai į savivaldybės e. paslaugą dėl neišvežtų atliekų, o savivaldybė jį nagrinėja įprasta tvarka. Skambinkite 112, jei gresia pavojus gyvybei ar turtui.",
+    "ro": "Fixa este o aplicație independentă, open-source, și nu face parte din Värmdö kommun. Trimite sesizarea dumneavoastră direct la serviciul online al comunei pentru gunoiul neridicat, iar comuna o tratează în mod obișnuit. Sunați la 112 dacă viața sau bunurile cuiva sunt în pericol.",
+    "el": "Το Fixa είναι μια ανεξάρτητη εφαρμογή ανοιχτού κώδικα και δεν ανήκει στο Värmdö kommun. Στέλνει την αναφορά σας απευθείας στην ηλεκτρονική υπηρεσία του δήμου για απορρίμματα που δεν συλλέχθηκαν, και ο δήμος τη διαχειρίζεται με τον συνήθη τρόπο. Καλέστε το 112 αν κινδυνεύουν ζωές ή περιουσίες.",
+    "hu": "A Fixa független, nyílt forráskódú alkalmazás, és nem része a Värmdö kommunnak. A bejelentését közvetlenül az önkormányzat elmaradt szemétszállítással kapcsolatos e-szolgáltatásába küldi, az önkormányzat pedig a szokásos módon intézi. Ha élet vagy vagyon van veszélyben, hívja a 112-t.",
+    "cs": "Fixa je nezávislá aplikace s otevřeným zdrojovým kódem a není součástí Värmdö kommun. Odešle vaše hlášení přímo do e-služby obce pro nevyvezený odpad a obec ho vyřídí obvyklým způsobem. Pokud je ohrožen život nebo majetek, volejte 112."
+  },
+  "contact": {
+    "pageURL": "https://www.varmdo.se/kommunochpolitik/kontaktcenter.4.1a4e4f4413f7b9c98702cd2.html",
+    "title": {
+      "sv": "Värmdö kommuns kontaktcenter",
+      "en": "Värmdö kommun contact centre",
+      "fi": "Värmdön kunnan asiakaspalvelu",
+      "ar": "مركز الاتصال في بلدية فارمدو",
+      "uk": "Контактний центр комуни Вермдьо",
+      "pl": "Centrum kontaktowe gminy Värmdö",
+      "ru": "Контактный центр коммуны Värmdö",
+      "de": "Kontaktcenter von Värmdö kommun",
+      "fr": "Centre de contact de Värmdö kommun",
+      "es": "Centro de contacto de Värmdö kommun",
+      "it": "Centro contatti di Värmdö kommun",
+      "pt": "Centro de contacto de Värmdö kommun",
+      "nl": "Contactcentrum van Värmdö kommun",
+      "da": "Värmdö kommuns kontaktcenter",
+      "nb": "Kontaktsenteret i Värmdö kommun",
+      "et": "Värmdö kommun: kontaktkeskus",
+      "lv": "Värmdö kommun kontaktu centrs",
+      "lt": "Värmdö kommun kontaktų centras",
+      "ro": "Centrul de contact Värmdö kommun",
+      "el": "Κέντρο επικοινωνίας του Värmdö kommun",
+      "hu": "Värmdö kommun kapcsolattartási központja",
+      "cs": "Kontaktní centrum Värmdö kommun"
+    }
+  },
+  "allowedWebHosts": [
+    "varmdo.se",
+    "www.varmdo.se",
+    "service.varmdo.se"
+  ]
+}

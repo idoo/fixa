@@ -24,9 +24,21 @@ enum Route: Hashable {
 @Observable
 @MainActor
 final class AppModel {
-    /// The municipality adapter: bundled, or a newer accepted copy from GitHub (`AdapterStore`).
+    /// The municipality adapters: bundled, or newer accepted copies from GitHub (`AdapterStore`).
     let adapters = AdapterStore(adapterID: AppModel.adapterID)
+    /// The primary adapter (Home's tile grid).
     var spec: AdapterSpec? { adapters.spec }
+    /// The adapter the current draft belongs to; the primary one when that id is unknown.
+    var draftSpec: AdapterSpec? { adapters.spec(id: draftStorage.adapterID) ?? spec }
+    /// Home's "More forms": every bundled adapter but the primary, by `service.order`.
+    var services: [AdapterSpec] { adapters.specs.filter { $0.id != adapters.primaryID } }
+    func spec(id: String?) -> AdapterSpec? {
+        id.flatMap { adapters.spec(id: $0) }
+    }
+    /// The adapter a report (draft, outbox or history item) belongs to; old items without one are the primary's.
+    func spec(forAdapterID id: String?) -> AdapterSpec? {
+        spec(id: id) ?? spec
+    }
     /// What Home shows about the municipality's e-service; `-FixaStatus` forces one for screenshots.
     var adapterStatus: AdapterStatus { options.status ?? adapters.status }
     let options: LaunchOptions
@@ -85,13 +97,14 @@ final class AppModel {
     var placeTextIsTyped = false
 
     var path: [Route] = []
-    /// What the report sends. `contact` always mirrors the profile while a reply is wanted and is
-    /// empty otherwise, so turning the toggle off never sends (or deletes) the saved details.
+    /// What the report sends. `contact` always mirrors the profile while a reply is wanted (or the form
+    /// has no reply question and simply asks for the details) and is empty otherwise, so turning the
+    /// toggle off never sends (or deletes) the saved details.
     var draft: ReportDraft {
         get { draftStorage }
         set {
             var next = newValue
-            next.contact = next.wantsFeedback ? profileStorage : Contact()
+            next.contact = carriesContact(next) ? profileStorage : Contact()
             // A translated place belongs to the text it was made from.
             if next.locationText != draftStorage.locationText, next.translation?.locationText != nil {
                 next.translation?.locationText = nil
@@ -111,12 +124,18 @@ final class AppModel {
         get { profileStorage }
         set {
             profileStorage = newValue
-            if draftStorage.wantsFeedback {
+            if carriesContact(draftStorage) {
                 draftStorage.contact = newValue
             }
             scheduleProfileSave()
         }
     }
+
+    /// The draft sends the profile's details: a reply is wanted, or its form has no reply question.
+    private func carriesContact(_ report: ReportDraft) -> Bool {
+        report.wantsFeedback || spec(forAdapterID: report.adapterID)?.hasField(.feedback) == false
+    }
+
     private var profileStorage: Contact
     /// Originals picked or taken; `draft.photoJPEG` is their collage.
     private(set) var photos: [UIImage] = []
@@ -151,7 +170,7 @@ final class AppModel {
     var language: AppLanguage? {
         didSet {
             guard language != oldValue else { return }
-            let previousDemoText = options.demo ? DemoData.draft(adapterID: Self.adapterID).description : nil
+            let previousDemoText = options.demo ? demoDescription : nil
             L10n.apply(language, savesSystemSetting: persists)
             if let previousDemoText { relocalizeDemo(replacing: previousDemoText) }
             guard persists else { return }
@@ -226,9 +245,34 @@ final class AppModel {
 
     // MARK: Flow
 
-    /// Idempotent: a second tap on a tile (or two tiles at once) sets the same one-screen path, so
-    /// only one Report screen is ever pushed.
+    /// A tile of any adapter: started in the adapter that has it.
     func startReport(tile: AdapterSpec.Tile) {
+        guard let owner = adapters.specs.first(where: { $0.tile(id: tile.id) != nil }) ?? spec else { return }
+        startReport(tile: tile, in: owner)
+    }
+
+    /// A report waiting for "Start a new report?": the unsent draft belongs to another form.
+    struct PendingStart: Identifiable, Equatable {
+        let tile: AdapterSpec.Tile
+        let adapterID: String
+        var id: String { tile.id }
+    }
+
+    /// Set when starting `tile` would delete an unsent report of another form; Home asks first.
+    var pendingStart: PendingStart?
+
+    /// Idempotent: a second tap on a tile (or two tiles at once) sets the same one-screen path, so
+    /// only one Report screen is ever pushed. A tile of another adapter than the draft's starts a new
+    /// draft for that adapter; an unsent one with content is not dropped without asking (`pendingStart`).
+    func startReport(tile: AdapterSpec.Tile, in spec: AdapterSpec) {
+        if draftStorage.adapterID != spec.id {
+            guard !submission.isSending, !isSendingDraft else { return }
+            if draftHasContent {
+                pendingStart = PendingStart(tile: tile, adapterID: spec.id)
+                return
+            }
+            switchDraft(to: spec.id)
+        }
         if draft.tileID != tile.id {
             draft.tileID = tile.id
             draft.categoryID = tile.categoryID
@@ -245,19 +289,59 @@ final class AppModel {
         path = [.report]
     }
 
+    /// Home's "More forms" row: that adapter's first tile.
+    func openService(adapterID: String) {
+        guard let spec = adapters.spec(id: adapterID), let tile = spec.tiles.first else { return }
+        startReport(tile: tile, in: spec)
+    }
+
+    /// "Delete & start": drops the unsent report and starts the one that was asked for.
+    func confirmPendingStart(_ pending: PendingStart) {
+        pendingStart = nil
+        guard let spec = adapters.spec(id: pending.adapterID), !submission.isSending, !isSendingDraft else { return }
+        switchDraft(to: spec.id)
+        startReport(tile: pending.tile, in: spec)
+    }
+
+    /// "Keep editing": back to the unsent report.
+    func cancelPendingStart() {
+        pendingStart = nil
+        if path.first != .report {
+            path = [.report]
+        }
+    }
+
+    /// A fresh draft for `adapterID`; photos, typed place and shown issues go with the old one.
+    /// Contact details stay: they live in the profile.
+    private func switchDraft(to adapterID: String) {
+        photos = []
+        clearSavedDraft()
+        draft = freshDraft(adapterID: adapterID)
+        placeTextIsTyped = false
+        pinIsAutomatic = false
+        duplicateOf = nil
+        showIssues = false
+    }
+
     func select(tile: AdapterSpec.Tile) {
         draft.tileID = tile.id
         draft.categoryID = tile.categoryID
     }
 
     var issues: [ValidationIssue] {
-        guard let spec else { return [] }
+        guard let spec = draftSpec else { return [] }
         return ReportValidator.validate(draft, spec: spec)
     }
 
     func issue(for field: ValidationIssue.Field) -> ValidationIssue? {
         guard showIssues else { return nil }
         return issues.first { $0.field == field }
+    }
+
+    /// The issue of one adapter question; nil until issues are shown.
+    func issue(forQuestion id: String) -> ValidationIssue? {
+        guard showIssues else { return nil }
+        return issues.first { $0.field == .question && $0.questionID == id }
     }
 
     /// Validates and moves to Review; returns false when something needs fixing.
@@ -292,12 +376,12 @@ final class AppModel {
 
     private func send(confirmedDuplicate: Bool) async {
         // Demo seeds a receipt up front; everywhere else a set `sent` means this draft already went.
-        guard let spec, !isSendingDraft, options.demo || sent == nil, outsideMunicipalityName == nil else { return }
+        guard let spec = draftSpec, !isSendingDraft, options.demo || sent == nil, outsideMunicipalityName == nil else { return }
         isSendingDraft = true
         defer { isSendingDraft = false }
         if options.demo {
             // "-FixaDemo: no network". Nothing leaves the phone; history is in memory only.
-            sent = DemoData.receipt
+            sent = spec.isPrimary ? DemoData.receipt : DemoData.receipt(for: draft, spec: spec)
             var item = historyItem(id: UUID(), from: draft, date: .now, caseNumber: DemoData.receipt.caseNumber, status: .sent)
             item.kommunMessage = DemoData.receipt.kommunMessage
             history.add(item)
@@ -332,7 +416,7 @@ final class AppModel {
         // The form changed: drift stops before the final step, so nothing reached the municipality.
         // Try once more with a newer signed adapter if there is one; otherwise Review shows the drift.
         if result == nil, case .formChanged? = submission.error,
-           await refreshAdapterAfterFormChange(), let fresh = self.spec {
+           await refreshAdapterAfterFormChange(adapterID: spec.id), let fresh = self.spec(id: spec.id) {
             submission.reset()
             result = await submission.submit(report, spec: fresh, dryRun: dryRun, beforeFinalSend: mark)
         }
@@ -418,10 +502,10 @@ final class AppModel {
     }
 
     /// A new report: replies default to on when the profile already has a usable e-mail.
-    private func freshDraft() -> ReportDraft {
-        var fresh = ReportDraft(adapterID: spec?.id ?? Self.adapterID)
+    private func freshDraft(adapterID: String? = nil) -> ReportDraft {
+        var fresh = ReportDraft(adapterID: adapterID ?? spec?.id ?? Self.adapterID)
         fresh.wantsFeedback = profileHasEmail
-        fresh.contact = fresh.wantsFeedback ? profileStorage : Contact()
+        fresh.contact = carriesContact(fresh) ? profileStorage : Contact()
         return fresh
     }
 
@@ -590,8 +674,16 @@ final class AppModel {
 
     // MARK: Draft persistence
 
+    /// Text, a photo, or an answer the resident gave (a date-time that defaults to now doesn't count).
     var draftHasContent: Bool {
-        !draftStorage.description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !photos.isEmpty
+        if !draftStorage.description.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !photos.isEmpty {
+            return true
+        }
+        let spec = draftSpec
+        return draftStorage.answers.contains { id, values in
+            spec?.question(id: id)?.kind != .dateTime
+                && values.contains { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        }
     }
 
     private func scheduleDraftSave() {
@@ -629,8 +721,12 @@ final class AppModel {
     private func restoreDraft() {
         guard let saved = DraftStore.load() else { return }
         var restored = saved.draft
-        restored.adapterID = spec?.id ?? Self.adapterID
-        restored.contact = restored.wantsFeedback ? profileStorage : Contact()
+        // A draft of a form this build doesn't ship can't be sent: start a fresh primary one instead.
+        guard adapters.spec(id: restored.adapterID) != nil else {
+            clearSavedDraft()
+            return
+        }
+        restored.contact = carriesContact(restored) ? profileStorage : Contact()
         draftStorage = restored
         photos = saved.photos
         photoFiles = saved.photoFiles
@@ -722,7 +818,8 @@ final class AppModel {
             caseNumber: caseNumber,
             thumbnail: report.photoJPEG.flatMap { PhotoCollage.thumbnail(from: $0) },
             status: status,
-            filedText: spec.map { ReportComposer.filedText(for: report, spec: $0, now: date) }
+            filedText: spec(forAdapterID: report.adapterID).map { ReportComposer.filedText(for: report, spec: $0, now: date) },
+            adapterID: report.adapterID
         )
     }
 
@@ -850,7 +947,7 @@ final class AppModel {
 
     /// The report as plain Swedish text to paste into the kommun's own web form.
     func webFallbackText(for draft: ReportDraft) -> String {
-        guard let spec else { return "" }
+        guard let spec = self.spec(forAdapterID: draft.adapterID) else { return "" }
         return WebFallback.text(draft, spec: spec)
     }
 
@@ -861,13 +958,13 @@ final class AppModel {
     }
 
     /// Copies `text` (this phone only, for an hour) and opens the kommun's own web form (in-app Safari),
-    /// where the user pastes it and attaches the photo themselves.
-    func openWebForm(_ text: String) {
+    /// where the user pastes it and attaches the photo themselves. The form of `adapterID`, else the draft's.
+    func openWebForm(_ text: String, adapterID: String? = nil) {
         UIPasteboard.general.setItems(
             [[UTType.utf8PlainText.identifier: text]],
             options: [.localOnly: true, .expirationDate: Date.now.addingTimeInterval(60 * 60)]
         )
-        guard let spec else { return }
+        guard let spec = self.spec(id: adapterID) ?? draftSpec else { return }
         KommunWeb.open(spec.webFormURL, spec: spec)
     }
 
@@ -1005,7 +1102,8 @@ final class AppModel {
     /// Sends one outbox report and waits for the e-service's final answer. Single flight per id:
     /// the check and the insert into `sendingIDs` run on the main actor with no await between.
     private func attempt(_ id: UUID, automatic: Bool) async {
-        guard persists, let spec, var item = outbox.item(id: id), !sendingIDs.contains(id), item.finalSendAt == nil else { return }
+        guard persists, var item = outbox.item(id: id), let spec = self.spec(forAdapterID: item.draft.adapterID),
+              !sendingIDs.contains(id), item.finalSendAt == nil else { return }
         // Re-read: another trigger may have tried it since this pass picked it.
         if automatic, !isDue(item, at: .now) { return }
         if let until = item.serverRetryAfter, until > .now { return }
@@ -1023,7 +1121,7 @@ final class AppModel {
         var result = await service.submit(report, spec: spec, dryRun: false, beforeFinalSend: mark)
         // Form drift stops before the final step: once more with a newer signed adapter, if any.
         if result == nil, case .formChanged? = service.error,
-           await refreshAdapterAfterFormChange(), let fresh = self.spec {
+           await refreshAdapterAfterFormChange(adapterID: spec.id), let fresh = self.spec(id: spec.id) {
             service.reset()
             result = await service.submit(report, spec: fresh, dryRun: false, beforeFinalSend: mark)
         }
@@ -1151,10 +1249,10 @@ final class AppModel {
         }
     }
 
-    /// `AdapterStore.refreshAfterFormChange` plus the status it may bring along.
-    private func refreshAdapterAfterFormChange() async -> Bool {
+    /// `AdapterStore.refreshAfterFormChange(adapterID:)` plus the status it may bring along.
+    private func refreshAdapterAfterFormChange(adapterID: String) async -> Bool {
         let previous = adapters.status.state
-        let changed = await adapters.refreshAfterFormChange()
+        let changed = await adapters.refreshAfterFormChange(adapterID: adapterID)
         syncSendsPauseWithStatus(previous: previous)
         return changed
     }
@@ -1194,12 +1292,20 @@ final class AppModel {
 
     private func seedDemo() {
         profileStorage = DemoData.profile
-        var demo = DemoData.draft(adapterID: spec?.id ?? Self.adapterID)
-        if let tile = options.tile, spec?.tile(id: tile) != nil { demo.tileID = tile }
-        demo.categoryID = spec?.tile(id: demo.tileID)?.categoryID
-        draft = demo
-        if let image = DemoData.photo {
-            photos = [image]
+        if let service = options.service.flatMap({ adapters.spec(id: $0) }) {
+            // `-FixaService`: that e-service's report; a photo only where the form takes one.
+            draft = DemoData.draft(for: service, tileID: options.tile)
+            if !service.allUploads.isEmpty, let image = DemoData.photo {
+                photos = [image]
+            }
+        } else {
+            var demo = DemoData.draft(adapterID: spec?.id ?? Self.adapterID)
+            if let tile = options.tile, spec?.tile(id: tile) != nil { demo.tileID = tile }
+            demo.categoryID = spec?.tile(id: demo.tileID)?.categoryID
+            draft = demo
+            if let image = DemoData.photo {
+                photos = [image]
+            }
         }
         recomposePhoto()
         history.replaceAll(options.emptyHistory ? [] : DemoData.historyItems())
@@ -1217,11 +1323,18 @@ final class AppModel {
     /// re-word the untouched demo draft and the demo receipt so they match the new language.
     private func relocalizeDemo(replacing previousText: String) {
         if draft.description == previousText {
-            draft.description = DemoData.draft(adapterID: Self.adapterID).description
+            draft.description = demoDescription
         }
         if let current = sent, !current.isDryRun, current.caseNumber == DemoData.receipt.caseNumber, current.historyID == nil {
             sent = DemoData.receipt
         }
+    }
+
+    /// The demo draft's description in the current language (`-FixaService` has its own).
+    private var demoDescription: String {
+        options.service.flatMap { adapters.spec(id: $0) } != nil
+            ? DemoData.serviceDescription
+            : DemoData.draft(adapterID: Self.adapterID).description
     }
 
     /// `-FixaStatus offline|uncertain` with `-FixaDemo 1`: the demo report as waiting to send or

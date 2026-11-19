@@ -31,10 +31,15 @@ struct ReportScreen: View {
     /// Where a picked photo was taken (inside the municipality), read from the original file
     /// before it is re-encoded without metadata.
     @State private var photoPlace: Coordinate?
+    /// VoiceOver and keyboard focus for the first question with an issue (question id).
+    @AccessibilityFocusState private var questionA11yFocus: String?
+    @FocusState private var questionKeyboardFocus: String?
+    /// Bumped when another problem of a multi-tile form is chosen: drives the selection haptic.
+    @State private var tileTaps = 0
 
     /// Form sections, top to bottom: required first, optional last.
     private enum Section: Int, Comparable, Hashable {
-        case problem, place, details, photos, reply
+        case problem, questions, place, details, photos, reply
 
         init(_ field: ValidationIssue.Field) {
             switch field {
@@ -42,6 +47,8 @@ struct ReportScreen: View {
             case .location: self = .place
             case .description: self = .details
             case .email, .phone: self = .reply
+            case .question: self = .questions
+            case .photo: self = .photos
             }
         }
 
@@ -57,30 +64,47 @@ struct ReportScreen: View {
                         waterCallCard(emergency)
                             .id(Self.callCardID)
                     }
-                    categorySection
-                        .id(Section.problem)
-                    locationSection
-                        .id(Section.place)
-                    VStack(alignment: .leading, spacing: Fx.Space.s) {
-                        FxSectionHeader(String(localized: "What's wrong?", bundle: L10n.bundle, locale: L10n.locale))
-                        FxTextEditor(
-                            title: String(localized: "What's wrong?", bundle: L10n.bundle, locale: L10n.locale),
-                            text: $model.draft.description,
-                            prompt: String(localized: "What's broken, and since when? Any language is fine.", bundle: L10n.bundle, locale: L10n.locale),
-                            issue: model.issue(for: .description)?.message,
-                            minHeight: 140,
-                            showsTitle: false
-                        )
-                        .focused($keyboardFocus, equals: .details)
-                        .accessibilityFocused($a11yFocus, equals: .details)
-                        .accessibilityIdentifier("report.description")
-                        quickPhrases
+                    if spec.isPrimary {
+                        categorySection
+                            .id(Section.problem)
+                    } else if spec.tiles.count > 1 {
+                        tileSwitcher
+                            .id(Section.problem)
                     }
-                    .id(Section.details)
-                    photoSection
-                        .id(Section.photos)
-                    feedbackSection
-                        .id(Section.reply)
+                    let questions = spec.visibleQuestions(tileID: model.draft.tileID)
+                    if !questions.isEmpty {
+                        VStack(alignment: .leading, spacing: Fx.Space.xl) {
+                            ForEach(questions) { question in
+                                QuestionField(
+                                    question: question,
+                                    spec: spec,
+                                    a11yFocus: $questionA11yFocus,
+                                    keyboardFocus: $questionKeyboardFocus
+                                )
+                                .id(QuestionField.scrollID(question.id))
+                            }
+                        }
+                        .id(Section.questions)
+                    }
+                    if hasPlace {
+                        locationSection
+                            .id(Section.place)
+                    }
+                    if spec.hasField(.description) {
+                        descriptionSection
+                            .id(Section.details)
+                    }
+                    if !spec.allUploads.isEmpty {
+                        photoSection
+                            .id(Section.photos)
+                    }
+                    if spec.hasField(.feedback) {
+                        feedbackSection
+                            .id(Section.reply)
+                    } else if hasContactFields {
+                        contactSection
+                            .id(Section.reply)
+                    }
                 }
                 .padding(Fx.Space.l)
             }
@@ -100,11 +124,12 @@ struct ReportScreen: View {
         .scrollDismissesKeyboard(.interactively)
         .fxScreenBackground()
         .kommunWebLinks(spec: spec)
-        .navigationTitle(Text("New report"))
+        .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
         .sensoryFeedback(.error, trigger: failedReviews) { _, _ in haptics }
         .sensoryFeedback(.impact(weight: .light), trigger: cameraTaps) { _, _ in haptics }
         .sensoryFeedback(.selection, trigger: phraseTaps) { _, _ in haptics }
+        .sensoryFeedback(.selection, trigger: tileTaps) { _, _ in haptics }
         .onAppear {
             replyInline = !model.profileIsReady
         }
@@ -112,7 +137,9 @@ struct ReportScreen: View {
         .onChange(of: model.draft.description) { _, _ in
             if model.draft.translation != nil { model.draft.translation = nil }
         }
-        .task { await model.prefillLocationIfAllowed() }
+        .task {
+            if hasPlace { await model.prefillLocationIfAllowed() }
+        }
         .onChange(of: model.photos.isEmpty) { _, isEmpty in
             if isEmpty { photoPlace = nil }
         }
@@ -132,8 +159,8 @@ struct ReportScreen: View {
     private func review(scrollingWith proxy: ScrollViewProxy) {
         guard !model.goToReview() else { return }
         failedReviews += 1
-        let issues = model.issues.sorted { Section($0.field) < Section($1.field) }
-        guard let firstIssue = issues.first else {
+        let issues = model.issues
+        guard let firstIssue = issues.min(by: { Section($0.field) < Section($1.field) }) else {
             // Nothing to fix in the fields: the pin is in another kommun.
             if let other = model.outsideMunicipalityName {
                 withAnimation(reduceMotion ? nil : Fx.Motion.select) {
@@ -145,16 +172,133 @@ struct ReportScreen: View {
             return
         }
         let first = Section(firstIssue.field)
-        withAnimation(reduceMotion ? nil : Fx.Motion.select) {
-            proxy.scrollTo(first, anchor: .top)
-        }
-        a11yFocus = first
-        if first == .details || (first == .reply && replyInline && model.draft.wantsFeedback) {
-            keyboardFocus = first
+        if first == .questions, let id = firstIssue.questionID {
+            withAnimation(reduceMotion ? nil : Fx.Motion.select) {
+                proxy.scrollTo(QuestionField.scrollID(id), anchor: .top)
+            }
+            questionA11yFocus = id
+            if let kind = spec.question(id: id)?.kind, kind == .text || kind == .longText {
+                questionKeyboardFocus = id
+            }
+        } else {
+            withAnimation(reduceMotion ? nil : Fx.Motion.select) {
+                proxy.scrollTo(first, anchor: .top)
+            }
+            a11yFocus = first
+            let contactInline = !spec.hasField(.feedback) || (replyInline && model.draft.wantsFeedback)
+            if first == .details || (first == .reply && contactInline && spec.hasField(.email)) {
+                keyboardFocus = first
+            }
         }
         AccessibilityNotification.Announcement(
-            String(localized: "Fix \(issues.count) things before review. \(firstIssue.message)", bundle: L10n.bundle, locale: L10n.locale)
+            String(localized: "Fix \(issues.count) things before review. \(firstIssue.message(in: spec))", bundle: L10n.bundle, locale: L10n.locale)
         ).post()
+    }
+
+    // MARK: Form shape
+
+    /// The form takes a place (text or map).
+    private var hasPlace: Bool {
+        spec.hasField(.place) || spec.hasField(.mapAnswer) || spec.hasField(.mapChoice)
+    }
+
+    private var hasName: Bool {
+        spec.hasField(.firstName) || spec.hasField(.lastName) || spec.hasField(.fullName)
+    }
+
+    private var hasContactFields: Bool {
+        hasName || spec.hasField(.phone) || spec.hasField(.email)
+    }
+
+    /// A service's own name; the main fault report is a "New report".
+    private var navigationTitle: Text {
+        spec.service.map { Text(verbatim: $0.title.resolve(L10n.locale)) } ?? Text("New report")
+    }
+
+    // MARK: Description
+
+    private var descriptionSection: some View {
+        @Bindable var model = model
+        let title = spec.descriptionTitle?.resolve(L10n.locale)
+            ?? String(localized: "What's wrong?", bundle: L10n.bundle, locale: L10n.locale)
+        let optional = spec.validation.descriptionRequired == false
+        return VStack(alignment: .leading, spacing: Fx.Space.s) {
+            FxSectionHeader(title, subtitle: optional ? String(localized: "Optional", bundle: L10n.bundle, locale: L10n.locale) : nil)
+            FxTextEditor(
+                title: title,
+                text: $model.draft.description,
+                prompt: spec.descriptionPrompt?.resolve(L10n.locale)
+                    ?? String(localized: "What's broken, and since when? Any language is fine.", bundle: L10n.bundle, locale: L10n.locale),
+                issue: model.issue(for: .description)?.message(in: spec),
+                minHeight: 140,
+                showsTitle: false
+            )
+            .focused($keyboardFocus, equals: .details)
+            .accessibilityFocused($a11yFocus, equals: .details)
+            .accessibilityIdentifier("report.description")
+            // Typing help written for the main fault report's tiles.
+            if spec.isPrimary {
+                quickPhrases
+            }
+        }
+    }
+
+    // MARK: Tiles of a service
+
+    /// A form with several problems (a recycling station that needs cleaning or emptying): one tap switches.
+    private var tileSwitcher: some View {
+        let issue = model.issue(for: .category)?.message(in: spec)
+        return VStack(alignment: .leading, spacing: Fx.Space.s) {
+            FxSectionHeader(String(localized: "Problem", bundle: L10n.bundle, locale: L10n.locale))
+                .accessibilityValue(issue.map { Text($0) } ?? Text(""))
+                .accessibilityFocused($a11yFocus, equals: .problem)
+            FxCard {
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(Array(spec.tiles.enumerated()), id: \.offset) { index, tile in
+                        if index > 0 { FxDivider() }
+                        tileRow(tile, index: index)
+                    }
+                }
+            }
+            if let issue {
+                issueText(issue)
+            }
+        }
+    }
+
+    private func tileRow(_ tile: AdapterSpec.Tile, index: Int) -> some View {
+        let selected = model.draft.tileID == tile.id
+        let title = tile.title.resolve(L10n.locale)
+        return Button {
+            tileTaps += 1
+            guard !selected else { return }
+            model.select(tile: tile)
+        } label: {
+            HStack(spacing: Fx.Space.m) {
+                Image(systemName: tile.symbol)
+                    .font(Fx.Font.headline)
+                    .foregroundStyle(Fx.Color.categoryGlyph(tile.categoryID))
+                    .frame(width: Fx.minTarget, height: Fx.minTarget)
+                    .background(Fx.Color.categoryTint(tile.categoryID), in: RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous))
+                    .accessibilityHidden(true)
+                Text(title)
+                    .font(Fx.Font.headline)
+                    .foregroundStyle(Fx.Color.ink)
+                    .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Image(systemName: selected ? "checkmark.circle.fill" : "circle")
+                    .font(Fx.Font.headline)
+                    .foregroundStyle(selected ? Fx.Color.sea : Fx.Color.ink2)
+                    .accessibilityHidden(true)
+            }
+            .frame(maxWidth: .infinity, minHeight: Fx.minTarget, alignment: .leading)
+            .contentShape(.rect)
+        }
+        .buttonStyle(FxPressStyle())
+        .accessibilityLabel(Text(verbatim: title))
+        .accessibilityAddTraits(selected ? .isSelected : [])
+        .accessibilityIdentifier("report.tile.\(index)")
     }
 
     // MARK: Acute water
@@ -277,8 +421,16 @@ struct ReportScreen: View {
                     .accessibilityIdentifier("report.responsibility")
             }
             ForEach(tile?.links ?? [], id: \.self) { link in
-                FxIconRow(systemImage: "safari", text: link.title.resolve(L10n.locale), link: link.url)
-                    .accessibilityHint(Text("Opens in Safari"))
+                if let adapterID = link.adapterID, model.spec(id: adapterID) != nil {
+                    // A form Fixa knows: opened in the app instead of the kommun's web page.
+                    FxIconRow(systemImage: "arrow.forward.circle", text: link.title.resolve(L10n.locale)) {
+                        model.openService(adapterID: adapterID)
+                    }
+                    .accessibilityHint(Text("Opens this form in Fixa"))
+                } else {
+                    FxIconRow(systemImage: "safari", text: link.title.resolve(L10n.locale), link: link.url)
+                        .accessibilityHint(Text("Opens in Safari"))
+                }
             }
             if let issue {
                 issueText(issue)
@@ -290,11 +442,16 @@ struct ReportScreen: View {
 
     private var photoSection: some View {
         let room = AppModel.maxPhotos - model.photos.count - pendingPhotos
+        let issue = model.issue(for: .photo)?.message(in: spec)
         return VStack(alignment: .leading, spacing: Fx.Space.s) {
             FxSectionHeader(
                 String(localized: "Photos", bundle: L10n.bundle, locale: L10n.locale),
-                subtitle: String(localized: "Optional, up to 3", bundle: L10n.bundle, locale: L10n.locale)
+                subtitle: spec.validation.photoRequired == true
+                    ? String(localized: "Required, up to 3", bundle: L10n.bundle, locale: L10n.locale)
+                    : String(localized: "Optional, up to 3", bundle: L10n.bundle, locale: L10n.locale)
             )
+            .accessibilityValue(issue.map { Text($0) } ?? Text(""))
+            .accessibilityFocused($a11yFocus, equals: .photos)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: Fx.Space.s) {
                     ForEach(Array(model.photos.enumerated()), id: \.offset) { index, image in
@@ -337,6 +494,9 @@ struct ReportScreen: View {
                 .font(Fx.Font.footnote)
                 .foregroundStyle(Fx.Color.ink2)
                 .fixedSize(horizontal: false, vertical: true)
+            if let issue {
+                issueText(issue)
+            }
         }
     }
 
@@ -563,6 +723,59 @@ struct ReportScreen: View {
 
     // MARK: Feedback
 
+    /// Forms without a reply choice take the contact details they have fields for, shown directly.
+    /// Typed into the profile like the reply fields, so they are there next time.
+    private var contactSection: some View {
+        @Bindable var model = model
+        let nameLayout = dynamicTypeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: Fx.Space.m))
+            : AnyLayout(HStackLayout(alignment: .top, spacing: Fx.Space.s))
+        let emailRequired = spec.validation.emailRequired == true
+        return VStack(alignment: .leading, spacing: Fx.Space.m) {
+            FxSectionHeader(
+                String(localized: "Your details", bundle: L10n.bundle, locale: L10n.locale),
+                subtitle: emailRequired && spec.hasField(.email) ? nil : String(localized: "Optional", bundle: L10n.bundle, locale: L10n.locale)
+            )
+            if spec.hasField(.email) {
+                FxTextField(
+                    title: emailRequired
+                        ? String(localized: "E-mail", bundle: L10n.bundle, locale: L10n.locale)
+                        : String(localized: "E-mail (optional)", bundle: L10n.bundle, locale: L10n.locale),
+                    text: $model.profile.email,
+                    prompt: String(localized: "name@example.com", bundle: L10n.bundle, locale: L10n.locale),
+                    kind: .email,
+                    issue: model.issue(for: .email)?.message(in: spec)
+                )
+                .focused($keyboardFocus, equals: .reply)
+                .accessibilityFocused($a11yFocus, equals: .reply)
+                .accessibilityIdentifier("report.email")
+            }
+            if hasName {
+                nameLayout {
+                    FxTextField(
+                        title: String(localized: "First name (optional)", bundle: L10n.bundle, locale: L10n.locale),
+                        text: $model.profile.firstName
+                    )
+                    FxTextField(
+                        title: String(localized: "Last name (optional)", bundle: L10n.bundle, locale: L10n.locale),
+                        text: $model.profile.lastName
+                    )
+                }
+            }
+            if spec.hasField(.phone) {
+                FxTextField(
+                    title: String(localized: "Phone (optional)", bundle: L10n.bundle, locale: L10n.locale),
+                    text: $model.profile.phone,
+                    kind: .phone,
+                    issue: model.issue(for: .phone)?.message
+                )
+            }
+            Text("Saved on this phone for next time.")
+                .font(Fx.Font.footnote)
+                .foregroundStyle(Fx.Color.ink2)
+        }
+    }
+
     private var feedbackSection: some View {
         @Bindable var model = model
         let nameLayout = dynamicTypeSize.isAccessibilitySize
@@ -590,7 +803,7 @@ struct ReportScreen: View {
                     text: $model.profile.email,
                     prompt: String(localized: "name@example.com", bundle: L10n.bundle, locale: L10n.locale),
                     kind: .email,
-                    issue: model.issue(for: .email)?.message
+                    issue: model.issue(for: .email)?.message(in: spec)
                 )
                 .focused($keyboardFocus, equals: .reply)
                 .accessibilityFocused($a11yFocus, equals: .reply)
@@ -713,7 +926,7 @@ enum QuickPhrases {
 }
 
 /// Wraps chips onto as many lines as they need. SwiftUI mirrors the placement for right-to-left.
-private struct FlowLayout: Layout {
+struct FlowLayout: Layout {
     var spacing: CGFloat
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {

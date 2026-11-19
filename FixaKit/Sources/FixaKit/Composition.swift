@@ -119,10 +119,10 @@ public enum ReportComposer {
     static let writtenLineAfter: TimeInterval = 60 * 60
 
     /// Tile summary, the resident's text, the Swedish translation (if any), the translated place (if
-    /// any), a line about an earlier report of the same problem (if any) and `Anmälan skriven:` when
-    /// the report was started over an hour before `now`, separated by blank lines. Longer than the
-    /// adapter's `descriptionMax`, the resident's text (then the translation) is cut; the other lines
-    /// are never cut.
+    /// any), a `Plats:` line when the form has no place field of its own (if a place was given), a line
+    /// about an earlier report of the same problem (if any) and `Anmälan skriven:` when the report was
+    /// started over an hour before `now`, separated by blank lines. Longer than the adapter's
+    /// `descriptionMax`, the resident's text (then the translation) is cut; the other lines are never cut.
     public static func description(for d: ReportDraft, spec: AdapterSpec, now: Date = Date()) -> String {
         var parts = parts(for: d, spec: spec, now: now)
         var overflow = parts.joined.count - spec.validation.descriptionMax
@@ -145,6 +145,7 @@ public enum ReportComposer {
         var translationHeader: String
         var translation: String
         var translatedPlace: String?
+        var place: String?
         var previous: String?
         var written: String?
 
@@ -154,6 +155,7 @@ public enum ReportComposer {
             if !text.isEmpty { blocks.append(text) }
             if !translationHeader.isEmpty, !translation.isEmpty { blocks.append(translationHeader + "\n" + translation) }
             if let translatedPlace { blocks.append(translatedPlace) }
+            if let place { blocks.append(place) }
             if let previous { blocks.append(previous) }
             if let written { blocks.append(written) }
             return blocks.joined(separator: "\n\n")
@@ -172,6 +174,7 @@ public enum ReportComposer {
             translationHeader: d.translation.map { "Översatt från \(swedishLanguageName($0.sourceLanguage)):" } ?? "",
             translation: translated,
             translatedPlace: translatedPlaceLine(for: d),
+            place: placeLine(for: d, spec: spec),
             previous: previousReportLine(for: d),
             written: written
         )
@@ -183,6 +186,13 @@ public enum ReportComposer {
               let place = translation.locationText?.trimmingCharacters(in: .whitespacesAndNewlines), !place.isEmpty
         else { return nil }
         return "Plats (översatt från \(swedishLanguageName(translation.sourceLanguage))): \(place)"
+    }
+
+    /// `Plats: …` for forms without a `place` field, so the place still reaches the municipality.
+    static func placeLine(for d: ReportDraft, spec: AdapterSpec) -> String? {
+        guard !spec.hasField(.place) else { return nil }
+        let place = placeText(for: d)
+        return place.isEmpty ? nil : "Plats: \(place)"
     }
 
     /// `Jag anmälde detta tidigare den 2026-10-20 (ärende 123).`, when the resident sends again anyway.
@@ -222,18 +232,38 @@ public enum ReportComposer {
         return formatter.string(from: date)
     }
 
-    /// What the municipality's form receives as text, in Swedish: `Område`, `Plats` and the
-    /// description exactly as `description(for:spec:now:)` sends it. Never the contact details.
-    /// Kept in Sent reports so the resident can see what was filed.
+    /// What the municipality's form receives as text, in Swedish: `Område` (if the form has a category),
+    /// one `<question>: <answer>` line per answer, `Plats` (if the form takes a place or one was given)
+    /// and the description exactly as `description(for:spec:now:)` sends it (if the form has one).
+    /// Never the contact details. Kept in Sent reports so the resident can see what was filed.
     public static func filedText(for d: ReportDraft, spec: AdapterSpec, now: Date = Date()) -> String {
+        var lines: [String] = []
+        if spec.hasField(.category) {
+            lines.append("Område: \(spec.category(for: d)?.value ?? "-")")
+        }
+        lines += answerLines(for: d, spec: spec)
         let place = placeText(for: d)
-        return [
-            "Område: \(spec.category(for: d)?.value ?? "-")",
-            "Plats: \(place.isEmpty ? "-" : place)",
-            "",
-            "Beskrivning:",
-            description(for: d, spec: spec, now: now),
-        ].joined(separator: "\n")
+        if spec.hasField(.place) || spec.hasField(.mapAnswer) || spec.hasField(.mapChoice) || !place.isEmpty {
+            lines.append("Plats: \(place.isEmpty ? "-" : place)")
+        }
+        if spec.hasField(.description) {
+            lines += ["", "Beskrivning:", description(for: d, spec: spec, now: now)]
+        }
+        return lines.joined(separator: "\n")
+    }
+
+    /// `<Swedish question title>: <answers joined with ", ">` for every answered visible question, then
+    /// every answer the tile fixes, as the form receives them.
+    static func answerLines(for d: ReportDraft, spec: AdapterSpec) -> [String] {
+        let answers = spec.answers(for: d)
+        let visible = spec.visibleQuestions(tileID: d.tileID)
+        let visibleIDs = Set(visible.map(\.id))
+        let fixed = (spec.questions ?? []).filter { !visibleIDs.contains($0.id) && answers[$0.id] != nil }
+        return (visible + fixed).compactMap { question in
+            guard let values = answers[question.id], !values.isEmpty else { return nil }
+            let title = question.title.values["sv"] ?? question.id
+            return "\(title): \(formValues(for: question, values: values).joined(separator: ", "))"
+        }
     }
 
     /// `locationText (lat, lng)`, the coordinates rounded to 5 decimals (about a metre).
@@ -247,16 +277,31 @@ public enum ReportComposer {
     static func rounded(_ value: Double) -> Double {
         (value * 100_000).rounded() / 100_000
     }
+
+    /// What the form receives for an answer: `dateTime` values (ISO 8601 with offset) as
+    /// `yyyy-MM-dd HH:mm` Stockholm time, every other kind as given.
+    public static func formValues(for question: AdapterSpec.Question, values: [String]) -> [String] {
+        guard question.kind == .dateTime else { return values }
+        let parser = ISO8601DateFormatter()
+        return values.map { value in
+            parser.date(from: value).map(stockholmTimestamp) ?? value
+        }
+    }
 }
 
 /// Plain Swedish report text the resident pastes into the municipality's own web form when Fixa cannot
 /// send (`AdapterSpec.webFormURL`). The resident attaches the photo there themselves.
 public enum WebFallback {
+    /// `filedText` plus the contact details: with a reply wanted when the form has a `feedback` field,
+    /// else every filled name, phone and e-mail the form has a field for.
     public static func text(_ d: ReportDraft, spec: AdapterSpec, now: Date = Date()) -> String {
         var lines = [ReportComposer.filedText(for: d, spec: spec, now: now)]
 
-        guard d.wantsFeedback else { return lines.joined(separator: "\n") }
-        lines += ["", "Jag vill ha återkoppling."]
+        let hasFeedback = spec.hasField(.feedback)
+        if hasFeedback {
+            guard d.wantsFeedback else { return lines.joined(separator: "\n") }
+            lines += ["", "Jag vill ha återkoppling."]
+        }
         let contact = d.contact
         let name = [contact.firstName, contact.lastName]
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -264,9 +309,15 @@ public enum WebFallback {
             .joined(separator: " ")
         let phone = contact.phone.trimmingCharacters(in: .whitespacesAndNewlines)
         let email = contact.email.trimmingCharacters(in: .whitespacesAndNewlines)
-        if !name.isEmpty { lines.append("Namn: \(name)") }
-        if !phone.isEmpty { lines.append("Telefon: \(phone)") }
-        if !email.isEmpty { lines.append("E-post: \(email)") }
+        let takesName = hasFeedback || spec.hasField(.firstName) || spec.hasField(.lastName) || spec.hasField(.fullName)
+        let takesPhone = hasFeedback || spec.hasField(.phone)
+        let takesEmail = hasFeedback || spec.hasField(.email)
+        var contactLines: [String] = []
+        if takesName && !name.isEmpty { contactLines.append("Namn: \(name)") }
+        if takesPhone && !phone.isEmpty { contactLines.append("Telefon: \(phone)") }
+        if takesEmail && !email.isEmpty { contactLines.append("E-post: \(email)") }
+        if !hasFeedback && !contactLines.isEmpty { lines.append("") }
+        lines += contactLines
         return lines.joined(separator: "\n")
     }
 }

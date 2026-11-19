@@ -30,13 +30,15 @@ func value(after flag: String, in args: [String]) -> String? {
 
 let usage = """
 usage:
-  fixa-cli dry-run [--category ID ... | --all-categories] [--no-point] [--feedback yes|no] [--delay SECONDS] [--save-html out.html]
+  fixa-cli dry-run [--adapter ID] [--category ID ... | --all-categories] [--no-point] [--feedback yes|no] [--delay SECONDS] [--save-html out.html]
       Walks the LIVE e-service on the municipality's server up to the summary page with a sample
       report, without a photo, and stops there. No case is created, but the server sees the requests
       and keeps an unfinished session. Run it by hand only, after a user hit a changed form, to find
       what changed. Never in CI, never on a schedule.
       --category may repeat; --all-categories runs once per adapter category, one after another,
       waiting --delay seconds (default 5) between runs. Without either, the street-light tile is used.
+      --adapter picks a bundled adapter (default se.varmdo.ksb); for any other the sample report uses
+      its first tile and answers every question (first option, first suggestion, an address, now).
       --save-html writes the last page reached. Exit 2 if any run found the form changed, 1 if any run failed otherwise.
   fixa-cli keygen [--key path]
       Creates the Ed25519 adapter signing key (default ~/.config/fixa/adapter-signing.key, mode 600)
@@ -93,8 +95,10 @@ if args.first == "sign" {
 
 guard args.first == "dry-run" else { fail(usage) }
 
-guard let spec = AdapterCatalog.bundled().first(where: { $0.id == "se.varmdo.ksb" }) else {
-    fail("Bundled adapter se.varmdo.ksb not found")
+let adapterID = value(after: "--adapter", in: args) ?? "se.varmdo.ksb"
+let bundledAdapters = AdapterCatalog.bundled()
+guard let spec = bundledAdapters.first(where: { $0.id == adapterID }) else {
+    fail("Bundled adapter \(adapterID) not found. Known: \(bundledAdapters.map(\.id).joined(separator: ", "))")
 }
 
 func values(after flag: String, in args: [String]) -> [String] {
@@ -112,6 +116,31 @@ var draft = ReportDraft(
     wantsFeedback: true,
     contact: Contact(email: "namn@example.se")
 )
+
+/// A sample answer for every question of the first tile: the first option, the first suggestion, a
+/// sample address, or now.
+func sampleAnswers(for spec: AdapterSpec, tileID: String?) -> [String: [String]] {
+    let iso = ISO8601DateFormatter()
+    iso.timeZone = TimeZone(identifier: "Europe/Stockholm")
+    var answers: [String: [String]] = [:]
+    for question in spec.visibleQuestions(tileID: tileID) {
+        switch question.kind {
+        case .choice, .multiChoice:
+            if let first = question.options?.first { answers[question.id] = [first.value] }
+        case .text, .longText:
+            answers[question.id] = [question.suggestions?.first?.value ?? "Skogsbovägen 9"]
+        case .dateTime:
+            answers[question.id] = [iso.string(from: Date())]
+        }
+    }
+    return answers
+}
+
+if spec.id != "se.varmdo.ksb" {
+    draft.tileID = spec.tiles.first?.id
+    draft.answers = sampleAnswers(for: spec, tileID: draft.tileID)
+    draft.contact = Contact(firstName: "Kontroll", lastName: "Formulär", email: "namn@example.se")
+}
 
 if args.contains("--no-point") { draft.coordinate = nil }
 switch value(after: "--feedback", in: args) {
@@ -143,7 +172,8 @@ for (number, categoryID) in categories.enumerated() {
     let name = categoryID ?? "tile \(draft.tileID ?? "-")"
     print("== \(name): point \(run.coordinate != nil ? "yes" : "no"), feedback \(run.wantsFeedback ? "yes" : "no")")
 
-    let issues = ReportValidator.validate(run, spec: spec)
+    // A dry run never uploads a photo, so a form that requires one is walked without it.
+    let issues = ReportValidator.validate(run, spec: spec).filter { $0.field != .photo }
     if !issues.isEmpty { fail("Draft invalid: \(issues)") }
 
     // A fresh transport (cookie jar) per run, like separate phones.

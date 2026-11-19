@@ -3,7 +3,7 @@ import Foundation
 import SwiftUI
 
 extension ValidationIssue {
-    /// Short inline message under the field.
+    /// Short inline message under the field. Questions are named by `message(in:)`.
     var message: String {
         switch (field, code) {
         case (.category, _):
@@ -24,8 +24,34 @@ extension ValidationIssue {
             String(localized: "This e-mail address doesn't look right.", bundle: L10n.bundle, locale: L10n.locale)
         case (.phone, _):
             String(localized: "This phone number doesn't look right.", bundle: L10n.bundle, locale: L10n.locale)
+        case (.photo, _):
+            String(localized: "Add a photo: this form needs one.", bundle: L10n.bundle, locale: L10n.locale)
+        case (.question, .missing):
+            String(localized: "Answer this question.", bundle: L10n.bundle, locale: L10n.locale)
+        case (.question, .tooLong):
+            String(localized: "This answer is too long for the e-service. Shorten it a little.", bundle: L10n.bundle, locale: L10n.locale)
         default:
             String(localized: "Check this field.", bundle: L10n.bundle, locale: L10n.locale)
+        }
+    }
+
+    /// `message`, naming the question by its title and saying when the form always needs an e-mail.
+    func message(in spec: AdapterSpec) -> String {
+        switch (field, code) {
+        case (.question, let code):
+            guard let title = spec.question(id: questionID)?.title.resolve(L10n.locale) else { return message }
+            return switch code {
+            case .missing:
+                String(localized: "Answer “\(title)”.", bundle: L10n.bundle, locale: L10n.locale)
+            case .tooLong:
+                String(localized: "“\(title)” is too long for the e-service. Shorten it a little.", bundle: L10n.bundle, locale: L10n.locale)
+            default:
+                String(localized: "Check your answer to “\(title)”.", bundle: L10n.bundle, locale: L10n.locale)
+            }
+        case (.email, .missing) where spec.validation.emailRequired == true:
+            return String(localized: "Add your e-mail: this form needs one.", bundle: L10n.bundle, locale: L10n.locale)
+        default:
+            return message
         }
     }
 }
@@ -79,7 +105,7 @@ struct WebFormFallback: View {
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 FxSecondaryButton(title: String(localized: "Open the kommun's website", bundle: L10n.bundle, locale: L10n.locale), systemImage: "safari") {
-                    model.openWebForm(text)
+                    model.openWebForm(text, adapterID: spec.id)
                 }
                 Text("The report text is copied. Paste it into the form and add the photo there.")
                     .font(Fx.Font.footnote)

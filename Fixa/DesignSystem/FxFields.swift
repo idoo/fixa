@@ -3,7 +3,8 @@ import SwiftUI
 /// Single-line labelled input with an inline issue message.
 struct FxTextField: View {
     enum Kind: Sendable {
-        case plain, email, phone
+        /// `code`: capitals, no autocorrect (number plates and other codes).
+        case plain, email, phone, code
     }
 
     let title: String
@@ -11,23 +12,28 @@ struct FxTextField: View {
     var prompt: String = ""
     var kind: Kind = .plain
     var issue: String? = nil
+    /// False when a header above already names the field; `title` still labels it for VoiceOver.
+    var showsTitle: Bool = true
 
     @FocusState private var focused: Bool
 
-    init(title: String, text: Binding<String>, prompt: String = "", kind: Kind = .plain, issue: String? = nil) {
+    init(title: String, text: Binding<String>, prompt: String = "", kind: Kind = .plain, issue: String? = nil, showsTitle: Bool = true) {
         self.title = title
         self._text = text
         self.prompt = prompt
         self.kind = kind
         self.issue = issue
+        self.showsTitle = showsTitle
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: Fx.Space.xs) {
-            Text(title)
-                .font(Fx.Font.subheadline)
-                .foregroundStyle(Fx.Color.ink)
-                .accessibilityHidden(true)
+            if showsTitle {
+                Text(title)
+                    .font(Fx.Font.subheadline)
+                    .foregroundStyle(Fx.Color.ink)
+                    .accessibilityHidden(true)
+            }
             TextField(text: $text, prompt: Text(prompt).foregroundStyle(Fx.Color.ink2)) {
                 Text(title)
             }
@@ -35,7 +41,7 @@ struct FxTextField: View {
             .foregroundStyle(Fx.Color.ink)
             .keyboardType(keyboard)
             .textContentType(contentType)
-            .textInputAutocapitalization(kind == .plain ? .sentences : .never)
+            .textInputAutocapitalization(autocapitalization)
             .autocorrectionDisabled(kind != .plain)
             .focused($focused)
             .padding(.horizontal, Fx.Space.m)
@@ -55,9 +61,17 @@ struct FxTextField: View {
         issue != nil || focused ? Fx.Border.emphasis : Fx.Border.hairline
     }
 
+    private var autocapitalization: TextInputAutocapitalization {
+        switch kind {
+        case .plain: .sentences
+        case .code: .characters
+        case .email, .phone: .never
+        }
+    }
+
     private var keyboard: UIKeyboardType {
         switch kind {
-        case .plain: .default
+        case .plain, .code: .default
         case .email: .emailAddress
         case .phone: .phonePad
         }
@@ -65,7 +79,7 @@ struct FxTextField: View {
 
     private var contentType: UITextContentType? {
         switch kind {
-        case .plain: nil
+        case .plain, .code: nil
         case .email: .emailAddress
         case .phone: .telephoneNumber
         }

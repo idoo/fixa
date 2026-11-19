@@ -24,12 +24,17 @@ extension AdapterSpec {
         if channel.pages.isEmpty { problems.append("no pages") }
         unique(channel.pages.map(\.id), "page")
         let roles = Set(channel.pages.flatMap(\.fields).map(\.role))
-        for role in [FieldSpec.Role.category, .description] where !roles.contains(role) {
-            problems.append("no \(role.rawValue) field")
+        // Only the main fault-report adapter must take a category and a description.
+        if isPrimary {
+            for role in [FieldSpec.Role.category, .description] where !roles.contains(role) {
+                problems.append("no \(role.rawValue) field")
+            }
         }
-        if let upload = channel.upload, !channel.pages.contains(where: { $0.id == upload.pageID }) {
+        let pageIDs = Set(channel.pages.map(\.id))
+        for upload in allUploads where !pageIDs.contains(upload.pageID) {
             problems.append("upload page \(upload.pageID) is not a page")
         }
+        problems += questionProblems
         if categories.isEmpty { problems.append("no categories") }
         if tiles.isEmpty { problems.append("no tiles") }
         unique(categories.map(\.id), "category")
@@ -60,6 +65,64 @@ extension AdapterSpec {
         problems += AdapterSpecValidator.linkProblems(self)
         if municipality.geocoderNames.isEmpty || municipality.geocoderNames.contains(where: { $0.trimmingCharacters(in: .whitespaces).isEmpty }) {
             problems.append("municipality needs geocoder names")
+        }
+        return problems
+    }
+}
+
+extension AdapterSpec {
+    /// Questions, the `answer` fields that send them, tile answers and upload conditions agree.
+    var questionProblems: [String] {
+        var problems: [String] = []
+        let questionIDs = (questions ?? []).map(\.id)
+        if Set(questionIDs).count != questionIDs.count { problems.append("duplicate question id") }
+        if questionIDs.contains(where: \.isEmpty) { problems.append("empty question id") }
+        var asked = Set<String>()
+        for field in channel.pages.flatMap(\.fields) where field.role == .answer {
+            guard let id = field.question, question(id: id) != nil else {
+                problems.append("answer field \(field.key) has unknown question \(field.question ?? "-")")
+                continue
+            }
+            asked.insert(id)
+        }
+        for id in questionIDs where !asked.contains(id) {
+            problems.append("question \(id) is not sent by any answer field")
+        }
+        for q in questions ?? [] where q.kind == .choice || q.kind == .multiChoice {
+            let values = (q.options ?? []).map(\.value)
+            if values.isEmpty { problems.append("question \(q.id) has no options") }
+            if Set(values).count != values.count { problems.append("question \(q.id) has duplicate option values") }
+        }
+        for tile in tiles {
+            for (id, values) in tile.answers ?? [:] {
+                guard let q = question(id: id) else {
+                    problems.append("tile \(tile.id) answers unknown question \(id)")
+                    continue
+                }
+                if q.kind == .choice || q.kind == .multiChoice {
+                    let options = Set((q.options ?? []).map(\.value))
+                    for value in values where !options.contains(value) {
+                        problems.append("tile \(tile.id) answer \(value) is not an option of \(id)")
+                    }
+                }
+            }
+            for id in tile.questionIDs ?? [] where question(id: id) == nil {
+                problems.append("tile \(tile.id) asks unknown question \(id)")
+            }
+            for link in tile.links ?? [] where link.adapterID?.isEmpty == true {
+                problems.append("tile \(tile.id) link has an empty adapterID")
+            }
+        }
+        for upload in allUploads {
+            if let when = upload.when, question(id: when.question) == nil {
+                problems.append("upload on \(upload.pageID) depends on unknown question \(when.question)")
+            }
+        }
+        if let service {
+            for language in ["sv", "en"]
+            where (service.title.values[language] ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                problems.append("service title needs \(language)")
+            }
         }
         return problems
     }
@@ -243,12 +306,29 @@ public enum AdapterSpecValidator {
         }
         var problems: [String] = []
         var paths = [("introPath", channel.introPath), ("startPath", channel.startPath)]
-        if let upload = channel.upload {
-            paths += [("upload.path", upload.path), ("upload.actionPath", upload.actionPath)]
-            // Both go into a multipart Content-Disposition header.
-            for (name, value) in [("upload.filePartName", upload.filePartName), ("upload.fileName", upload.fileName)]
-            where value.isEmpty || value.unicodeScalars.contains(where: { $0.value < 0x20 || $0.value == 0x7F || "\"\\/;".unicodeScalars.contains($0) }) {
-                problems.append("\(name) has unsafe characters")
+        for upload in (channel.uploads ?? []) + (channel.upload.map { [$0] } ?? []) {
+            switch upload.resolvedKind {
+            case .ajax:
+                guard let path = upload.path, let actionPath = upload.actionPath,
+                      let filePartName = upload.filePartName, let fileName = upload.fileName,
+                      let fieldID = upload.fieldID, !fieldID.isEmpty else {
+                    problems.append("ajax upload on \(upload.pageID) needs fieldID, path, actionPath, filePartName and fileName")
+                    continue
+                }
+                paths += [("upload.path", path), ("upload.actionPath", actionPath)]
+                // Both go into a multipart Content-Disposition header.
+                for (name, value) in [("upload.filePartName", filePartName), ("upload.fileName", fileName)]
+                where value.isEmpty || value.unicodeScalars.contains(where: { $0.value < 0x20 || $0.value == 0x7F || "\"\\/;".unicodeScalars.contains($0) }) {
+                    problems.append("\(name) has unsafe characters")
+                }
+            case .formFile:
+                let plain = { (s: String?) in
+                    guard let s, !s.isEmpty else { return false }
+                    return s.allSatisfy { $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "_") }
+                }
+                if !plain(upload.key) || !plain(upload.control) {
+                    problems.append("formFile upload on \(upload.pageID) needs a plain key and control")
+                }
             }
         }
         for (name, path) in paths where !isSafePath(path, origin: origin) {
@@ -269,6 +349,11 @@ public enum AdapterSpecValidator {
             problems.append("more than \(maxFieldsPerPage) fields on a page")
         }
         if spec.categories.count > maxCategories { problems.append("more than \(maxCategories) categories") }
+        let questions = spec.questions ?? []
+        if questions.count > maxCategories { problems.append("more than \(maxCategories) questions") }
+        if questions.contains(where: { ($0.options?.count ?? 0) > maxCategories || ($0.suggestions?.count ?? 0) > maxCategories }) {
+            problems.append("a question has more than \(maxCategories) options or suggestions")
+        }
         if spec.tiles.count > maxTiles { problems.append("more than \(maxTiles) tiles") }
         let fields = pages.flatMap(\.fields)
         var lists: [Int] = [spec.emergency?.contacts.count ?? 0, spec.emergency?.rules.count ?? 0]

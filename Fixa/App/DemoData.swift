@@ -28,6 +28,51 @@ enum DemoData {
         )
     }
 
+    /// `-FixaService`: a report for `spec` with a sample answer to every visible question of `tileID`
+    /// (else its first tile): the first option, the first suggestion (or a sample), now for a date-time.
+    static func draft(for spec: AdapterSpec, tileID: String?) -> ReportDraft {
+        let tile = spec.tile(id: tileID) ?? spec.tiles.first
+        var answers: [String: [String]] = [:]
+        let stockholm = ISO8601DateFormatter()
+        stockholm.timeZone = TimeZone(identifier: "Europe/Stockholm")
+        for question in spec.visibleQuestions(tileID: tile?.id) {
+            switch question.kind {
+            case .choice, .multiChoice:
+                if let first = question.options?.first { answers[question.id] = [first.value] }
+            case .dateTime:
+                answers[question.id] = [stockholm.string(from: .now)]
+            case .text, .longText:
+                if let text = sampleText[question.id] ?? question.suggestions?.first?.value {
+                    answers[question.id] = [text]
+                }
+            }
+        }
+        let hasPlace = spec.hasField(.place) || spec.hasField(.mapAnswer) || spec.hasField(.mapChoice)
+        return ReportDraft(
+            adapterID: spec.id,
+            tileID: tile?.id,
+            categoryID: tile?.categoryID,
+            description: spec.hasField(.description) ? serviceDescription : "",
+            coordinate: hasPlace ? coordinate : nil,
+            locationText: hasPlace ? "Gustavsbergs centrum, Odelbergs väg" : "",
+            photoJPEG: nil,
+            wantsFeedback: false,
+            contact: profile,
+            answers: answers
+        )
+    }
+
+    /// The demo description of an e-service report; re-worded on a language switch like the KSB one.
+    static var serviceDescription: String {
+        String(localized: "Next to the footpath behind the school, for about two months.", bundle: L10n.bundle, locale: L10n.locale)
+    }
+
+    /// Text answers without suggestions (or nicer than the first one) for screenshots.
+    private static let sampleText: [String: String] = [
+        "address": "Skogsbovägen 9",
+        "registration": "ABC 123",
+    ]
+
     /// The kommun's receipt as Abou words it (saved page `09-thankyou-receipt`), with the demo case number.
     static let kommunMessage = """
         Tack för att du använder vår e-tjänst!
@@ -48,6 +93,18 @@ enum DemoData {
             kommunMessage: kommunMessage,
             residentText: draft.description,
             filedText: filedText(draft, swedish: "Gatlyktan vid busshållplatsen har varit släckt sedan måndag. Det är väldigt mörkt där på kvällen.")
+        )
+    }
+
+    /// The demo receipt of an e-service report: the kommun's words and what this very draft filed.
+    static func receipt(for draft: ReportDraft, spec: AdapterSpec) -> SentReport {
+        SentReport(
+            caseNumber: "DEMO-1234",
+            date: .now,
+            isDryRun: false,
+            kommunMessage: kommunMessage,
+            residentText: draft.description,
+            filedText: ReportComposer.filedText(for: draft, spec: spec)
         )
     }
 

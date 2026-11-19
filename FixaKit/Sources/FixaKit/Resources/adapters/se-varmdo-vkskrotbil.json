@@ -1,0 +1,1134 @@
+{
+  "specVersion": 1,
+  "minAppBuild": 13,
+  "id": "se.varmdo.vkskrotbil",
+  "service": {
+    "title": {
+      "en": "Abandoned vehicle",
+      "sv": "Övergivet fordon",
+      "cs": "Opuštěné vozidlo",
+      "da": "Efterladt køretøj",
+      "de": "Verlassenes Fahrzeug",
+      "et": "Mahajäetud sõiduk",
+      "es": "Vehículo abandonado",
+      "fr": "Véhicule abandonné",
+      "it": "Veicolo abbandonato",
+      "lv": "Pamests transportlīdzeklis",
+      "lt": "Apleista transporto priemonė",
+      "hu": "Elhagyott jármű",
+      "nl": "Achtergelaten voertuig",
+      "nb": "Forlatt kjøretøy",
+      "pl": "Porzucony pojazd",
+      "pt": "Veículo abandonado",
+      "ro": "Vehicul abandonat",
+      "fi": "Hylätty ajoneuvo",
+      "el": "Εγκαταλελειμμένο όχημα",
+      "ru": "Брошенный автомобиль",
+      "uk": "Покинутий автомобіль",
+      "ar": "مركبة مهجورة"
+    },
+    "subtitle": {
+      "en": "A car that looks scrapped or abandoned",
+      "sv": "En bil som verkar skrotad eller övergiven",
+      "cs": "Auto, které vypadá jako vrak nebo opuštěné",
+      "da": "En bil, der ser skrottet eller efterladt ud",
+      "de": "Ein Auto, das verschrottet oder verlassen aussieht",
+      "et": "Auto, mis näib romu või mahajäetud",
+      "es": "Un coche que parece desguazado o abandonado",
+      "fr": "Une voiture qui semble épave ou abandonnée",
+      "it": "Un'auto che sembra rottamata o abbandonata",
+      "lv": "Auto, kas izskatās nolietots vai pamests",
+      "lt": "Automobilis, kuris atrodo kaip laužas ar apleistas",
+      "hu": "Roncsnak vagy elhagyottnak tűnő autó",
+      "nl": "Een auto die er gesloopt of achtergelaten uitziet",
+      "nb": "En bil som ser vraket eller forlatt ut",
+      "pl": "Samochód, który wygląda na wrak lub porzucony",
+      "pt": "Um carro que parece abatido ou abandonado",
+      "ro": "O mașină care pare dezmembrată sau abandonată",
+      "fi": "Auto, joka näyttää romulta tai hylätyltä",
+      "el": "Αυτοκίνητο που μοιάζει παροπλισμένο ή εγκαταλελειμμένο",
+      "ru": "Машина, похожая на брошенную или на лом",
+      "uk": "Авто, схоже на покинуте чи на брухт",
+      "ar": "سيارة تبدو خردة أو مهجورة"
+    },
+    "symbol": "car",
+    "order": 4
+  },
+  "municipality": {
+    "name": "Värmdö kommun",
+    "countryCode": "SE",
+    "region": {
+      "center": {
+        "latitude": 59.31,
+        "longitude": 18.55
+      },
+      "bbox": {
+        "minLatitude": 59.15,
+        "maxLatitude": 59.45,
+        "minLongitude": 18.25,
+        "maxLongitude": 19.05
+      }
+    },
+    "geocoderNames": [
+      "Värmdö",
+      "Värmdö kommun"
+    ]
+  },
+  "channel": {
+    "kind": "abou",
+    "baseURL": "https://service.varmdo.se",
+    "service": "VKSKROTBIL",
+    "introPath": "/VKSKROTBIL",
+    "startPath": "/Setup.aspx?Service=VKSKROTBIL&skipintro=true",
+    "nextEventTarget": "ctl00$ctl00$LeftAndMainSection$MainSection$ServiceSection$ServicePageNavigationSection$NextAndBackButtons$NextButton",
+    "sessionLockedMarker": "Du har ett ärende igång redan",
+    "completionPostBackMarker": "var doPostBack = 'True'",
+    "maxCompletionPostBacks": 3,
+    "pages": [
+      {
+        "id": "Uppgifterombilen",
+        "stage": "sendingReport",
+        "fields": [
+          {
+            "role": "answer",
+            "question": "vehicleType",
+            "key": "VKSKROTBIL_1",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Typ av fordon (ex personbil)"
+              ],
+              "en": [
+                "Type of vehicle"
+              ]
+            }
+          },
+          {
+            "role": "answer",
+            "question": "registration",
+            "key": "VKSKROTBIL_2",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Registreringsnummer"
+              ],
+              "en": [
+                "Number plate"
+              ]
+            }
+          },
+          {
+            "role": "answer",
+            "question": "make",
+            "key": "VKSKROTBIL_3",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Fabrikat"
+              ],
+              "en": [
+                "Make"
+              ]
+            }
+          },
+          {
+            "role": "answer",
+            "question": "colour",
+            "key": "VKSKROTBIL_4",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Färg"
+              ],
+              "en": [
+                "Colour"
+              ]
+            }
+          },
+          {
+            "role": "place",
+            "key": "VKSKROTBIL_5",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Var står fordonet?"
+              ],
+              "en": [
+                "Where is the vehicle?"
+              ]
+            }
+          },
+          {
+            "role": "fullName",
+            "key": "VKSKROTBIL_6",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Ditt namn (frivilligt)"
+              ],
+              "en": [
+                "Your name (optional)"
+              ]
+            }
+          },
+          {
+            "role": "email",
+            "key": "VKSKROTBIL_7",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "E-post (frivilligt)"
+              ],
+              "en": [
+                "Email (optional)"
+              ]
+            }
+          },
+          {
+            "role": "phone",
+            "key": "VKSKROTBIL_8",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Ditt telefonnummet (frivilligt)"
+              ],
+              "en": [
+                "Your phone number (optional)"
+              ]
+            }
+          },
+          {
+            "role": "description",
+            "key": "VKSKROTBIL_9",
+            "control": "textFieldControl",
+            "type": "text",
+            "labels": {
+              "sv": [
+                "Övrig information"
+              ],
+              "en": [
+                "Other information"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "SummaryPage",
+        "stage": "confirming",
+        "fields": []
+      }
+    ],
+    "uploads": [
+      {
+        "pageID": "Uppgifterombilen",
+        "kind": "formFile",
+        "key": "VKSKROTBIL_10",
+        "control": "fileUploadControl"
+      }
+    ]
+  },
+  "categories": [
+    {
+      "id": "vehicles",
+      "value": "Skrotbil",
+      "title": {
+        "en": "Scrapped car",
+        "sv": "Skrotbil",
+        "cs": "Autovrak",
+        "da": "Skrotbil",
+        "de": "Schrottauto",
+        "et": "Romuauto",
+        "es": "Coche para desguace",
+        "fr": "Épave de voiture",
+        "it": "Auto da rottamare",
+        "lv": "Auto vraks",
+        "lt": "Automobilio laužas",
+        "hu": "Autóroncs",
+        "nl": "Autowrak",
+        "nb": "Vrakbil",
+        "pl": "Wrak samochodu",
+        "pt": "Carro abandonado",
+        "ro": "Mașină abandonată",
+        "fi": "Romuauto",
+        "el": "Εγκαταλελειμμένο αυτοκίνητο",
+        "ru": "Автохлам",
+        "uk": "Автобрухт",
+        "ar": "سيارة خردة"
+      }
+    }
+  ],
+  "questions": [
+    {
+      "id": "vehicleType",
+      "kind": "text",
+      "title": {
+        "en": "Type of vehicle",
+        "sv": "Typ av fordon",
+        "cs": "Typ vozidla",
+        "da": "Køretøjstype",
+        "de": "Fahrzeugart",
+        "et": "Sõiduki tüüp",
+        "es": "Tipo de vehículo",
+        "fr": "Type de véhicule",
+        "it": "Tipo di veicolo",
+        "lv": "Transportlīdzekļa veids",
+        "lt": "Transporto priemonės tipas",
+        "hu": "Jármű típusa",
+        "nl": "Soort voertuig",
+        "nb": "Type kjøretøy",
+        "pl": "Rodzaj pojazdu",
+        "pt": "Tipo de veículo",
+        "ro": "Tipul vehiculului",
+        "fi": "Ajoneuvon tyyppi",
+        "el": "Είδος οχήματος",
+        "ru": "Тип транспортного средства",
+        "uk": "Тип транспортного засобу",
+        "ar": "نوع المركبة"
+      },
+      "required": true,
+      "suggestions": [
+        {
+          "value": "Personbil",
+          "title": {
+            "en": "Car",
+            "sv": "Personbil",
+            "cs": "Osobní auto",
+            "da": "Personbil",
+            "de": "Pkw",
+            "et": "Sõiduauto",
+            "es": "Turismo",
+            "fr": "Voiture",
+            "it": "Auto",
+            "lv": "Vieglais auto",
+            "lt": "Lengvasis automobilis",
+            "hu": "Személyautó",
+            "nl": "Personenauto",
+            "nb": "Personbil",
+            "pl": "Samochód osobowy",
+            "pt": "Automóvel",
+            "ro": "Autoturism",
+            "fi": "Henkilöauto",
+            "el": "Επιβατικό",
+            "ru": "Легковой автомобиль",
+            "uk": "Легковий автомобіль",
+            "ar": "سيارة"
+          }
+        },
+        {
+          "value": "Lätt lastbil",
+          "title": {
+            "en": "Van",
+            "sv": "Lätt lastbil",
+            "cs": "Dodávka",
+            "da": "Varebil",
+            "de": "Transporter",
+            "et": "Kaubik",
+            "es": "Furgoneta",
+            "fr": "Camionnette",
+            "it": "Furgone",
+            "lv": "Furgons",
+            "lt": "Furgonas",
+            "hu": "Kisteherautó",
+            "nl": "Bestelwagen",
+            "nb": "Varebil",
+            "pl": "Furgonetka",
+            "pt": "Carrinha",
+            "ro": "Dubă",
+            "fi": "Pakettiauto",
+            "el": "Βαν",
+            "ru": "Фургон",
+            "uk": "Фургон",
+            "ar": "شاحنة صغيرة"
+          }
+        },
+        {
+          "value": "Husbil",
+          "title": {
+            "en": "Motorhome",
+            "sv": "Husbil",
+            "cs": "Obytný vůz",
+            "da": "Autocamper",
+            "de": "Wohnmobil",
+            "et": "Matkaauto",
+            "es": "Autocaravana",
+            "fr": "Camping-car",
+            "it": "Camper",
+            "lv": "Autodzīvojamā mašīna",
+            "lt": "Kemperis",
+            "hu": "Lakóautó",
+            "nl": "Camper",
+            "nb": "Bobil",
+            "pl": "Kamper",
+            "pt": "Autocaravana",
+            "ro": "Autorulotă",
+            "fi": "Matkailuauto",
+            "el": "Αυτοκινούμενο",
+            "ru": "Автодом",
+            "uk": "Автобудинок",
+            "ar": "منزل متنقل"
+          }
+        },
+        {
+          "value": "Husvagn",
+          "title": {
+            "en": "Caravan",
+            "sv": "Husvagn",
+            "cs": "Obytný přívěs",
+            "da": "Campingvogn",
+            "de": "Wohnwagen",
+            "et": "Haagissuvila",
+            "es": "Caravana",
+            "fr": "Caravane",
+            "it": "Roulotte",
+            "lv": "Dzīvojamā piekabe",
+            "lt": "Kemperio priekaba",
+            "hu": "Lakókocsi",
+            "nl": "Caravan",
+            "nb": "Campingvogn",
+            "pl": "Przyczepa kempingowa",
+            "pt": "Caravana",
+            "ro": "Rulotă",
+            "fi": "Asuntovaunu",
+            "el": "Τροχόσπιτο",
+            "ru": "Жилой прицеп",
+            "uk": "Житловий причіп",
+            "ar": "كرفان"
+          }
+        },
+        {
+          "value": "Släpvagn",
+          "title": {
+            "en": "Trailer",
+            "sv": "Släpvagn",
+            "cs": "Přívěs",
+            "da": "Trailer",
+            "de": "Anhänger",
+            "et": "Haagis",
+            "es": "Remolque",
+            "fr": "Remorque",
+            "it": "Rimorchio",
+            "lv": "Piekabe",
+            "lt": "Priekaba",
+            "hu": "Utánfutó",
+            "nl": "Aanhangwagen",
+            "nb": "Tilhenger",
+            "pl": "Przyczepa",
+            "pt": "Reboque",
+            "ro": "Remorcă",
+            "fi": "Peräkärry",
+            "el": "Ρυμουλκούμενο",
+            "ru": "Прицеп",
+            "uk": "Причіп",
+            "ar": "مقطورة"
+          }
+        },
+        {
+          "value": "Motorcykel",
+          "title": {
+            "en": "Motorcycle",
+            "sv": "Motorcykel",
+            "cs": "Motocykl",
+            "da": "Motorcykel",
+            "de": "Motorrad",
+            "et": "Mootorratas",
+            "es": "Moto",
+            "fr": "Moto",
+            "it": "Moto",
+            "lv": "Motocikls",
+            "lt": "Motociklas",
+            "hu": "Motorkerékpár",
+            "nl": "Motor",
+            "nb": "Motorsykkel",
+            "pl": "Motocykl",
+            "pt": "Mota",
+            "ro": "Motocicletă",
+            "fi": "Moottoripyörä",
+            "el": "Μοτοσικλέτα",
+            "ru": "Мотоцикл",
+            "uk": "Мотоцикл",
+            "ar": "دراجة نارية"
+          }
+        }
+      ]
+    },
+    {
+      "id": "registration",
+      "kind": "text",
+      "title": {
+        "en": "Number plate",
+        "sv": "Registreringsnummer",
+        "cs": "Registrační značka",
+        "da": "Nummerplade",
+        "de": "Kennzeichen",
+        "et": "Registreerimisnumber",
+        "es": "Matrícula",
+        "fr": "Plaque d'immatriculation",
+        "it": "Targa",
+        "lv": "Numura zīme",
+        "lt": "Valstybinis numeris",
+        "hu": "Rendszám",
+        "nl": "Kenteken",
+        "nb": "Registreringsnummer",
+        "pl": "Numer rejestracyjny",
+        "pt": "Matrícula",
+        "ro": "Număr de înmatriculare",
+        "fi": "Rekisterinumero",
+        "el": "Πινακίδα κυκλοφορίας",
+        "ru": "Госномер",
+        "uk": "Номерний знак",
+        "ar": "رقم اللوحة"
+      },
+      "hint": {
+        "en": "E.g. ABC 123",
+        "sv": "T.ex. ABC 123",
+        "cs": "Např. ABC 123",
+        "da": "Fx ABC 123",
+        "de": "Z. B. ABC 123",
+        "et": "Nt ABC 123",
+        "es": "P. ej. ABC 123",
+        "fr": "P. ex. ABC 123",
+        "it": "Ad es. ABC 123",
+        "lv": "Piem., ABC 123",
+        "lt": "Pvz., ABC 123",
+        "hu": "Pl. ABC 123",
+        "nl": "Bijv. ABC 123",
+        "nb": "F.eks. ABC 123",
+        "pl": "Np. ABC 123",
+        "pt": "P. ex. ABC 123",
+        "ro": "De ex. ABC 123",
+        "fi": "Esim. ABC 123",
+        "el": "Π.χ. ABC 123",
+        "ru": "Например, ABC 123",
+        "uk": "Наприклад, ABC 123",
+        "ar": "مثلاً ABC 123"
+      },
+      "required": true,
+      "suggestions": [
+        {
+          "value": "Saknas",
+          "title": {
+            "en": "No plates",
+            "sv": "Saknas",
+            "cs": "Bez značky",
+            "da": "Ingen nummerplade",
+            "de": "Kein Kennzeichen",
+            "et": "Numbrimärk puudub",
+            "es": "Sin matrícula",
+            "fr": "Pas de plaque",
+            "it": "Senza targa",
+            "lv": "Nav numura zīmes",
+            "lt": "Be numerio",
+            "hu": "Nincs rendszám",
+            "nl": "Geen kenteken",
+            "nb": "Mangler skilt",
+            "pl": "Brak tablic",
+            "pt": "Sem matrícula",
+            "ro": "Fără numere",
+            "fi": "Ei kilpiä",
+            "el": "Χωρίς πινακίδες",
+            "ru": "Без номеров",
+            "uk": "Без номерів",
+            "ar": "بلا لوحات"
+          }
+        }
+      ],
+      "maxLength": 20
+    },
+    {
+      "id": "make",
+      "kind": "text",
+      "title": {
+        "en": "Make",
+        "sv": "Märke",
+        "cs": "Značka",
+        "da": "Mærke",
+        "de": "Marke",
+        "et": "Mark",
+        "es": "Marca",
+        "fr": "Marque",
+        "it": "Marca",
+        "lv": "Marka",
+        "lt": "Markė",
+        "hu": "Márka",
+        "nl": "Merk",
+        "nb": "Merke",
+        "pl": "Marka",
+        "pt": "Marca",
+        "ro": "Marcă",
+        "fi": "Merkki",
+        "el": "Μάρκα",
+        "ru": "Марка",
+        "uk": "Марка",
+        "ar": "الماركة"
+      },
+      "hint": {
+        "en": "E.g. Volvo",
+        "sv": "T.ex. Volvo",
+        "cs": "Např. Volvo",
+        "da": "Fx Volvo",
+        "de": "Z. B. Volvo",
+        "et": "Nt Volvo",
+        "es": "P. ej. Volvo",
+        "fr": "P. ex. Volvo",
+        "it": "Ad es. Volvo",
+        "lv": "Piem., Volvo",
+        "lt": "Pvz., Volvo",
+        "hu": "Pl. Volvo",
+        "nl": "Bijv. Volvo",
+        "nb": "F.eks. Volvo",
+        "pl": "Np. Volvo",
+        "pt": "P. ex. Volvo",
+        "ro": "De ex. Volvo",
+        "fi": "Esim. Volvo",
+        "el": "Π.χ. Volvo",
+        "ru": "Например, Volvo",
+        "uk": "Наприклад, Volvo",
+        "ar": "مثلاً Volvo"
+      },
+      "required": true,
+      "suggestions": [
+        {
+          "value": "Volvo",
+          "title": {
+            "en": "Volvo",
+            "sv": "Volvo",
+            "cs": "Volvo",
+            "da": "Volvo",
+            "de": "Volvo",
+            "et": "Volvo",
+            "es": "Volvo",
+            "fr": "Volvo",
+            "it": "Volvo",
+            "lv": "Volvo",
+            "lt": "Volvo",
+            "hu": "Volvo",
+            "nl": "Volvo",
+            "nb": "Volvo",
+            "pl": "Volvo",
+            "pt": "Volvo",
+            "ro": "Volvo",
+            "fi": "Volvo",
+            "el": "Volvo",
+            "ru": "Volvo",
+            "uk": "Volvo",
+            "ar": "Volvo"
+          }
+        },
+        {
+          "value": "Volkswagen",
+          "title": {
+            "en": "Volkswagen",
+            "sv": "Volkswagen",
+            "cs": "Volkswagen",
+            "da": "Volkswagen",
+            "de": "Volkswagen",
+            "et": "Volkswagen",
+            "es": "Volkswagen",
+            "fr": "Volkswagen",
+            "it": "Volkswagen",
+            "lv": "Volkswagen",
+            "lt": "Volkswagen",
+            "hu": "Volkswagen",
+            "nl": "Volkswagen",
+            "nb": "Volkswagen",
+            "pl": "Volkswagen",
+            "pt": "Volkswagen",
+            "ro": "Volkswagen",
+            "fi": "Volkswagen",
+            "el": "Volkswagen",
+            "ru": "Volkswagen",
+            "uk": "Volkswagen",
+            "ar": "Volkswagen"
+          }
+        },
+        {
+          "value": "Toyota",
+          "title": {
+            "en": "Toyota",
+            "sv": "Toyota",
+            "cs": "Toyota",
+            "da": "Toyota",
+            "de": "Toyota",
+            "et": "Toyota",
+            "es": "Toyota",
+            "fr": "Toyota",
+            "it": "Toyota",
+            "lv": "Toyota",
+            "lt": "Toyota",
+            "hu": "Toyota",
+            "nl": "Toyota",
+            "nb": "Toyota",
+            "pl": "Toyota",
+            "pt": "Toyota",
+            "ro": "Toyota",
+            "fi": "Toyota",
+            "el": "Toyota",
+            "ru": "Toyota",
+            "uk": "Toyota",
+            "ar": "Toyota"
+          }
+        },
+        {
+          "value": "Saab",
+          "title": {
+            "en": "Saab",
+            "sv": "Saab",
+            "cs": "Saab",
+            "da": "Saab",
+            "de": "Saab",
+            "et": "Saab",
+            "es": "Saab",
+            "fr": "Saab",
+            "it": "Saab",
+            "lv": "Saab",
+            "lt": "Saab",
+            "hu": "Saab",
+            "nl": "Saab",
+            "nb": "Saab",
+            "pl": "Saab",
+            "pt": "Saab",
+            "ro": "Saab",
+            "fi": "Saab",
+            "el": "Saab",
+            "ru": "Saab",
+            "uk": "Saab",
+            "ar": "Saab"
+          }
+        },
+        {
+          "value": "Ford",
+          "title": {
+            "en": "Ford",
+            "sv": "Ford",
+            "cs": "Ford",
+            "da": "Ford",
+            "de": "Ford",
+            "et": "Ford",
+            "es": "Ford",
+            "fr": "Ford",
+            "it": "Ford",
+            "lv": "Ford",
+            "lt": "Ford",
+            "hu": "Ford",
+            "nl": "Ford",
+            "nb": "Ford",
+            "pl": "Ford",
+            "pt": "Ford",
+            "ro": "Ford",
+            "fi": "Ford",
+            "el": "Ford",
+            "ru": "Ford",
+            "uk": "Ford",
+            "ar": "Ford"
+          }
+        },
+        {
+          "value": "Vet inte",
+          "title": {
+            "en": "Not sure",
+            "sv": "Vet inte",
+            "cs": "Nevím",
+            "da": "Ved ikke",
+            "de": "Weiß nicht",
+            "et": "Ei tea",
+            "es": "No lo sé",
+            "fr": "Je ne sais pas",
+            "it": "Non so",
+            "lv": "Nezinu",
+            "lt": "Nežinau",
+            "hu": "Nem tudom",
+            "nl": "Weet ik niet",
+            "nb": "Vet ikke",
+            "pl": "Nie wiem",
+            "pt": "Não sei",
+            "ro": "Nu știu",
+            "fi": "En tiedä",
+            "el": "Δεν ξέρω",
+            "ru": "Не знаю",
+            "uk": "Не знаю",
+            "ar": "لا أعرف"
+          }
+        }
+      ]
+    },
+    {
+      "id": "colour",
+      "kind": "text",
+      "title": {
+        "en": "Colour",
+        "sv": "Färg",
+        "cs": "Barva",
+        "da": "Farve",
+        "de": "Farbe",
+        "et": "Värv",
+        "es": "Color",
+        "fr": "Couleur",
+        "it": "Colore",
+        "lv": "Krāsa",
+        "lt": "Spalva",
+        "hu": "Szín",
+        "nl": "Kleur",
+        "nb": "Farge",
+        "pl": "Kolor",
+        "pt": "Cor",
+        "ro": "Culoare",
+        "fi": "Väri",
+        "el": "Χρώμα",
+        "ru": "Цвет",
+        "uk": "Колір",
+        "ar": "اللون"
+      },
+      "required": true,
+      "suggestions": [
+        {
+          "value": "Vit",
+          "title": {
+            "en": "White",
+            "sv": "Vit",
+            "cs": "Bílá",
+            "da": "Hvid",
+            "de": "Weiß",
+            "et": "Valge",
+            "es": "Blanco",
+            "fr": "Blanc",
+            "it": "Bianco",
+            "lv": "Balta",
+            "lt": "Balta",
+            "hu": "Fehér",
+            "nl": "Wit",
+            "nb": "Hvit",
+            "pl": "Biały",
+            "pt": "Branco",
+            "ro": "Alb",
+            "fi": "Valkoinen",
+            "el": "Λευκό",
+            "ru": "Белый",
+            "uk": "Білий",
+            "ar": "أبيض"
+          }
+        },
+        {
+          "value": "Svart",
+          "title": {
+            "en": "Black",
+            "sv": "Svart",
+            "cs": "Černá",
+            "da": "Sort",
+            "de": "Schwarz",
+            "et": "Must",
+            "es": "Negro",
+            "fr": "Noir",
+            "it": "Nero",
+            "lv": "Melna",
+            "lt": "Juoda",
+            "hu": "Fekete",
+            "nl": "Zwart",
+            "nb": "Svart",
+            "pl": "Czarny",
+            "pt": "Preto",
+            "ro": "Negru",
+            "fi": "Musta",
+            "el": "Μαύρο",
+            "ru": "Чёрный",
+            "uk": "Чорний",
+            "ar": "أسود"
+          }
+        },
+        {
+          "value": "Grå",
+          "title": {
+            "en": "Grey",
+            "sv": "Grå",
+            "cs": "Šedá",
+            "da": "Grå",
+            "de": "Grau",
+            "et": "Hall",
+            "es": "Gris",
+            "fr": "Gris",
+            "it": "Grigio",
+            "lv": "Pelēka",
+            "lt": "Pilka",
+            "hu": "Szürke",
+            "nl": "Grijs",
+            "nb": "Grå",
+            "pl": "Szary",
+            "pt": "Cinzento",
+            "ro": "Gri",
+            "fi": "Harmaa",
+            "el": "Γκρι",
+            "ru": "Серый",
+            "uk": "Сірий",
+            "ar": "رمادي"
+          }
+        },
+        {
+          "value": "Silver",
+          "title": {
+            "en": "Silver",
+            "sv": "Silver",
+            "cs": "Stříbrná",
+            "da": "Sølv",
+            "de": "Silber",
+            "et": "Hõbedane",
+            "es": "Plateado",
+            "fr": "Argent",
+            "it": "Argento",
+            "lv": "Sudraba",
+            "lt": "Sidabrinė",
+            "hu": "Ezüst",
+            "nl": "Zilver",
+            "nb": "Sølv",
+            "pl": "Srebrny",
+            "pt": "Prateado",
+            "ro": "Argintiu",
+            "fi": "Hopea",
+            "el": "Ασημί",
+            "ru": "Серебристый",
+            "uk": "Сріблястий",
+            "ar": "فضي"
+          }
+        },
+        {
+          "value": "Röd",
+          "title": {
+            "en": "Red",
+            "sv": "Röd",
+            "cs": "Červená",
+            "da": "Rød",
+            "de": "Rot",
+            "et": "Punane",
+            "es": "Rojo",
+            "fr": "Rouge",
+            "it": "Rosso",
+            "lv": "Sarkana",
+            "lt": "Raudona",
+            "hu": "Piros",
+            "nl": "Rood",
+            "nb": "Rød",
+            "pl": "Czerwony",
+            "pt": "Vermelho",
+            "ro": "Roșu",
+            "fi": "Punainen",
+            "el": "Κόκκινο",
+            "ru": "Красный",
+            "uk": "Червоний",
+            "ar": "أحمر"
+          }
+        },
+        {
+          "value": "Blå",
+          "title": {
+            "en": "Blue",
+            "sv": "Blå",
+            "cs": "Modrá",
+            "da": "Blå",
+            "de": "Blau",
+            "et": "Sinine",
+            "es": "Azul",
+            "fr": "Bleu",
+            "it": "Blu",
+            "lv": "Zila",
+            "lt": "Mėlyna",
+            "hu": "Kék",
+            "nl": "Blauw",
+            "nb": "Blå",
+            "pl": "Niebieski",
+            "pt": "Azul",
+            "ro": "Albastru",
+            "fi": "Sininen",
+            "el": "Μπλε",
+            "ru": "Синий",
+            "uk": "Синій",
+            "ar": "أزرق"
+          }
+        },
+        {
+          "value": "Grön",
+          "title": {
+            "en": "Green",
+            "sv": "Grön",
+            "cs": "Zelená",
+            "da": "Grøn",
+            "de": "Grün",
+            "et": "Roheline",
+            "es": "Verde",
+            "fr": "Vert",
+            "it": "Verde",
+            "lv": "Zaļa",
+            "lt": "Žalia",
+            "hu": "Zöld",
+            "nl": "Groen",
+            "nb": "Grønn",
+            "pl": "Zielony",
+            "pt": "Verde",
+            "ro": "Verde",
+            "fi": "Vihreä",
+            "el": "Πράσινο",
+            "ru": "Зелёный",
+            "uk": "Зелений",
+            "ar": "أخضر"
+          }
+        }
+      ]
+    }
+  ],
+  "tiles": [
+    {
+      "id": "abandoned-car",
+      "symbol": "car",
+      "categoryID": "vehicles",
+      "title": {
+        "en": "Abandoned vehicle",
+        "sv": "Övergivet fordon",
+        "cs": "Opuštěné vozidlo",
+        "da": "Efterladt køretøj",
+        "de": "Verlassenes Fahrzeug",
+        "et": "Mahajäetud sõiduk",
+        "es": "Vehículo abandonado",
+        "fr": "Véhicule abandonné",
+        "it": "Veicolo abbandonato",
+        "lv": "Pamests transportlīdzeklis",
+        "lt": "Apleista transporto priemonė",
+        "hu": "Elhagyott jármű",
+        "nl": "Achtergelaten voertuig",
+        "nb": "Forlatt kjøretøy",
+        "pl": "Porzucony pojazd",
+        "pt": "Veículo abandonado",
+        "ro": "Vehicul abandonat",
+        "fi": "Hylätty ajoneuvo",
+        "el": "Εγκαταλελειμμένο όχημα",
+        "ru": "Брошенный автомобиль",
+        "uk": "Покинутий автомобіль",
+        "ar": "مركبة مهجورة"
+      },
+      "questionIDs": [
+        "vehicleType",
+        "registration",
+        "make",
+        "colour"
+      ]
+    }
+  ],
+  "validation": {
+    "descriptionMin": 0,
+    "descriptionMax": 1000,
+    "descriptionRequired": false,
+    "emailRequiredWhenFeedback": false,
+    "requireLocation": true,
+    "photoRequired": false
+  },
+  "descriptionTitle": {
+    "en": "Anything else?",
+    "sv": "Övrigt",
+    "cs": "Ještě něco?",
+    "da": "Andet?",
+    "de": "Sonst noch etwas?",
+    "et": "Midagi veel?",
+    "es": "¿Algo más?",
+    "fr": "Autre chose ?",
+    "it": "Altro?",
+    "lv": "Kas vēl?",
+    "lt": "Kas nors dar?",
+    "hu": "Egyéb?",
+    "nl": "Nog iets?",
+    "nb": "Noe mer?",
+    "pl": "Coś jeszcze?",
+    "pt": "Mais alguma coisa?",
+    "ro": "Altceva?",
+    "fi": "Muuta?",
+    "el": "Κάτι άλλο;",
+    "ru": "Что-то ещё?",
+    "uk": "Щось іще?",
+    "ar": "شيء آخر؟"
+  },
+  "descriptionPrompt": {
+    "en": "E.g. how long it has been there",
+    "sv": "T.ex. hur länge den har stått där",
+    "cs": "Např. jak dlouho tam stojí",
+    "da": "Fx hvor længe den har stået der",
+    "de": "Z. B. wie lange es schon dort steht",
+    "et": "Nt kui kaua see seal on seisnud",
+    "es": "P. ej. cuánto tiempo lleva ahí",
+    "fr": "P. ex. depuis combien de temps il est là",
+    "it": "Ad es. da quanto tempo è lì",
+    "lv": "Piem., cik ilgi tas tur stāv",
+    "lt": "Pvz., kiek laiko jis ten stovi",
+    "hu": "Pl. mióta áll ott",
+    "nl": "Bijv. hoe lang hij er al staat",
+    "nb": "F.eks. hvor lenge den har stått der",
+    "pl": "Np. jak długo tam stoi",
+    "pt": "P. ex. há quanto tempo está lá",
+    "ro": "De ex. de cât timp stă acolo",
+    "fi": "Esim. kuinka kauan se on seissyt siellä",
+    "el": "Π.χ. πόσο καιρό βρίσκεται εκεί",
+    "ru": "Например, как долго она там стоит",
+    "uk": "Наприклад, як довго вона там стоїть",
+    "ar": "مثلاً منذ متى وهي هناك"
+  },
+  "webFormURL": "https://service.varmdo.se/VKSKROTBIL",
+  "disclaimer": {
+    "en": "Fixa is an independent open-source app and is not part of Värmdö kommun. It sends your report straight to the municipality's e-service “Anmälan om flytt av skrotbil”, and the municipality handles it the usual way. Call 112 if life or property is in danger.",
+    "sv": "Fixa är en fristående app med öppen källkod och ingen del av Värmdö kommun. Appen skickar din anmälan direkt till kommunens e-tjänst Anmälan om flytt av skrotbil, och kommunen hanterar ärendet på sitt vanliga sätt. Ring 112 om liv eller egendom är i fara.",
+    "cs": "Fixa je nezávislá aplikace s otevřeným zdrojovým kódem a není součástí Värmdö kommun. Odešle vaše hlášení přímo do e-služby obce „Anmälan om flytt av skrotbil“ a obec ho vyřídí obvyklým způsobem. Pokud je ohrožen život nebo majetek, volejte 112.",
+    "da": "Fixa er en uafhængig app med åben kildekode og er ikke en del af Värmdö kommun. Den sender din anmeldelse direkte til kommunens e-tjeneste »Anmälan om flytt av skrotbil«, og kommunen behandler den på sædvanlig vis. Ring 112, hvis liv eller ejendom er i fare.",
+    "de": "Fixa ist eine unabhängige Open-Source-App und gehört nicht zu Värmdö kommun. Die App sendet Ihre Meldung direkt an den E-Service der Gemeinde „Anmälan om flytt av skrotbil“, und die Gemeinde bearbeitet sie wie gewohnt. Rufen Sie 112 an, wenn Leben oder Eigentum in Gefahr sind.",
+    "et": "Fixa on sõltumatu avatud lähtekoodiga rakendus ega kuulu omavalitsusele Värmdö kommun. See saadab teie teate otse omavalitsuse e-teenusesse „Anmälan om flytt av skrotbil” ja omavalitsus menetleb seda tavapärasel viisil. Kui elu või vara on ohus, helistage 112.",
+    "es": "Fixa es una app independiente de código abierto y no forma parte de Värmdö kommun. Envía tu aviso directamente al servicio electrónico del municipio «Anmälan om flytt av skrotbil», que lo gestiona de la forma habitual. Llama al 112 si hay peligro para personas o bienes.",
+    "fr": "Fixa est une app indépendante et open source, qui ne fait pas partie de Värmdö kommun. Elle envoie votre signalement directement au service en ligne de la commune « Anmälan om flytt av skrotbil », qui le traite de la manière habituelle. Appelez le 112 si des vies ou des biens sont en danger.",
+    "it": "Fixa è un'app indipendente e open source e non fa parte di Värmdö kommun. Invia la tua segnalazione direttamente al servizio online del comune «Anmälan om flytt av skrotbil», e il comune la gestisce come di consueto. Chiama il 112 se ci sono pericoli per persone o cose.",
+    "lv": "Fixa ir neatkarīga atvērtā koda lietotne, un tā nav saistīta ar Värmdö kommun. Tā nosūta jūsu ziņojumu tieši pašvaldības e-pakalpojumam “Anmälan om flytt av skrotbil”, un pašvaldība to izskata ierastajā kārtībā. Zvaniet 112, ja apdraudēta dzīvība vai īpašums.",
+    "lt": "Fixa yra nepriklausoma atvirojo kodo programėlė ir nėra Värmdö kommun dalis. Ji siunčia jūsų pranešimą tiesiai į savivaldybės e. paslaugą „Anmälan om flytt av skrotbil“, o savivaldybė jį nagrinėja įprasta tvarka. Skambinkite 112, jei gresia pavojus gyvybei ar turtui.",
+    "hu": "A Fixa független, nyílt forráskódú alkalmazás, és nem része a Värmdö kommunnak. A bejelentését közvetlenül az önkormányzat „Anmälan om flytt av skrotbil” e-szolgáltatásába küldi, az önkormányzat pedig a szokásos módon intézi. Ha élet vagy vagyon van veszélyben, hívja a 112-t.",
+    "nl": "Fixa is een onafhankelijke opensource-app en hoort niet bij Värmdö kommun. De app stuurt je melding rechtstreeks naar de e-dienst ‘Anmälan om flytt av skrotbil’ van de gemeente, en de gemeente behandelt die op de gewone manier. Bel 112 als levens of eigendommen in gevaar zijn.",
+    "nb": "Fixa er en uavhengig app med åpen kildekode og er ikke en del av Värmdö kommun. Appen sender meldingen din direkte til kommunens e-tjeneste «Anmälan om flytt av skrotbil», og kommunen behandler den på vanlig måte. Ring 112 hvis liv eller eiendom er i fare.",
+    "pl": "Fixa to niezależna aplikacja open source, która nie należy do gminy Värmdö. Wysyła Twoje zgłoszenie bezpośrednio do e-usługi gminy „Anmälan om flytt av skrotbil”, a gmina zajmuje się nim w zwykły sposób. Jeśli zagrożone jest życie lub mienie, dzwoń pod 112.",
+    "pt": "A Fixa é uma app independente de código aberto e não faz parte de Värmdö kommun. Envia a sua participação diretamente para o serviço online do município «Anmälan om flytt av skrotbil», que a trata da forma habitual. Ligue 112 se houver perigo para pessoas ou bens.",
+    "ro": "Fixa este o aplicație independentă, open-source, și nu face parte din Värmdö kommun. Trimite sesizarea dumneavoastră direct la serviciul online al comunei „Anmälan om flytt av skrotbil”, iar comuna o tratează în mod obișnuit. Sunați la 112 dacă viața sau bunurile cuiva sunt în pericol.",
+    "fi": "Fixa on itsenäinen avoimen lähdekoodin sovellus, eikä se ole osa Värmdön kuntaa. Sovellus lähettää ilmoituksesi suoraan kunnan sähköiseen palveluun ”Anmälan om flytt av skrotbil”, ja kunta käsittelee sen tavalliseen tapaan. Soita 112, jos henki tai omaisuus on vaarassa.",
+    "el": "Το Fixa είναι μια ανεξάρτητη εφαρμογή ανοιχτού κώδικα και δεν ανήκει στο Värmdö kommun. Στέλνει την αναφορά σας απευθείας στην ηλεκτρονική υπηρεσία του δήμου «Anmälan om flytt av skrotbil», και ο δήμος τη διαχειρίζεται με τον συνήθη τρόπο. Καλέστε το 112 αν κινδυνεύουν ζωές ή περιουσίες.",
+    "ru": "Fixa является независимым приложением с открытым исходным кодом и не относится к коммуне Värmdö. Оно отправляет вашу заявку напрямую в электронную услугу коммуны «Anmälan om flytt av skrotbil», и коммуна рассматривает её в обычном порядке. Если под угрозой жизнь или имущество, звоните 112.",
+    "uk": "Fixa — незалежний застосунок із відкритим кодом, який не належить комуні Вермдьо. Він надсилає ваше повідомлення безпосередньо до електронного сервісу комуни «Anmälan om flytt av skrotbil», і комуна розглядає його у звичайному порядку. Якщо є загроза життю чи майну, телефонуйте 112.",
+    "ar": "Fixa تطبيق مستقل ومفتوح المصدر، وليس جزءاً من بلدية فارمدو. يرسل التطبيق بلاغك مباشرة إلى الخدمة الإلكترونية للبلدية «Anmälan om flytt av skrotbil»، وتتعامل البلدية معه بالطريقة المعتادة. اتصل بالرقم 112 إذا كانت الأرواح أو الممتلكات في خطر."
+  },
+  "contact": {
+    "pageURL": "https://www.varmdo.se/kommunochpolitik/kontaktcenter.4.1a4e4f4413f7b9c98702cd2.html",
+    "title": {
+      "sv": "Värmdö kommuns kontaktcenter",
+      "en": "Värmdö kommun contact centre",
+      "fi": "Värmdön kunnan asiakaspalvelu",
+      "ar": "مركز الاتصال في بلدية فارمدو",
+      "uk": "Контактний центр комуни Вермдьо",
+      "pl": "Centrum kontaktowe gminy Värmdö",
+      "ru": "Контактный центр коммуны Värmdö",
+      "de": "Kontaktcenter von Värmdö kommun",
+      "fr": "Centre de contact de Värmdö kommun",
+      "es": "Centro de contacto de Värmdö kommun",
+      "it": "Centro contatti di Värmdö kommun",
+      "pt": "Centro de contacto de Värmdö kommun",
+      "nl": "Contactcentrum van Värmdö kommun",
+      "da": "Värmdö kommuns kontaktcenter",
+      "nb": "Kontaktsenteret i Värmdö kommun",
+      "et": "Värmdö kommun: kontaktkeskus",
+      "lv": "Värmdö kommun kontaktu centrs",
+      "lt": "Värmdö kommun kontaktų centras",
+      "ro": "Centrul de contact Värmdö kommun",
+      "el": "Κέντρο επικοινωνίας του Värmdö kommun",
+      "hu": "Värmdö kommun kapcsolattartási központja",
+      "cs": "Kontaktní centrum Värmdö kommun"
+    }
+  },
+  "allowedWebHosts": [
+    "varmdo.se",
+    "www.varmdo.se",
+    "service.varmdo.se"
+  ]
+}

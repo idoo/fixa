@@ -4,17 +4,18 @@
 
 **Report a problem in your municipality from your phone.** On the App Store as *Fixa: felanmälan till kommunen* (English: *Fixa: Report Local Problems*).
 
-Fixa is an independent, open-source iPhone app for reporting everyday faults in your municipality: a street light that is out, a pothole, graffiti, a broken playground, a blocked drain in the street. You pick what's wrong, take a photo, drop a pin, and Fixa sends the report straight to the municipality's own e-service. Acute water and sewer faults are phoned in, not reported in the app.
+Fixa is an independent, open-source iPhone app for reporting everyday faults in your municipality: a street light that is out, a pothole, graffiti, a broken playground, a blocked drain in the street, an overflowing recycling station, a bin that wasn't emptied, invasive plants, an abandoned car. You pick what's wrong, take a photo, drop a pin, and Fixa sends the report straight to the municipality's own e-service. Acute water and sewer faults are phoned in, not reported in the app.
 
 **Fixa is not made by, endorsed by, or affiliated with any municipality.** It is a citizen-built tool that fills in the municipality's public web form for you, in a form that works better on a phone. Reports end up in the same queue as reports sent through the website.
 
-The first supported municipality is Värmdö (Stockholm County). Adding another is a matter of writing one JSON file; see [docs/ADAPTERS.md](docs/ADAPTERS.md).
+The first supported municipality is Värmdö (Stockholm County), with five of its e-services: the fault report for streets, parks, water and sewer, and under *More forms* the recycling-station report, missed bin collection, invasive plants and abandoned vehicles. Each e-service is one JSON file, and so is adding another municipality; see [docs/ADAPTERS.md](docs/ADAPTERS.md).
 
 ## Why
 
-Fixa sends the same report to the same destination as Värmdö's own fault-report form, and adds:
+Fixa sends the same report to the same destination as Värmdö's own web forms, and adds:
 
-- eight large tiles for the common cases, mapped to the form's categories;
+- eight large tiles for the common cases, mapped to the fault-report form's categories;
+- four more of the municipality's forms, each reduced to its few real questions with tap-to-pick answers (which station, what needs emptying, which plant, the car's plate and colour), so nobody has to type Swedish form terms;
 - GPS, a real map and address search; coordinates go into both the place text and the form's map field;
 - up to three photos, merged into the single attachment the form accepts, with metadata stripped;
 - a one-tap call for acute water and sewer faults only, picking the right number for the time of day (service centre or the after-hours water/sewer duty line);
@@ -26,7 +27,7 @@ Fixa sends the same report to the same destination as Värmdö's own fault-repor
 
 ## How it works
 
-There is no Fixa server. The app talks directly to the municipality's e-service ([Abou](https://www.abou.se/) e-tjänsteplattform): it opens a fresh anonymous session, posts each page with the same fields the website sends (the photo goes to the form's own upload), presses *Slutför*, and reads the confirmation page. Everything about a municipality is described in an adapter file (`adapters/*.json`), validated by `schema/adapter.schema.json`: URLs, page IDs, field keys, categories, tiles, emergency numbers, opening hours and public holidays. No code change is needed.
+There is no Fixa server. The app talks directly to the municipality's e-service ([Abou](https://www.abou.se/) e-tjänsteplattform): it opens a fresh anonymous session, posts each page with the same fields the website sends (the photo goes to the form's own upload), presses *Slutför*, and reads the confirmation page. Every e-service is described in an adapter file (`adapters/*.json`), validated by `schema/adapter.schema.json`: URLs, page IDs, field keys, categories, tiles, questions and their answers, emergency numbers, opening hours and public holidays. No code change is needed.
 
 ```
 FixaKit/          Swift package: adapter spec, Abou client and parser, validation, tests, fixa-cli
@@ -79,10 +80,10 @@ Fixa sends your report only to the municipality's e-service. Your e-mail, name a
 
 Fixa is an independent app by one developer; it is not run or approved by the kommun. Contact: [support@jvcr.se](mailto:support@jvcr.se).
 
-- **What is sent.** Only what a resident chooses to send, when they press Send: the same fields the website form has (område, plats, map position, beskrivning, one photo, and name, phone and e-mail only when a reply is wanted). Nothing in a report names the app. One report is one walk through the form, about ten requests with a short pause between them.
+- **What is sent.** Only what a resident chooses to send, when they press Send: the same fields the e-service's website form has. For Felanmälan (KSB): område, plats, map position, beskrivning, one photo, and name, phone and e-mail only when a reply is wanted. For FELATER, anmutbsop, invasivaarter and VKSKROTBIL: the answers the form asks for (station, what needs doing, pickup address, plant, vehicle details), one photo where the form takes one, and the contact fields the form has, filled only with what the resident typed. Optional fields the resident can't know (fastighetsbeteckning, postnummer) stay empty, as on the website. Nothing in a report names the app. One report is one walk through the form, about ten requests with a short pause between them.
 - **How often.** Only when a resident sends. A phone sends at most 5 reports an hour and 15 a day, warns before a repeat report of the same problem within 14 days, and never re-sends a report whose final step may already have gone through.
 - **No automatic traffic.** No test reports, no scheduled checks, no polling of the e-service. A failed send is retried a few times with growing pauses, honouring `Retry-After`.
-- **Stopping Fixa.** If the kommun asks, we set Värmdö's state in `adapters/status.json` to `down`: installed apps then stop sending and point residents to the kommun's own web form. If the e-service answers 401/403 or asks for a sign-in, the app stops by itself and does the same. We don't work around blocks.
+- **Stopping Fixa.** If the kommun asks, we set the e-service's state in `adapters/status.json` to `down` (each e-service has its own entry): installed apps then stop sending to it and point residents to the kommun's own web form. If the e-service answers 401/403 or asks for a sign-in, the app stops by itself and does the same. We don't work around blocks.
 - **Questions from residents.** Fixa doesn't take them and doesn't phone or e-mail the kommun for them. "Questions about this report?" and "Other questions?" copy the case number and open the kommun's Kontaktcenter page (adapter `contact`) in an in-app Safari view; only acute water and sewer faults (VA-jouren / servicecenter during office hours) and 112 are calls. Questions about the app go to the developer, not the kommun.
 
 ## For other municipalities

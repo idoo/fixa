@@ -3,26 +3,35 @@ import Observation
 import FixaKit
 import os
 
-/// The municipality adapter the app runs, updatable without an App Store release.
+/// The municipality adapters the app runs, updatable without an App Store release.
 ///
-/// Starts from the copy cached by an earlier update (if this app build accepted it), else the bundled one.
+/// Holds every bundled adapter: the primary one (Home's tile grid) and the other e-services ("More forms").
+/// Each starts from the copy cached by an earlier update (if this app build accepted it), else the bundled one.
 /// Fixa contacts GitHub only when a send has just failed because the municipality's form changed:
-/// `refreshAfterFormChange()` then fetches the adapter and `status.json`, each with its Ed25519 `.sig`, and
-/// caches what `AdapterUpdatePolicy` and `AdapterStatus.decodeMap` accept (signature included). No periodic
-/// or on-launch checks. A downloaded adapter may never change where reports go (`AdapterSpecValidator`).
-/// Failures and rejections are only logged: the current adapter and status stay in place.
+/// `refreshAfterFormChange(adapterID:)` then fetches that adapter and `status.json`, each with its Ed25519
+/// `.sig`, and caches what `AdapterUpdatePolicy` and `AdapterStatus.decodeMap` accept (signature included).
+/// No periodic or on-launch checks. A downloaded adapter may never change where reports go
+/// (`AdapterSpecValidator`). Failures and rejections are only logged: the current adapter and status stay.
 @MainActor @Observable
 final class AdapterStore {
-    private(set) var spec: AdapterSpec?
-    private(set) var status: AdapterStatus = .ok
+    /// Primary first, then the other e-services by `service.order`, then id.
+    private(set) var specs: [AdapterSpec] = []
+    /// The status file's map, by adapter id; a missing id is ok.
+    private var statuses: [String: AdapterStatus] = [:]
 
-    @ObservationIgnored private let bundled: AdapterSpec?
+    /// The primary adapter (KSB).
+    var spec: AdapterSpec? { spec(id: primaryID) }
+    /// The primary adapter's status.
+    var status: AdapterStatus { status(id: primaryID) }
+
+    @ObservationIgnored let primaryID: String
+    @ObservationIgnored private let bundled: [String: AdapterSpec]
     @ObservationIgnored private let defaults: UserDefaults
-    @ObservationIgnored private var isRefreshing = false
+    @ObservationIgnored private var refreshing: Set<String> = []
 
     nonisolated private static let remoteHost = "raw.githubusercontent.com"
     nonisolated private static let remoteBase = URL(string: "https://raw.githubusercontent.com/idoo/fixa/main/adapters/")!
-    /// Floor between two checks, so repeated failures can't hammer GitHub.
+    /// Floor between two checks of one adapter, so repeated failures can't hammer GitHub.
     private static let minimumGap: TimeInterval = 15 * 60
     private static let lastCheckKey = "adapterStore.lastCheck"
     private static let cacheBuildKey = "adapterStore.cacheBuild"
@@ -47,42 +56,59 @@ final class AdapterStore {
     init(adapterID: String, defaults: UserDefaults = .standard) {
         self.defaults = defaults
         let shipped = AdapterCatalog.bundled()
-        bundled = shipped.first { $0.id == adapterID } ?? shipped.first
-        spec = bundled
+        primaryID = shipped.contains { $0.id == adapterID } ? adapterID : (shipped.first?.id ?? adapterID)
+        bundled = Dictionary(shipped.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
 
-        // A cache written by another build may predate the adapter this build ships: drop it.
+        // A cache written by another build may predate the adapters this build ships: drop it.
         if defaults.integer(forKey: Self.cacheBuildKey) != Self.appBuild {
-            defaults.removeObject(forKey: Self.lastCheckKey)
+            for id in bundled.keys {
+                defaults.removeObject(forKey: Self.lastCheckKey(id, primary: id == primaryID))
+            }
             try? FileManager.default.removeItem(at: Self.cacheDirectory)
             defaults.set(Self.appBuild, forKey: Self.cacheBuildKey)
         }
-        if let bundled, let data = try? Data(contentsOf: Self.adapterCacheURL(bundled.id)) {
-            do {
-                let signature = try? Data(contentsOf: Self.signatureURL(Self.adapterCacheURL(bundled.id)))
-                spec = try AdapterUpdatePolicy.check(remote: data, signature: signature, bundled: bundled, appBuild: Self.appBuild)
-            } catch {
-                Self.log.notice("Ignoring cached adapter: \(String(describing: error), privacy: .public)")
+        var loaded: [AdapterSpec] = []
+        for original in shipped where loaded.allSatisfy({ $0.id != original.id }) {
+            var current = original
+            if let data = try? Data(contentsOf: Self.adapterCacheURL(original.id)) {
+                do {
+                    let signature = try? Data(contentsOf: Self.signatureURL(Self.adapterCacheURL(original.id)))
+                    current = try AdapterUpdatePolicy.check(remote: data, signature: signature, bundled: original, appBuild: Self.appBuild)
+                } catch {
+                    Self.log.notice("Ignoring cached adapter \(original.id, privacy: .public): \(String(describing: error), privacy: .public)")
+                }
             }
+            loaded.append(current)
         }
-        if let id = spec?.id, let data = try? Data(contentsOf: Self.statusCacheURL),
+        specs = Self.ordered(loaded, primaryID: primaryID)
+        if let data = try? Data(contentsOf: Self.statusCacheURL),
            let map = try? AdapterStatus.decodeMap(data, signature: try? Data(contentsOf: Self.signatureURL(Self.statusCacheURL))) {
-            status = map[id] ?? .ok
+            statuses = map
         }
     }
 
-    /// Call only after a send failed because the form changed. Fetches the signed adapter and status
-    /// (at most once per 15 minutes) and returns true when a different adapter was accepted, so the
-    /// caller can retry that send once; the failed send stopped before the final step, so a retry is safe.
-    @discardableResult
-    func refreshAfterFormChange() async -> Bool {
-        guard let bundled, !isRefreshing else { return false }
-        if let last = defaults.object(forKey: Self.lastCheckKey) as? Date,
-           Date.now.timeIntervalSince(last) < Self.minimumGap { return false }
-        isRefreshing = true
-        defer { isRefreshing = false }
-        let before = spec
+    func spec(id: String) -> AdapterSpec? {
+        specs.first { $0.id == id }
+    }
 
-        let adapterFile = "\(bundled.id.replacingOccurrences(of: ".", with: "-")).json"
+    func status(id: String) -> AdapterStatus {
+        statuses[id] ?? .ok
+    }
+
+    /// Call only after a send failed because the form changed. Fetches the signed adapter and status
+    /// (at most once per 15 minutes per adapter) and returns true when a different adapter was accepted,
+    /// so the caller can retry that send once; the failed send stopped before the final step, so a retry is safe.
+    @discardableResult
+    func refreshAfterFormChange(adapterID: String) async -> Bool {
+        guard let original = bundled[adapterID], !refreshing.contains(adapterID) else { return false }
+        let checkKey = Self.lastCheckKey(adapterID, primary: adapterID == primaryID)
+        if let last = defaults.object(forKey: checkKey) as? Date,
+           Date.now.timeIntervalSince(last) < Self.minimumGap { return false }
+        refreshing.insert(adapterID)
+        defer { refreshing.remove(adapterID) }
+        let before = spec(id: adapterID)
+
+        let adapterFile = "\(adapterID.replacingOccurrences(of: ".", with: "-")).json"
         async let adapterData = Self.fetch(adapterFile)
         async let adapterSignature = Self.fetch(adapterFile + ".sig")
         async let statusData = Self.fetch("status.json")
@@ -90,32 +116,45 @@ final class AdapterStore {
         let (remoteAdapter, remoteAdapterSignature) = await (adapterData, adapterSignature)
         let (remoteStatus, remoteStatusSignature) = await (statusData, statusSignature)
         guard remoteAdapter != nil || remoteStatus != nil else { return false }
-        defaults.set(Date.now, forKey: Self.lastCheckKey)
+        defaults.set(Date.now, forKey: checkKey)
 
         var changed = false
         if let remoteAdapter {
             do {
                 let accepted = try AdapterUpdatePolicy.check(remote: remoteAdapter, signature: remoteAdapterSignature,
-                                                             bundled: bundled, appBuild: Self.appBuild)
+                                                             bundled: original, appBuild: Self.appBuild)
                 let encoder = JSONEncoder()
                 encoder.outputFormatting = .sortedKeys
                 changed = (try? encoder.encode(accepted)) != (try? encoder.encode(before))
-                spec = accepted
-                Self.store(remoteAdapter, signature: remoteAdapterSignature, at: Self.adapterCacheURL(bundled.id))
+                specs = Self.ordered(specs.filter { $0.id != adapterID } + [accepted], primaryID: primaryID)
+                Self.store(remoteAdapter, signature: remoteAdapterSignature, at: Self.adapterCacheURL(adapterID))
             } catch {
-                Self.log.error("Rejected downloaded adapter, keeping the current one: \(String(describing: error), privacy: .public)")
+                Self.log.error("Rejected downloaded adapter \(adapterID, privacy: .public), keeping the current one: \(String(describing: error), privacy: .public)")
             }
         }
         if let remoteStatus {
             do {
-                let map = try AdapterStatus.decodeMap(remoteStatus, signature: remoteStatusSignature)
-                status = map[bundled.id] ?? .ok
+                statuses = try AdapterStatus.decodeMap(remoteStatus, signature: remoteStatusSignature)
                 Self.store(remoteStatus, signature: remoteStatusSignature, at: Self.statusCacheURL)
             } catch {
                 Self.log.error("Rejected downloaded status, keeping the current one: \(String(describing: error), privacy: .public)")
             }
         }
         return changed
+    }
+
+    /// Primary first, then adapters with a `service` by its order, then the rest; ties by id.
+    private static func ordered(_ specs: [AdapterSpec], primaryID: String) -> [AdapterSpec] {
+        specs.sorted { lhs, rhs in
+            let left = (lhs.id == primaryID ? 0 : 1, lhs.service?.order ?? Int.max)
+            let right = (rhs.id == primaryID ? 0 : 1, rhs.service?.order ?? Int.max)
+            return left != right ? left < right : lhs.id < rhs.id
+        }
+    }
+
+    /// The primary keeps the key earlier builds wrote.
+    private static func lastCheckKey(_ id: String, primary: Bool) -> String {
+        primary ? lastCheckKey : "\(lastCheckKey).\(id)"
     }
 
     // MARK: - Network and cache

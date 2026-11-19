@@ -15,9 +15,27 @@ public enum AbouPageParser {
 
     /// The `action` of the main form, HTML-unescaped and still relative (e.g. `./BlockPage.aspx?eServiceName=KSB&PageId=FaultReport`).
     public static func formAction(_ html: String) -> String? {
+        mainForm(html)?["action"]
+    }
+
+    /// Whether the main form posts `multipart/form-data` (pages with an `<input type="file">`).
+    public static func isMultipartForm(_ html: String) -> Bool {
+        mainForm(html)?["enctype"]?.lowercased() == "multipart/form-data"
+    }
+
+    /// Names of every `<input type="file">` with a name, in page order, HTML-unescaped.
+    public static func fileInputNames(_ html: String) -> [String] {
+        matches(#"<input\b[^>]*>"#, in: html, options: [.caseInsensitive]).compactMap { m in
+            let attributes = attributes(of: m[0])
+            guard attributes["type"]?.lowercased() == "file", let name = attributes["name"], !name.isEmpty else { return nil }
+            return name
+        }
+    }
+
+    /// Attributes of the `MainForm` form, else of the first form.
+    static func mainForm(_ html: String) -> [String: String]? {
         let forms = matches(#"<form\b[^>]*>"#, in: html, options: [.caseInsensitive]).map { attributes(of: $0[0]) }
-        let form = forms.first { $0["id"] == "MainForm" } ?? forms.first
-        return form?["action"]
+        return forms.first { $0["id"] == "MainForm" } ?? forms.first
     }
 
     public static func fieldName(_ html: String, key: String, control: String) -> String? {
