@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Coordinate: Codable, Sendable, Equatable {
+public struct Coordinate: Codable, Sendable, Hashable {
     public var latitude: Double
     public var longitude: Double
 
@@ -11,6 +11,29 @@ public struct Coordinate: Codable, Sendable, Equatable {
 
     /// `"lat,lng"` in WGS84 decimal degrees, e.g. `59.3262,18.3856`.
     var formValue: String { "\(latitude),\(longitude)" }
+}
+
+extension Coordinate {
+    /// Great-circle distance in metres (haversine on a 6 371 km sphere; under 0.5 % off at these scales).
+    public func distance(to other: Coordinate) -> Double {
+        let radians = Double.pi / 180
+        let dLat = (other.latitude - latitude) * radians
+        let dLon = (other.longitude - longitude) * radians
+        let a = sin(dLat / 2) * sin(dLat / 2)
+            + cos(latitude * radians) * cos(other.latitude * radians) * sin(dLon / 2) * sin(dLon / 2)
+        return 2 * 6_371_000 * atan2(sqrt(a), sqrt(1 - a))
+    }
+}
+
+extension AdapterSpec.Question {
+    /// The options that carry a `location`, nearest to `point` first, with their distance in metres.
+    /// Options without one are left out; ties keep the adapter's order.
+    public func locatedOptions(nearestTo point: Coordinate) -> [(option: AdapterSpec.QuestionOption, meters: Double)] {
+        (options ?? []).enumerated()
+            .compactMap { index, option in option.location.map { (index, option, point.distance(to: $0)) } }
+            .sorted { $0.2 != $1.2 ? $0.2 < $1.2 : $0.0 < $1.0 }
+            .map { (option: $0.1, meters: $0.2) }
+    }
 }
 
 public struct Contact: Codable, Sendable, Equatable {

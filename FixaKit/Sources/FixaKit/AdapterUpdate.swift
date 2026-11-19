@@ -93,6 +93,22 @@ extension AdapterSpec {
             if values.isEmpty { problems.append("question \(q.id) has no options") }
             if Set(values).count != values.count { problems.append("question \(q.id) has duplicate option values") }
         }
+        for q in questions ?? [] {
+            for option in q.suggestions ?? [] where option.location != nil {
+                problems.append("question \(q.id) suggestion \(option.value) location is only allowed on choice options")
+            }
+            for option in q.options ?? [] {
+                guard let location = option.location else { continue }
+                if q.kind != .choice {
+                    problems.append("question \(q.id) option \(option.value) location is only allowed on choice questions")
+                }
+                if !location.latitude.isFinite || !location.longitude.isFinite {
+                    problems.append("question \(q.id) option \(option.value) location is not a finite coordinate")
+                } else if !municipality.region.contains(location) {
+                    problems.append("question \(q.id) option \(option.value) location is outside the municipality")
+                }
+            }
+        }
         for tile in tiles {
             for (id, values) in tile.answers ?? [:] {
                 guard let q = question(id: id) else {

@@ -198,6 +198,9 @@ public struct AdapterSpec: Codable, Sendable, Identifiable {
         /// Exact option value (choices) or the Swedish text (suggestions) sent to the form.
         public let value: String
         public let title: LocalizedText
+        /// `choice` options that are places (a recycling station): where it is, inside the
+        /// municipality's `region.bbox`. The app offers the nearest one and sorts by distance.
+        public var location: Coordinate?
         public var id: String { value }
     }
 

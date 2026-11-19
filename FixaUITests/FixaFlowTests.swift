@@ -1,3 +1,4 @@
+import CoreLocation
 import XCTest
 
 /// End-to-end flows in demo mode (`-FixaDemo 1`): nothing leaves the phone, nothing is saved.
@@ -276,6 +277,41 @@ final class FixaFlowTests: XCTestCase {
         XCTAssertFalse(app.descendants(matching: .any).matching(identifier: "review.send").firstMatch.waitForExistence(timeout: 2), "Review opened without the required photo")
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS[c] 'photo'")).firstMatch.exists, "No photo issue shown")
         shot("h-recycling-photo-required")
+    }
+
+    /// "Find the nearest" from a simulated position by the Coop car park in Gustavsberg centrum picks that
+    /// station and says how far it is. If the permission alert doesn't come up, grant it first:
+    /// `xcrun simctl privacy booted grant location-always se.jvcr.fixa` (the app's bundle id).
+    @MainActor
+    func testI_NearestStationFromLocation() {
+        XCUIDevice.shared.location = XCUILocation(location: CLLocation(latitude: 59.32820, longitude: 18.39280))
+        let monitor = addUIInterruptionMonitor(withDescription: "Location permission") { alert in
+            for title in ["Allow While Using App", "Allow Once", "Allow"] where alert.buttons[title].exists {
+                alert.buttons[title].tap()
+                return true
+            }
+            return false
+        }
+        defer { removeUIInterruptionMonitor(monitor) }
+        let app = launch(["-FixaLanguage", "en"])
+        openService(app, "se.varmdo.felater")
+        let nearest = element(app, "report.question.station.nearest")
+        reveal(app, nearest)
+        nearest.tap()
+        // The monitor only runs on the next interaction with the app.
+        app.swipeDown()
+        let note = element(app, "report.question.station.nearestNote", timeout: 20)
+        XCTAssertTrue(note.label.contains("Nearest to you"), "Unexpected note: \(note.label)")
+        let menu = element(app, "report.question.station.menu")
+        XCTAssertTrue(menu.label.contains("Gustavsberg centrum"), "Not the Gustavsberg centrum station: \(menu.label)")
+        shot("i-recycling-nearest-station")
+        // With a position the menu lists stations nearest first (adapter order would start with Djurö).
+        menu.tap()
+        let first = element(app, "report.question.station.option.0")
+        let second = element(app, "report.question.station.option.1")
+        XCTAssertTrue(first.label.contains("Gustavsberg centrum") && second.label.contains("Hästhagen"),
+                      "Menu isn't nearest first: \(first.label), \(second.label)")
+        shot("i-recycling-nearest-menu")
     }
 
     /// Home › More forms › `adapterID`. The demo's unsent street-light report belongs to another form,

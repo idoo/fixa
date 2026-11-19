@@ -36,6 +36,8 @@ struct ReportScreen: View {
     @FocusState private var questionKeyboardFocus: String?
     /// Bumped when another problem of a multi-tile form is chosen: drives the selection haptic.
     @State private var tileTaps = 0
+    /// Problem icon, sized like Home's service rows.
+    @ScaledMetric(relativeTo: .body) private var tileIconSide: CGFloat = 40
 
     /// Form sections, top to bottom: required first, optional last.
     private enum Section: Int, Comparable, Hashable {
@@ -79,7 +81,8 @@ struct ReportScreen: View {
                                     question: question,
                                     spec: spec,
                                     a11yFocus: $questionA11yFocus,
-                                    keyboardFocus: $questionKeyboardFocus
+                                    keyboardFocus: $questionKeyboardFocus,
+                                    photoPlace: photoPlace
                                 )
                                 .id(QuestionField.scrollID(question.id))
                             }
@@ -275,12 +278,7 @@ struct ReportScreen: View {
             model.select(tile: tile)
         } label: {
             HStack(spacing: Fx.Space.m) {
-                Image(systemName: tile.symbol)
-                    .font(Fx.Font.headline)
-                    .foregroundStyle(Fx.Color.categoryGlyph(tile.categoryID))
-                    .frame(width: Fx.minTarget, height: Fx.minTarget)
-                    .background(Fx.Color.categoryTint(tile.categoryID), in: RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous))
-                    .accessibilityHidden(true)
+                FxCategoryIcon(systemImage: tile.symbol, categoryID: tile.categoryID, side: min(tileIconSide, 72))
                 Text(title)
                     .font(Fx.Font.headline)
                     .foregroundStyle(Fx.Color.ink)
@@ -292,6 +290,7 @@ struct ReportScreen: View {
                     .foregroundStyle(selected ? Fx.Color.sea : Fx.Color.ink2)
                     .accessibilityHidden(true)
             }
+            .padding(.vertical, Fx.Space.s)
             .frame(maxWidth: .infinity, minHeight: Fx.minTarget, alignment: .leading)
             .contentShape(.rect)
         }
@@ -387,12 +386,7 @@ struct ReportScreen: View {
             } label: {
                 FxCard {
                     rowLayout {
-                        Image(systemName: tile?.symbol ?? "questionmark.circle")
-                            .font(Fx.Font.headline)
-                            .foregroundStyle(Fx.Color.categoryGlyph(tile?.categoryID))
-                            .frame(width: Fx.minTarget, height: Fx.minTarget)
-                            .background(Fx.Color.categoryTint(tile?.categoryID), in: RoundedRectangle(cornerRadius: Fx.Radius.s, style: .continuous))
-                            .accessibilityHidden(true)
+                        FxCategoryIcon(systemImage: tile?.symbol ?? "questionmark.circle", categoryID: tile?.categoryID, side: min(tileIconSide, 72))
                         Text(title)
                             .font(Fx.Font.headline)
                             .foregroundStyle(Fx.Color.ink)
@@ -404,6 +398,7 @@ struct ReportScreen: View {
                             .font(Fx.Font.callout)
                             .foregroundStyle(Fx.Color.sea)
                     }
+                    .padding(.vertical, Fx.Space.s)
                     .frame(maxWidth: .infinity, minHeight: Fx.minTarget, alignment: .leading)
                 }
             }

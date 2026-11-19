@@ -293,161 +293,184 @@
           "title": {
             "sv": "Djurö, utanför ÅVC (Djuröhällsvägen)",
             "en": "Djurö, utanför ÅVC (Djuröhällsvägen)"
-          }
+          },
+          "location": {"latitude": 59.30271, "longitude": 18.67715}
         },
         {
           "value": "780002, Bullandö Marina|, Ingen insamling",
           "title": {
             "sv": "Bullandö Marina",
             "en": "Bullandö Marina"
-          }
+          },
+          "location": {"latitude": 59.30036, "longitude": 18.65136}
         },
         {
           "value": "780003, Grisslinge|Skärgårdsvägen 160, Human Bridge",
           "title": {
             "sv": "Grisslinge (Skärgårdsvägen 160)",
             "en": "Grisslinge (Skärgårdsvägen 160)"
-          }
+          },
+          "location": {"latitude": 59.31305, "longitude": 18.45240}
         },
         {
           "value": "780004, Munkmora/Skyttevägen|Skyttevägen 25-27, Myrorna",
           "title": {
             "sv": "Munkmora/Skyttevägen (Skyttevägen 25-27)",
             "en": "Munkmora/Skyttevägen (Skyttevägen 25-27)"
-          }
+          },
+          "location": {"latitude": 59.33368, "longitude": 18.39898}
         },
         {
           "value": "780005, Gustavsberg centrum|Coop parkeringen, Myrorna",
           "title": {
             "sv": "Gustavsberg centrum (Coop parkeringen)",
             "en": "Gustavsberg centrum (Coop parkeringen)"
-          }
+          },
+          "location": {"latitude": 59.32848, "longitude": 18.39323}
         },
         {
           "value": "780006, Hemmesta centrum|Skärgårdsvägen, Human Bridge",
           "title": {
             "sv": "Hemmesta centrum (Skärgårdsvägen)",
             "en": "Hemmesta centrum (Skärgårdsvägen)"
-          }
+          },
+          "location": {"latitude": 59.32272, "longitude": 18.48717}
         },
         {
           "value": "780007, Holmviksskogen Fyren|Skärgårdsvägen, Myrorna",
           "title": {
             "sv": "Holmviksskogen Fyren (Skärgårdsvägen)",
             "en": "Holmviksskogen Fyren (Skärgårdsvägen)"
-          }
+          },
+          "location": {"latitude": 59.31822, "longitude": 18.40916}
         },
         {
           "value": "780008, Långvik, Ingarö|Långviksvägen, Myrorna",
           "title": {
             "sv": "Långvik, Ingarö (Långviksvägen)",
             "en": "Långvik, Ingarö (Långviksvägen)"
-          }
+          },
+          "location": {"latitude": 59.24300, "longitude": 18.50833}
         },
         {
           "value": "780009, Södra Kopparmora|Angöringsvägen, Human Bridge",
           "title": {
             "sv": "Södra Kopparmora (Angöringsvägen)",
             "en": "Södra Kopparmora (Angöringsvägen)"
-          }
+          },
+          "location": {"latitude": 59.33270, "longitude": 18.58656}
         },
         {
           "value": "780010, Stavsnäs, ICA|, Human Bridge",
           "title": {
             "sv": "Stavsnäs, ICA",
             "en": "Stavsnäs, ICA"
-          }
+          },
+          "location": {"latitude": 59.28679, "longitude": 18.68897}
         },
         {
           "value": "780011, Djurö Björkås|Björkås centrum, Human Bridge",
           "title": {
             "sv": "Djurö Björkås (Björkås centrum)",
             "en": "Djurö Björkås (Björkås centrum)"
-          }
+          },
+          "location": {"latitude": 59.31129, "longitude": 18.70069}
         },
         {
           "value": "780012, Östra Ekedal|Gezelius Väg, Kapellvägen, Myrorna",
           "title": {
             "sv": "Östra Ekedal (Gezelius Väg, Kapellvägen)",
             "en": "Östra Ekedal (Gezelius Väg, Kapellvägen)"
-          }
+          },
+          "location": {"latitude": 59.32827, "longitude": 18.37447}
         },
         {
           "value": "780013, Stavsnäs Vinterhamn|Stavsnäs vinterhamn, Human Bridge",
           "title": {
             "sv": "Stavsnäs Vinterhamn (Stavsnäs vinterhamn)",
             "en": "Stavsnäs Vinterhamn (Stavsnäs vinterhamn)"
-          }
+          },
+          "location": {"latitude": 59.28631, "longitude": 18.70321}
         },
         {
           "value": "780014, Farsta Slottsvik|Godeniusvägen, Odelbergsvägen, Ingen insamling",
           "title": {
             "sv": "Farsta Slottsvik (Godeniusvägen, Odelbergsvägen)",
             "en": "Farsta Slottsvik (Godeniusvägen, Odelbergsvägen)"
-          }
+          },
+          "location": {"latitude": 59.32110, "longitude": 18.37420}
         },
         {
           "value": "780015, Hästhagen|Gamle Svartens väg 1, Myrorna",
           "title": {
             "sv": "Hästhagen (Gamle Svartens väg 1)",
             "en": "Hästhagen (Gamle Svartens väg 1)"
-          }
+          },
+          "location": {"latitude": 59.32241, "longitude": 18.39448}
         },
         {
           "value": "780016, Styrmannen|Björnskogsvägen, Myrorna",
           "title": {
             "sv": "Styrmannen (Björnskogsvägen)",
             "en": "Styrmannen (Björnskogsvägen)"
-          }
+          },
+          "location": {"latitude": 59.33851, "longitude": 18.39709}
         },
         {
           "value": "780017, Mölnviks Handelsplats, Lidl|Medeas väg 2, Myrorna",
           "title": {
             "sv": "Mölnviks Handelsplats, Lidl (Medeas väg 2)",
             "en": "Mölnviks Handelsplats, Lidl (Medeas väg 2)"
-          }
+          },
+          "location": {"latitude": 59.31204, "longitude": 18.42363}
         },
         {
           "value": "780018, Hemmestatorp|Värmdövägen, Ingen insamling",
           "title": {
             "sv": "Hemmestatorp (Värmdövägen)",
             "en": "Hemmestatorp (Värmdövägen)"
-          }
+          },
+          "location": {"latitude": 59.32889, "longitude": 18.50089}
         },
         {
           "value": "780019, Fågelbro pendlarparkering|Stavsnäsvägen, Fågelbro, Human Bridge",
           "title": {
             "sv": "Fågelbro pendlarparkering (Stavsnäsvägen, Fågelbro)",
             "en": "Fågelbro pendlarparkering (Stavsnäsvägen, Fågelbro)"
-          }
+          },
+          "location": {"latitude": 59.28216, "longitude": 18.57028}
         },
         {
           "value": "780020, Brunn pendlarparkering/Näsuddsvägen|Näsuddsvägen, Eknäsvägen, Myrorna",
           "title": {
             "sv": "Brunn pendlarparkering/Näsuddsvägen (Näsuddsvägen, Eknäsvägen)",
             "en": "Brunn pendlarparkering/Näsuddsvägen (Näsuddsvägen, Eknäsvägen)"
-          }
+          },
+          "location": {"latitude": 59.28122, "longitude": 18.43434}
         },
         {
           "value": "780021, Villagatan/Porslinsfabriken|Villagatan, Kvarntorpsvägen, Human Bridge",
           "title": {
             "sv": "Villagatan/Porslinsfabriken (Villagatan, Kvarntorpsvägen)",
             "en": "Villagatan/Porslinsfabriken (Villagatan, Kvarntorpsvägen)"
-          }
+          },
+          "location": {"latitude": 59.32183, "longitude": 18.38753}
         },
         {
           "value": "780022, Sollenkroka hamn|Lövdalsvägen, Human Bridge",
           "title": {
             "sv": "Sollenkroka hamn (Lövdalsvägen)",
             "en": "Sollenkroka hamn (Lövdalsvägen)"
-          }
+          },
+          "location": {"latitude": 59.37274, "longitude": 18.69807}
         },
         {
           "value": "780024, Ekobacken|Leveransvägen 29, Human Bridge",
           "title": {
             "sv": "Ekobacken (Leveransvägen 29)",
             "en": "Ekobacken (Leveransvägen 29)"
-          }
+          },
+          "location": {"latitude": 59.30973, "longitude": 18.37911}
         }
       ]
     },
